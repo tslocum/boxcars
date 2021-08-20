@@ -1,6 +1,7 @@
 package game
 
 import (
+	"bytes"
 	"embed"
 	"fmt"
 	"image"
@@ -53,13 +54,17 @@ var (
 )
 
 func init() {
-	imgCheckerWhite = loadAsset("assets/checker_white.png")
-	imgCheckerBlack = loadAsset("assets/checker_black.png")
+	loadAssets(0)
 
 	initializeFonts()
 }
 
-func loadAsset(assetPath string) *ebiten.Image {
+func loadAssets(width int) {
+	imgCheckerWhite = loadAsset("assets/checker_white.png", width)
+	imgCheckerBlack = loadAsset("assets/checker_black.png", width)
+}
+
+func loadAsset(assetPath string, width int) *ebiten.Image {
 	f, err := assetsFS.Open(assetPath)
 	if err != nil {
 		panic(err)
@@ -70,9 +75,11 @@ func loadAsset(assetPath string) *ebiten.Image {
 		log.Fatal(err)
 	}
 
-	imgResized := resize.Resize(100, 0, img, resize.Lanczos3)
-
-	return ebiten.NewImageFromImage(imgResized)
+	if width > 0 {
+		imgResized := resize.Resize(uint(width), 0, img, resize.Lanczos3)
+		return ebiten.NewImageFromImage(imgResized)
+	}
+	return ebiten.NewImageFromImage(img)
 
 }
 
@@ -161,14 +168,12 @@ func line(x0, y0, x1, y1 float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
 }
 
 type Sprite struct {
-	image *ebiten.Image
-	w     int
-	h     int
-	x     int
-	y     int
-	vx    int
-	vy    int
-	angle int
+	image      *ebiten.Image
+	w          int
+	h          int
+	x          int
+	y          int
+	colorWhite bool
 }
 
 func (s *Sprite) Update() {
@@ -198,6 +203,8 @@ type Game struct {
 	board    *board
 
 	screenW, screenH int
+
+	drawBuffer bytes.Buffer
 }
 
 func NewGame() *Game {
@@ -270,8 +277,22 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	debugBox := image.NewRGBA(image.Rect(10, 20, 200, 200))
 	debugImg := ebiten.NewImageFromImage(debugBox)
 
-	msg := fmt.Sprintf("FPS %0.0f\nTPS %0.0f\n%s", ebiten.CurrentTPS(), ebiten.CurrentFPS(), debugExtra)
-	ebitenutil.DebugPrint(debugImg, msg)
+	g.drawBuffer.Reset()
+
+	g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %0.0f\nTPS %0.0f", ebiten.CurrentFPS(), ebiten.CurrentTPS())))
+
+	scaleFactor := ebiten.DeviceScaleFactor()
+	if scaleFactor != 1.0 {
+		g.drawBuffer.WriteRune('\n')
+		g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f", scaleFactor)))
+	}
+
+	if debugExtra != nil {
+		g.drawBuffer.WriteRune('\n')
+		g.drawBuffer.Write(debugExtra)
+	}
+
+	ebitenutil.DebugPrint(debugImg, g.drawBuffer.String())
 
 	g.resetImageOptions()
 	g.op.GeoM.Translate(3, 0)
@@ -286,8 +307,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 
-	g.board.setRect(300, 25, g.screenW-325, g.screenH-50)
+	g.board.setRect(300, 0, g.screenW-300, g.screenH)
 
+	// TODO use scale factor
 	return outsideWidth, outsideHeight
 }
 

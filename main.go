@@ -16,7 +16,7 @@ func main() {
 	ebiten.SetWindowTitle("Boxcars")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowResizable(true)
-	ebiten.SetMaxTPS(144)               // TODO tune
+	ebiten.SetMaxTPS(60)                // TODO allow users to set custom value
 	ebiten.SetRunnableOnUnfocused(true) // Note - this currently does nothing in ebiten
 
 	//ebiten.SetWindowClosingHandled(true) TODO implement
