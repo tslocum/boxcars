@@ -307,7 +307,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 
-	g.board.setRect(300, 0, g.screenW-300, g.screenH)
+	g.board.setRect(0, 0, g.screenW, g.screenH)
 
 	// TODO use scale factor
 	return outsideWidth, outsideHeight

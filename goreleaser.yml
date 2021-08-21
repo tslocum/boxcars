@@ -1,0 +1,30 @@
+project_name: boxcars
+
+builds:
+  -
+    id: boxcars
+#    ldflags:
+#      - -s -w -X code.rocketnine.space/tslocum/boxcars/main.Version={{.Version}}
+    goos:
+      - linux
+      - windows
+#      - darwin
+#      - freebsd
+    goarch:
+      - amd64
+archives:
+  -
+    id: boxcars
+    builds:
+      - boxcars
+    replacements:
+      386: i386
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - ./*.md
+#      - CHANGELOG
+      - LICENSE
+checksum:
+  name_template: 'checksums.txt'

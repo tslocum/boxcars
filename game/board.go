@@ -3,7 +3,6 @@ package game
 import (
 	"image"
 	"image/color"
-	"log"
 	"math/rand"
 
 	"github.com/llgcode/draw2d/draw2dimg"
@@ -16,6 +15,8 @@ import (
 type board struct {
 	Sprites *Sprites
 	op      *ebiten.DrawImageOptions
+
+	spaces [][]*Sprite
 
 	backgroundImage *ebiten.Image
 
@@ -44,9 +45,10 @@ func NewBoard() *board {
 		verticalBorderSize:   25,
 		overlapSize:          97,
 		Sprites: &Sprites{
-			sprites: make([]*Sprite, 24),
-			num:     24,
+			sprites: make([]*Sprite, 30),
+			num:     30,
 		},
+		spaces: make([][]*Sprite, 26),
 	}
 
 	for i := range b.Sprites.sprites {
@@ -58,6 +60,13 @@ func NewBoard() *board {
 		s.w, s.h = imgCheckerWhite.Size()
 
 		b.Sprites.sprites[i] = s
+
+		space := (i % 24) + 1
+		if i > 25 {
+			space = 3
+		}
+
+		b.spaces[space] = append(b.spaces[space], s)
 	}
 
 	b.op = &ebiten.DrawImageOptions{}
@@ -69,7 +78,6 @@ func NewBoard() *board {
 
 // relX, relY
 func (b *board) spacePosition(index int) (int, int) {
-	log.Printf("%d", index)
 	if index <= 12 {
 		return b.spaceWidth * (index - 1), 0
 	}
@@ -78,15 +86,26 @@ func (b *board) spacePosition(index int) (int, int) {
 }
 
 func (b *board) updateBackgroundImage() {
-	// TODO percentage of screen instead
+	tableColor := color.RGBA{0, 102, 51, 255}
 
-	borderColor := color.RGBA{65, 40, 14, 255}
-
-	// Border
+	// Table
 	box := image.NewRGBA(image.Rect(0, 0, b.w, b.h))
 	img := ebiten.NewImageFromImage(box)
-	img.Fill(borderColor)
+	img.Fill(tableColor)
 	b.backgroundImage = ebiten.NewImageFromImage(img)
+
+	// Border
+	borderColor := color.RGBA{65, 40, 14, 255}
+	borderSize := b.horizontalBorderSize
+	if borderSize > b.barWidth/2 {
+		borderSize = b.barWidth / 2
+	}
+	box = image.NewRGBA(image.Rect(0, 0, b.w-((b.horizontalBorderSize-borderSize)*2), b.h))
+	img = ebiten.NewImageFromImage(box)
+	img.Fill(borderColor)
+	b.op.GeoM.Reset()
+	b.op.GeoM.Translate(float64(b.horizontalBorderSize-borderSize), float64(b.verticalBorderSize))
+	b.backgroundImage.DrawImage(img, b.op)
 
 	// Face
 	box = image.NewRGBA(image.Rect(0, 0, b.w-(b.horizontalBorderSize*2), b.h-(b.verticalBorderSize*2)))
@@ -172,14 +191,35 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.x, b.y, b.w, b.h = x, y, w, h
 
-	b.spaceWidth = ((b.w - (b.horizontalBorderSize * 2)) - b.barWidth) / 12
+	b.horizontalBorderSize = 0
+
+	b.triangleOffset = float64(b.h) / 30
+
+	for {
+		b.verticalBorderSize = 0 // TODO configurable
+
+		b.spaceWidth = (b.w - (b.horizontalBorderSize * 2)) / 13
+
+		b.barWidth = b.spaceWidth
+
+		b.overlapSize = (((b.h - (b.verticalBorderSize * 2)) - (int(b.triangleOffset) * 2)) / 2) / 5
+		if b.overlapSize >= b.spaceWidth {
+			b.overlapSize = b.spaceWidth
+			break
+		}
+
+		b.horizontalBorderSize++
+	}
+
+	b.horizontalBorderSize = ((b.w - (b.spaceWidth * 12)) - b.barWidth) / 2
+	if b.horizontalBorderSize < 0 {
+		b.horizontalBorderSize = 0
+	}
 
 	loadAssets(b.spaceWidth)
 	for i := 0; i < b.Sprites.num; i++ {
 		s := b.Sprites.sprites[i]
-		log.Printf("%d-%d", s.w, s.h)
 		s.w, s.h = imgCheckerWhite.Size()
-		log.Printf("NEW %d-%d", s.w, s.h)
 	}
 
 	b.updateBackgroundImage()
@@ -191,28 +231,23 @@ func (b *board) offsetPosition(x, y int) (int, int) {
 }
 
 func (b *board) positionCheckers() {
-	// TODO slightly overlap to save space
-	for i := 0; i < b.Sprites.num; i++ {
-		s := b.Sprites.sprites[i]
-		if b.dragging == s {
-			continue
+	for space := 1; space < 25; space++ {
+		sprites := b.spaces[space]
+
+		for i := range sprites {
+			s := sprites[i]
+			if b.dragging == s {
+				continue
+			}
+
+			x, y := b.spacePosition(space)
+			s.x, s.y = b.offsetPosition(x, y)
+			if (space > 6 && space < 13) || (space > 18 && space < 25) {
+				s.x += b.barWidth
+			}
+			s.x += (b.spaceWidth - s.w) / 2
+			s.y += i * b.overlapSize
 		}
-
-		spaceIndex := i + 1
-
-		x, y := b.spacePosition(spaceIndex)
-		s.x, s.y = b.offsetPosition(x, y)
-		if (spaceIndex > 6 && spaceIndex < 13) || (spaceIndex > 18 && spaceIndex < 25) {
-			s.x += b.barWidth
-		}
-		s.x += (b.spaceWidth - s.w) / 2
-
-		/* multiple pieces
-		if i <= 12 {
-			s.y += b.overlapSize
-		} else {
-			s.y -= b.overlapSize
-		}*/
 	}
 }
 
