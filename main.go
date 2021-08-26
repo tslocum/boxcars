@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"flag"
 	"log"
+	"os"
+	"time"
 
 	"code.rocketnine.space/tslocum/boxcars/game"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -19,6 +23,10 @@ func main() {
 	ebiten.SetMaxTPS(60)                // TODO allow users to set custom value
 	ebiten.SetRunnableOnUnfocused(true) // Note - this currently does nothing in ebiten
 
+	// TODO set up system to call scheduleframe automatically
+	//ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMinimum)
+	// TODO breaks justpressedkey
+
 	//ebiten.SetWindowClosingHandled(true) TODO implement
 
 	fullscreenWidth, fullscreenHeight := ebiten.ScreenSizeInFullscreen()
@@ -26,7 +34,41 @@ func main() {
 		ebiten.SetFullscreen(true)
 	}
 
-	if err := ebiten.RunGame(game.NewGame()); err != nil {
+	g := game.NewGame()
+
+	flag.StringVar(&g.Username, "username", "", "Username")
+	flag.StringVar(&g.Password, "password", "", "Password")
+	flag.StringVar(&g.ServerAddress, "address", "fibs.com:4321", "Server address")
+	flag.BoolVar(&g.Watch, "watch", false, "Watch random game")
+	flag.Parse()
+
+	// Auto-connect
+	if g.Username != "" && g.Password != "" {
+		g.Connect()
+	}
+
+	go func() {
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			// TODO temporary
+			if string(scanner.Bytes()) == "/board" {
+				g.Client.Out <- []byte("set boardstyle 2")
+				time.Sleep(time.Second / 2)
+				g.Client.Out <- []byte("board")
+				time.Sleep(time.Second / 2)
+				g.Client.Out <- []byte("set boardstyle 3")
+				continue
+			}
+
+			g.Client.Out <- append(scanner.Bytes())
+		}
+
+		if scanner.Err() != nil {
+			// TODO
+		}
+	}()
+
+	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}
 }

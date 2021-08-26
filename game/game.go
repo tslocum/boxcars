@@ -6,22 +6,19 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	_ "image/png"
 	"log"
-	"math"
-	"math/rand"
+	"strings"
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
-	"golang.org/x/image/font/opentype"
-
-	"github.com/nfnt/resize"
-
-	// Asset decoding
-	_ "image/png"
-
+	"code.rocketnine.space/tslocum/fibs"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/nfnt/resize"
 	"golang.org/x/image/font"
+	"golang.org/x/image/font/opentype"
 )
 
 // Copyright 2020 The Ebiten Authors
@@ -38,8 +35,6 @@ import (
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const maxAngle = 256
-
 //go:embed assets
 var assetsFS embed.FS
 
@@ -52,6 +47,8 @@ var (
 	mplusNormalFont font.Face
 	mplusBigFont    font.Face
 )
+
+const defaultServerAddress = "fibs.com:4321"
 
 func init() {
 	loadAssets(0)
@@ -108,65 +105,6 @@ func initializeFonts() {
 	}
 }
 
-// TODO copied
-
-func line(x0, y0, x1, y1 float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
-	const width = 1
-
-	theta := math.Atan2(float64(y1-y0), float64(x1-x0))
-	theta += math.Pi / 2
-	dx := float32(math.Cos(theta))
-	dy := float32(math.Sin(theta))
-
-	r := float32(clr.R) / 0xff
-	g := float32(clr.G) / 0xff
-	b := float32(clr.B) / 0xff
-	a := float32(clr.A) / 0xff
-
-	return []ebiten.Vertex{
-		{
-			DstX:   x0 - width*dx/2,
-			DstY:   y0 - width*dy/2,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-		{
-			DstX:   x0 + width*dx/2,
-			DstY:   y0 + width*dy/2,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-		{
-			DstX:   x1 - width*dx/2,
-			DstY:   y1 - width*dy/2,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-		{
-			DstX:   x1 + width*dx/2,
-			DstY:   y1 + width*dy/2,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-	}, []uint16{0, 1, 2, 1, 2, 3}
-}
-
 type Sprite struct {
 	image      *ebiten.Image
 	w          int
@@ -196,29 +134,105 @@ const (
 	MaxSprites = 50000
 )
 
+var spinner = []byte(`-\|/`)
+
 type Game struct {
 	touchIDs []ebiten.TouchID
 	sprites  Sprites
 	op       *ebiten.DrawImageOptions
-	board    *board
+	Board    *board
 
 	screenW, screenH int
 
 	drawBuffer bytes.Buffer
+
+	spinnerIndex int
+
+	ServerAddress     string
+	Username          string
+	Password          string
+	loggedIn          bool
+	usernameConfirmed bool
+
+	Watch bool
+
+	Client *fibs.Client
+
+	runeBuffer  []rune
+	inputBuffer string
+
+	Debug int
 }
 
 func NewGame() *Game {
-	rand.Seed(time.Now().UnixNano())
-
 	go func() {
 		// TODO fetch HTTP request, set debugExtra
 	}()
 
-	return &Game{
+	g := &Game{
 		op: &ebiten.DrawImageOptions{
 			Filter: ebiten.FilterNearest,
 		},
-		board: NewBoard(),
+		Board: NewBoard(),
+
+		runeBuffer: make([]rune, 24),
+	}
+
+	go func() {
+		t := time.NewTicker(time.Second / 4)
+		for range t.C {
+			_ = g.update()
+		}
+	}()
+
+	return g
+}
+
+func (g *Game) handleEvents() {
+	for e := range g.Client.Event {
+		switch event := e.(type) {
+		case *fibs.EventMove:
+			g.Board.movePiece(event.From, event.To)
+		}
+	}
+}
+
+func (g *Game) Connect() {
+	g.loggedIn = true
+
+	address := g.ServerAddress
+	if address == "" {
+		address = defaultServerAddress
+	}
+	g.Client = fibs.NewClient(address, g.Username, g.Password)
+
+	go g.handleEvents()
+
+	c := g.Client
+
+	if g.Watch {
+		go func() {
+			time.Sleep(1 * time.Second)
+			c.WatchRandomGame()
+
+			go g.renderLoop()
+		}()
+	}
+
+	go func() {
+		err := c.Connect()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+}
+
+func (g *Game) renderLoop() {
+	t := time.NewTicker(time.Second)
+	for range t.C {
+		gameBoard := g.Board
+		v := g.Client.Board.GetIntState()
+		gameBoard.SetState(v)
 	}
 }
 
@@ -244,7 +258,61 @@ func (g *Game) rightTouched() bool {
 	return false
 }
 
-func (g *Game) Update() error {
+// Separate update function for all normal update logic, as Update may only be
+// called when there is user input when vsync is disabled.
+func (g *Game) update() error {
+	return nil
+}
+
+func (g *Game) Update() error { // Called by ebiten only when input occurs
+	err := g.update()
+	if err != nil {
+		return err
+	}
+
+	if !g.loggedIn {
+		f := func() {
+			var clearBuffer bool
+			defer func() {
+				if clearBuffer {
+					g.inputBuffer = ""
+
+					if !g.usernameConfirmed {
+						g.usernameConfirmed = true
+					} else if g.Password != "" {
+						g.Connect()
+					}
+				}
+			}()
+
+			if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(g.inputBuffer) > 0 {
+				g.inputBuffer = g.inputBuffer[:len(g.inputBuffer)-1]
+			}
+
+			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+				clearBuffer = true
+			}
+
+			g.runeBuffer = ebiten.AppendInputChars(g.runeBuffer[:0])
+			if len(g.runeBuffer) > 0 {
+				g.inputBuffer += string(g.runeBuffer)
+
+				if strings.ContainsRune(g.inputBuffer, '\n') {
+					g.inputBuffer = strings.Split(g.inputBuffer, "\n")[0]
+					clearBuffer = true
+				}
+				if !g.usernameConfirmed {
+					g.Username = g.inputBuffer
+				} else {
+					g.Password = g.inputBuffer
+				}
+				log.Println("INPUT BUFFER IS:" + g.inputBuffer)
+			}
+		}
+
+		f()
+	}
+
 	g.touchIDs = ebiten.AppendTouchIDs(g.touchIDs[:0])
 
 	// Decrease the number of the sprites.
@@ -263,7 +331,15 @@ func (g *Game) Update() error {
 		}
 	}
 
-	g.board.update()
+	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
+		g.Debug++
+		if g.Debug == 3 {
+			g.Debug = 0
+		}
+		g.Board.debug = g.Debug
+	}
+
+	g.Board.update()
 
 	//g.sprites.Update()
 	return nil
@@ -272,44 +348,73 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0, 102, 51, 255})
 
-	g.board.draw(screen)
+	// Log in screen
+	if !g.loggedIn {
+		const welcomeText = `Please enter your FIBS username and password.
+If you do not have a FIBS account yet, visit
+http://www.fibs.com/help.html#register`
+		debugBox := image.NewRGBA(image.Rect(0, 0, g.screenW, g.screenH))
+		debugImg := ebiten.NewImageFromImage(debugBox)
 
-	debugBox := image.NewRGBA(image.Rect(10, 20, 200, 200))
-	debugImg := ebiten.NewImageFromImage(debugBox)
+		if !g.usernameConfirmed {
+			ebitenutil.DebugPrint(debugImg, welcomeText+fmt.Sprintf("\n\nUsername: %s", g.Username))
+		} else {
+			ebitenutil.DebugPrint(debugImg, welcomeText+fmt.Sprintf("\n\nPassword: %s", strings.Repeat("*", len(g.Password))))
+		}
 
-	g.drawBuffer.Reset()
-
-	g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %0.0f\nTPS %0.0f", ebiten.CurrentFPS(), ebiten.CurrentTPS())))
-
-	scaleFactor := ebiten.DeviceScaleFactor()
-	if scaleFactor != 1.0 {
-		g.drawBuffer.WriteRune('\n')
-		g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f", scaleFactor)))
+		g.resetImageOptions()
+		g.op.GeoM.Scale(2, 2)
+		screen.DrawImage(debugImg, g.op)
+		return
 	}
 
-	if debugExtra != nil {
-		g.drawBuffer.WriteRune('\n')
-		g.drawBuffer.Write(debugExtra)
+	// Game screen
+
+	g.Board.draw(screen)
+
+	if g.Debug == 1 {
+		debugBox := image.NewRGBA(image.Rect(10, 20, 200, 200))
+		debugImg := ebiten.NewImageFromImage(debugBox)
+
+		g.drawBuffer.Reset()
+
+		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %0.0f\nTPS %0.0f", ebiten.CurrentFPS(), ebiten.CurrentTPS())))
+
+		/* TODO enable when vsync is able to be turned off
+		g.spinnerIndex++
+		if g.spinnerIndex == 4 {
+			g.spinnerIndex = 0
+		}*/
+
+		scaleFactor := ebiten.DeviceScaleFactor()
+		if scaleFactor != 1.0 {
+			g.drawBuffer.WriteRune('\n')
+			g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f", scaleFactor)))
+		}
+
+		if debugExtra != nil {
+			g.drawBuffer.WriteRune('\n')
+			g.drawBuffer.Write(debugExtra)
+		}
+
+		ebitenutil.DebugPrint(debugImg, g.drawBuffer.String())
+
+		g.resetImageOptions()
+		g.op.GeoM.Translate(3, 0)
+		g.op.GeoM.Scale(2, 2)
+		screen.DrawImage(debugImg, g.op)
 	}
-
-	ebitenutil.DebugPrint(debugImg, g.drawBuffer.String())
-
-	g.resetImageOptions()
-	g.op.GeoM.Translate(3, 0)
-	g.op.GeoM.Scale(2, 2)
-	screen.DrawImage(debugImg, g.op)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+	s := ebiten.DeviceScaleFactor()
+	outsideWidth, outsideHeight = int(float64(outsideWidth)*s), int(float64(outsideHeight)*s)
 	if g.screenW == outsideWidth && g.screenH == outsideHeight {
 		return outsideWidth, outsideHeight
 	}
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
-
-	g.board.setRect(0, 0, g.screenW, g.screenH)
-
-	// TODO use scale factor
+	g.Board.setRect(0, 0, g.screenW, g.screenH)
 	return outsideWidth, outsideHeight
 }
 
