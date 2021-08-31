@@ -4,7 +4,8 @@ go 1.17
 
 require (
 	code.rocketnine.space/tslocum/fibs v0.0.0-00010101000000-000000000000
-	github.com/hajimehoshi/ebiten/v2 v2.2.0-alpha.12.0.20210825183521-91a72880271d
+	code.rocketnine.space/tslocum/kibodo v0.0.0-20210830194839-05789279ce56
+	github.com/hajimehoshi/ebiten/v2 v2.2.0-alpha.12.0.20210828073710-0e5dca9453a5
 	github.com/llgcode/draw2d v0.0.0-20210313082411-577c1ead272a
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d

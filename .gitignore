@@ -1,4 +1,5 @@
 .idea
 *.sh
 *.wasm
+boxcars
 dist

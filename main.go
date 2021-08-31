@@ -5,6 +5,8 @@ import (
 	"flag"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"code.rocketnine.space/tslocum/boxcars/game"
@@ -20,14 +22,10 @@ func main() {
 	ebiten.SetWindowTitle("Boxcars")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowResizable(true)
+	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMinimum)
 	ebiten.SetMaxTPS(60)                // TODO allow users to set custom value
 	ebiten.SetRunnableOnUnfocused(true) // Note - this currently does nothing in ebiten
-
-	// TODO set up system to call scheduleframe automatically
-	//ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMinimum)
-	// TODO breaks justpressedkey
-
-	//ebiten.SetWindowClosingHandled(true) TODO implement
+	ebiten.SetWindowClosingHandled(true)
 
 	fullscreenWidth, fullscreenHeight := ebiten.ScreenSizeInFullscreen()
 	if fullscreenWidth <= screenWidth || fullscreenHeight <= screenHeight {
@@ -66,6 +64,16 @@ func main() {
 		if scanner.Err() != nil {
 			// TODO
 		}
+	}()
+
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc,
+		syscall.SIGINT,
+		syscall.SIGTERM)
+	go func() {
+		<-sigc
+
+		g.Exit()
 	}()
 
 	if err := ebiten.RunGame(g); err != nil {

@@ -1,3 +1,5 @@
+code.rocketnine.space/tslocum/kibodo v0.0.0-20210830194839-05789279ce56 h1:+KVT4Zw9CEQkxdNP81wuTvX3EHRPpPUQFwn6UVLoMFY=
+code.rocketnine.space/tslocum/kibodo v0.0.0-20210830194839-05789279ce56/go.mod h1:nWGK8LvmYgMZQcwGMYOOuZ19VsVYL5E1hREEJ2gV46M=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/go-gl/gl v0.0.0-20180407155706-68e253793080/go.mod h1:482civXOzJJCPzJ4ZOX/pwvXBWSnzD4OKMdH4ClKGbk=
 github.com/go-gl/glfw v0.0.0-20180426074136-46a8d530c326 h1:QqWaXlVeUGwSH7hO8giZP2Y06Qjl1LWR+FWC22YQsU8=
@@ -8,8 +10,8 @@ github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 h1:DACJavvAHhabrF0
 github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0/go.mod h1:E/TSTwGwJL78qG/PmXZO1EjYhfJinVAhrmmHX6Z8B9k=
 github.com/hajimehoshi/bitmapfont/v2 v2.1.3 h1:JefUkL0M4nrdVwVq7MMZxSTh6mSxOylm+C4Anoucbb0=
 github.com/hajimehoshi/bitmapfont/v2 v2.1.3/go.mod h1:2BnYrkTQGThpr/CY6LorYtt/zEPNzvE/ND69CRTaHMs=
-github.com/hajimehoshi/ebiten/v2 v2.2.0-alpha.12.0.20210825183521-91a72880271d h1:EMEmUvZhS8hZ4eq1732CWs7aKcSWXhVvcxllfhVZc9Y=
-github.com/hajimehoshi/ebiten/v2 v2.2.0-alpha.12.0.20210825183521-91a72880271d/go.mod h1:B4Cje+Kb1ZjztrKFPaiMWOGXO3Vp8u+zIBdxkZqkyD4=
+github.com/hajimehoshi/ebiten/v2 v2.2.0-alpha.12.0.20210828073710-0e5dca9453a5 h1:fUSKz2wvklV02UTmBXXDlNKc6molRGUu5O8b80AvEa4=
+github.com/hajimehoshi/ebiten/v2 v2.2.0-alpha.12.0.20210828073710-0e5dca9453a5/go.mod h1:B4Cje+Kb1ZjztrKFPaiMWOGXO3Vp8u+zIBdxkZqkyD4=
 github.com/hajimehoshi/file2byteslice v0.0.0-20200812174855-0e5e8a80490e/go.mod h1:CqqAHp7Dk/AqQiwuhV1yT2334qbA/tFWQW0MD2dGqUE=
 github.com/hajimehoshi/go-mp3 v0.3.2/go.mod h1:qMJj/CSDxx6CGHiZeCgbiq2DSUkbK0UbtXShQcnfyMM=
 github.com/hajimehoshi/oto v0.6.1/go.mod h1:0QXGEkbuJRohbJaxr7ZQSxnju7hEhseiPx2hrh6raOI=

@@ -8,10 +8,12 @@ import (
 	"image/color"
 	_ "image/png"
 	"log"
+	"os"
 	"strings"
 	"time"
 
 	"code.rocketnine.space/tslocum/fibs"
+	"code.rocketnine.space/tslocum/kibodo"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
@@ -162,6 +164,9 @@ type Game struct {
 	inputBuffer string
 
 	Debug int
+
+	keyboard      *kibodo.Keyboard
+	shownKeyboard bool
 }
 
 func NewGame() *Game {
@@ -176,8 +181,12 @@ func NewGame() *Game {
 		Board: NewBoard(),
 
 		runeBuffer: make([]rune, 24),
-	}
 
+		keyboard: kibodo.NewKeyboard(),
+	}
+	g.keyboard.SetKeys(kibodo.KeysQWERTY)
+
+	// TODO
 	go func() {
 		t := time.NewTicker(time.Second / 4)
 		for range t.C {
@@ -270,10 +279,30 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		return err
 	}
 
+	if ebiten.IsWindowBeingClosed() {
+		g.Exit()
+		return nil
+	}
+
+	err = g.keyboard.Update()
+	if err != nil {
+		return fmt.Errorf("failed to update virtual keyboard: %s", err)
+	}
+
 	if !g.loggedIn {
 		f := func() {
 			var clearBuffer bool
 			defer func() {
+				if strings.ContainsRune(g.inputBuffer, '\n') {
+					g.inputBuffer = strings.Split(g.inputBuffer, "\n")[0]
+					clearBuffer = true
+				}
+				if !g.usernameConfirmed {
+					g.Username = g.inputBuffer
+				} else {
+					g.Password = g.inputBuffer
+				}
+
 				if clearBuffer {
 					g.inputBuffer = ""
 
@@ -284,6 +313,23 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 					}
 				}
 			}()
+
+			if !g.shownKeyboard {
+				ch := make(chan *kibodo.Input, 10)
+				go func() {
+					for input := range ch {
+						if input.Rune > 0 {
+							g.inputBuffer += string(input.Rune)
+							continue
+						}
+						if input.Key == ebiten.KeyEnter {
+							g.inputBuffer += "\n"
+						}
+					}
+				}()
+				g.keyboard.Show(ch)
+				g.shownKeyboard = true
+			}
 
 			if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(g.inputBuffer) > 0 {
 				g.inputBuffer = g.inputBuffer[:len(g.inputBuffer)-1]
@@ -296,17 +342,6 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 			g.runeBuffer = ebiten.AppendInputChars(g.runeBuffer[:0])
 			if len(g.runeBuffer) > 0 {
 				g.inputBuffer += string(g.runeBuffer)
-
-				if strings.ContainsRune(g.inputBuffer, '\n') {
-					g.inputBuffer = strings.Split(g.inputBuffer, "\n")[0]
-					clearBuffer = true
-				}
-				if !g.usernameConfirmed {
-					g.Username = g.inputBuffer
-				} else {
-					g.Password = g.inputBuffer
-				}
-				log.Println("INPUT BUFFER IS:" + g.inputBuffer)
 			}
 		}
 
@@ -350,6 +385,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Log in screen
 	if !g.loggedIn {
+		g.keyboard.Draw(screen)
+
 		const welcomeText = `Please enter your FIBS username and password.
 If you do not have a FIBS account yet, visit
 http://www.fibs.com/help.html#register`
@@ -372,19 +409,18 @@ http://www.fibs.com/help.html#register`
 
 	g.Board.draw(screen)
 
-	if g.Debug == 1 {
+	if g.Debug > 0 {
 		debugBox := image.NewRGBA(image.Rect(10, 20, 200, 200))
 		debugImg := ebiten.NewImageFromImage(debugBox)
 
 		g.drawBuffer.Reset()
 
-		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %0.0f\nTPS %0.0f", ebiten.CurrentFPS(), ebiten.CurrentTPS())))
+		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %0.0f %c\nTPS %0.0f", ebiten.CurrentFPS(), spinner[g.spinnerIndex], ebiten.CurrentTPS())))
 
-		/* TODO enable when vsync is able to be turned off
 		g.spinnerIndex++
 		if g.spinnerIndex == 4 {
 			g.spinnerIndex = 0
-		}*/
+		}
 
 		scaleFactor := ebiten.DeviceScaleFactor()
 		if scaleFactor != 1.0 {
@@ -415,9 +451,17 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 	g.Board.setRect(0, 0, g.screenW, g.screenH)
+
+	displayArea := 200
+	g.keyboard.SetRect(0, displayArea, g.screenW, g.screenH-displayArea)
 	return outsideWidth, outsideHeight
 }
 
 func (g *Game) resetImageOptions() {
 	g.op.GeoM.Reset()
+}
+
+func (g *Game) Exit() {
+	g.Board.drawFrame <- false
+	os.Exit(0)
 }

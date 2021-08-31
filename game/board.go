@@ -51,6 +51,8 @@ type board struct {
 
 	moveQueue chan *stateUpdate
 
+	drawFrame chan bool
+
 	debug int // Print and draw debug information
 }
 
@@ -69,6 +71,7 @@ func NewBoard() *board {
 		spaceRects: make([][4]int, 26),
 		V:          make([]int, 42),
 		moveQueue:  make(chan *stateUpdate, 10),
+		drawFrame:  make(chan bool, 10),
 	}
 
 	for i := range b.Sprites.sprites {
@@ -88,6 +91,8 @@ func NewBoard() *board {
 		b.spaces[space] = append(b.spaces[space], s)
 	}
 
+	go b.handleDraw()
+
 	go b.handlePieceMoves()
 
 	b.op = &ebiten.DrawImageOptions{}
@@ -95,6 +100,31 @@ func NewBoard() *board {
 	b.dragTouchId = -1
 
 	return b
+}
+
+func (b *board) handleDraw() {
+	drawFreq := time.Second / 144 // TODO
+	lastDraw := time.Now()
+	for v := range b.drawFrame {
+		if !v {
+			return
+		}
+		since := time.Since(lastDraw)
+		if since < drawFreq {
+			t := time.NewTimer(drawFreq - since)
+		DELAYDRAW:
+			for {
+				select {
+				case <-b.drawFrame:
+					continue DELAYDRAW
+				case <-t.C:
+					break DELAYDRAW
+				}
+			}
+		}
+		ebiten.ScheduleFrame()
+		lastDraw = time.Now()
+	}
 }
 
 func (b *board) newSprite(white bool) *Sprite {
@@ -106,6 +136,18 @@ func (b *board) newSprite(white bool) *Sprite {
 
 func (b *board) updateBackgroundImage() {
 	tableColor := color.RGBA{0, 102, 51, 255}
+	frameColor := color.RGBA{65, 40, 14, 255}
+	borderColor := color.RGBA{0, 0, 0, 255}
+	faceColor := color.RGBA{120, 63, 25, 255}
+	triangleA := color.RGBA{225.0, 188, 125, 255}
+	triangleB := color.RGBA{120.0, 17.0, 0, 255}
+
+	borderSize := b.horizontalBorderSize
+	if borderSize > b.barWidth/2 {
+		borderSize = b.barWidth / 2
+	}
+	frameW := b.w - ((b.horizontalBorderSize - borderSize) * 2)
+	innerW := b.w - (b.horizontalBorderSize * 2) // Outer board width (including frame)
 
 	// Table
 	box := image.NewRGBA(image.Rect(0, 0, b.w, b.h))
@@ -113,39 +155,33 @@ func (b *board) updateBackgroundImage() {
 	img.Fill(tableColor)
 	b.backgroundImage = ebiten.NewImageFromImage(img)
 
-	// Border
-	borderColor := color.RGBA{65, 40, 14, 255}
-	borderSize := b.horizontalBorderSize
-	if borderSize > b.barWidth/2 {
-		borderSize = b.barWidth / 2
-	}
-	box = image.NewRGBA(image.Rect(0, 0, b.w-((b.horizontalBorderSize-borderSize)*2), b.h))
+	// Frame
+	box = image.NewRGBA(image.Rect(0, 0, frameW, b.h))
 	img = ebiten.NewImageFromImage(box)
-	img.Fill(borderColor)
+	img.Fill(frameColor)
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(float64(b.horizontalBorderSize-borderSize), 0)
 	b.backgroundImage.DrawImage(img, b.op)
 
 	// Face
-	box = image.NewRGBA(image.Rect(0, 0, b.w-(b.horizontalBorderSize*2), b.h-(b.verticalBorderSize*2)))
+	box = image.NewRGBA(image.Rect(0, 0, innerW, b.h-(b.verticalBorderSize*2)))
 	img = ebiten.NewImageFromImage(box)
-	img.Fill(color.RGBA{120, 63, 25, 255})
+	img.Fill(faceColor)
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(float64(b.horizontalBorderSize), float64(b.verticalBorderSize))
 	b.backgroundImage.DrawImage(img, b.op)
 
-	baseImg := image.NewRGBA(image.Rect(0, 0, b.w-(b.horizontalBorderSize*2), b.h-(b.verticalBorderSize*2)))
-	gc := draw2dimg.NewGraphicContext(baseImg)
-
 	// Bar
 	box = image.NewRGBA(image.Rect(0, 0, b.barWidth, b.h))
 	img = ebiten.NewImageFromImage(box)
-	img.Fill(borderColor)
+	img.Fill(frameColor)
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(float64((b.w/2)-(b.barWidth/2)), 0)
 	b.backgroundImage.DrawImage(img, b.op)
 
 	// Draw triangles
+	baseImg := image.NewRGBA(image.Rect(0, 0, b.w-(b.horizontalBorderSize*2), b.h-(b.verticalBorderSize*2)))
+	gc := draw2dimg.NewGraphicContext(baseImg)
 	for i := 0; i < 2; i++ {
 		triangleTip := float64((b.h - (b.verticalBorderSize * 2)) / 2)
 		if i == 0 {
@@ -160,9 +196,9 @@ func (b *board) updateBackgroundImage() {
 			}
 
 			if colorA {
-				gc.SetFillColor(color.RGBA{219.0, 185, 113, 255})
+				gc.SetFillColor(triangleA)
 			} else {
-				gc.SetFillColor(color.RGBA{120.0, 17.0, 0, 255})
+				gc.SetFillColor(triangleB)
 			}
 
 			tx := b.spaceWidth * j
@@ -177,12 +213,56 @@ func (b *board) updateBackgroundImage() {
 			gc.Fill()
 		}
 	}
-
 	img = ebiten.NewImageFromImage(baseImg)
-
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(float64(b.horizontalBorderSize), float64(b.verticalBorderSize))
 	b.backgroundImage.DrawImage(img, b.op)
+
+	// Border
+	borderImage := image.NewRGBA(image.Rect(0, 0, b.w, b.h))
+	gc = draw2dimg.NewGraphicContext(borderImage)
+	gc.SetStrokeColor(borderColor)
+	// - Outside left
+	gc.SetLineWidth(2)
+	gc.MoveTo(float64(1), float64(0))
+	gc.LineTo(float64(1), float64(b.h))
+	// - Center
+	gc.SetLineWidth(2)
+	gc.MoveTo(float64(frameW/2), float64(0))
+	gc.LineTo(float64(frameW/2), float64(b.h))
+	// - Outside right
+	gc.MoveTo(float64(frameW), float64(0))
+	gc.LineTo(float64(frameW), float64(b.h))
+	gc.Close()
+	gc.Stroke()
+	// - Inside left
+	gc.SetLineWidth(1)
+	edge := float64((((innerW) - b.barWidth) / 2) + borderSize)
+	gc.MoveTo(float64(borderSize), float64(b.verticalBorderSize))
+	gc.LineTo(edge, float64(b.verticalBorderSize))
+	gc.LineTo(edge, float64(b.h-b.verticalBorderSize))
+	gc.LineTo(float64(borderSize), float64(b.h-b.verticalBorderSize))
+	gc.LineTo(float64(borderSize), float64(b.verticalBorderSize))
+	gc.Close()
+	gc.Stroke()
+	// - Inside right
+	edgeStart := float64((innerW / 2) + (b.barWidth / 2) + borderSize)
+	edgeEnd := float64(innerW + borderSize)
+	gc.MoveTo(float64(edgeStart), float64(b.verticalBorderSize))
+	gc.LineTo(edgeEnd, float64(b.verticalBorderSize))
+	gc.LineTo(edgeEnd, float64(b.h-b.verticalBorderSize))
+	gc.LineTo(float64(edgeStart), float64(b.h-b.verticalBorderSize))
+	gc.LineTo(float64(edgeStart), float64(b.verticalBorderSize))
+	gc.Close()
+	gc.Stroke()
+	img = ebiten.NewImageFromImage(borderImage)
+	b.op.GeoM.Reset()
+	b.op.GeoM.Translate(float64(b.horizontalBorderSize-borderSize), 0)
+	b.backgroundImage.DrawImage(img, b.op)
+}
+
+func (b *board) ScheduleFrame() {
+	b.drawFrame <- true
 }
 
 func (b *board) draw(screen *ebiten.Image) {
@@ -280,7 +360,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.horizontalBorderSize = 0
 
-	b.triangleOffset = float64(b.h-(b.verticalBorderSize*2)) / 33
+	b.triangleOffset = float64(b.h-(b.verticalBorderSize*2)) / 15
 
 	for {
 		b.verticalBorderSize = 7 // TODO configurable
@@ -304,7 +384,6 @@ func (b *board) setRect(x, y, w, h int) {
 	if extraSpace >= largeBarWidth {
 		b.barWidth = largeBarWidth
 	}
-	// TODO barwidth in calcs is wrong
 
 	b.horizontalBorderSize = ((b.w - (b.spaceWidth * 12)) - b.barWidth) / 2
 	if b.horizontalBorderSize < 0 {
@@ -312,6 +391,7 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 
 	loadAssets(b.spaceWidth)
+
 	for i := 0; i < b.Sprites.num; i++ {
 		s := b.Sprites.sprites[i]
 		s.w, s.h = imgCheckerWhite.Size()
@@ -524,37 +604,77 @@ func (b *board) ProcessState() {
 
 func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int) {
 	moveSize := 1
-	moveDelay := time.Duration(2/speed) * time.Millisecond
+	moveDelay := time.Duration(1/speed) * time.Millisecond
 
-	stackTo := len(b.spaces[to])
-	if stackTo == 1 && sprite.colorWhite != b.spaces[to][0].colorWhite {
-		stackTo = 0 // Hit
-	}
-	x, y, _, _ := b.stackSpaceRect(to, stackTo)
-	x, y = b.offsetPosition(x, y)
+	space := from
+	for {
+		if space == to {
+			break
+		} else if to > space {
+			space++
+		} else {
+			space--
+		}
 
-	if sprite.x != x {
-		// Center
-		cy := (b.h / 2) - (b.spaceWidth / 2)
-		for {
-			if sprite.y == cy {
-				break
-			}
-			if sprite.y < cy {
-				sprite.y += moveSize
-				if sprite.y > cy {
-					sprite.y = cy
+		// Go to bar or home immediately
+		if from == 0 || from == 25 || to == 0 || to == 25 {
+			space = to
+		}
+
+		stack := len(b.spaces[space])
+		if stack == 1 && sprite.colorWhite != b.spaces[space][0].colorWhite {
+			stack = 0 // Hit
+		}
+
+		x, y, _, _ := b.stackSpaceRect(space, stack)
+		x, y = b.offsetPosition(x, y)
+
+		cy := y
+		if cy > sprite.y == b.bottomRow(space) {
+			cy = sprite.y
+		}
+
+		if sprite.x != x {
+			// Center
+			for {
+				if sprite.y == cy {
+					break
 				}
-			} else if sprite.y > cy {
-				sprite.y -= moveSize
 				if sprite.y < cy {
-					sprite.y = cy
+					sprite.y += moveSize
+					if sprite.y > cy {
+						sprite.y = cy
+					}
+				} else if sprite.y > cy {
+					sprite.y -= moveSize
+					if sprite.y < cy {
+						sprite.y = cy
+					}
 				}
+				b.ScheduleFrame()
+				time.Sleep(moveDelay)
 			}
-			time.Sleep(moveDelay)
+			for {
+				if sprite.x == x {
+					break
+				}
+				if sprite.x < x {
+					sprite.x += moveSize
+					if sprite.x > x {
+						sprite.x = x
+					}
+				} else if sprite.x > x {
+					sprite.x -= moveSize
+					if sprite.x < x {
+						sprite.x = x
+					}
+				}
+				b.ScheduleFrame()
+				time.Sleep(moveDelay / 2)
+			}
 		}
 		for {
-			if sprite.x == x {
+			if sprite.x == x && sprite.y == y {
 				break
 			}
 			if sprite.x < x {
@@ -568,36 +688,20 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int) {
 					sprite.x = x
 				}
 			}
-			time.Sleep(moveDelay / 2)
-		}
-	}
-	for {
-		if sprite.x == x && sprite.y == y {
-			break
-		}
-		if sprite.x < x {
-			sprite.x += moveSize
-			if sprite.x > x {
-				sprite.x = x
-			}
-		} else if sprite.x > x {
-			sprite.x -= moveSize
-			if sprite.x < x {
-				sprite.x = x
-			}
-		}
-		if sprite.y < y {
-			sprite.y += moveSize
-			if sprite.y > y {
-				sprite.y = y
-			}
-		} else if sprite.y > y {
-			sprite.y -= moveSize
 			if sprite.y < y {
-				sprite.y = y
+				sprite.y += moveSize
+				if sprite.y > y {
+					sprite.y = y
+				}
+			} else if sprite.y > y {
+				sprite.y -= moveSize
+				if sprite.y < y {
+					sprite.y = y
+				}
 			}
+			b.ScheduleFrame()
+			time.Sleep(moveDelay)
 		}
-		time.Sleep(moveDelay)
 	}
 
 	// TODO do not add bear off pieces
@@ -609,6 +713,10 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int) {
 		}
 	}
 	b.moving = nil
+
+	b.ScheduleFrame()
+
+	time.Sleep(time.Second)
 }
 
 func (b *board) handlePieceMoves() {
@@ -638,8 +746,11 @@ func (b *board) handlePieceMoves() {
 		b._movePiece(sprite, from, to, 1)
 		if moveAfter != nil {
 			toBar := 0
-			if b.V[fibs.StateDirection] == 1 {
-				toBar = 25
+			if b.V[fibs.StateTurn] == b.V[fibs.StatePlayerColor] {
+				toBar = 25 // TODO how is this determined?
+			}
+			if b.V[fibs.StateDirection] == -1 {
+				toBar = 25 - toBar
 			}
 			b._movePiece(moveAfter, to, toBar, 2)
 		}
@@ -658,9 +769,8 @@ func (b *board) update() {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
 		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			x, y := ebiten.CursorPosition()
-
 			if b.dragging == nil {
+				x, y := ebiten.CursorPosition()
 				s := b.spriteAt(x, y)
 				if s != nil {
 					b.dragging = s
