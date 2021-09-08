@@ -23,9 +23,13 @@ Run the following command to build a `boxcars` executable:
 
 Run `~/go/bin/boxcars` to play.
 
-## Android
+### Android
 
 *Coming soon*
+
+## Gameplay notes
+
+- To bear off a piece, drag it from your home on to the bar.
 
 ## Support
 
@@ -35,4 +39,5 @@ Please share issues and suggestions [here](https://code.rocketnine.space/tslocum
 
 - [ebiten](https://github.com/hajimehoshi/ebiten) - 2D game engine
 - [draw2d](https://github.com/llgcode/draw2d) - 2D shape drawing
+- [kibodo](https://code.rocketnine.space/tslocum/kibodo) - On-screen keyboard
 - [resize](https://github.com/nfnt/resize) - Image resizing

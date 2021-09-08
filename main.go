@@ -18,6 +18,8 @@ const (
 	screenHeight = 768
 )
 
+var AutoWatch bool // WASM only
+
 func main() {
 	ebiten.SetWindowTitle("Boxcars")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
@@ -38,7 +40,12 @@ func main() {
 	flag.StringVar(&g.Password, "password", "", "Password")
 	flag.StringVar(&g.ServerAddress, "address", "fibs.com:4321", "Server address")
 	flag.BoolVar(&g.Watch, "watch", false, "Watch random game")
+	flag.BoolVar(&g.TV, "tv", false, "Watch random games continuously")
 	flag.Parse()
+
+	if AutoWatch {
+		g.Watch = true
+	}
 
 	// Auto-connect
 	if g.Username != "" && g.Password != "" {
@@ -59,10 +66,6 @@ func main() {
 			}
 
 			g.Client.Out <- append(scanner.Bytes())
-		}
-
-		if scanner.Err() != nil {
-			// TODO
 		}
 	}()
 

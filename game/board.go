@@ -17,12 +17,15 @@ import (
 type stateUpdate struct {
 	from int
 	to   int
+	s    []string
 	v    []int
 }
 
 type board struct {
 	x, y int
 	w, h int
+
+	innerW, innerH int
 
 	op *ebiten.DrawImageOptions
 
@@ -47,13 +50,19 @@ type board struct {
 	overlapSize          int
 
 	lastDirection int
-	V             []int
+
+	s []string
+	v []int
 
 	moveQueue chan *stateUpdate
 
 	drawFrame chan bool
 
 	debug int // Print and draw debug information
+
+	Client *fibs.Client
+
+	dragX, dragY int
 }
 
 func NewBoard() *board {
@@ -69,7 +78,8 @@ func NewBoard() *board {
 		},
 		spaces:     make([][]*Sprite, 26),
 		spaceRects: make([][4]int, 26),
-		V:          make([]int, 42),
+		s:          make([]string, 2),
+		v:          make([]int, 42),
 		moveQueue:  make(chan *stateUpdate, 10),
 		drawFrame:  make(chan bool, 10),
 	}
@@ -270,9 +280,60 @@ func (b *board) draw(screen *ebiten.Image) {
 	b.op.GeoM.Translate(float64(b.x), float64(b.y))
 	screen.DrawImage(b.backgroundImage, b.op)
 
+	if b.debug == 2 {
+		b.iterateSpaces(func(space int) {
+			x, y, w, h := b.spaceRect(space)
+			spaceImage := ebiten.NewImage(w, h)
+			if space%2 == 0 {
+				spaceImage.Fill(color.RGBA{50, 50, 50, 150})
+			} else {
+				spaceImage.Fill(color.RGBA{255, 255, 255, 150})
+			}
+			x, y = b.offsetPosition(x, y)
+			b.op.GeoM.Reset()
+			b.op.GeoM.Translate(float64(x), float64(y))
+			screen.DrawImage(spaceImage, b.op)
+		})
+	}
+
 	drawSprite := func(sprite *Sprite) {
+		x, y := float64(sprite.x), float64(sprite.y)
+		if !sprite.toStart.IsZero() {
+			progress := float64(time.Since(sprite.toStart)) / float64(sprite.toTime)
+			if x == float64(sprite.toX) && y == float64(sprite.toY) {
+				sprite.toStart = time.Time{}
+				sprite.x = sprite.toX
+				sprite.y = sprite.toY
+			} else {
+				if x < float64(sprite.toX) {
+					x += (float64(sprite.toX) - x) * progress
+					if x > float64(sprite.toX) {
+						x = float64(sprite.toX)
+					}
+				} else if x > float64(sprite.toX) {
+					x -= (x - float64(sprite.toX)) * progress
+					if x < float64(sprite.toX) {
+						x = float64(sprite.toX)
+					}
+				}
+
+				if y < float64(sprite.toY) {
+					y += (float64(sprite.toY) - y) * progress
+					if y > float64(sprite.toY) {
+						y = float64(sprite.toY)
+					}
+				} else if y > float64(sprite.toY) {
+					y -= (y - float64(sprite.toY)) * progress
+					if y < float64(sprite.toY) {
+						y = float64(sprite.toY)
+					}
+				}
+			}
+			// Schedule another frame
+			ebiten.ScheduleFrame()
+		}
 		b.op.GeoM.Reset()
-		b.op.GeoM.Translate(float64(sprite.x), float64(sprite.y))
+		b.op.GeoM.Translate(x, y)
 
 		if sprite.colorWhite {
 			screen.DrawImage(imgCheckerWhite, b.op)
@@ -314,6 +375,63 @@ func (b *board) draw(screen *ebiten.Image) {
 		}
 	})
 
+	// Draw opponent name and dice
+
+	borderSize := b.horizontalBorderSize
+	if borderSize > b.barWidth/2 {
+		borderSize = b.barWidth / 2
+	}
+
+	playerColor := color.White
+	opponentColor := color.Black
+	if b.v[fibs.StatePlayerColor] == -1 {
+		playerColor = color.Black
+		opponentColor = color.White
+	}
+
+	if b.v[fibs.StateOpponentDice1] > 0 {
+		label := fmt.Sprintf("%s  %d %d", b.s[fibs.StateOpponentName], b.v[fibs.StateOpponentDice1], b.v[fibs.StateOpponentDice2])
+
+		bounds := text.BoundString(mplusNormalFont, label)
+		img := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
+		text.Draw(img, label, mplusNormalFont, 0, bounds.Dy(), opponentColor)
+
+		x := ((b.innerW - borderSize) / 4) - (bounds.Dx() / 2)
+		y := (b.innerH / 2) - (bounds.Dy() / 2)
+		x, y = b.offsetPosition(x, y)
+		b.op.GeoM.Reset()
+		b.op.GeoM.Translate(float64(x), float64(y))
+		screen.DrawImage(img, b.op)
+	}
+
+	// Draw player name and dice
+
+	if b.v[fibs.StatePlayerDice1] > 0 {
+		label := fmt.Sprintf("%s  %d %d", b.s[fibs.StatePlayerName], b.v[fibs.StatePlayerDice1], b.v[fibs.StatePlayerDice2])
+
+		bounds := text.BoundString(mplusNormalFont, label)
+		img := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
+		text.Draw(img, label, mplusNormalFont, 0, bounds.Dy(), playerColor)
+
+		x := ((b.innerW / 4) * 3) - (bounds.Dx() / 2)
+		y := (b.innerH / 2) - (bounds.Dy() / 2)
+		x, y = b.offsetPosition(x, y)
+		b.op.GeoM.Reset()
+		b.op.GeoM.Translate(float64(x), float64(y))
+		screen.DrawImage(img, b.op)
+	}
+
+	/* TODO centering issue
+	img := ebiten.NewImage(115, 20)
+	img.Fill(color.White)
+	x := (((b.innerW - borderSize) / 2) / 2) - (115 / 2)
+	y := (b.innerH / 2) - (20 / 2)
+	x = (b.innerW - borderSize) / 4
+	x, y = b.offsetPosition(x, y)
+	b.op.GeoM.Reset()
+	b.op.GeoM.Translate(float64(x), float64(y))
+	screen.DrawImage(img, b.op)*/
+
 	// Draw moving sprite
 	if b.moving != nil {
 		drawSprite(b.moving)
@@ -328,22 +446,14 @@ func (b *board) draw(screen *ebiten.Image) {
 		b.iterateSpaces(func(space int) {
 			x, y, w, h := b.spaceRect(space)
 			spaceImage := ebiten.NewImage(w, h)
-			if space%2 == 0 {
-				spaceImage.Fill(color.RGBA{0, 0, 0, 150})
-			} else {
-				spaceImage.Fill(color.RGBA{255, 255, 255, 150})
-			}
-
 			br := ""
 			if b.bottomRow(space) {
 				br = "B"
 			}
-
 			ebitenutil.DebugPrint(spaceImage, fmt.Sprintf(" %d %s", space, br))
-
 			x, y = b.offsetPosition(x, y)
-
 			b.op.GeoM.Reset()
+			b.op.GeoM.Scale(2, 2)
 			b.op.GeoM.Translate(float64(x), float64(y))
 			screen.DrawImage(spaceImage, b.op)
 		})
@@ -390,6 +500,13 @@ func (b *board) setRect(x, y, w, h int) {
 		b.horizontalBorderSize = 0
 	}
 
+	borderSize := b.horizontalBorderSize
+	if borderSize > b.barWidth/2 {
+		borderSize = b.barWidth / 2
+	}
+	b.innerW = b.w - (b.horizontalBorderSize * 2)
+	b.innerH = b.h - (b.verticalBorderSize * 2)
+
 	loadAssets(b.spaceWidth)
 
 	for i := 0; i < b.Sprites.num; i++ {
@@ -422,6 +539,8 @@ func (b *board) positionCheckers() {
 			s.x += (w - s.w) / 2
 		}
 	}
+
+	b.ScheduleFrame()
 }
 
 func (b *board) spriteAt(x, y int) *Sprite {
@@ -447,21 +566,14 @@ func (b *board) spaceAt(x, y int) int {
 	return -1
 }
 
-// TODO move to fibs library
 func (b *board) iterateSpaces(f func(space int)) {
-	if b.V[fibs.StateDirection] == 1 {
-		for space := 0; space <= 25; space++ {
-			f(space)
-		}
-		return
-	}
-	for space := 25; space >= 0; space-- {
+	for space := 0; space <= 25; space++ {
 		f(space)
 	}
 }
 
 func (b *board) translateSpace(space int) int {
-	if b.V[fibs.StateDirection] == -1 {
+	if b.v[fibs.StateDirection] == -1 {
 		// Spaces range from 24 - 1.
 		if space == 0 || space == 25 {
 			space = 25 - space
@@ -526,7 +638,7 @@ func (b *board) bottomRow(space int) bool {
 	bottomStart := 1
 	bottomEnd := 12
 	bottomBar := 25
-	if b.V[fibs.StateDirection] == 1 {
+	if b.v[fibs.StateDirection] == 1 {
 		bottomStart = 13
 		bottomEnd = 24
 		bottomBar = 0
@@ -562,12 +674,13 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 	return x, y, w, h
 }
 
-func (b *board) SetState(v []int) {
-	b.moveQueue <- &stateUpdate{-1, -1, v}
+func (b *board) SetState(s []string, v []int) {
+	// TODO setstate include playernames, use string?
+	b.moveQueue <- &stateUpdate{-1, -1, s, v}
 }
 
 func (b *board) ProcessState() {
-	v := b.V
+	v := b.v
 
 	if b.lastDirection != v[fibs.StateDirection] {
 		b.setSpaceRects()
@@ -578,21 +691,26 @@ func (b *board) ProcessState() {
 	b.spaces = make([][]*Sprite, 26)
 	for space := 0; space < 26; space++ {
 		spaceValue := v[fibs.StateBoardSpace0+space]
-		if spaceValue == 0 {
-			continue
-		}
 
 		white := spaceValue > 0
-		// TODO reverse bar spaces - always?
-		// TODO take direction into account
+		if spaceValue == 0 {
+			white = v[fibs.StatePlayerColor] == 1
+		}
 
 		abs := spaceValue
 		if abs < 0 {
 			abs *= -1
 		}
 
-		for i := 0; i < abs; i++ {
+		var preMovesTo = b.Client.Board.Premoveto[space]
+		var preMovesFrom = b.Client.Board.Premovefrom[space]
+
+		for i := 0; i < (abs+preMovesTo)-preMovesFrom; i++ {
 			s := b.newSprite(white)
+			if i >= abs {
+				s.colorWhite = v[fibs.StatePlayerColor] == 1
+				// TODO draw special premove overlay?
+			}
 			b.spaces[space] = append(b.spaces[space], s)
 			b.Sprites.sprites = append(b.Sprites.sprites, s)
 		}
@@ -602,9 +720,13 @@ func (b *board) ProcessState() {
 	b.positionCheckers()
 }
 
-func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int) {
-	moveSize := 1
-	moveDelay := time.Duration(1/speed) * time.Millisecond
+func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bool) {
+	//moveSize := 1
+	//moveDelay := time.Duration(1/speed) * time.Millisecond
+	moveTime := time.Second / time.Duration(speed)
+	pauseTime := 750 * time.Millisecond
+
+	b.moving = sprite
 
 	space := from
 	for {
@@ -616,95 +738,76 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int) {
 			space--
 		}
 
+		var diag bool
+
 		// Go to bar or home immediately
-		if from == 0 || from == 25 || to == 0 || to == 25 {
+		// TODO always enabled
+		if true || from == 0 || from == 25 || to == 0 || to == 25 {
 			space = to
+			diag = true
 		}
 
 		stack := len(b.spaces[space])
 		if stack == 1 && sprite.colorWhite != b.spaces[space][0].colorWhite {
 			stack = 0 // Hit
+		} else if space != to {
+			stack++
 		}
 
 		x, y, _, _ := b.stackSpaceRect(space, stack)
 		x, y = b.offsetPosition(x, y)
 
 		cy := y
-		if cy > sprite.y == b.bottomRow(space) {
+		if cy > sprite.y == b.bottomRow(space) && !diag {
 			cy = sprite.y
 		}
 
-		if sprite.x != x {
-			// Center
-			for {
-				if sprite.y == cy {
-					break
-				}
-				if sprite.y < cy {
-					sprite.y += moveSize
-					if sprite.y > cy {
-						sprite.y = cy
-					}
-				} else if sprite.y > cy {
-					sprite.y -= moveSize
-					if sprite.y < cy {
-						sprite.y = cy
-					}
-				}
-				b.ScheduleFrame()
-				time.Sleep(moveDelay)
+		if diag {
+			sprite.toX = x
+			sprite.toY = y
+			sprite.toTime = moveTime
+			sprite.toStart = time.Now()
+			ebiten.ScheduleFrame()
+			time.Sleep(sprite.toTime)
+			sprite.x = x
+			sprite.y = y
+		} else {
+			if sprite.y != cy {
+				sprite.toX = sprite.x
+				sprite.toY = cy
+				sprite.toTime = moveTime / 4
+				sprite.toStart = time.Now()
+				ebiten.ScheduleFrame()
+				time.Sleep(sprite.toTime)
+				sprite.toStart = time.Time{}
+				sprite.y = cy
 			}
-			for {
-				if sprite.x == x {
-					break
-				}
-				if sprite.x < x {
-					sprite.x += moveSize
-					if sprite.x > x {
-						sprite.x = x
-					}
-				} else if sprite.x > x {
-					sprite.x -= moveSize
-					if sprite.x < x {
-						sprite.x = x
-					}
-				}
-				b.ScheduleFrame()
-				time.Sleep(moveDelay / 2)
+
+			if sprite.x != x {
+				sprite.toX = x
+				sprite.toY = sprite.y
+				sprite.toTime = moveTime / 4
+				sprite.toStart = time.Now()
+				ebiten.ScheduleFrame()
+				time.Sleep(sprite.toTime)
+				sprite.toStart = time.Time{}
+				sprite.x = x
 			}
-		}
-		for {
-			if sprite.x == x && sprite.y == y {
-				break
+
+			if sprite.x != x || sprite.y != y {
+				sprite.toX = x
+				sprite.toY = y
+				sprite.toTime = moveTime / 4
+				sprite.toStart = time.Now()
+				ebiten.ScheduleFrame()
+				time.Sleep(sprite.toTime)
+				sprite.toStart = time.Time{}
+				sprite.x = x
+				sprite.y = y
 			}
-			if sprite.x < x {
-				sprite.x += moveSize
-				if sprite.x > x {
-					sprite.x = x
-				}
-			} else if sprite.x > x {
-				sprite.x -= moveSize
-				if sprite.x < x {
-					sprite.x = x
-				}
-			}
-			if sprite.y < y {
-				sprite.y += moveSize
-				if sprite.y > y {
-					sprite.y = y
-				}
-			} else if sprite.y > y {
-				sprite.y -= moveSize
-				if sprite.y < y {
-					sprite.y = y
-				}
-			}
-			b.ScheduleFrame()
-			time.Sleep(moveDelay)
 		}
 	}
 
-	// TODO do not add bear off pieces
 	b.spaces[to] = append(b.spaces[to], sprite)
 	for i, s := range b.spaces[from] {
 		if s == sprite {
@@ -716,13 +819,41 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int) {
 
 	b.ScheduleFrame()
 
-	time.Sleep(time.Second)
+	if !pause {
+		return
+	}
+	time.Sleep(pauseTime)
 }
 
 func (b *board) handlePieceMoves() {
 	for u := range b.moveQueue {
 		if u.from == -1 || u.to == -1 {
-			b.V = u.v
+			same := true
+			if len(b.s) == len(u.s) {
+				for i := range b.s {
+					if b.s[i] != u.s[i] {
+						same = false
+						break
+					}
+				}
+			} else {
+				same = false
+			}
+			if len(b.v) == len(u.v) {
+				for i := range b.v {
+					if b.v[i] != u.v[i] {
+						same = false
+						break
+					}
+				}
+			} else {
+				same = false
+			}
+			if same {
+				continue
+			}
+			b.s = u.s
+			b.v = u.v
 			b.ProcessState()
 			continue
 		}
@@ -743,16 +874,16 @@ func (b *board) handlePieceMoves() {
 			}
 		}
 
-		b._movePiece(sprite, from, to, 1)
+		b._movePiece(sprite, from, to, 1, moveAfter == nil)
 		if moveAfter != nil {
 			toBar := 0
-			if b.V[fibs.StateTurn] == b.V[fibs.StatePlayerColor] {
-				toBar = 25 // TODO how is this determined?
+			if b.v[fibs.StateDirection] == -1 {
+				toBar = 25
 			}
-			if b.V[fibs.StateDirection] == -1 {
-				toBar = 25 - toBar
+			if b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor] {
+				toBar = 25 - toBar // TODO how is this determined?
 			}
-			b._movePiece(moveAfter, to, toBar, 2)
+			b._movePiece(moveAfter, to, toBar, 1, true)
 		}
 
 		b.positionCheckers()
@@ -761,7 +892,7 @@ func (b *board) handlePieceMoves() {
 
 // Do not call directly
 func (b *board) movePiece(from int, to int) {
-	b.moveQueue <- &stateUpdate{from, to, nil}
+	b.moveQueue <- &stateUpdate{from, to, nil, nil}
 }
 
 func (b *board) update() {
@@ -781,6 +912,9 @@ func (b *board) update() {
 		b.touchIDs = inpututil.AppendJustPressedTouchIDs(b.touchIDs[:0])
 		for _, id := range b.touchIDs {
 			x, y := ebiten.TouchPosition(id)
+
+			b.dragX, b.dragY = x, y
+
 			s := b.spriteAt(x, y)
 			if s != nil {
 				b.dragging = s
@@ -792,6 +926,12 @@ func (b *board) update() {
 	x, y := ebiten.CursorPosition()
 	if b.dragTouchId != -1 {
 		x, y = ebiten.TouchPosition(b.dragTouchId)
+
+		if x != 0 || y != 0 { // 0,0 is returned when the touch is released
+			b.dragX, b.dragY = x, y
+		} else {
+			x, y = b.dragX, b.dragY
+		}
 	}
 
 	var dropped *Sprite
@@ -810,12 +950,16 @@ func (b *board) update() {
 
 		index := b.spaceAt(x, y)
 		if index >= 0 {
-			for space, pieces := range b.spaces {
-				for stackIndex, piece := range pieces {
-					if piece == dropped {
-						b.spaces[space] = append(b.spaces[space][:stackIndex], b.spaces[space][stackIndex+1:]...)
-						b.spaces[index] = append(b.spaces[index], dropped)
-						break
+			if b.Client != nil {
+				for space, pieces := range b.spaces {
+					for _, piece := range pieces {
+						if piece == dropped {
+							if space != index {
+								b.Client.Board.AddPreMove(space, index)
+								b.ProcessState()
+							}
+							break
+						}
 					}
 				}
 			}

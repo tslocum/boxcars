@@ -113,6 +113,10 @@ type Sprite struct {
 	h          int
 	x          int
 	y          int
+	toStart    time.Time
+	toTime     time.Duration
+	toX        int
+	toY        int
 	colorWhite bool
 }
 
@@ -147,6 +151,7 @@ type Game struct {
 	screenW, screenH int
 
 	drawBuffer bytes.Buffer
+	lastDraw   time.Time
 
 	spinnerIndex int
 
@@ -157,6 +162,7 @@ type Game struct {
 	usernameConfirmed bool
 
 	Watch bool
+	TV    bool
 
 	Client *fibs.Client
 
@@ -200,8 +206,12 @@ func NewGame() *Game {
 func (g *Game) handleEvents() {
 	for e := range g.Client.Event {
 		switch event := e.(type) {
+		case *fibs.EventBoardState:
+			g.Board.SetState(event.S, event.V)
 		case *fibs.EventMove:
 			g.Board.movePiece(event.From, event.To)
+		case *fibs.EventDraw:
+			g.Board.ProcessState()
 		}
 	}
 }
@@ -214,17 +224,21 @@ func (g *Game) Connect() {
 		address = defaultServerAddress
 	}
 	g.Client = fibs.NewClient(address, g.Username, g.Password)
+	g.Board.Client = g.Client
 
 	go g.handleEvents()
 
 	c := g.Client
 
-	if g.Watch {
+	if g.TV {
 		go func() {
-			time.Sleep(1 * time.Second)
-			c.WatchRandomGame()
-
-			go g.renderLoop()
+			time.Sleep(time.Second)
+			c.Out <- []byte("tv")
+		}()
+	} else if g.Watch {
+		go func() {
+			time.Sleep(time.Second)
+			c.Out <- []byte("watch")
 		}()
 	}
 
@@ -234,15 +248,6 @@ func (g *Game) Connect() {
 			log.Fatal(err)
 		}
 	}()
-}
-
-func (g *Game) renderLoop() {
-	t := time.NewTicker(time.Second)
-	for range t.C {
-		gameBoard := g.Board
-		v := g.Client.Board.GetIntState()
-		gameBoard.SetState(v)
-	}
 }
 
 func (g *Game) leftTouched() bool {
@@ -322,7 +327,11 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 							g.inputBuffer += string(input.Rune)
 							continue
 						}
-						if input.Key == ebiten.KeyEnter {
+						if input.Key == ebiten.KeyBackspace {
+							if len(g.inputBuffer) > 0 {
+								g.inputBuffer = g.inputBuffer[:len(g.inputBuffer)-1]
+							}
+						} else if input.Key == ebiten.KeyEnter {
 							g.inputBuffer += "\n"
 						}
 					}
@@ -381,6 +390,12 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	frameTime := time.Second / 175
+	if time.Since(g.lastDraw) < frameTime {
+		time.Sleep(time.Until(g.lastDraw.Add(frameTime)))
+	}
+	g.lastDraw = time.Now()
+
 	screen.Fill(color.RGBA{0, 102, 51, 255})
 
 	// Log in screen
