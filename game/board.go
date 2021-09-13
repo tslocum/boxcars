@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"log"
 	"time"
 
 	"code.rocketnine.space/tslocum/fibs"
@@ -13,13 +14,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/llgcode/draw2d/draw2dimg"
 )
-
-type stateUpdate struct {
-	from int
-	to   int
-	s    []string
-	v    []int
-}
 
 type board struct {
 	x, y int
@@ -54,8 +48,6 @@ type board struct {
 	s []string
 	v []int
 
-	moveQueue chan *stateUpdate
-
 	drawFrame chan bool
 
 	debug int // Print and draw debug information
@@ -80,7 +72,6 @@ func NewBoard() *board {
 		spaceRects: make([][4]int, 26),
 		s:          make([]string, 2),
 		v:          make([]int, 42),
-		moveQueue:  make(chan *stateUpdate, 10),
 		drawFrame:  make(chan bool, 10),
 	}
 
@@ -102,8 +93,6 @@ func NewBoard() *board {
 	}
 
 	go b.handleDraw()
-
-	go b.handlePieceMoves()
 
 	b.op = &ebiten.DrawImageOptions{}
 
@@ -275,6 +264,12 @@ func (b *board) ScheduleFrame() {
 	b.drawFrame <- true
 }
 
+func (b *board) resetButtonRect() (int, int, int, int) {
+	w := 200
+	h := 75
+	return (b.w - w) / 2, (b.h - h) / 2, w, h
+}
+
 func (b *board) draw(screen *ebiten.Image) {
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(float64(b.x), float64(b.y))
@@ -375,6 +370,28 @@ func (b *board) draw(screen *ebiten.Image) {
 		}
 	})
 
+	// Draw hover overlay
+
+	if b.dragging != nil {
+		dx, dy := b.dragX, b.dragY
+
+		x, y := ebiten.CursorPosition()
+		if x != 0 || y != 0 {
+			dx, dy = x, y
+		}
+
+		space := b.spaceAt(dx, dy)
+		if space >= 0 {
+			x, y, w, h := b.spaceRect(space)
+			spaceImage := ebiten.NewImage(w, h)
+			spaceImage.Fill(color.RGBA{255, 255, 255, 50})
+			x, y = b.offsetPosition(x, y)
+			b.op.GeoM.Reset()
+			b.op.GeoM.Translate(float64(x), float64(y))
+			screen.DrawImage(spaceImage, b.op)
+		}
+	}
+
 	// Draw opponent name and dice
 
 	borderSize := b.horizontalBorderSize
@@ -389,12 +406,37 @@ func (b *board) draw(screen *ebiten.Image) {
 		opponentColor = color.White
 	}
 
-	if b.v[fibs.StateOpponentDice1] > 0 {
+	drawLabel := func(label string, labelColor color.Color, border bool, borderColor color.Color) *ebiten.Image {
+		bounds := text.BoundString(mplusNormalFont, label)
+
+		w := int(float64(bounds.Dx()) * 1.5)
+		h := int(float64(bounds.Dy()) * 2)
+
+		baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
+		// Draw border
+		if border {
+			gc := draw2dimg.NewGraphicContext(baseImg)
+			gc.SetLineWidth(5)
+			gc.SetStrokeColor(borderColor)
+			gc.MoveTo(float64(0), float64(0))
+			gc.LineTo(float64(w), 0)
+			gc.LineTo(float64(w), float64(h))
+			gc.LineTo(float64(0), float64(h))
+			gc.Close()
+			gc.Stroke()
+		}
+
+		img := ebiten.NewImageFromImage(baseImg)
+		text.Draw(img, label, mplusNormalFont, (w-bounds.Dx())/2, int(float64(h-(bounds.Max.Y/2))*0.75), labelColor)
+
+		return img
+	}
+
+	if b.s[fibs.StateOpponentName] != "" {
 		label := fmt.Sprintf("%s  %d %d", b.s[fibs.StateOpponentName], b.v[fibs.StateOpponentDice1], b.v[fibs.StateOpponentDice2])
 
-		bounds := text.BoundString(mplusNormalFont, label)
-		img := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-		text.Draw(img, label, mplusNormalFont, 0, bounds.Dy(), opponentColor)
+		img := drawLabel(label, opponentColor, b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor], opponentColor)
+		bounds := img.Bounds()
 
 		x := ((b.innerW - borderSize) / 4) - (bounds.Dx() / 2)
 		y := (b.innerH / 2) - (bounds.Dy() / 2)
@@ -406,12 +448,11 @@ func (b *board) draw(screen *ebiten.Image) {
 
 	// Draw player name and dice
 
-	if b.v[fibs.StatePlayerDice1] > 0 {
+	if b.s[fibs.StatePlayerName] != "" {
 		label := fmt.Sprintf("%s  %d %d", b.s[fibs.StatePlayerName], b.v[fibs.StatePlayerDice1], b.v[fibs.StatePlayerDice2])
 
-		bounds := text.BoundString(mplusNormalFont, label)
-		img := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-		text.Draw(img, label, mplusNormalFont, 0, bounds.Dy(), playerColor)
+		img := drawLabel(label, playerColor, b.v[fibs.StateTurn] == b.v[fibs.StatePlayerColor], playerColor)
+		bounds := img.Bounds()
 
 		x := ((b.innerW / 4) * 3) - (bounds.Dx() / 2)
 		y := (b.innerH / 2) - (bounds.Dy() / 2)
@@ -419,18 +460,34 @@ func (b *board) draw(screen *ebiten.Image) {
 		b.op.GeoM.Reset()
 		b.op.GeoM.Translate(float64(x), float64(y))
 		screen.DrawImage(img, b.op)
+
 	}
 
-	/* TODO centering issue
-	img := ebiten.NewImage(115, 20)
-	img.Fill(color.White)
-	x := (((b.innerW - borderSize) / 2) / 2) - (115 / 2)
-	y := (b.innerH / 2) - (20 / 2)
-	x = (b.innerW - borderSize) / 4
-	x, y = b.offsetPosition(x, y)
-	b.op.GeoM.Reset()
-	b.op.GeoM.Translate(float64(x), float64(y))
-	screen.DrawImage(img, b.op)*/
+	if len(b.Client.Board.GetPreMoves()) > 0 {
+		x, y, w, h := b.resetButtonRect()
+		baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
+
+		gc := draw2dimg.NewGraphicContext(baseImg)
+		gc.SetLineWidth(5)
+		gc.SetStrokeColor(color.Black)
+		gc.MoveTo(0, 0)
+		gc.LineTo(float64(w), 0)
+		gc.LineTo(float64(w), float64(h))
+		gc.LineTo(0, float64(h))
+		gc.Close()
+		gc.Stroke()
+		img := ebiten.NewImage(w, h)
+		img.Fill(color.RGBA{225.0, 188, 125, 255})
+		img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
+
+		label := "Reset"
+		bounds := text.BoundString(mplusNormalFont, label)
+		text.Draw(img, label, mplusNormalFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
+
+		b.op.GeoM.Reset()
+		b.op.GeoM.Translate(float64(x), float64(y))
+		screen.DrawImage(img, b.op)
+	}
 
 	// Draw moving sprite
 	if b.moving != nil {
@@ -676,7 +733,9 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 
 func (b *board) SetState(s []string, v []int) {
 	// TODO setstate include playernames, use string?
-	b.moveQueue <- &stateUpdate{-1, -1, s, v}
+	b.s = s
+	b.v = v
+	b.ProcessState()
 }
 
 func (b *board) ProcessState() {
@@ -721,94 +780,46 @@ func (b *board) ProcessState() {
 }
 
 func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bool) {
-	//moveSize := 1
-	//moveDelay := time.Duration(1/speed) * time.Millisecond
 	moveTime := time.Second / time.Duration(speed)
 	pauseTime := 750 * time.Millisecond
 
 	b.moving = sprite
 
-	space := from
-	for {
-		if space == to {
-			break
-		} else if to > space {
-			space++
-		} else {
-			space--
-		}
+	space := to // Immediately go to target space
 
-		var diag bool
-
-		// Go to bar or home immediately
-		// TODO always enabled
-		if true || from == 0 || from == 25 || to == 0 || to == 25 {
-			space = to
-			diag = true
-		}
-
-		stack := len(b.spaces[space])
-		if stack == 1 && sprite.colorWhite != b.spaces[space][0].colorWhite {
-			stack = 0 // Hit
-		} else if space != to {
-			stack++
-		}
-
-		x, y, _, _ := b.stackSpaceRect(space, stack)
-		x, y = b.offsetPosition(x, y)
-
-		cy := y
-		if cy > sprite.y == b.bottomRow(space) && !diag {
-			cy = sprite.y
-		}
-
-		if diag {
-			sprite.toX = x
-			sprite.toY = y
-			sprite.toTime = moveTime
-			sprite.toStart = time.Now()
-			ebiten.ScheduleFrame()
-			time.Sleep(sprite.toTime)
-			sprite.x = x
-			sprite.y = y
-		} else {
-			if sprite.y != cy {
-				sprite.toX = sprite.x
-				sprite.toY = cy
-				sprite.toTime = moveTime / 4
-				sprite.toStart = time.Now()
-				ebiten.ScheduleFrame()
-				time.Sleep(sprite.toTime)
-				sprite.toStart = time.Time{}
-				sprite.y = cy
-			}
-
-			if sprite.x != x {
-				sprite.toX = x
-				sprite.toY = sprite.y
-				sprite.toTime = moveTime / 4
-				sprite.toStart = time.Now()
-				ebiten.ScheduleFrame()
-				time.Sleep(sprite.toTime)
-				sprite.toStart = time.Time{}
-				sprite.x = x
-			}
-
-			if sprite.x != x || sprite.y != y {
-				sprite.toX = x
-				sprite.toY = y
-				sprite.toTime = moveTime / 4
-				sprite.toStart = time.Now()
-				ebiten.ScheduleFrame()
-				time.Sleep(sprite.toTime)
-				sprite.toStart = time.Time{}
-				sprite.x = x
-				sprite.y = y
-			}
-		}
+	stack := len(b.spaces[space])
+	if stack == 1 && sprite.colorWhite != b.spaces[space][0].colorWhite {
+		stack = 0 // Hit
+	} else if space != to {
+		stack++
 	}
 
-	b.spaces[to] = append(b.spaces[to], sprite)
+	x, y, _, _ := b.stackSpaceRect(space, stack)
+	x, y = b.offsetPosition(x, y)
+
+	sprite.toX = x
+	sprite.toY = y
+	sprite.toTime = moveTime
+	sprite.toStart = time.Now()
+	ebiten.ScheduleFrame()
+	time.Sleep(sprite.toTime)
+	sprite.x = x
+	sprite.y = y
+
+	if pause {
+		log.Println("PAUSE ", pauseTime)
+		time.Sleep(pauseTime)
+		log.Println("UNPAUSE")
+	}
+
+	homeSpace := b.Client.Board.PlayerHomeSpace()
+	if b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor] {
+		homeSpace = 25 - homeSpace
+	}
+
+	if to != homeSpace {
+		b.spaces[to] = append(b.spaces[to], sprite)
+	}
 	for i, s := range b.spaces[from] {
 		if s == sprite {
 			b.spaces[from] = append(b.spaces[from][:i], b.spaces[from][i+1:]...)
@@ -818,93 +829,65 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	b.moving = nil
 
 	b.ScheduleFrame()
-
-	if !pause {
-		return
-	}
-	time.Sleep(pauseTime)
-}
-
-func (b *board) handlePieceMoves() {
-	for u := range b.moveQueue {
-		if u.from == -1 || u.to == -1 {
-			same := true
-			if len(b.s) == len(u.s) {
-				for i := range b.s {
-					if b.s[i] != u.s[i] {
-						same = false
-						break
-					}
-				}
-			} else {
-				same = false
-			}
-			if len(b.v) == len(u.v) {
-				for i := range b.v {
-					if b.v[i] != u.v[i] {
-						same = false
-						break
-					}
-				}
-			} else {
-				same = false
-			}
-			if same {
-				continue
-			}
-			b.s = u.s
-			b.v = u.v
-			b.ProcessState()
-			continue
-		}
-
-		from, to := u.from, u.to
-
-		pieces := b.spaces[from]
-		if len(pieces) == 0 {
-			continue
-		}
-
-		sprite := pieces[len(pieces)-1]
-
-		var moveAfter *Sprite
-		if len(b.spaces[to]) == 1 {
-			if sprite.colorWhite != b.spaces[to][0].colorWhite {
-				moveAfter = b.spaces[to][0]
-			}
-		}
-
-		b._movePiece(sprite, from, to, 1, moveAfter == nil)
-		if moveAfter != nil {
-			toBar := 0
-			if b.v[fibs.StateDirection] == -1 {
-				toBar = 25
-			}
-			if b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor] {
-				toBar = 25 - toBar // TODO how is this determined?
-			}
-			b._movePiece(moveAfter, to, toBar, 1, true)
-		}
-
-		b.positionCheckers()
-	}
 }
 
 // Do not call directly
 func (b *board) movePiece(from int, to int) {
-	b.moveQueue <- &stateUpdate{from, to, nil, nil}
+	pieces := b.spaces[from]
+	if len(pieces) == 0 {
+		log.Printf("%d-%d: NO PIECES AT SPACE %d", from, to, from)
+		return
+	}
+
+	sprite := pieces[len(pieces)-1]
+
+	var moveAfter *Sprite
+	if len(b.spaces[to]) == 1 {
+		if sprite.colorWhite != b.spaces[to][0].colorWhite {
+			moveAfter = b.spaces[to][0]
+		}
+	}
+
+	b._movePiece(sprite, from, to, 1, moveAfter == nil)
+	if moveAfter != nil {
+		toBar := 0
+		if b.v[fibs.StateDirection] == -1 {
+			toBar = 25
+		}
+		if b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor] {
+			toBar = 25 - toBar // TODO how is this determined?
+		}
+		b._movePiece(moveAfter, to, toBar, 1, true)
+	}
+	log.Println("FINISH MOVE PIECE", from, to)
 }
 
 func (b *board) update() {
 	if b.dragging == nil {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
+		handleReset := func(x, y int) bool {
+			if len(b.Client.Board.GetPreMoves()) > 0 {
+				rx, ry, rw, rh := b.resetButtonRect()
+				if x >= rx && x <= rx+rw && y >= ry && y <= ry+rh {
+					b.Client.Board.ResetPreMoves()
+					b.ProcessState()
+					return true
+				}
+			}
+			return false
+		}
+
 		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			if b.dragging == nil {
 				x, y := ebiten.CursorPosition()
-				s := b.spriteAt(x, y)
-				if s != nil {
-					b.dragging = s
+
+				handled := handleReset(x, y)
+				if !handled {
+					s := b.spriteAt(x, y)
+					if s != nil {
+						b.dragging = s
+					}
 				}
 			}
 		}
@@ -913,12 +896,15 @@ func (b *board) update() {
 		for _, id := range b.touchIDs {
 			x, y := ebiten.TouchPosition(id)
 
-			b.dragX, b.dragY = x, y
+			handled := handleReset(x, y)
+			if !handled {
+				b.dragX, b.dragY = x, y
 
-			s := b.spriteAt(x, y)
-			if s != nil {
-				b.dragging = s
-				b.dragTouchId = id
+				s := b.spriteAt(x, y)
+				if s != nil {
+					b.dragging = s
+					b.dragTouchId = id
+				}
 			}
 		}
 	}

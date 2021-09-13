@@ -79,7 +79,6 @@ func loadAsset(assetPath string, width int) *ebiten.Image {
 		return ebiten.NewImageFromImage(imgResized)
 	}
 	return ebiten.NewImageFromImage(img)
-
 }
 
 func initializeFonts() {
@@ -207,10 +206,13 @@ func (g *Game) handleEvents() {
 	for e := range g.Client.Event {
 		switch event := e.(type) {
 		case *fibs.EventBoardState:
+			log.Println("STATE")
 			g.Board.SetState(event.S, event.V)
 		case *fibs.EventMove:
+			log.Println("MOVE")
 			g.Board.movePiece(event.From, event.To)
 		case *fibs.EventDraw:
+			log.Println("DRAW")
 			g.Board.ProcessState()
 		}
 	}
@@ -392,7 +394,9 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 func (g *Game) Draw(screen *ebiten.Image) {
 	frameTime := time.Second / 175
 	if time.Since(g.lastDraw) < frameTime {
-		time.Sleep(time.Until(g.lastDraw.Add(frameTime)))
+		//time.Sleep(time.Until(g.lastDraw.Add(frameTime)))
+		// TODO causes panics on WASM
+		// draw offscreen and cache, redraw cached image instead of sleeping?
 	}
 	g.lastDraw = time.Now()
 
