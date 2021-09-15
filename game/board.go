@@ -339,7 +339,7 @@ func (b *board) draw(screen *ebiten.Image) {
 
 	b.iterateSpaces(func(space int) {
 		var numPieces int
-		for _, sprite := range b.spaces[space] {
+		for i, sprite := range b.spaces[space] {
 			if sprite == b.dragging || sprite == b.moving {
 				continue
 			}
@@ -347,26 +347,37 @@ func (b *board) draw(screen *ebiten.Image) {
 
 			drawSprite(sprite)
 
-			if numPieces > 5 {
-				label := fmt.Sprintf("%d", numPieces)
-				labelColor := color.RGBA{255, 255, 255, 255}
-				if sprite.colorWhite {
-					labelColor = color.RGBA{0, 0, 0, 255}
-				}
-
-				bounds := text.BoundString(mplusNormalFont, label)
-				overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-				text.Draw(overlayImage, label, mplusNormalFont, 0, bounds.Dy(), labelColor)
-
-				x, y, w, h := b.stackSpaceRect(space, numPieces)
-				x += (w / 2) - (bounds.Dx() / 2)
-				y += (h / 2) - (bounds.Dy() / 2)
-				x, y = b.offsetPosition(x, y)
-
-				b.op.GeoM.Reset()
-				b.op.GeoM.Translate(float64(x), float64(y))
-				screen.DrawImage(overlayImage, b.op)
+			var overlayText string
+			if i > 5 {
+				overlayText = fmt.Sprintf("%d", numPieces)
 			}
+			if sprite.premove {
+				if overlayText != "" {
+					overlayText += " "
+				}
+				overlayText += "%"
+			}
+			if overlayText == "" {
+				continue
+			}
+
+			labelColor := color.RGBA{255, 255, 255, 255}
+			if sprite.colorWhite {
+				labelColor = color.RGBA{0, 0, 0, 255}
+			}
+
+			bounds := text.BoundString(mplusNormalFont, overlayText)
+			overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
+			text.Draw(overlayImage, overlayText, mplusNormalFont, 0, bounds.Dy(), labelColor)
+
+			x, y, w, h := b.stackSpaceRect(space, numPieces-1)
+			x += (w / 2) - (bounds.Dx() / 2)
+			y += (h / 2) - (bounds.Dy() / 2)
+			x, y = b.offsetPosition(x, y)
+
+			b.op.GeoM.Reset()
+			b.op.GeoM.Translate(float64(x), float64(y))
+			screen.DrawImage(overlayImage, b.op)
 		}
 	})
 
@@ -732,9 +743,8 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 }
 
 func (b *board) SetState(s []string, v []int) {
-	// TODO setstate include playernames, use string?
-	b.s = s
-	b.v = v
+	copy(b.s, s)
+	copy(b.v, v)
 	b.ProcessState()
 }
 
@@ -764,11 +774,11 @@ func (b *board) ProcessState() {
 		var preMovesTo = b.Client.Board.Premoveto[space]
 		var preMovesFrom = b.Client.Board.Premovefrom[space]
 
-		for i := 0; i < (abs+preMovesTo)-preMovesFrom; i++ {
+		for i := 0; i < abs+(preMovesTo-preMovesFrom); i++ {
 			s := b.newSprite(white)
 			if i >= abs {
 				s.colorWhite = v[fibs.StatePlayerColor] == 1
-				// TODO draw special premove overlay?
+				s.premove = true
 			}
 			b.spaces[space] = append(b.spaces[space], s)
 			b.Sprites.sprites = append(b.Sprites.sprites, s)
@@ -863,6 +873,10 @@ func (b *board) movePiece(from int, to int) {
 }
 
 func (b *board) update() {
+	if b.Client == nil {
+		return
+	}
+
 	if b.dragging == nil {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
@@ -941,6 +955,7 @@ func (b *board) update() {
 					for _, piece := range pieces {
 						if piece == dropped {
 							if space != index {
+								b.Client.Board.SetSelection(1, space)
 								b.Client.Board.AddPreMove(space, index)
 								b.ProcessState()
 							}

@@ -117,6 +117,7 @@ type Sprite struct {
 	toX        int
 	toY        int
 	colorWhite bool
+	premove    bool
 }
 
 func (s *Sprite) Update() {
@@ -179,6 +180,8 @@ func NewGame() *Game {
 		// TODO fetch HTTP request, set debugExtra
 	}()
 
+	fibs.Debug = 1 // TODO
+
 	g := &Game{
 		op: &ebiten.DrawImageOptions{
 			Filter: ebiten.FilterNearest,
@@ -206,13 +209,10 @@ func (g *Game) handleEvents() {
 	for e := range g.Client.Event {
 		switch event := e.(type) {
 		case *fibs.EventBoardState:
-			log.Println("STATE")
 			g.Board.SetState(event.S, event.V)
 		case *fibs.EventMove:
-			log.Println("MOVE")
 			g.Board.movePiece(event.From, event.To)
 		case *fibs.EventDraw:
-			log.Println("DRAW")
 			g.Board.ProcessState()
 		}
 	}
