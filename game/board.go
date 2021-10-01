@@ -134,13 +134,6 @@ func (b *board) newSprite(white bool) *Sprite {
 }
 
 func (b *board) updateBackgroundImage() {
-	tableColor := color.RGBA{0, 102, 51, 255}
-	frameColor := color.RGBA{65, 40, 14, 255}
-	borderColor := color.RGBA{0, 0, 0, 255}
-	faceColor := color.RGBA{120, 63, 25, 255}
-	triangleA := color.RGBA{225.0, 188, 125, 255}
-	triangleB := color.RGBA{120.0, 17.0, 0, 255}
-
 	borderSize := b.horizontalBorderSize
 	if borderSize > b.barWidth/2 {
 		borderSize = b.barWidth / 2
@@ -812,24 +805,30 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	sprite.toTime = moveTime
 	sprite.toStart = time.Now()
 	ebiten.ScheduleFrame()
+	log.Println("SCHEDULED FRAME, SLEEP")
 	time.Sleep(sprite.toTime)
 	sprite.x = x
 	sprite.y = y
+	sprite.toStart = time.Time{}
+	ebiten.ScheduleFrame()
+	log.Println("SCHEDULED FRAME, UNSLEEP")
 
 	if pause {
 		log.Println("PAUSE ", pauseTime)
 		time.Sleep(pauseTime)
 		log.Println("UNPAUSE")
+	} else {
+		time.Sleep(50 * time.Millisecond)
 	}
 
-	homeSpace := b.Client.Board.PlayerHomeSpace()
+	/*homeSpace := b.Client.Board.PlayerHomeSpace()
 	if b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor] {
 		homeSpace = 25 - homeSpace
 	}
 
-	if to != homeSpace {
-		b.spaces[to] = append(b.spaces[to], sprite)
-	}
+	if to != homeSpace {*/
+	b.spaces[to] = append(b.spaces[to], sprite)
+	/*}*/
 	for i, s := range b.spaces[from] {
 		if s == sprite {
 			b.spaces[from] = append(b.spaces[from][:i], b.spaces[from][i+1:]...)
@@ -860,14 +859,7 @@ func (b *board) movePiece(from int, to int) {
 
 	b._movePiece(sprite, from, to, 1, moveAfter == nil)
 	if moveAfter != nil {
-		toBar := 0
-		if b.v[fibs.StateDirection] == -1 {
-			toBar = 25
-		}
-		if b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor] {
-			toBar = 25 - toBar // TODO how is this determined?
-		}
-		b._movePiece(moveAfter, to, toBar, 1, true)
+		b._movePiece(moveAfter, to, b.Client.Board.PlayerBarSpace(), 1, true)
 	}
 	log.Println("FINISH MOVE PIECE", from, to)
 }
@@ -895,12 +887,12 @@ func (b *board) update() {
 		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			if b.dragging == nil {
 				x, y := ebiten.CursorPosition()
-
 				handled := handleReset(x, y)
 				if !handled {
 					s := b.spriteAt(x, y)
 					if s != nil {
 						b.dragging = s
+						// TODO set dragFrom instead of calculating later
 					}
 				}
 			}
@@ -909,7 +901,6 @@ func (b *board) update() {
 		b.touchIDs = inpututil.AppendJustPressedTouchIDs(b.touchIDs[:0])
 		for _, id := range b.touchIDs {
 			x, y := ebiten.TouchPosition(id)
-
 			handled := handleReset(x, y)
 			if !handled {
 				b.dragX, b.dragY = x, y

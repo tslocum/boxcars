@@ -120,34 +120,16 @@ type Sprite struct {
 	premove    bool
 }
 
-func (s *Sprite) Update() {
-	return // TODO
-}
-
 type Sprites struct {
 	sprites []*Sprite
 	num     int
 }
 
-func (s *Sprites) Update() {
-	for i := 0; i < s.num; i++ {
-		s.sprites[i].Update()
-	}
-}
-
-const (
-	MinSprites = 0
-	MaxSprites = 50000
-)
-
 var spinner = []byte(`-\|/`)
 
-type Game struct {
-	touchIDs []ebiten.TouchID
-	sprites  Sprites
-	op       *ebiten.DrawImageOptions
-	Board    *board
+var viewBoard bool // View board or lobby
 
+type Game struct {
 	screenW, screenH int
 
 	drawBuffer bytes.Buffer
@@ -166,6 +148,11 @@ type Game struct {
 
 	Client *fibs.Client
 
+	Board *board
+
+	lobby      *lobby
+	pendingWho []*fibs.WhoInfo
+
 	runeBuffer  []rune
 	inputBuffer string
 
@@ -173,13 +160,11 @@ type Game struct {
 
 	keyboard      *kibodo.Keyboard
 	shownKeyboard bool
+
+	op *ebiten.DrawImageOptions
 }
 
 func NewGame() *Game {
-	go func() {
-		// TODO fetch HTTP request, set debugExtra
-	}()
-
 	fibs.Debug = 1 // TODO
 
 	g := &Game{
@@ -187,6 +172,8 @@ func NewGame() *Game {
 			Filter: ebiten.FilterNearest,
 		},
 		Board: NewBoard(),
+
+		lobby: NewLobby(),
 
 		runeBuffer: make([]rune, 24),
 
@@ -208,6 +195,17 @@ func NewGame() *Game {
 func (g *Game) handleEvents() {
 	for e := range g.Client.Event {
 		switch event := e.(type) {
+		case *fibs.EventWho:
+			empty := len(g.lobby.who) == 0
+			if viewBoard || empty {
+				g.lobby.setWhoInfo(event.Who)
+
+				if empty {
+					ebiten.ScheduleFrame()
+				}
+			} else {
+				g.pendingWho = event.Who
+			}
 		case *fibs.EventBoardState:
 			g.Board.SetState(event.S, event.V)
 		case *fibs.EventMove:
@@ -226,6 +224,7 @@ func (g *Game) Connect() {
 		address = defaultServerAddress
 	}
 	g.Client = fibs.NewClient(address, g.Username, g.Password)
+	g.lobby.c = g.Client
 	g.Board.Client = g.Client
 
 	go g.handleEvents()
@@ -252,28 +251,6 @@ func (g *Game) Connect() {
 	}()
 }
 
-func (g *Game) leftTouched() bool {
-	for _, id := range g.touchIDs {
-		x, _ := ebiten.TouchPosition(id)
-		/*if x < screenWidth/2 {
-			return true
-		}*/
-		_ = x
-	}
-	return false
-}
-
-func (g *Game) rightTouched() bool {
-	for _, id := range g.touchIDs {
-		x, _ := ebiten.TouchPosition(id)
-		/*if x >= screenWidth/2 {
-			return true
-		}*/
-		_ = x
-	}
-	return false
-}
-
 // Separate update function for all normal update logic, as Update may only be
 // called when there is user input when vsync is disabled.
 func (g *Game) update() error {
@@ -289,6 +266,10 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	if ebiten.IsWindowBeingClosed() {
 		g.Exit()
 		return nil
+	}
+	if g.pendingWho != nil && viewBoard {
+		g.lobby.setWhoInfo(g.pendingWho)
+		g.pendingWho = nil
 	}
 
 	err = g.keyboard.Update()
@@ -359,24 +340,6 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		f()
 	}
 
-	g.touchIDs = ebiten.AppendTouchIDs(g.touchIDs[:0])
-
-	// Decrease the number of the sprites.
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) || g.leftTouched() {
-		g.sprites.num -= 20
-		if g.sprites.num < MinSprites {
-			g.sprites.num = MinSprites
-		}
-	}
-
-	// Increase the number of the sprites.
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) || g.rightTouched() {
-		g.sprites.num += 20
-		if MaxSprites < g.sprites.num {
-			g.sprites.num = MaxSprites
-		}
-	}
-
 	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		g.Debug++
 		if g.Debug == 3 {
@@ -385,9 +348,16 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		g.Board.debug = g.Debug
 	}
 
-	g.Board.update()
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		viewBoard = !viewBoard
+	}
 
-	//g.sprites.Update()
+	if !viewBoard {
+		g.lobby.update()
+	} else {
+		g.Board.update()
+	}
+
 	return nil
 }
 
@@ -424,9 +394,13 @@ http://www.fibs.com/help.html#register`
 		return
 	}
 
-	// Game screen
-
-	g.Board.draw(screen)
+	if !viewBoard {
+		// Lobby screen
+		g.lobby.draw(screen)
+	} else {
+		// Game board screen
+		g.Board.draw(screen)
+	}
 
 	if g.Debug > 0 {
 		debugBox := image.NewRGBA(image.Rect(10, 20, 200, 200))
@@ -469,6 +443,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	}
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
+
+	g.lobby.setRect(0, 0, g.screenW, g.screenH)
 	g.Board.setRect(0, 0, g.screenW, g.screenH)
 
 	displayArea := 200
