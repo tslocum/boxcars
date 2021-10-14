@@ -51,6 +51,9 @@ type lobby struct {
 	buffer      *ebiten.Image
 	bufferDirty bool
 
+	bufferButtons      *ebiten.Image
+	bufferButtonsDirty bool
+
 	op *ebiten.DrawImageOptions
 
 	c *fibs.Client
@@ -77,6 +80,41 @@ func (l *lobby) getButtons() []*lobbyButton {
 		return inviteButtons
 	}
 	return mainButtons
+}
+
+func (l *lobby) _drawBufferButtons() {
+	l.bufferButtons.Fill(frameColor)
+
+	// Draw border
+	for ly := 0; ly < 2; ly++ {
+		for lx := 0; lx < l.w; lx++ {
+			l.bufferButtons.Set(lx, ly, triangleA)
+		}
+	}
+
+	buttons := l.getButtons()
+
+	buttonWidth := l.w / len(buttons)
+	for i, button := range buttons {
+		// Draw border
+		if i > 0 {
+			for ly := 0; ly < l.buttonBarHeight; ly++ {
+				for lx := buttonWidth * i; lx < (buttonWidth*i)+2; lx++ {
+					l.bufferButtons.Set(lx, ly, triangleA)
+				}
+			}
+		}
+		bounds := text.BoundString(mplusNormalFont, button.label)
+
+		labelColor := triangleA
+
+		img := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
+		text.Draw(img, button.label, mplusNormalFont, 0, bounds.Dy(), labelColor)
+
+		l.op.GeoM.Reset()
+		l.op.GeoM.Translate(float64(buttonWidth*i)+float64((buttonWidth-bounds.Dx())/2), float64(l.buttonBarHeight-bounds.Dy())/2-float64(bounds.Dy()/2))
+		l.bufferButtons.DrawImage(img, l.op)
+	}
 }
 
 // Draw to the off-screen buffer.
@@ -172,43 +210,14 @@ func (l *lobby) drawBuffer() {
 		}
 	}
 
-	// Fill button bar
-	for ly := 0; ly < l.buttonBarHeight; ly++ {
-		for lx := 0; lx < l.w; lx++ {
-			l.buffer.Set(lx, l.h-ly, frameColor)
-		}
+	if l.bufferButtonsDirty {
+		l._drawBufferButtons()
+		l.bufferButtonsDirty = false
 	}
 
-	// Draw border
-	for ly := l.h - l.buttonBarHeight; ly < l.h-l.buttonBarHeight+2; ly++ {
-		for lx := 0; lx < l.w; lx++ {
-			l.buffer.Set(lx, ly, triangleA)
-		}
-	}
-
-	buttons := l.getButtons()
-
-	buttonWidth := l.w / len(buttons)
-	for i, button := range buttons {
-		// Draw border
-		if i > 0 {
-			for ly := l.h - l.buttonBarHeight; ly < l.h; ly++ {
-				for lx := buttonWidth * i; lx < (buttonWidth*i)+2; lx++ {
-					l.buffer.Set(lx, ly, triangleA)
-				}
-			}
-		}
-		bounds := text.BoundString(mplusNormalFont, button.label)
-
-		labelColor := triangleA
-
-		img := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-		text.Draw(img, button.label, mplusNormalFont, 0, bounds.Dy(), labelColor)
-
-		l.op.GeoM.Reset()
-		l.op.GeoM.Translate(float64(buttonWidth*i)+float64((buttonWidth-bounds.Dx())/2), float64(l.h-l.buttonBarHeight)+float64(l.buttonBarHeight-bounds.Dy())/2-float64(bounds.Dy()/2))
-		l.buffer.DrawImage(img, l.op)
-	}
+	l.op.GeoM.Reset()
+	l.op.GeoM.Translate(float64(l.x), float64(l.h-l.buttonBarHeight))
+	l.buffer.DrawImage(l.bufferButtons, l.op)
 }
 
 // Draw to the screen.
@@ -217,7 +226,14 @@ func (l *lobby) draw(screen *ebiten.Image) {
 		return
 	}
 
+	var p bool
+
 	if l.bufferDirty {
+		if len(l.who) > 1 {
+			p = true
+			//debugGame.toggleProfiling()
+		}
+
 		l.drawBuffer()
 		l.bufferDirty = false
 	}
@@ -225,6 +241,11 @@ func (l *lobby) draw(screen *ebiten.Image) {
 	l.op.GeoM.Reset()
 	l.op.GeoM.Translate(float64(l.x), float64(l.y))
 	screen.DrawImage(l.buffer, l.op)
+
+	if p {
+		//debugGame.toggleProfiling()
+		//os.Exit(0)
+	}
 }
 
 func (l *lobby) setRect(x, y, w, h int) {
@@ -232,17 +253,19 @@ func (l *lobby) setRect(x, y, w, h int) {
 		return
 	}
 
-	if l.w != w || l.h != h {
-		l.buffer = ebiten.NewImage(w, h)
-	}
-
 	s := ebiten.DeviceScaleFactor()
 	l.padding = 4 * s
 	l.entryH = 32 * s
 	l.buttonBarHeight = int(200 * s)
 
+	if l.w != w || l.h != h {
+		l.buffer = ebiten.NewImage(w, h)
+		l.bufferButtons = ebiten.NewImage(w, l.buttonBarHeight)
+	}
+
 	l.x, l.y, l.w, l.h = x, y, w, h
 	l.bufferDirty = true
+	l.bufferButtonsDirty = true
 }
 
 func (l *lobby) click(x, y int) {
@@ -268,6 +291,7 @@ func (l *lobby) click(x, y int) {
 
 				l.inviteUser = nil
 				l.bufferDirty = true
+				l.bufferButtonsDirty = true
 
 				viewBoard = true
 			case 1:
@@ -282,6 +306,7 @@ func (l *lobby) click(x, y int) {
 			case 3:
 				l.inviteUser = nil
 				l.bufferDirty = true
+				l.bufferButtonsDirty = true
 			}
 			return
 		}
@@ -291,6 +316,7 @@ func (l *lobby) click(x, y int) {
 			l.inviteUser = l.who[l.selected]
 			l.invitePoints = 1
 			l.bufferDirty = true
+			l.bufferButtonsDirty = true
 		case 1:
 			l.c.Out <- []byte(fmt.Sprintf("join %s", l.who[l.selected].Username))
 			viewBoard = true

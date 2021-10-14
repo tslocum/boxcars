@@ -9,6 +9,8 @@ import (
 	_ "image/png"
 	"log"
 	"os"
+	"path"
+	"runtime/pprof"
 	"strings"
 	"time"
 
@@ -41,6 +43,8 @@ import (
 var assetsFS embed.FS
 
 var debugExtra []byte
+
+var debugGame *Game
 
 var (
 	imgCheckerWhite *ebiten.Image
@@ -161,6 +165,10 @@ type Game struct {
 	keyboard      *kibodo.Keyboard
 	shownKeyboard bool
 
+	buffers *tabbedBuffers
+
+	cpuProfile *os.File
+
 	op *ebiten.DrawImageOptions
 }
 
@@ -178,17 +186,31 @@ func NewGame() *Game {
 		runeBuffer: make([]rune, 24),
 
 		keyboard: kibodo.NewKeyboard(),
+
+		buffers: newTabbedBuffers(),
 	}
 	g.keyboard.SetKeys(kibodo.KeysQWERTY)
 
 	// TODO
 	go func() {
+		/*
+			time.Sleep(5 * time.Second)
+			g.lobby.offset += 10
+			g.lobby.bufferDirty = true
+			g.toggleProfiling()
+			g.lobby.drawBuffer()
+			g.toggleProfiling()
+			os.Exit(0)
+		*/
+
 		t := time.NewTicker(time.Second / 4)
 		for range t.C {
+
 			_ = g.update()
 		}
 	}()
 
+	debugGame = g // TODO
 	return g
 }
 
@@ -270,6 +292,13 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	if g.pendingWho != nil && viewBoard {
 		g.lobby.setWhoInfo(g.pendingWho)
 		g.pendingWho = nil
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyP) {
+		err = g.toggleProfiling()
+		if err != nil {
+			return err
+		}
 	}
 
 	err = g.keyboard.Update()
@@ -400,6 +429,8 @@ http://www.fibs.com/help.html#register`
 	} else {
 		// Game board screen
 		g.Board.draw(screen)
+
+		g.buffers.draw(screen)
 	}
 
 	if g.Debug > 0 {
@@ -447,6 +478,36 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.lobby.setRect(0, 0, g.screenW, g.screenH)
 	g.Board.setRect(0, 0, g.screenW, g.screenH)
 
+	// Clamp buffer position.
+	bx, by := g.buffers.x, g.buffers.y
+	var bw, bh int
+	if g.buffers.w == 0 && g.buffers.h == 0 {
+		// Set initial buffer position.
+		bx = g.screenW / 2
+		by = g.screenH / 2
+		// Set initial buffer size.
+		bw = g.screenW / 2
+		bh = g.screenH / 4
+	} else {
+		// Scale existing buffer size
+		bx, by = bx*(outsideWidth/g.screenW), by*(outsideHeight/g.screenH)
+		bw, bh = g.buffers.w*(outsideWidth/g.screenW), g.buffers.h*(outsideHeight/g.screenH)
+		if bw < 200 {
+			bw = 200
+		}
+		if bh < 100 {
+			bh = 100
+		}
+	}
+	padding := 7
+	if bx > g.screenW-padding {
+		bx = g.screenW - padding
+	}
+	if by > g.screenH-padding {
+		by = g.screenH - padding
+	}
+	g.buffers.setRect(bx, by, bw, bh)
+
 	displayArea := 200
 	g.keyboard.SetRect(0, displayArea, g.screenW, g.screenH-displayArea)
 	return outsideWidth, outsideHeight
@@ -454,6 +515,34 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func (g *Game) resetImageOptions() {
 	g.op.GeoM.Reset()
+}
+
+func (g *Game) toggleProfiling() error {
+	if g.cpuProfile == nil {
+		log.Println("Profiling started...")
+
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return err
+		}
+		g.cpuProfile, err = os.Create(path.Join(homeDir, "cpu.prof")) // TODO add flag
+		if err != nil {
+			return err
+		}
+
+		if err := pprof.StartCPUProfile(g.cpuProfile); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	pprof.StopCPUProfile()
+	g.cpuProfile.Close()
+	g.cpuProfile = nil
+
+	log.Println("Profiling stopped")
+	return nil
 }
 
 func (g *Game) Exit() {

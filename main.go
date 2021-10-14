@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -35,12 +34,7 @@ func main() {
 
 	g := game.NewGame()
 
-	flag.StringVar(&g.Username, "username", "", "Username")
-	flag.StringVar(&g.Password, "password", "", "Password")
-	flag.StringVar(&g.ServerAddress, "address", "fibs.com:4321", "Server address")
-	flag.BoolVar(&g.Watch, "watch", false, "Watch random game")
-	flag.BoolVar(&g.TV, "tv", false, "Watch random games continuously")
-	flag.Parse()
+	parseFlags(g)
 
 	if AutoWatch {
 		g.Watch = true
