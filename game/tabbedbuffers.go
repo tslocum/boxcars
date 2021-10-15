@@ -2,6 +2,7 @@ package game
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 const (
@@ -29,6 +30,8 @@ type tabbedBuffers struct {
 	state int
 
 	focused bool
+
+	touchIDs []ebiten.TouchID
 }
 
 func newTabbedBuffers() *tabbedBuffers {
@@ -78,4 +81,27 @@ func (t *tabbedBuffers) draw(target *ebiten.Image) {
 	t.op.ColorM.Reset()
 	t.op.ColorM.Scale(1, 1, 1, alpha)
 	target.DrawImage(t.buffer, t.op)
+}
+
+func (t *tabbedBuffers) click(x, y int) {
+
+}
+
+func (t *tabbedBuffers) update() {
+	// TODO accept keyboard input
+
+	// TODO switch tabs
+
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		x, y := ebiten.CursorPosition()
+		t.click(x, y)
+	}
+
+	t.touchIDs = inpututil.AppendJustPressedTouchIDs(t.touchIDs[:0])
+	for _, id := range t.touchIDs {
+		x, y := ebiten.TouchPosition(id)
+		t.click(x, y)
+	}
+
+	// TODO add show virtual keyboard button
 }

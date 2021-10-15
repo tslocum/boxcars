@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"image/color"
 	"math"
-	"os"
+	"sort"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 
@@ -19,17 +20,17 @@ type lobbyButton struct {
 }
 
 var mainButtons = []*lobbyButton{
-	{"Invite...", func() {}},
-	{"Join", func() {}},
+	{"Refresh", func() {}},
 	{"Watch", func() {}},
-	{"Quit", func() {}},
+	{"Invite", func() {}},
+	{"Join", func() {}},
 }
 
 var inviteButtons = []*lobbyButton{
-	{"Send", func() {}},
+	{"Cancel", func() {}},
 	{"- Point", func() {}},
 	{"+ Point", func() {}},
-	{"Cancel", func() {}},
+	{"Send", func() {}},
 }
 
 type lobby struct {
@@ -60,17 +61,33 @@ type lobby struct {
 
 	inviteUser   *fibs.WhoInfo
 	invitePoints int
+
+	refresh bool
 }
 
 func NewLobby() *lobby {
 	l := &lobby{
-		op: &ebiten.DrawImageOptions{},
+		refresh: true,
+		op:      &ebiten.DrawImageOptions{},
 	}
 	return l
 }
 
 func (l *lobby) setWhoInfo(who []*fibs.WhoInfo) {
 	l.who = who
+
+	sort.Slice(l.who, func(i, j int) bool {
+		if (l.who[i].Opponent != "") != (l.who[j].Opponent != "") {
+			return l.who[i].Opponent != ""
+		}
+		if l.who[i].Ready != l.who[j].Ready {
+			return l.who[i].Ready
+		}
+		if l.who[i].Rating != l.who[j].Rating {
+			return l.who[i].Rating > l.who[j].Rating
+		}
+		return strings.ToLower(l.who[i].Username) < strings.ToLower(l.who[j].Username)
+	})
 
 	l.bufferDirty = true
 }
@@ -199,6 +216,8 @@ func (l *lobby) drawBuffer() {
 				status := "In the lobby"
 				if who.Opponent != "" {
 					status = fmt.Sprintf("Playing versus %s", who.Opponent)
+				} else if who.Ready {
+					status = "Ready to play"
 				}
 
 				drawEntry(cx+l.padding, cy+l.padding, who.Username, details, status, i == l.selected)
@@ -287,13 +306,9 @@ func (l *lobby) click(x, y int) {
 		if l.inviteUser != nil {
 			switch buttonIndex {
 			case 0:
-				l.c.Out <- []byte(fmt.Sprintf("invite %s %d", l.inviteUser.Username, l.invitePoints))
-
 				l.inviteUser = nil
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
-
-				viewBoard = true
 			case 1:
 				l.invitePoints--
 				if l.invitePoints < 1 {
@@ -304,27 +319,32 @@ func (l *lobby) click(x, y int) {
 				l.invitePoints++
 				l.bufferDirty = true
 			case 3:
+				l.c.Out <- []byte(fmt.Sprintf("invite %s %d", l.inviteUser.Username, l.invitePoints))
+
 				l.inviteUser = nil
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
+
+				viewBoard = true
 			}
 			return
 		}
 
 		switch buttonIndex {
 		case 0:
+			l.refresh = true
+			l.c.Out <- []byte("rawwho")
+		case 1:
+			l.c.Out <- []byte(fmt.Sprintf("watch %s", l.who[l.selected].Username))
+			viewBoard = true
+		case 2:
 			l.inviteUser = l.who[l.selected]
 			l.invitePoints = 1
 			l.bufferDirty = true
 			l.bufferButtonsDirty = true
-		case 1:
+		case 3:
 			l.c.Out <- []byte(fmt.Sprintf("join %s", l.who[l.selected].Username))
 			viewBoard = true
-		case 2:
-			l.c.Out <- []byte(fmt.Sprintf("watch %s", l.who[l.selected].Username))
-			viewBoard = true
-		case 3:
-			os.Exit(0)
 		}
 		return
 	}
@@ -338,10 +358,16 @@ func (l *lobby) click(x, y int) {
 }
 
 func (l *lobby) update() {
-	scrollLength := 2
+	scrollLength := 3
 
 	if _, y := ebiten.Wheel(); y != 0 {
-		l.offset -= int(math.Ceil(y)) * scrollLength
+		scroll := int(math.Ceil(y))
+		if scroll < -1 {
+			scroll = -1
+		} else if scroll > 1 {
+			scroll = 1
+		}
+		l.offset -= scroll * scrollLength
 		l.bufferDirty = true
 	}
 

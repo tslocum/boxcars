@@ -218,12 +218,12 @@ func (g *Game) handleEvents() {
 	for e := range g.Client.Event {
 		switch event := e.(type) {
 		case *fibs.EventWho:
-			empty := len(g.lobby.who) == 0
-			if viewBoard || empty {
+			if viewBoard || g.lobby.refresh {
 				g.lobby.setWhoInfo(event.Who)
 
-				if empty {
+				if g.lobby.refresh {
 					ebiten.ScheduleFrame()
+					g.lobby.refresh = false
 				}
 			} else {
 				g.pendingWho = event.Who
