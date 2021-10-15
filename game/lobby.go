@@ -7,10 +7,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
-
 	"code.rocketnine.space/tslocum/fibs"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 )
 
@@ -78,7 +77,7 @@ func (l *lobby) setWhoInfo(who []*fibs.WhoInfo) {
 
 	sort.Slice(l.who, func(i, j int) bool {
 		if (l.who[i].Opponent != "") != (l.who[j].Opponent != "") {
-			return l.who[i].Opponent != ""
+			return l.who[j].Opponent != ""
 		}
 		if l.who[i].Ready != l.who[j].Ready {
 			return l.who[i].Ready

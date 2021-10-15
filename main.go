@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"code.rocketnine.space/tslocum/fibs"
+
 	"code.rocketnine.space/tslocum/boxcars/game"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -35,6 +37,8 @@ func main() {
 	g := game.NewGame()
 
 	parseFlags(g)
+
+	fibs.Debug = g.Debug
 
 	if AutoWatch {
 		g.Watch = true

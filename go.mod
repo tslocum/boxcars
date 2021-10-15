@@ -8,6 +8,7 @@ require (
 	github.com/hajimehoshi/ebiten/v2 v2.2.0
 	github.com/llgcode/draw2d v0.0.0-20210904075650-80aa0a2a901d
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
+	golang.org/x/exp v0.0.0-20211012155715-ffe10e552389
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
 )
 
@@ -20,7 +21,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/reiver/go-oi v1.0.0 // indirect
 	github.com/reiver/go-telnet v0.0.0-20180421082511-9ff0b2ab096e // indirect
-	golang.org/x/exp v0.0.0-20211012155715-ffe10e552389 // indirect
 	golang.org/x/mobile v0.0.0-20210924032853-1c027f395ef7 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect

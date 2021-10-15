@@ -1,8 +1,12 @@
 package game
 
 import (
+	"image"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text"
+	"golang.org/x/exp/shiny/materialdesign/colornames"
 )
 
 const (
@@ -11,7 +15,7 @@ const (
 	WindowMaximized
 )
 
-const windowStartingAlpha = 0.8
+const windowStartingAlpha = 0.9
 
 type tabbedBuffers struct {
 	buffers []*textBuffer
@@ -35,12 +39,19 @@ type tabbedBuffers struct {
 }
 
 func newTabbedBuffers() *tabbedBuffers {
-	return &tabbedBuffers{
+	tab := &tabbedBuffers{
 		state:          windowNormal,
 		unfocusedAlpha: windowStartingAlpha,
 		buffer:         ebiten.NewImage(1, 1),
 		op:             &ebiten.DrawImageOptions{},
 	}
+
+	b := &textBuffer{
+		tab: tab,
+	}
+	tab.buffers = []*textBuffer{b}
+
+	return tab
 }
 
 func (t *tabbedBuffers) setRect(x, y, w, h int) {
@@ -57,14 +68,46 @@ func (t *tabbedBuffers) setRect(x, y, w, h int) {
 }
 
 func (t *tabbedBuffers) drawBuffer() {
-	t.buffer.Fill(frameColor)
+	t.buffer.Fill(borderColor)
+
+	sub := t.buffer.SubImage(image.Rect(1, 1, t.w-1, t.h-1)).(*ebiten.Image)
+	sub.Fill(frameColor)
+
+	b := t.buffers[0]
+
+	l := len(b.content)
+
+	lineHeight := 16
+	showLines := t.h / lineHeight
+	if showLines > 1 {
+		showLines--
+	}
+	if showLines > 1 {
+		showLines--
+	}
+
+	if l < showLines {
+		showLines = l
+	}
+	for i := 0; i < showLines; i++ {
+		line := string(b.content[l-showLines+i])
+
+		bounds := text.BoundString(monoFont, line)
+		_ = bounds
+		text.Draw(t.buffer, line, monoFont, 0, (lineHeight * (i + 1)), colornames.White)
+	}
+
+	text.Draw(t.buffer, "Say: Input buffer test", monoFont, 0, t.h-lineHeight, colornames.White)
 }
 
 func (t *tabbedBuffers) draw(target *ebiten.Image) {
 	if t.buffer == nil {
 		return
 	}
-	return // This feature is not yet finished.
+
+	if t.state == windowMinimized {
+		return
+	}
 
 	if t.bufferDirty {
 		t.drawBuffer()
@@ -89,6 +132,17 @@ func (t *tabbedBuffers) click(x, y int) {
 
 func (t *tabbedBuffers) update() {
 	// TODO accept keyboard input
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		if t.state == windowMinimized {
+			t.state = windowNormal
+		} else {
+			t.state = windowMinimized
+		}
+		t.bufferDirty = true
+	}
+
+	// Enter brings up keyboard and hides it when there is no input
 
 	// TODO switch tabs
 

@@ -25,20 +25,6 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
-// Copyright 2020 The Ebiten Authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 //go:embed assets
 var assetsFS embed.FS
 
@@ -51,6 +37,7 @@ var (
 	imgCheckerBlack *ebiten.Image
 
 	mplusNormalFont font.Face
+	monoFont        font.Face
 	mplusBigFont    font.Face
 )
 
@@ -104,6 +91,19 @@ func initializeFonts() {
 		Size:    32,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tt, err = opentype.Parse(fonts.PressStart2P_ttf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	monoFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    12,
+		DPI:     dpi,
+		Hinting: font.HintingNone,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -173,8 +173,6 @@ type Game struct {
 }
 
 func NewGame() *Game {
-	fibs.Debug = 1 // TODO
-
 	g := &Game{
 		op: &ebiten.DrawImageOptions{
 			Filter: ebiten.FilterNearest,
@@ -190,6 +188,10 @@ func NewGame() *Game {
 		buffers: newTabbedBuffers(),
 	}
 	g.keyboard.SetKeys(kibodo.KeysQWERTY)
+
+	msgHandler := NewMessageHandler(g)
+	fibs.StatusWriter = msgHandler
+	fibs.GameWriter = msgHandler
 
 	// TODO
 	go func() {
@@ -381,6 +383,8 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		viewBoard = !viewBoard
 	}
 
+	g.buffers.update()
+
 	if !viewBoard {
 		g.lobby.update()
 	} else {
@@ -483,11 +487,11 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	var bw, bh int
 	if g.buffers.w == 0 && g.buffers.h == 0 {
 		// Set initial buffer position.
-		bx = g.screenW / 2
+		bx = 0
 		by = g.screenH / 2
 		// Set initial buffer size.
-		bw = g.screenW / 2
-		bh = g.screenH / 4
+		bw = g.screenW
+		bh = g.screenH / 2
 	} else {
 		// Scale existing buffer size
 		bx, by = bx*(outsideWidth/g.screenW), by*(outsideHeight/g.screenH)
@@ -548,4 +552,21 @@ func (g *Game) toggleProfiling() error {
 func (g *Game) Exit() {
 	g.Board.drawFrame <- false
 	os.Exit(0)
+}
+
+type messageHandler struct {
+	g *Game
+}
+
+func NewMessageHandler(g *Game) *messageHandler {
+	return &messageHandler{
+		g: g,
+	}
+}
+
+func (m messageHandler) Write(p []byte) (n int, err error) {
+	log.Println(string(p))
+
+	m.g.buffers.buffers[0].Write(p)
+	return len(p), nil
 }
