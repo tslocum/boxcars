@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	code.rocketnine.space/tslocum/fibs v0.0.0-20211001010223-882585bf240f
-	code.rocketnine.space/tslocum/kibodo v0.0.0-20210917002454-47a7751c7a48
+	code.rocketnine.space/tslocum/kibodo v0.0.0-20211019025539-477569f21e2d
 	github.com/hajimehoshi/ebiten/v2 v2.2.0
 	github.com/llgcode/draw2d v0.0.0-20210904075650-80aa0a2a901d
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
@@ -23,11 +23,9 @@ require (
 	github.com/reiver/go-telnet v0.0.0-20180421082511-9ff0b2ab096e // indirect
 	golang.org/x/mobile v0.0.0-20210924032853-1c027f395ef7 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
+	golang.org/x/sys v0.0.0-20211015200801-69063c4bb744 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
 
 replace code.rocketnine.space/tslocum/fibs => /home/trevor/programming/fibs
-
-replace code.rocketnine.space/tslocum/kibodo => /home/trevor/programming/kibodo

@@ -163,6 +163,7 @@ type Game struct {
 	Debug int
 
 	keyboard      *kibodo.Keyboard
+	keyboardInput []*kibodo.Input
 	shownKeyboard bool
 
 	buffers *tabbedBuffers
@@ -334,23 +335,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 			}()
 
 			if !g.shownKeyboard {
-				ch := make(chan *kibodo.Input, 10)
-				go func() {
-					for input := range ch {
-						if input.Rune > 0 {
-							g.inputBuffer += string(input.Rune)
-							continue
-						}
-						if input.Key == ebiten.KeyBackspace {
-							if len(g.inputBuffer) > 0 {
-								g.inputBuffer = g.inputBuffer[:len(g.inputBuffer)-1]
-							}
-						} else if input.Key == ebiten.KeyEnter {
-							g.inputBuffer += "\n"
-						}
-					}
-				}()
-				g.keyboard.Show(ch)
+				g.keyboard.Show()
 				g.shownKeyboard = true
 			}
 
@@ -365,6 +350,22 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 			g.runeBuffer = ebiten.AppendInputChars(g.runeBuffer[:0])
 			if len(g.runeBuffer) > 0 {
 				g.inputBuffer += string(g.runeBuffer)
+			}
+
+			// Process on-screen keyboard input.
+			g.keyboardInput = g.keyboard.AppendInput(g.keyboardInput[:0])
+			for _, input := range g.keyboardInput {
+				if input.Rune > 0 {
+					g.inputBuffer += string(input.Rune)
+					continue
+				}
+				if input.Key == ebiten.KeyBackspace {
+					if len(g.inputBuffer) > 0 {
+						g.inputBuffer = g.inputBuffer[:len(g.inputBuffer)-1]
+					}
+				} else if input.Key == ebiten.KeyEnter {
+					g.inputBuffer += "\n"
+				}
 			}
 		}
 
@@ -565,7 +566,7 @@ func NewMessageHandler(g *Game) *messageHandler {
 }
 
 func (m messageHandler) Write(p []byte) (n int, err error) {
-	log.Println(string(p))
+	log.Print(string(p))
 
 	m.g.buffers.buffers[0].Write(p)
 	return len(p), nil
