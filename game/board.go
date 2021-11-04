@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"log"
+	"os"
 	"time"
 
 	"code.rocketnine.space/tslocum/fibs"
@@ -504,12 +505,18 @@ func (b *board) draw(screen *ebiten.Image) {
 	}
 
 	if b.debug == 2 {
+		homeStart, homeEnd := b.Client.Board.PlayerHomeSpaces()
 		b.iterateSpaces(func(space int) {
 			x, y, w, h := b.spaceRect(space)
 			spaceImage := ebiten.NewImage(w, h)
 			br := ""
-			if b.bottomRow(space) {
-				br = "B"
+			if space >= homeStart && space <= homeEnd {
+				br += "H"
+			}
+			if space == b.Client.Board.PlayerBarSpace() {
+				br += "(PB)"
+			} else if space == 25-b.Client.Board.PlayerBarSpace() {
+				br += "(OB)"
 			}
 			ebitenutil.DebugPrint(spaceImage, fmt.Sprintf(" %d %s", space, br))
 			x, y = b.offsetPosition(x, y)
@@ -736,6 +743,16 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 }
 
 func (b *board) SetState(s []string, v []int) {
+	log.Printf("OLD %+v", b.v)
+	log.Printf("NEW %+v", v)
+
+	for i := 0; i < 26; i++ {
+		var str string
+		if b.v[fibs.StateBoardSpace0+i] != v[fibs.StateBoardSpace0+i] {
+			str = "^^^"
+		}
+		log.Printf("SPACE %d WAS %d, NOW %d %s", i, b.v[fibs.StateBoardSpace0+i], v[fibs.StateBoardSpace0+i], str)
+	}
 	copy(b.s, s)
 	copy(b.v, v)
 	b.ProcessState()
@@ -782,9 +799,15 @@ func (b *board) ProcessState() {
 	b.positionCheckers()
 }
 
+// _movePiece returns after moving the piece.
 func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bool) {
-	moveTime := time.Second / time.Duration(speed)
-	pauseTime := 750 * time.Millisecond
+	t := time.Now()
+	defer func() {
+		log.Printf("MOVE PIECE TOOK %s", time.Since(t))
+	}()
+
+	moveTime := (750 * time.Millisecond) / time.Duration(speed)
+	pauseTime := 500 * time.Millisecond
 
 	b.moving = sprite
 
@@ -805,21 +828,12 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	sprite.toTime = moveTime
 	sprite.toStart = time.Now()
 	ebiten.ScheduleFrame()
-	log.Println("SCHEDULED FRAME, SLEEP")
-	time.Sleep(sprite.toTime)
+	time.Sleep(moveTime)
+
 	sprite.x = x
 	sprite.y = y
 	sprite.toStart = time.Time{}
 	ebiten.ScheduleFrame()
-	log.Println("SCHEDULED FRAME, UNSLEEP")
-
-	if pause {
-		log.Println("PAUSE ", pauseTime)
-		time.Sleep(pauseTime)
-		log.Println("UNPAUSE")
-	} else {
-		time.Sleep(50 * time.Millisecond)
-	}
 
 	/*homeSpace := b.Client.Board.PlayerHomeSpace()
 	if b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor] {
@@ -837,14 +851,19 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	}
 	b.moving = nil
 
-	b.ScheduleFrame()
+	if pause {
+		time.Sleep(pauseTime)
+	} else {
+		time.Sleep(50 * time.Millisecond)
+	}
 }
 
-// Do not call directly
+// movePiece returns when finished moving the piece.
 func (b *board) movePiece(from int, to int) {
 	pieces := b.spaces[from]
 	if len(pieces) == 0 {
 		log.Printf("%d-%d: NO PIECES AT SPACE %d", from, to, from)
+		os.Exit(1)
 		return
 	}
 
@@ -859,7 +878,11 @@ func (b *board) movePiece(from int, to int) {
 
 	b._movePiece(sprite, from, to, 1, moveAfter == nil)
 	if moveAfter != nil {
-		b._movePiece(moveAfter, to, b.Client.Board.PlayerBarSpace(), 1, true)
+		bar := b.Client.Board.PlayerBarSpace()
+		if b.v[fibs.StateTurn] == b.v[fibs.StatePlayerColor] {
+			bar = 25 - bar
+		}
+		b._movePiece(moveAfter, to, bar, 1, true)
 	}
 	log.Println("FINISH MOVE PIECE", from, to)
 }

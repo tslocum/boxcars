@@ -162,6 +162,8 @@ type Game struct {
 
 	Debug int
 
+	debugImg *ebiten.Image
+
 	keyboard      *kibodo.Keyboard
 	keyboardInput []*kibodo.Input
 	shownKeyboard bool
@@ -187,6 +189,8 @@ func NewGame() *Game {
 		keyboard: kibodo.NewKeyboard(),
 
 		buffers: newTabbedBuffers(),
+
+		debugImg: ebiten.NewImage(200, 200),
 	}
 	g.keyboard.SetKeys(kibodo.KeysQWERTY)
 
@@ -208,7 +212,6 @@ func NewGame() *Game {
 
 		t := time.NewTicker(time.Second / 4)
 		for range t.C {
-
 			_ = g.update()
 		}
 	}()
@@ -232,10 +235,15 @@ func (g *Game) handleEvents() {
 				g.pendingWho = event.Who
 			}
 		case *fibs.EventBoardState:
+			log.Println("EVENTBOARDSTATE START")
 			g.Board.SetState(event.S, event.V)
+			log.Println("EVENTBOARDSTATE FINISH")
 		case *fibs.EventMove:
+			log.Printf("EVENTMOVE START %d %d", event.From, event.To)
 			g.Board.movePiece(event.From, event.To)
+			log.Println("EVENTMOVE FINISH")
 		case *fibs.EventDraw:
+			log.Println("EVENTDRAW START")
 			g.Board.ProcessState()
 		}
 	}
@@ -439,9 +447,6 @@ http://www.fibs.com/help.html#register`
 	}
 
 	if g.Debug > 0 {
-		debugBox := image.NewRGBA(image.Rect(10, 20, 200, 200))
-		debugImg := ebiten.NewImageFromImage(debugBox)
-
 		g.drawBuffer.Reset()
 
 		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %0.0f %c\nTPS %0.0f", ebiten.CurrentFPS(), spinner[g.spinnerIndex], ebiten.CurrentTPS())))
@@ -462,12 +467,14 @@ http://www.fibs.com/help.html#register`
 			g.drawBuffer.Write(debugExtra)
 		}
 
-		ebitenutil.DebugPrint(debugImg, g.drawBuffer.String())
+		g.debugImg.Clear()
+
+		ebitenutil.DebugPrint(g.debugImg, g.drawBuffer.String())
 
 		g.resetImageOptions()
 		g.op.GeoM.Translate(3, 0)
 		g.op.GeoM.Scale(2, 2)
-		screen.DrawImage(debugImg, g.op)
+		screen.DrawImage(g.debugImg, g.op)
 	}
 }
 
@@ -480,38 +487,46 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 
-	g.lobby.setRect(0, 0, g.screenW, g.screenH)
 	g.Board.setRect(0, 0, g.screenW, g.screenH)
+	g.lobby.setRect(0, 0, g.screenW, g.screenH)
 
-	// Clamp buffer position.
-	bx, by := g.buffers.x, g.buffers.y
-	var bw, bh int
-	if g.buffers.w == 0 && g.buffers.h == 0 {
-		// Set initial buffer position.
-		bx = 0
-		by = g.screenH / 2
-		// Set initial buffer size.
-		bw = g.screenW
-		bh = g.screenH / 2
+	availableWidth := g.Board.w - (g.Board.spaceWidth * 14)
+	if availableWidth >= 150 {
+		g.Board.setRect(0, 0, g.screenW-availableWidth, g.screenH)
+		g.buffers.setRect(g.screenW-availableWidth, 0, availableWidth, g.screenH)
+		// TODO set flag to restore user position (could use extra state for this? docked state?)
 	} else {
-		// Scale existing buffer size
-		bx, by = bx*(outsideWidth/g.screenW), by*(outsideHeight/g.screenH)
-		bw, bh = g.buffers.w*(outsideWidth/g.screenW), g.buffers.h*(outsideHeight/g.screenH)
-		if bw < 200 {
-			bw = 200
+		// Clamp buffer position.
+		bx, by := g.buffers.x, g.buffers.y
+		var bw, bh int
+		if g.buffers.w == 0 && g.buffers.h == 0 {
+			// Set initial buffer position.
+			bx = 0
+			by = g.screenH / 2
+			// Set initial buffer size.
+			bw = g.screenW
+			bh = g.screenH / 2
+		} else {
+			// Scale existing buffer size
+			bx, by = bx*(outsideWidth/g.screenW), by*(outsideHeight/g.screenH)
+			bw, bh = g.buffers.w*(outsideWidth/g.screenW), g.buffers.h*(outsideHeight/g.screenH)
+			if bw < 200 {
+				bw = 200
+			}
+			if bh < 100 {
+				bh = 100
+			}
 		}
-		if bh < 100 {
-			bh = 100
+		padding := 7
+		if bx > g.screenW-padding {
+			bx = g.screenW - padding
 		}
+		if by > g.screenH-padding {
+			by = g.screenH - padding
+		}
+
+		g.buffers.setRect(bx, by, bw, bh)
 	}
-	padding := 7
-	if bx > g.screenW-padding {
-		bx = g.screenW - padding
-	}
-	if by > g.screenH-padding {
-		by = g.screenH - padding
-	}
-	g.buffers.setRect(bx, by, bw, bh)
 
 	displayArea := 200
 	g.keyboard.SetRect(0, displayArea, g.screenW, g.screenH-displayArea)

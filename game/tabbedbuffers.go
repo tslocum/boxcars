@@ -17,6 +17,8 @@ const (
 
 const windowStartingAlpha = 0.9
 
+const bufferCharacterWidth = 12
+
 type tabbedBuffers struct {
 	buffers []*textBuffer
 	labels  [][]byte
@@ -28,6 +30,8 @@ type tabbedBuffers struct {
 
 	buffer      *ebiten.Image
 	bufferDirty bool
+
+	wrapWidth int
 
 	op *ebiten.DrawImageOptions
 
@@ -64,6 +68,13 @@ func (t *tabbedBuffers) setRect(x, y, w, h int) {
 		t.bufferDirty = true
 	}
 
+	if t.w != w {
+		t.wrapWidth = w / bufferCharacterWidth
+		for _, b := range t.buffers {
+			b.wrapDirty = true
+		}
+	}
+
 	t.x, t.y, t.w, t.h = x, y, w, h
 }
 
@@ -75,7 +86,7 @@ func (t *tabbedBuffers) drawBuffer() {
 
 	b := t.buffers[0]
 
-	l := len(b.content)
+	l := len(b.contentWrapped)
 
 	lineHeight := 16
 	showLines := t.h / lineHeight
@@ -90,7 +101,7 @@ func (t *tabbedBuffers) drawBuffer() {
 		showLines = l
 	}
 	for i := 0; i < showLines; i++ {
-		line := string(b.content[l-showLines+i])
+		line := b.contentWrapped[l-showLines+i]
 
 		bounds := text.BoundString(monoFont, line)
 		_ = bounds
@@ -110,7 +121,16 @@ func (t *tabbedBuffers) draw(target *ebiten.Image) {
 	}
 
 	if t.bufferDirty {
+		for _, b := range t.buffers {
+			if b.wrapDirty {
+				b.wrapContent()
+
+				b.wrapDirty = false
+			}
+		}
+
 		t.drawBuffer()
+
 		t.bufferDirty = false
 	}
 
