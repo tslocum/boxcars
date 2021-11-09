@@ -259,6 +259,7 @@ func (g *Game) Connect() {
 	g.Client = fibs.NewClient(address, g.Username, g.Password)
 	g.lobby.c = g.Client
 	g.Board.Client = g.Client
+	g.buffers.client = g.Client
 
 	go g.handleEvents()
 
@@ -380,7 +381,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		f()
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
+	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		g.Debug++
 		if g.Debug == 3 {
 			g.Debug = 0
@@ -392,12 +393,12 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		viewBoard = !viewBoard
 	}
 
-	g.buffers.update()
-
 	if !viewBoard {
 		g.lobby.update()
 	} else {
 		g.Board.update()
+
+		g.buffers.update()
 	}
 
 	return nil
@@ -449,7 +450,7 @@ http://www.fibs.com/help.html#register`
 	if g.Debug > 0 {
 		g.drawBuffer.Reset()
 
-		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %0.0f %c\nTPS %0.0f", ebiten.CurrentFPS(), spinner[g.spinnerIndex], ebiten.CurrentTPS())))
+		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %c %0.0f", spinner[g.spinnerIndex], ebiten.CurrentFPS())))
 
 		g.spinnerIndex++
 		if g.spinnerIndex == 4 {

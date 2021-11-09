@@ -5,10 +5,10 @@ go 1.17
 require (
 	code.rocketnine.space/tslocum/fibs v0.0.0-20211104004539-6041d6487dd3
 	code.rocketnine.space/tslocum/kibodo v0.0.0-20211027223129-7b870790d865
-	github.com/hajimehoshi/ebiten/v2 v2.2.1
+	github.com/hajimehoshi/ebiten/v2 v2.2.2
 	github.com/llgcode/draw2d v0.0.0-20210904075650-80aa0a2a901d
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	golang.org/x/exp v0.0.0-20211103171733-83d51122435b
+	golang.org/x/exp v0.0.0-20211105205138-14c72366447f
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 )
 
@@ -23,7 +23,7 @@ require (
 	github.com/reiver/go-telnet v0.0.0-20180421082511-9ff0b2ab096e // indirect
 	golang.org/x/mobile v0.0.0-20211103151657-e68c98865fb2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211103235746-7861aae1554b // indirect
+	golang.org/x/sys v0.0.0-20211108224332-cbcd623f202e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )

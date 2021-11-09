@@ -3,6 +3,7 @@ package game
 import (
 	"image"
 
+	"code.rocketnine.space/tslocum/fibs"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -40,6 +41,12 @@ type tabbedBuffers struct {
 	focused bool
 
 	touchIDs []ebiten.TouchID
+
+	incomingBuffer []rune
+
+	inputBuffer []byte
+
+	client *fibs.Client
 }
 
 func newTabbedBuffers() *tabbedBuffers {
@@ -62,6 +69,8 @@ func (t *tabbedBuffers) setRect(x, y, w, h int) {
 	if t.x == x && t.y == y && t.w == w && t.h == h {
 		return
 	}
+
+	// TODO dynamic padding
 
 	if t.w != w || t.h != h {
 		t.buffer = ebiten.NewImage(w, h)
@@ -90,9 +99,7 @@ func (t *tabbedBuffers) drawBuffer() {
 
 	lineHeight := 16
 	showLines := t.h / lineHeight
-	if showLines > 1 {
-		showLines--
-	}
+	// Leave space for the input buffer.
 	if showLines > 1 {
 		showLines--
 	}
@@ -108,7 +115,7 @@ func (t *tabbedBuffers) drawBuffer() {
 		text.Draw(t.buffer, line, monoFont, 0, (lineHeight * (i + 1)), colornames.White)
 	}
 
-	text.Draw(t.buffer, "Say: Input buffer test", monoFont, 0, t.h-lineHeight, colornames.White)
+	text.Draw(t.buffer, "> "+string(t.inputBuffer), monoFont, 0, t.h, colornames.White)
 }
 
 func (t *tabbedBuffers) draw(target *ebiten.Image) {
@@ -151,17 +158,6 @@ func (t *tabbedBuffers) click(x, y int) {
 }
 
 func (t *tabbedBuffers) update() {
-	// TODO accept keyboard input
-
-	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		if t.state == windowMinimized {
-			t.state = windowNormal
-		} else {
-			t.state = windowMinimized
-		}
-		t.bufferDirty = true
-	}
-
 	// Enter brings up keyboard and hides it when there is no input
 
 	// TODO switch tabs
@@ -175,6 +171,41 @@ func (t *tabbedBuffers) update() {
 	for _, id := range t.touchIDs {
 		x, y := ebiten.TouchPosition(id)
 		t.click(x, y)
+	}
+
+	// Read user input.
+	t.incomingBuffer = ebiten.AppendInputChars(t.incomingBuffer[:0])
+	if len(t.incomingBuffer) > 0 {
+		t.inputBuffer = append(t.inputBuffer, []byte(string(t.incomingBuffer))...)
+		t.bufferDirty = true
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(t.inputBuffer) > 0 {
+		b := string(t.inputBuffer)
+		if len(b) > 1 {
+			t.inputBuffer = []byte(b[:len(b)-1])
+		} else {
+			t.inputBuffer = nil
+		}
+		t.bufferDirty = true
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		if len(t.inputBuffer) == 0 {
+			if t.state == windowMinimized {
+				t.state = windowNormal
+			} else {
+				t.state = windowMinimized
+			}
+		} else {
+			if t.client != nil {
+				t.client.Out <- t.inputBuffer
+			} else {
+				fibs.StatusWriter.Write([]byte("* You have not connected to a server yet"))
+			}
+			t.inputBuffer = nil
+		}
+		t.bufferDirty = true
 	}
 
 	// TODO add show virtual keyboard button
