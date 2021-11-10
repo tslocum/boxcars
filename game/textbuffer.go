@@ -26,6 +26,8 @@ func (b *textBuffer) Write(p []byte) {
 
 	b.wrapDirty = true
 	b.tab.bufferDirty = true
+
+	// TODO /boardstate results in invalid draw
 	ebiten.ScheduleFrame()
 }
 

@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"image/color"
 
 	"code.rocketnine.space/tslocum/fibs"
@@ -123,11 +124,11 @@ func (t *tabbedBuffers) drawBuffer() {
 
 	lineHeight := 14
 	showLines := t.h / lineHeight
+	if showLines > 1 {
+		showLines--
+	}
 	if t.acceptInput {
 		// Leave space for the input buffer.
-		if showLines > 1 {
-			showLines--
-		}
 		if showLines > 1 {
 			showLines--
 		}
@@ -236,10 +237,10 @@ func (t *tabbedBuffers) update() {
 			if t.client != nil {
 				if len(t.inputBuffer) > 0 {
 					if t.inputBuffer[0] == '/' {
-						// TODO add chat modes and show (kibitz/yell)
-						t.inputBuffer = t.inputBuffer[1:]
+						t.client.Out <- t.inputBuffer[1:]
+					} else {
+						t.client.Out <- []byte(fmt.Sprintf("kibitz %s", t.inputBuffer))
 					}
-					t.client.Out <- t.inputBuffer
 				}
 			} else {
 				fibs.StatusWriter.Write([]byte("* You have not connected to a server yet"))

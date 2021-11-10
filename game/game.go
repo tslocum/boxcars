@@ -258,6 +258,7 @@ func (g *Game) handleEvents() {
 		case *fibs.EventDraw:
 			log.Println("EVENTDRAW START")
 			g.Board.ProcessState()
+			log.Println("EVENTDRAW FINISH")
 		}
 	}
 }
@@ -506,15 +507,18 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		statusBufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
 
-	gameBufferheight := 100
+	showGameBufferLines := 8
+	gameBufferHeight := g.statusBuffer.chatFontSize * showGameBufferLines * 2
+	statusBufferHeight := g.screenH - gameBufferHeight
 
-	g.Board.setRect(0, 0, g.screenW-statusBufferWidth, g.screenH-gameBufferheight)
 	g.lobby.setRect(0, 0, g.screenW, g.screenH)
 
-	availableWidth := g.screenW - (g.Board.innerW + int(g.Board.barWidth))
+	g.Board.setRect(0, 0, g.screenW-statusBufferWidth, g.screenH)
+
+	availableWidth := g.screenW - (g.Board.innerW + int(g.Board.horizontalBorderSize*2))
 	if availableWidth > statusBufferWidth {
 		statusBufferWidth = availableWidth
-		g.Board.setRect(0, 0, g.screenW-statusBufferWidth, g.screenH-gameBufferheight)
+		g.Board.setRect(0, 0, g.screenW-statusBufferWidth, g.screenH)
 	}
 
 	if g.Board.h > g.Board.w {
@@ -523,10 +527,10 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	if true || availableWidth >= 150 { // TODO allow chat window to be repositioned
 		g.statusBuffer.docked = true
-		g.statusBuffer.setRect(g.screenW-statusBufferWidth, 0, statusBufferWidth, g.screenH)
+		g.statusBuffer.setRect(g.screenW-statusBufferWidth, g.screenH-(statusBufferHeight), statusBufferWidth, statusBufferHeight)
 
 		g.gameBuffer.docked = true
-		g.gameBuffer.setRect(0, g.Board.h, g.Board.w, g.screenH-(g.Board.h))
+		g.gameBuffer.setRect(g.screenW-statusBufferWidth, 0, statusBufferWidth, statusBufferHeight)
 	} else {
 		// Clamp buffer position.
 		bx, by := g.statusBuffer.x, g.statusBuffer.y

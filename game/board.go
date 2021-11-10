@@ -552,6 +552,13 @@ func (b *board) setRect(x, y, w, h int) {
 		b.spaceWidth = ((float64(b.w) - (b.horizontalBorderSize * 2)) - b.barWidth) / 12
 	}
 
+	if b.barWidth < 1 {
+		b.barWidth = 1
+	}
+	if b.spaceWidth < 1 {
+		b.spaceWidth = 1
+	}
+
 	borderSize := b.horizontalBorderSize
 	if borderSize > b.barWidth/2 {
 		borderSize = b.barWidth / 2
@@ -568,14 +575,15 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.setSpaceRects()
 	b.updateBackgroundImage()
-	b.positionCheckers()
+	b.ProcessState()
 }
 
 func (b *board) offsetPosition(x, y int) (int, int) {
 	return b.x + x + int(b.horizontalBorderSize), b.y + y + int(b.verticalBorderSize)
 }
 
-func (b *board) positionCheckers() {
+// Do not call _positionCheckers directly.  Call ProcessState instead.
+func (b *board) _positionCheckers() {
 	for space := 0; space < 26; space++ {
 		sprites := b.spaces[space]
 
@@ -786,16 +794,11 @@ func (b *board) ProcessState() {
 	}
 	b.Sprites.num = len(b.Sprites.sprites)
 
-	b.positionCheckers()
+	b._positionCheckers()
 }
 
 // _movePiece returns after moving the piece.
 func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bool) {
-	t := time.Now()
-	defer func() {
-		log.Printf("MOVE PIECE TOOK %s", time.Since(t))
-	}()
-
 	moveTime := (750 * time.Millisecond) / time.Duration(speed)
 	pauseTime := 500 * time.Millisecond
 
@@ -876,7 +879,6 @@ func (b *board) movePiece(from int, to int) {
 		}
 		b._movePiece(moveAfter, to, bar, 1, true)
 	}
-	log.Println("FINISH MOVE PIECE", from, to)
 }
 
 func (b *board) update() {
@@ -951,27 +953,27 @@ func (b *board) update() {
 		b.dragging = nil
 	}
 	if dropped != nil {
-		// TODO allow dragging anywhere outside of board to bear off
-		// allow dragging on to bar to bear off
-
 		index := b.spaceAt(x, y)
-		if index >= 0 {
-			if b.Client != nil {
-				for space, pieces := range b.spaces {
-					for _, piece := range pieces {
-						if piece == dropped {
-							if space != index {
-								b.Client.Board.SetSelection(1, space)
-								b.Client.Board.AddPreMove(space, index)
-								b.ProcessState()
-							}
-							break
+		// Bear off by dragging outside the board.
+		if index == fibs.SpaceUnknown && b.Client.Board.PlayerPieceAreHome() {
+			index = b.Client.Board.PlayerBearOffSpace()
+		}
+		if index >= 0 && b.Client != nil {
+		ADDPREMOVE:
+			for space, pieces := range b.spaces {
+				for _, piece := range pieces {
+					if piece == dropped {
+						if space != index {
+							b.Client.Board.SetSelection(1, space)
+							b.Client.Board.AddPreMove(space, index)
 						}
+						break ADDPREMOVE
 					}
 				}
 			}
 		}
-		b.positionCheckers()
+
+		b.ProcessState()
 	}
 
 	if b.dragging != nil {

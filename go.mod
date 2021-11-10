@@ -3,7 +3,7 @@ module code.rocketnine.space/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocketnine.space/tslocum/fibs v0.0.0-20211104004539-6041d6487dd3
+	code.rocketnine.space/tslocum/fibs v0.0.0-20211110163919-18c4cdbc32e9
 	code.rocketnine.space/tslocum/kibodo v0.0.0-20211027223129-7b870790d865
 	github.com/hajimehoshi/ebiten/v2 v2.2.2
 	github.com/llgcode/draw2d v0.0.0-20210904075650-80aa0a2a901d
@@ -23,7 +23,7 @@ require (
 	golang.org/x/exp v0.0.0-20211109222223-9df80dc805b5 // indirect
 	golang.org/x/mobile v0.0.0-20211109191125-d61a72f26a1a // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211109184856-51b60fd695b3 // indirect
+	golang.org/x/sys v0.0.0-20211110154304-99a53858aa08 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 )
