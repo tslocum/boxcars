@@ -5,7 +5,6 @@ import (
 	"embed"
 	"fmt"
 	"image"
-	"image/color"
 	_ "image/png"
 	"log"
 	"os"
@@ -36,12 +35,15 @@ var (
 	imgCheckerWhite *ebiten.Image
 	imgCheckerBlack *ebiten.Image
 
-	mplusNormalFont font.Face
-	monoFont        font.Face
-	mplusBigFont    font.Face
+	smallFont  font.Face
+	normalFont font.Face
+	monoFont   font.Face
+	largeFont  font.Face
 )
 
 const defaultServerAddress = "fibs.com:4321"
+
+const maxStatusWidthRatio = 0.5
 
 func init() {
 	loadAssets(0)
@@ -79,7 +81,15 @@ func initializeFonts() {
 	}
 
 	const dpi = 72
-	mplusNormalFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+	smallFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    smallFontSize,
+		DPI:     dpi,
+		Hinting: font.HintingFull,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	normalFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
 		Size:    24,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
@@ -87,7 +97,7 @@ func initializeFonts() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	mplusBigFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+	largeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
 		Size:    32,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
@@ -101,7 +111,7 @@ func initializeFonts() {
 		log.Fatal(err)
 	}
 	monoFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    12,
+		Size:    monoFontSize,
 		DPI:     dpi,
 		Hinting: font.HintingNone,
 	})
@@ -168,7 +178,8 @@ type Game struct {
 	keyboardInput []*kibodo.Input
 	shownKeyboard bool
 
-	buffers *tabbedBuffers
+	statusBuffer *tabbedBuffers
+	gameBuffer   *tabbedBuffers
 
 	cpuProfile *os.File
 
@@ -188,15 +199,17 @@ func NewGame() *Game {
 
 		keyboard: kibodo.NewKeyboard(),
 
-		buffers: newTabbedBuffers(),
+		statusBuffer: newTabbedBuffers(),
+		gameBuffer:   newTabbedBuffers(),
 
 		debugImg: ebiten.NewImage(200, 200),
 	}
 	g.keyboard.SetKeys(kibodo.KeysQWERTY)
 
-	msgHandler := NewMessageHandler(g)
-	fibs.StatusWriter = msgHandler
-	fibs.GameWriter = msgHandler
+	g.statusBuffer.acceptInput = true
+
+	fibs.StatusWriter = NewMessageHandler(g.statusBuffer.buffers[0])
+	fibs.GameWriter = NewMessageHandler(g.gameBuffer.buffers[0])
 
 	// TODO
 	go func() {
@@ -259,7 +272,7 @@ func (g *Game) Connect() {
 	g.Client = fibs.NewClient(address, g.Username, g.Password)
 	g.lobby.c = g.Client
 	g.Board.Client = g.Client
-	g.buffers.client = g.Client
+	g.statusBuffer.client = g.Client
 
 	go g.handleEvents()
 
@@ -280,7 +293,7 @@ func (g *Game) Connect() {
 	go func() {
 		err := c.Connect()
 		if err != nil {
-			log.Fatal(err)
+			fibs.StatusWriter.Write([]byte(err.Error()))
 		}
 	}()
 }
@@ -398,7 +411,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	} else {
 		g.Board.update()
 
-		g.buffers.update()
+		g.statusBuffer.update()
 	}
 
 	return nil
@@ -413,7 +426,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 	g.lastDraw = time.Now()
 
-	screen.Fill(color.RGBA{0, 102, 51, 255})
+	screen.Fill(tableColor)
 
 	// Log in screen
 	if !g.loggedIn {
@@ -442,9 +455,9 @@ http://www.fibs.com/help.html#register`
 		g.lobby.draw(screen)
 	} else {
 		// Game board screen
+		g.gameBuffer.draw(screen)
+		g.statusBuffer.draw(screen)
 		g.Board.draw(screen)
-
-		g.buffers.draw(screen)
 	}
 
 	if g.Debug > 0 {
@@ -488,19 +501,37 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 
-	g.Board.setRect(0, 0, g.screenW, g.screenH)
+	statusBufferWidth := g.statusBuffer.chatFontSize * 77
+	if statusBufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
+		statusBufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
+	}
+
+	gameBufferheight := 100
+
+	g.Board.setRect(0, 0, g.screenW-statusBufferWidth, g.screenH-gameBufferheight)
 	g.lobby.setRect(0, 0, g.screenW, g.screenH)
 
-	availableWidth := g.Board.w - (g.Board.spaceWidth * 14)
-	if availableWidth >= 150 {
-		g.Board.setRect(0, 0, g.screenW-availableWidth, g.screenH)
-		g.buffers.setRect(g.screenW-availableWidth, 0, availableWidth, g.screenH)
-		// TODO set flag to restore user position (could use extra state for this? docked state?)
+	availableWidth := g.screenW - (g.Board.innerW + int(g.Board.barWidth))
+	if availableWidth > statusBufferWidth {
+		statusBufferWidth = availableWidth
+		g.Board.setRect(0, 0, g.screenW-statusBufferWidth, g.screenH-gameBufferheight)
+	}
+
+	if g.Board.h > g.Board.w {
+		g.Board.setRect(0, 0, g.Board.w, g.Board.w)
+	}
+
+	if true || availableWidth >= 150 { // TODO allow chat window to be repositioned
+		g.statusBuffer.docked = true
+		g.statusBuffer.setRect(g.screenW-statusBufferWidth, 0, statusBufferWidth, g.screenH)
+
+		g.gameBuffer.docked = true
+		g.gameBuffer.setRect(0, g.Board.h, g.Board.w, g.screenH-(g.Board.h))
 	} else {
 		// Clamp buffer position.
-		bx, by := g.buffers.x, g.buffers.y
+		bx, by := g.statusBuffer.x, g.statusBuffer.y
 		var bw, bh int
-		if g.buffers.w == 0 && g.buffers.h == 0 {
+		if g.statusBuffer.w == 0 && g.statusBuffer.h == 0 {
 			// Set initial buffer position.
 			bx = 0
 			by = g.screenH / 2
@@ -510,7 +541,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		} else {
 			// Scale existing buffer size
 			bx, by = bx*(outsideWidth/g.screenW), by*(outsideHeight/g.screenH)
-			bw, bh = g.buffers.w*(outsideWidth/g.screenW), g.buffers.h*(outsideHeight/g.screenH)
+			bw, bh = g.statusBuffer.w*(outsideWidth/g.screenW), g.statusBuffer.h*(outsideHeight/g.screenH)
 			if bw < 200 {
 				bw = 200
 			}
@@ -526,7 +557,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 			by = g.screenH - padding
 		}
 
-		g.buffers.setRect(bx, by, bw, bh)
+		g.statusBuffer.docked = false
+		g.statusBuffer.setRect(bx, by, bw, bh)
 	}
 
 	displayArea := 200
@@ -572,18 +604,18 @@ func (g *Game) Exit() {
 }
 
 type messageHandler struct {
-	g *Game
+	t *textBuffer
 }
 
-func NewMessageHandler(g *Game) *messageHandler {
+func NewMessageHandler(t *textBuffer) *messageHandler {
 	return &messageHandler{
-		g: g,
+		t: t,
 	}
 }
 
-func (m messageHandler) Write(p []byte) (n int, err error) {
-	log.Print(string(p))
+func (m *messageHandler) Write(p []byte) (n int, err error) {
+	fmt.Print(string(p))
 
-	m.g.buffers.buffers[0].Write(p)
+	m.t.Write(p)
 	return len(p), nil
 }

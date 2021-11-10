@@ -37,12 +37,12 @@ type board struct {
 	dragTouchId ebiten.TouchID
 	touchIDs    []ebiten.TouchID
 
-	spaceWidth           int
-	barWidth             int
+	spaceWidth           float64
+	barWidth             float64
 	triangleOffset       float64
-	horizontalBorderSize int
-	verticalBorderSize   int
-	overlapSize          int
+	horizontalBorderSize float64
+	verticalBorderSize   float64
+	overlapSize          float64
 
 	lastDirection int
 
@@ -62,8 +62,8 @@ func NewBoard() *board {
 	b := &board{
 		barWidth:             100,
 		triangleOffset:       float64(50),
-		horizontalBorderSize: 50,
-		verticalBorderSize:   25,
+		horizontalBorderSize: 20,
+		verticalBorderSize:   10,
 		overlapSize:          97,
 		Sprites: &Sprites{
 			sprites: make([]*Sprite, 30),
@@ -139,8 +139,8 @@ func (b *board) updateBackgroundImage() {
 	if borderSize > b.barWidth/2 {
 		borderSize = b.barWidth / 2
 	}
-	frameW := b.w - ((b.horizontalBorderSize - borderSize) * 2)
-	innerW := b.w - (b.horizontalBorderSize * 2) // Outer board width (including frame)
+	frameW := b.w - int((b.horizontalBorderSize-borderSize)*2)
+	innerW := float64(b.w) - b.horizontalBorderSize*2 // Outer board width (including frame)
 
 	// Table
 	box := image.NewRGBA(image.Rect(0, 0, b.w, b.h))
@@ -157,7 +157,7 @@ func (b *board) updateBackgroundImage() {
 	b.backgroundImage.DrawImage(img, b.op)
 
 	// Face
-	box = image.NewRGBA(image.Rect(0, 0, innerW, b.h-(b.verticalBorderSize*2)))
+	box = image.NewRGBA(image.Rect(0, 0, int(innerW), b.h-int(b.verticalBorderSize*2)))
 	img = ebiten.NewImageFromImage(box)
 	img.Fill(faceColor)
 	b.op.GeoM.Reset()
@@ -165,18 +165,18 @@ func (b *board) updateBackgroundImage() {
 	b.backgroundImage.DrawImage(img, b.op)
 
 	// Bar
-	box = image.NewRGBA(image.Rect(0, 0, b.barWidth, b.h))
+	box = image.NewRGBA(image.Rect(0, 0, int(b.barWidth), b.h))
 	img = ebiten.NewImageFromImage(box)
 	img.Fill(frameColor)
 	b.op.GeoM.Reset()
-	b.op.GeoM.Translate(float64((b.w/2)-(b.barWidth/2)), 0)
+	b.op.GeoM.Translate(float64((b.w/2)-int(b.barWidth/2)), 0)
 	b.backgroundImage.DrawImage(img, b.op)
 
 	// Draw triangles
-	baseImg := image.NewRGBA(image.Rect(0, 0, b.w-(b.horizontalBorderSize*2), b.h-(b.verticalBorderSize*2)))
+	baseImg := image.NewRGBA(image.Rect(0, 0, b.w-int(b.horizontalBorderSize*2), b.h-int(b.verticalBorderSize*2)))
 	gc := draw2dimg.NewGraphicContext(baseImg)
 	for i := 0; i < 2; i++ {
-		triangleTip := float64((b.h - (b.verticalBorderSize * 2)) / 2)
+		triangleTip := (float64(b.h) - (b.verticalBorderSize * 2)) / 2
 		if i == 0 {
 			triangleTip -= b.triangleOffset
 		} else {
@@ -194,7 +194,7 @@ func (b *board) updateBackgroundImage() {
 				gc.SetFillColor(triangleB)
 			}
 
-			tx := b.spaceWidth * j
+			tx := b.spaceWidth * float64(j)
 			ty := b.h * i
 			if j >= 6 {
 				tx += b.barWidth
@@ -233,8 +233,8 @@ func (b *board) updateBackgroundImage() {
 	edge := float64((((innerW) - b.barWidth) / 2) + borderSize)
 	gc.MoveTo(float64(borderSize), float64(b.verticalBorderSize))
 	gc.LineTo(edge, float64(b.verticalBorderSize))
-	gc.LineTo(edge, float64(b.h-b.verticalBorderSize))
-	gc.LineTo(float64(borderSize), float64(b.h-b.verticalBorderSize))
+	gc.LineTo(edge, float64(b.h-int(b.verticalBorderSize)))
+	gc.LineTo(float64(borderSize), float64(b.h-int(b.verticalBorderSize)))
 	gc.LineTo(float64(borderSize), float64(b.verticalBorderSize))
 	gc.Close()
 	gc.Stroke()
@@ -243,14 +243,14 @@ func (b *board) updateBackgroundImage() {
 	edgeEnd := float64(innerW + borderSize)
 	gc.MoveTo(float64(edgeStart), float64(b.verticalBorderSize))
 	gc.LineTo(edgeEnd, float64(b.verticalBorderSize))
-	gc.LineTo(edgeEnd, float64(b.h-b.verticalBorderSize))
-	gc.LineTo(float64(edgeStart), float64(b.h-b.verticalBorderSize))
+	gc.LineTo(edgeEnd, float64(b.h-int(b.verticalBorderSize)))
+	gc.LineTo(float64(edgeStart), float64(b.h-int(b.verticalBorderSize)))
 	gc.LineTo(float64(edgeStart), float64(b.verticalBorderSize))
 	gc.Close()
 	gc.Stroke()
 	img = ebiten.NewImageFromImage(borderImage)
 	b.op.GeoM.Reset()
-	b.op.GeoM.Translate(float64(b.horizontalBorderSize-borderSize), 0)
+	b.op.GeoM.Translate(b.horizontalBorderSize-borderSize, 0)
 	b.backgroundImage.DrawImage(img, b.op)
 }
 
@@ -360,9 +360,9 @@ func (b *board) draw(screen *ebiten.Image) {
 				labelColor = color.RGBA{0, 0, 0, 255}
 			}
 
-			bounds := text.BoundString(mplusNormalFont, overlayText)
+			bounds := text.BoundString(normalFont, overlayText)
 			overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-			text.Draw(overlayImage, overlayText, mplusNormalFont, 0, bounds.Dy(), labelColor)
+			text.Draw(overlayImage, overlayText, normalFont, 0, bounds.Dy(), labelColor)
 
 			x, y, w, h := b.stackSpaceRect(space, numPieces-1)
 			x += (w / 2) - (bounds.Dx() / 2)
@@ -412,7 +412,7 @@ func (b *board) draw(screen *ebiten.Image) {
 	}
 
 	drawLabel := func(label string, labelColor color.Color, border bool, borderColor color.Color) *ebiten.Image {
-		bounds := text.BoundString(mplusNormalFont, label)
+		bounds := text.BoundString(normalFont, label)
 
 		w := int(float64(bounds.Dx()) * 1.5)
 		h := int(float64(bounds.Dy()) * 2)
@@ -432,7 +432,7 @@ func (b *board) draw(screen *ebiten.Image) {
 		}
 
 		img := ebiten.NewImageFromImage(baseImg)
-		text.Draw(img, label, mplusNormalFont, (w-bounds.Dx())/2, int(float64(h-(bounds.Max.Y/2))*0.75), labelColor)
+		text.Draw(img, label, normalFont, (w-bounds.Dx())/2, int(float64(h-(bounds.Max.Y/2))*0.75), labelColor)
 
 		return img
 	}
@@ -443,7 +443,7 @@ func (b *board) draw(screen *ebiten.Image) {
 		img := drawLabel(label, opponentColor, b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor], opponentColor)
 		bounds := img.Bounds()
 
-		x := ((b.innerW - borderSize) / 4) - (bounds.Dx() / 2)
+		x := int(((float64(b.innerW) - borderSize) / 4) - (float64(bounds.Dx()) / 2))
 		y := (b.innerH / 2) - (bounds.Dy() / 2)
 		x, y = b.offsetPosition(x, y)
 		b.op.GeoM.Reset()
@@ -486,8 +486,8 @@ func (b *board) draw(screen *ebiten.Image) {
 		img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
 
 		label := "Reset"
-		bounds := text.BoundString(mplusNormalFont, label)
-		text.Draw(img, label, mplusNormalFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
+		bounds := text.BoundString(normalFont, label)
+		text.Draw(img, label, normalFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
 
 		b.op.GeoM.Reset()
 		b.op.GeoM.Translate(float64(x), float64(y))
@@ -532,50 +532,34 @@ func (b *board) setRect(x, y, w, h int) {
 	if b.x == x && b.y == y && b.w == w && b.h == h {
 		return
 	}
-	const stackAllowance = 0.97 // TODO configurable
 
 	b.x, b.y, b.w, b.h = x, y, w, h
 
-	b.horizontalBorderSize = 0
+	b.triangleOffset = (float64(b.h) - (b.verticalBorderSize * 2)) / 15
 
-	b.triangleOffset = float64(b.h-(b.verticalBorderSize*2)) / 15
+	b.spaceWidth = (float64(b.w) - (b.horizontalBorderSize * 2)) / 13
+	b.barWidth = b.spaceWidth
 
-	for {
-		b.verticalBorderSize = 7 // TODO configurable
-
-		b.spaceWidth = (b.w - (b.horizontalBorderSize * 2)) / 13
-
-		b.barWidth = b.spaceWidth
-
-		b.overlapSize = (((b.h - (b.verticalBorderSize * 2)) - (int(b.triangleOffset) * 2)) / 2) / 5
-		o := int(float64(b.spaceWidth) * stackAllowance)
-		if b.overlapSize >= o {
-			b.overlapSize = o
-			break
-		}
-
-		b.horizontalBorderSize++
+	b.overlapSize = (((float64(b.h) - (b.verticalBorderSize * 2)) - (b.triangleOffset * 2)) / 2) / 5
+	if b.overlapSize > b.spaceWidth*0.94 {
+		b.overlapSize = b.spaceWidth * 0.94
 	}
 
-	extraSpace := b.w - (b.spaceWidth * 12)
-	largeBarWidth := int(float64(b.spaceWidth) * 1.25)
+	extraSpace := float64(b.w) - (b.spaceWidth * 12)
+	largeBarWidth := float64(b.spaceWidth) * 1.25
 	if extraSpace >= largeBarWidth {
 		b.barWidth = largeBarWidth
-	}
-
-	b.horizontalBorderSize = ((b.w - (b.spaceWidth * 12)) - b.barWidth) / 2
-	if b.horizontalBorderSize < 0 {
-		b.horizontalBorderSize = 0
+		b.spaceWidth = ((float64(b.w) - (b.horizontalBorderSize * 2)) - b.barWidth) / 12
 	}
 
 	borderSize := b.horizontalBorderSize
 	if borderSize > b.barWidth/2 {
 		borderSize = b.barWidth / 2
 	}
-	b.innerW = b.w - (b.horizontalBorderSize * 2)
-	b.innerH = b.h - (b.verticalBorderSize * 2)
+	b.innerW = int(float64(b.w) - (b.horizontalBorderSize * 2))
+	b.innerH = int(float64(b.h) - (b.verticalBorderSize * 2))
 
-	loadAssets(b.spaceWidth)
+	loadAssets(int(b.spaceWidth))
 
 	for i := 0; i < b.Sprites.num; i++ {
 		s := b.Sprites.sprites[i]
@@ -588,7 +572,7 @@ func (b *board) setRect(x, y, w, h int) {
 }
 
 func (b *board) offsetPosition(x, y int) (int, int) {
-	return b.x + x + b.horizontalBorderSize, b.y + y + b.verticalBorderSize
+	return b.x + x + int(b.horizontalBorderSize), b.y + y + int(b.verticalBorderSize)
 }
 
 func (b *board) positionCheckers() {
@@ -663,34 +647,34 @@ func (b *board) setSpaceRects() {
 		if !b.bottomRow(trueSpace) {
 			y = 0
 		} else {
-			y = (b.h / 2) - b.verticalBorderSize
+			y = int((float64(b.h) / 2) - b.verticalBorderSize)
 		}
 
-		w = b.spaceWidth
+		w = int(b.spaceWidth)
 
 		var hspace int // horizontal space
 		var add int
 		if space == 0 {
 			hspace = 6
-			w = b.barWidth
+			w = int(b.barWidth)
 		} else if space == 25 {
 			hspace = 6
-			w = b.barWidth
+			w = int(b.barWidth)
 		} else if space <= 6 {
 			hspace = space - 1
 		} else if space <= 12 {
 			hspace = space - 1
-			add = b.barWidth
+			add = int(b.barWidth)
 		} else if space <= 18 {
 			hspace = 24 - space
-			add = b.barWidth
+			add = int(b.barWidth)
 		} else {
 			hspace = 24 - space
 		}
 
-		x = (b.spaceWidth * hspace) + add
+		x = int((b.spaceWidth * float64(hspace)) + float64(add))
 
-		h = (b.h - (b.verticalBorderSize * 2)) / 2
+		h = int((float64(b.h) - (b.verticalBorderSize * 2)) / 2)
 
 		b.spaceRects[trueSpace] = [4]int{x, y, w, h}
 	}
@@ -719,8 +703,8 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 	x, y, w, h = b.spaceRect(space)
 
 	// Stack pieces
-	osize := float64(stack)
 	var o int
+	osize := float64(stack)
 	if stack > 4 {
 		osize = 3.5
 	}
@@ -728,15 +712,21 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 		osize += 1.0
 	}
 	o = int(osize * float64(b.overlapSize))
+	padding := int(b.spaceWidth - b.overlapSize)
+	if b.bottomRow(space) {
+		o += padding
+	} else {
+		o -= padding - 3
+	}
 	if !b.bottomRow(space) {
 		y += o
 	} else {
 		y = y + (h - o)
 	}
 
-	w, h = b.spaceWidth, b.spaceWidth
+	w, h = int(b.spaceWidth), int(b.spaceWidth)
 	if space == 0 || space == 25 {
-		w = b.barWidth
+		w = int(b.barWidth)
 	}
 
 	return x, y, w, h
@@ -820,8 +810,10 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 		stack++
 	}
 
-	x, y, _, _ := b.stackSpaceRect(space, stack)
+	x, y, w, _ := b.stackSpaceRect(space, stack)
 	x, y = b.offsetPosition(x, y)
+	// Center piece in space
+	x += (w - int(b.spaceWidth)) / 2
 
 	sprite.toX = x
 	sprite.toY = y

@@ -1,6 +1,9 @@
 package game
 
 import (
+	"bytes"
+	"unicode"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -19,7 +22,7 @@ type textBuffer struct {
 }
 
 func (b *textBuffer) Write(p []byte) {
-	b.content = append(b.content, p)
+	b.content = append(b.content, bytes.TrimRightFunc(p, unicode.IsSpace))
 
 	b.wrapDirty = true
 	b.tab.bufferDirty = true

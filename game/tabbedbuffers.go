@@ -1,13 +1,13 @@
 package game
 
 import (
-	"image"
+	"image/color"
 
 	"code.rocketnine.space/tslocum/fibs"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
-	"golang.org/x/exp/shiny/materialdesign/colornames"
+	"golang.org/x/image/font"
 )
 
 const (
@@ -18,7 +18,8 @@ const (
 
 const windowStartingAlpha = 0.9
 
-const bufferCharacterWidth = 12
+const smallFontSize = 14
+const monoFontSize = 10
 
 type tabbedBuffers struct {
 	buffers []*textBuffer
@@ -26,6 +27,8 @@ type tabbedBuffers struct {
 
 	x, y int
 	w, h int
+
+	padding int
 
 	unfocusedAlpha float64
 
@@ -38,6 +41,8 @@ type tabbedBuffers struct {
 
 	state int
 
+	docked bool
+
 	focused bool
 
 	touchIDs []ebiten.TouchID
@@ -47,6 +52,11 @@ type tabbedBuffers struct {
 	inputBuffer []byte
 
 	client *fibs.Client
+
+	chatFont     font.Face
+	chatFontSize int
+
+	acceptInput bool
 }
 
 func newTabbedBuffers() *tabbedBuffers {
@@ -55,7 +65,13 @@ func newTabbedBuffers() *tabbedBuffers {
 		unfocusedAlpha: windowStartingAlpha,
 		buffer:         ebiten.NewImage(1, 1),
 		op:             &ebiten.DrawImageOptions{},
+		chatFont:       monoFont,
+		chatFontSize:   monoFontSize,
 	}
+
+	// TODO
+	//tab.chatFont = smallFont
+	//tab.chatFontSize = smallFontSize
 
 	b := &textBuffer{
 		tab: tab,
@@ -70,15 +86,21 @@ func (t *tabbedBuffers) setRect(x, y, w, h int) {
 		return
 	}
 
-	// TODO dynamic padding
-
 	if t.w != w || t.h != h {
 		t.buffer = ebiten.NewImage(w, h)
 		t.bufferDirty = true
 	}
 
 	if t.w != w {
-		t.wrapWidth = w / bufferCharacterWidth
+		if w > 200 {
+			t.padding = 2
+		} else if w > 100 {
+			t.padding = 1
+		} else {
+			t.padding = 0
+		}
+
+		t.wrapWidth = (w - (t.padding * 4)) / t.chatFontSize
 		for _, b := range t.buffers {
 			b.wrapDirty = true
 		}
@@ -88,20 +110,27 @@ func (t *tabbedBuffers) setRect(x, y, w, h int) {
 }
 
 func (t *tabbedBuffers) drawBuffer() {
-	t.buffer.Fill(borderColor)
+	t.buffer.Fill(color.Black)
 
-	sub := t.buffer.SubImage(image.Rect(1, 1, t.w-1, t.h-1)).(*ebiten.Image)
-	sub.Fill(frameColor)
+	textColor := triangleALight
+
+	/*sub := t.buffer.SubImage(image.Rect(1, 1, t.w-1, t.h-1)).(*ebiten.Image)
+	sub.Fill(frameColor)*/
 
 	b := t.buffers[0]
 
 	l := len(b.contentWrapped)
 
-	lineHeight := 16
+	lineHeight := 14
 	showLines := t.h / lineHeight
-	// Leave space for the input buffer.
-	if showLines > 1 {
-		showLines--
+	if t.acceptInput {
+		// Leave space for the input buffer.
+		if showLines > 1 {
+			showLines--
+		}
+		if showLines > 1 {
+			showLines--
+		}
 	}
 
 	if l < showLines {
@@ -110,12 +139,14 @@ func (t *tabbedBuffers) drawBuffer() {
 	for i := 0; i < showLines; i++ {
 		line := b.contentWrapped[l-showLines+i]
 
-		bounds := text.BoundString(monoFont, line)
+		bounds := text.BoundString(t.chatFont, line)
 		_ = bounds
-		text.Draw(t.buffer, line, monoFont, 0, (lineHeight * (i + 1)), colornames.White)
+		text.Draw(t.buffer, line, t.chatFont, t.padding*2, t.padding+(lineHeight*(i+1)), textColor)
 	}
 
-	text.Draw(t.buffer, "> "+string(t.inputBuffer), monoFont, 0, t.h, colornames.White)
+	if t.acceptInput {
+		text.Draw(t.buffer, "> "+string(t.inputBuffer), t.chatFont, t.padding*2, t.h-(t.padding*2), textColor)
+	}
 }
 
 func (t *tabbedBuffers) draw(target *ebiten.Image) {
@@ -123,7 +154,7 @@ func (t *tabbedBuffers) draw(target *ebiten.Image) {
 		return
 	}
 
-	if t.state == windowMinimized {
+	if !t.docked && t.state == windowMinimized {
 		return
 	}
 
@@ -192,20 +223,31 @@ func (t *tabbedBuffers) update() {
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 		if len(t.inputBuffer) == 0 {
-			if t.state == windowMinimized {
-				t.state = windowNormal
-			} else {
-				t.state = windowMinimized
+			if !t.docked {
+				if t.state == windowMinimized {
+					t.state = windowNormal
+				} else {
+					t.state = windowMinimized
+				}
+
+				t.bufferDirty = true
 			}
 		} else {
 			if t.client != nil {
-				t.client.Out <- t.inputBuffer
+				if len(t.inputBuffer) > 0 {
+					if t.inputBuffer[0] == '/' {
+						// TODO add chat modes and show (kibitz/yell)
+						t.inputBuffer = t.inputBuffer[1:]
+					}
+					t.client.Out <- t.inputBuffer
+				}
 			} else {
 				fibs.StatusWriter.Write([]byte("* You have not connected to a server yet"))
 			}
 			t.inputBuffer = nil
+
+			t.bufferDirty = true
 		}
-		t.bufferDirty = true
 	}
 
 	// TODO add show virtual keyboard button

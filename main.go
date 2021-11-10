@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"log"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"code.rocketnine.space/tslocum/fibs"
-
 	"code.rocketnine.space/tslocum/boxcars/game"
+	"code.rocketnine.space/tslocum/fibs"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -39,6 +40,12 @@ func main() {
 	parseFlags(g)
 
 	fibs.Debug = g.Debug
+
+	if g.Debug > 0 {
+		go func() {
+			log.Fatal(http.ListenAndServe("localhost:8880", nil))
+		}()
+	}
 
 	if AutoWatch {
 		g.Watch = true
