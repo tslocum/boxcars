@@ -20,6 +20,8 @@ type board struct {
 	x, y int
 	w, h int
 
+	fullHeight bool
+
 	innerW, innerH int
 
 	op *ebiten.DrawImageOptions
@@ -215,18 +217,14 @@ func (b *board) updateBackgroundImage() {
 	borderImage := image.NewRGBA(image.Rect(0, 0, b.w, b.h))
 	gc = draw2dimg.NewGraphicContext(borderImage)
 	gc.SetStrokeColor(borderColor)
-	// - Outside left
-	gc.SetLineWidth(2)
-	gc.MoveTo(float64(1), float64(0))
-	gc.LineTo(float64(1), float64(b.h))
 	// - Center
 	gc.SetLineWidth(2)
 	gc.MoveTo(float64(frameW/2), float64(0))
 	gc.LineTo(float64(frameW/2), float64(b.h))
+	gc.Stroke()
 	// - Outside right
 	gc.MoveTo(float64(frameW), float64(0))
 	gc.LineTo(float64(frameW), float64(b.h))
-	gc.Close()
 	gc.Stroke()
 	// - Inside left
 	gc.SetLineWidth(1)
@@ -248,6 +246,19 @@ func (b *board) updateBackgroundImage() {
 	gc.LineTo(float64(edgeStart), float64(b.verticalBorderSize))
 	gc.Close()
 	gc.Stroke()
+	if !b.fullHeight {
+		// - Outside left
+		gc.SetLineWidth(1)
+		gc.MoveTo(float64(0), float64(0))
+		gc.LineTo(float64(0), float64(b.h))
+		// Top
+		gc.MoveTo(0, float64(0))
+		gc.LineTo(float64(b.w), float64(0))
+		// Bottom
+		gc.MoveTo(0, float64(b.h))
+		gc.LineTo(float64(b.w), float64(b.h))
+		gc.Stroke()
+	}
 	img = ebiten.NewImageFromImage(borderImage)
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(b.horizontalBorderSize-borderSize, 0)
@@ -918,12 +929,26 @@ func (b *board) movePiece(from int, to int) {
 	}
 }
 
+// WatchingGame returns whether the active game is being watched.
+func (b *board) watchingGame() bool {
+	return !b.playingGame() && b.s[fibs.StatePlayerName] != "" && b.s[fibs.StateOpponentName] != ""
+}
+
+// PlayingGame returns whether the active game is being played.
+func (b *board) playingGame() bool {
+	return b.s[fibs.StatePlayerName] == "You" || b.s[fibs.StateOpponentName] == "You"
+}
+
+func (b *board) playerTurn() bool {
+	return b.playingGame() && b.v[fibs.StateTurn] == b.v[fibs.StatePlayerColor]
+}
+
 func (b *board) update() {
 	if b.Client == nil {
 		return
 	}
 
-	if b.dragging == nil {
+	if b.dragging == nil && b.playerTurn() {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
 		handleReset := func(x, y int) bool {

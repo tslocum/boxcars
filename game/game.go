@@ -45,7 +45,7 @@ var (
 
 var (
 	lightCheckerColor = color.RGBA{232, 211, 162, 255}
-	darkCheckerColor  = color.RGBA{51, 0, 111, 255}
+	darkCheckerColor  = color.RGBA{0, 0, 0, 255}
 )
 
 const defaultServerAddress = "fibs.com:4321"
@@ -53,6 +53,15 @@ const defaultServerAddress = "fibs.com:4321"
 const maxStatusWidthRatio = 0.5
 
 const bufferCharacterWidth = 54
+
+const lobbyCharacterWidth = 48
+
+const showGameBufferLines = 4
+
+const (
+	minWidth  = 320
+	minHeight = 240
+)
 
 func init() {
 	loadAssets(0)
@@ -461,13 +470,13 @@ http://www.fibs.com/help.html#register`
 		return
 	}
 
+	g.gameBuffer.draw(screen)
+	g.statusBuffer.draw(screen)
 	if !viewBoard {
 		// Lobby screen
 		g.lobby.draw(screen)
 	} else {
 		// Game board screen
-		g.gameBuffer.draw(screen)
-		g.statusBuffer.draw(screen)
 		g.Board.draw(screen)
 	}
 
@@ -506,6 +515,12 @@ http://www.fibs.com/help.html#register`
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	s := ebiten.DeviceScaleFactor()
 	outsideWidth, outsideHeight = int(float64(outsideWidth)*s), int(float64(outsideHeight)*s)
+	if outsideWidth < minWidth {
+		outsideWidth = minWidth
+	}
+	if outsideHeight < minHeight {
+		outsideHeight = minHeight
+	}
 	if g.screenW == outsideWidth && g.screenH == outsideHeight {
 		return outsideWidth, outsideHeight
 	}
@@ -517,12 +532,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		statusBufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
 
-	showGameBufferLines := 8
-	gameBufferHeight := g.statusBuffer.chatFontSize * showGameBufferLines * 2
-	statusBufferHeight := g.screenH - gameBufferHeight
-
-	g.lobby.setRect(0, 0, g.screenW, g.screenH)
-
+	g.Board.fullHeight = true
 	g.Board.setRect(0, 0, g.screenW-statusBufferWidth, g.screenH)
 
 	availableWidth := g.screenW - (g.Board.innerW + int(g.Board.horizontalBorderSize*2))
@@ -532,15 +542,43 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	}
 
 	if g.Board.h > g.Board.w {
+		g.Board.fullHeight = false
 		g.Board.setRect(0, 0, g.Board.w, g.Board.w)
 	}
 
+	if g.screenW > 200 {
+		g.statusBuffer.padding = 2
+		g.gameBuffer.padding = 2
+	} else if g.screenW > 100 {
+		g.statusBuffer.padding = 1
+		g.gameBuffer.padding = 1
+	} else {
+		g.statusBuffer.padding = 0
+		g.gameBuffer.padding = 0
+	}
+
+	bufferPadding := int(g.Board.horizontalBorderSize / 2)
+
+	gameBufferHeight := (g.gameBuffer.chatLineHeight * showGameBufferLines) + (g.gameBuffer.padding * 4)
+
+	g.lobby.buttonBarHeight = gameBufferHeight + int(float64(bufferPadding)*1.5)
+	minLobbyWidth := text.BoundString(mediumFont, strings.Repeat("A", lobbyCharacterWidth)).Dx()
+	if g.Board.w >= minLobbyWidth {
+		g.lobby.fullscreen = false
+		g.lobby.setRect(0, 0, g.Board.w, g.screenH)
+	} else {
+		g.lobby.fullscreen = true
+		g.lobby.setRect(0, 0, g.screenW, g.screenH)
+	}
+
 	if true || availableWidth >= 150 { // TODO allow chat window to be repositioned
+		statusBufferHeight := g.screenH - gameBufferHeight - bufferPadding*3
+
 		g.statusBuffer.docked = true
-		g.statusBuffer.setRect(g.screenW-statusBufferWidth, g.screenH-(statusBufferHeight), statusBufferWidth, statusBufferHeight)
+		g.statusBuffer.setRect((g.screenW-statusBufferWidth)+bufferPadding, bufferPadding, statusBufferWidth-(bufferPadding*2), statusBufferHeight)
 
 		g.gameBuffer.docked = true
-		g.gameBuffer.setRect(g.screenW-statusBufferWidth, 0, statusBufferWidth, statusBufferHeight)
+		g.gameBuffer.setRect((g.screenW-statusBufferWidth)+bufferPadding, (g.screenH-(gameBufferHeight))-bufferPadding, statusBufferWidth-(bufferPadding*2), gameBufferHeight)
 	} else {
 		// Clamp buffer position.
 		bx, by := g.statusBuffer.x, g.statusBuffer.y

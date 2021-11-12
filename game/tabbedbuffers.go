@@ -28,7 +28,7 @@ const (
 
 const (
 	monoLineHeight     = 14
-	standardLineHeight = 22
+	standardLineHeight = 24
 )
 
 type tabbedBuffers struct {
@@ -105,14 +105,6 @@ func (t *tabbedBuffers) setRect(x, y, w, h int) {
 	}
 
 	if t.w != w {
-		if w > 200 {
-			t.padding = 2
-		} else if w > 100 {
-			t.padding = 1
-		} else {
-			t.padding = 0
-		}
-
 		t.wrapWidth = (w - (t.padding * 4)) / t.chatFontSize
 		for _, b := range t.buffers {
 			b.wrapDirty = true
@@ -122,40 +114,43 @@ func (t *tabbedBuffers) setRect(x, y, w, h int) {
 	t.x, t.y, t.w, t.h = x, y, w, h
 }
 
+func (t *tabbedBuffers) linesVisible() int {
+	lines := (t.h - (t.padding * 2)) / t.chatLineHeight
+	// Leave space for the input buffer.
+	if t.acceptInput {
+		if lines > 1 {
+			lines--
+		}
+	}
+	return lines
+}
+
 func (t *tabbedBuffers) drawBuffer() {
-	t.buffer.Fill(color.Black)
+	// Draw background.
+	t.buffer.Fill(color.RGBA{0, 0, 0, 100})
+
+	// Draw content.
 
 	textColor := triangleALight
-
-	/*sub := t.buffer.SubImage(image.Rect(1, 1, t.w-1, t.h-1)).(*ebiten.Image)
-	sub.Fill(frameColor)*/
 
 	b := t.buffers[0]
 
 	l := len(b.contentWrapped)
 
-	showLines := t.h / t.chatLineHeight
-	if showLines > 1 {
-		showLines--
-	}
-	if t.acceptInput {
-		// Leave space for the input buffer.
-		if showLines > 1 {
-			showLines--
-		}
-	}
-
+	showLines := t.linesVisible()
 	if l < showLines {
 		showLines = l
 	}
+
 	for i := 0; i < showLines; i++ {
 		line := b.contentWrapped[l-showLines+i]
 
-		text.Draw(t.buffer, line, t.chatFont, t.padding*2, t.padding+(t.chatLineHeight*(i+1)), textColor)
+		text.Draw(t.buffer, line, t.chatFont, t.padding*2, t.chatLineHeight*(i+1), textColor)
 	}
 
+	// Draw input buffer.
 	if t.acceptInput {
-		text.Draw(t.buffer, "> "+string(t.inputBuffer), t.chatFont, t.padding*2, t.h-(t.padding*2), textColor)
+		text.Draw(t.buffer, "> "+string(t.inputBuffer), t.chatFont, t.padding*2, t.h-(t.padding*4), textColor)
 	}
 }
 
