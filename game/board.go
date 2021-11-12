@@ -130,7 +130,7 @@ func (b *board) handleDraw() {
 func (b *board) newSprite(white bool) *Sprite {
 	s := &Sprite{}
 	s.colorWhite = white
-	s.w, s.h = imgCheckerWhite.Size()
+	s.w, s.h = imgCheckerLight.Size()
 	return s
 }
 
@@ -321,14 +321,43 @@ func (b *board) draw(screen *ebiten.Image) {
 			// Schedule another frame
 			ebiten.ScheduleFrame()
 		}
+
+		// Draw shadow.
+
 		b.op.GeoM.Reset()
 		b.op.GeoM.Translate(x, y)
+		b.op.ColorM.Scale(0, 0, 0, 1)
 
-		if sprite.colorWhite {
-			screen.DrawImage(imgCheckerWhite, b.op)
-		} else {
-			screen.DrawImage(imgCheckerBlack, b.op)
+		b.op.Filter = ebiten.FilterLinear
+
+		screen.DrawImage(imgCheckerLight, b.op)
+
+		b.op.ColorM.Reset()
+
+		// Draw checker.
+
+		checkerScale := 0.94
+
+		b.op.GeoM.Reset()
+		b.op.GeoM.Translate(-b.spaceWidth/2, -b.spaceWidth/2)
+		b.op.GeoM.Scale(checkerScale, checkerScale)
+		b.op.GeoM.Translate((b.spaceWidth/2)+x, (b.spaceWidth/2)+y)
+
+		c := lightCheckerColor
+		if !sprite.colorWhite {
+			c = darkCheckerColor
 		}
+		b.op.ColorM.Scale(0.0, 0.0, 0.0, 1)
+		r := float64(c.R) / 0xff
+		g := float64(c.G) / 0xff
+		bl := float64(c.B) / 0xff
+		b.op.ColorM.Translate(r, g, bl, 0)
+
+		screen.DrawImage(imgCheckerLight, b.op)
+
+		b.op.ColorM.Reset()
+
+		b.op.Filter = ebiten.FilterNearest
 	}
 
 	b.iterateSpaces(func(space int) {
@@ -360,9 +389,9 @@ func (b *board) draw(screen *ebiten.Image) {
 				labelColor = color.RGBA{0, 0, 0, 255}
 			}
 
-			bounds := text.BoundString(normalFont, overlayText)
+			bounds := text.BoundString(mediumFont, overlayText)
 			overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-			text.Draw(overlayImage, overlayText, normalFont, 0, bounds.Dy(), labelColor)
+			text.Draw(overlayImage, overlayText, mediumFont, 0, bounds.Dy(), labelColor)
 
 			x, y, w, h := b.stackSpaceRect(space, numPieces-1)
 			x += (w / 2) - (bounds.Dx() / 2)
@@ -386,7 +415,7 @@ func (b *board) draw(screen *ebiten.Image) {
 		}
 
 		space := b.spaceAt(dx, dy)
-		if space >= 0 {
+		if space > 0 && space < 25 {
 			x, y, w, h := b.spaceRect(space)
 			spaceImage := ebiten.NewImage(w, h)
 			spaceImage.Fill(color.RGBA{255, 255, 255, 50})
@@ -406,13 +435,17 @@ func (b *board) draw(screen *ebiten.Image) {
 
 	playerColor := color.White
 	opponentColor := color.Black
+	playerBorderColor := lightCheckerColor
+	opponentBorderColor := darkCheckerColor
 	if b.v[fibs.StatePlayerColor] == -1 {
 		playerColor = color.Black
 		opponentColor = color.White
+		playerBorderColor = darkCheckerColor
+		opponentBorderColor = lightCheckerColor
 	}
 
 	drawLabel := func(label string, labelColor color.Color, border bool, borderColor color.Color) *ebiten.Image {
-		bounds := text.BoundString(normalFont, label)
+		bounds := text.BoundString(mediumFont, label)
 
 		w := int(float64(bounds.Dx()) * 1.5)
 		h := int(float64(bounds.Dy()) * 2)
@@ -432,7 +465,7 @@ func (b *board) draw(screen *ebiten.Image) {
 		}
 
 		img := ebiten.NewImageFromImage(baseImg)
-		text.Draw(img, label, normalFont, (w-bounds.Dx())/2, int(float64(h-(bounds.Max.Y/2))*0.75), labelColor)
+		text.Draw(img, label, mediumFont, (w-bounds.Dx())/2, int(float64(h-(bounds.Max.Y/2))*0.75), labelColor)
 
 		return img
 	}
@@ -440,7 +473,7 @@ func (b *board) draw(screen *ebiten.Image) {
 	if b.s[fibs.StateOpponentName] != "" {
 		label := fmt.Sprintf("%s  %d %d", b.s[fibs.StateOpponentName], b.v[fibs.StateOpponentDice1], b.v[fibs.StateOpponentDice2])
 
-		img := drawLabel(label, opponentColor, b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor], opponentColor)
+		img := drawLabel(label, opponentColor, b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor], opponentBorderColor)
 		bounds := img.Bounds()
 
 		x := int(((float64(b.innerW) - borderSize) / 4) - (float64(bounds.Dx()) / 2))
@@ -456,7 +489,7 @@ func (b *board) draw(screen *ebiten.Image) {
 	if b.s[fibs.StatePlayerName] != "" {
 		label := fmt.Sprintf("%s  %d %d", b.s[fibs.StatePlayerName], b.v[fibs.StatePlayerDice1], b.v[fibs.StatePlayerDice2])
 
-		img := drawLabel(label, playerColor, b.v[fibs.StateTurn] == b.v[fibs.StatePlayerColor], playerColor)
+		img := drawLabel(label, playerColor, b.v[fibs.StateTurn] == b.v[fibs.StatePlayerColor], playerBorderColor)
 		bounds := img.Bounds()
 
 		x := ((b.innerW / 4) * 3) - (bounds.Dx() / 2)
@@ -486,8 +519,8 @@ func (b *board) draw(screen *ebiten.Image) {
 		img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
 
 		label := "Reset"
-		bounds := text.BoundString(normalFont, label)
-		text.Draw(img, label, normalFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
+		bounds := text.BoundString(mediumFont, label)
+		text.Draw(img, label, mediumFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
 
 		b.op.GeoM.Reset()
 		b.op.GeoM.Translate(float64(x), float64(y))
@@ -570,7 +603,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	for i := 0; i < b.Sprites.num; i++ {
 		s := b.Sprites.sprites[i]
-		s.w, s.h = imgCheckerWhite.Size()
+		s.w, s.h = imgCheckerLight.Size()
 	}
 
 	b.setSpaceRects()
@@ -779,8 +812,12 @@ func (b *board) ProcessState() {
 			abs *= -1
 		}
 
-		var preMovesTo = b.Client.Board.Premoveto[space]
-		var preMovesFrom = b.Client.Board.Premovefrom[space]
+		var preMovesTo int
+		var preMovesFrom int
+		if b.Client != nil {
+			preMovesTo = b.Client.Board.Premoveto[space]
+			preMovesFrom = b.Client.Board.Premovefrom[space]
+		}
 
 		for i := 0; i < abs+(preMovesTo-preMovesFrom); i++ {
 			s := b.newSprite(white)

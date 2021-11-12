@@ -19,8 +19,17 @@ const (
 
 const windowStartingAlpha = 0.9
 
-const smallFontSize = 14
-const monoFontSize = 10
+const (
+	smallFontSize  = 20
+	monoFontSize   = 10
+	mediumFontSize = 24
+	largeFontSize  = 32
+)
+
+const (
+	monoLineHeight     = 14
+	standardLineHeight = 22
+)
 
 type tabbedBuffers struct {
 	buffers []*textBuffer
@@ -54,8 +63,9 @@ type tabbedBuffers struct {
 
 	client *fibs.Client
 
-	chatFont     font.Face
-	chatFontSize int
+	chatFont       font.Face
+	chatFontSize   int
+	chatLineHeight int
 
 	acceptInput bool
 }
@@ -68,11 +78,13 @@ func newTabbedBuffers() *tabbedBuffers {
 		op:             &ebiten.DrawImageOptions{},
 		chatFont:       monoFont,
 		chatFontSize:   monoFontSize,
+		chatLineHeight: monoLineHeight,
 	}
 
 	// TODO
-	//tab.chatFont = smallFont
-	//tab.chatFontSize = smallFontSize
+	tab.chatFont = smallFont
+	tab.chatFontSize = smallFontSize
+	tab.chatLineHeight = standardLineHeight
 
 	b := &textBuffer{
 		tab: tab,
@@ -122,8 +134,7 @@ func (t *tabbedBuffers) drawBuffer() {
 
 	l := len(b.contentWrapped)
 
-	lineHeight := 14
-	showLines := t.h / lineHeight
+	showLines := t.h / t.chatLineHeight
 	if showLines > 1 {
 		showLines--
 	}
@@ -140,9 +151,7 @@ func (t *tabbedBuffers) drawBuffer() {
 	for i := 0; i < showLines; i++ {
 		line := b.contentWrapped[l-showLines+i]
 
-		bounds := text.BoundString(t.chatFont, line)
-		_ = bounds
-		text.Draw(t.buffer, line, t.chatFont, t.padding*2, t.padding+(lineHeight*(i+1)), textColor)
+		text.Draw(t.buffer, line, t.chatFont, t.padding*2, t.padding+(t.chatLineHeight*(i+1)), textColor)
 	}
 
 	if t.acceptInput {

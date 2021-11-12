@@ -120,12 +120,12 @@ func (l *lobby) _drawBufferButtons() {
 				}
 			}
 		}
-		bounds := text.BoundString(normalFont, button.label)
+		bounds := text.BoundString(mediumFont, button.label)
 
 		labelColor := triangleA
 
 		img := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-		text.Draw(img, button.label, normalFont, 0, bounds.Dy(), labelColor)
+		text.Draw(img, button.label, mediumFont, 0, bounds.Dy(), labelColor)
 
 		l.op.GeoM.Reset()
 		l.op.GeoM.Translate(float64(buttonWidth*i)+float64((buttonWidth-bounds.Dx())/2), float64(l.buttonBarHeight-bounds.Dy())/2-float64(bounds.Dy()/2))
@@ -149,10 +149,10 @@ func (l *lobby) drawBuffer() {
 		lineHeight := 30
 		padding := 24.0
 		for i, label := range labels {
-			bounds := text.BoundString(normalFont, label)
+			bounds := text.BoundString(mediumFont, label)
 			labelColor := triangleA
 			img := ebiten.NewImage(l.w-int(l.padding*2), int(l.entryH))
-			text.Draw(img, label, normalFont, 4, bounds.Dy(), labelColor)
+			text.Draw(img, label, mediumFont, 4, bounds.Dy(), labelColor)
 			l.op.GeoM.Reset()
 			l.op.GeoM.Translate(padding, padding+float64(i*lineHeight))
 			l.buffer.DrawImage(img, l.op)
@@ -160,9 +160,9 @@ func (l *lobby) drawBuffer() {
 	} else {
 		var img *ebiten.Image
 		drawEntry := func(cx float64, cy float64, colA string, colB string, colC string, highlight bool) {
-			boundsA := text.BoundString(normalFont, colA)
-			boundsB := text.BoundString(normalFont, colB)
-			boundsC := text.BoundString(normalFont, colC)
+			boundsA := text.BoundString(mediumFont, colA)
+			boundsB := text.BoundString(mediumFont, colB)
+			boundsC := text.BoundString(mediumFont, colC)
 			y := (boundsA.Dy() + boundsB.Dy() + boundsC.Dy()) / 3 // TODO this isn't correct
 
 			labelColor := triangleA
@@ -184,9 +184,9 @@ func (l *lobby) drawBuffer() {
 				}
 			}
 
-			text.Draw(img, colA, normalFont, 4, y+2, labelColor)
-			text.Draw(img, colB, normalFont, int(250*ebiten.DeviceScaleFactor()), y+2, labelColor)
-			text.Draw(img, colC, normalFont, int(500*ebiten.DeviceScaleFactor()), y+2, labelColor)
+			text.Draw(img, colA, mediumFont, 4, y+2, labelColor)
+			text.Draw(img, colB, mediumFont, int(250*ebiten.DeviceScaleFactor()), y+2, labelColor)
+			text.Draw(img, colC, mediumFont, int(500*ebiten.DeviceScaleFactor()), y+2, labelColor)
 
 			l.op.GeoM.Reset()
 			l.op.GeoM.Translate(cx, cy)

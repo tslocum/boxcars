@@ -5,6 +5,7 @@ import (
 	"embed"
 	"fmt"
 	"image"
+	"image/color"
 	_ "image/png"
 	"log"
 	"os"
@@ -19,6 +20,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/nfnt/resize"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -32,18 +34,25 @@ var debugExtra []byte
 var debugGame *Game
 
 var (
-	imgCheckerWhite *ebiten.Image
-	imgCheckerBlack *ebiten.Image
+	imgCheckerLight *ebiten.Image
+	imgCheckerDark  *ebiten.Image
 
 	smallFont  font.Face
-	normalFont font.Face
+	mediumFont font.Face
 	monoFont   font.Face
 	largeFont  font.Face
+)
+
+var (
+	lightCheckerColor = color.RGBA{232, 211, 162, 255}
+	darkCheckerColor  = color.RGBA{51, 0, 111, 255}
 )
 
 const defaultServerAddress = "fibs.com:4321"
 
 const maxStatusWidthRatio = 0.5
+
+const bufferCharacterWidth = 54
 
 func init() {
 	loadAssets(0)
@@ -52,8 +61,9 @@ func init() {
 }
 
 func loadAssets(width int) {
-	imgCheckerWhite = loadAsset("assets/checker_white.png", width)
-	imgCheckerBlack = loadAsset("assets/checker_black.png", width)
+	imgCheckerLight = loadAsset("assets/checker_white.png", width)
+	imgCheckerDark = loadAsset("assets/checker_white.png", width)
+	//imgCheckerDark = loadAsset("assets/checker_black.png", width)
 }
 
 func loadAsset(assetPath string, width int) *ebiten.Image {
@@ -89,8 +99,8 @@ func initializeFonts() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	normalFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    24,
+	mediumFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    mediumFontSize,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
 	})
@@ -98,7 +108,7 @@ func initializeFonts() {
 		log.Fatal(err)
 	}
 	largeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    32,
+		Size:    largeFontSize,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
 	})
@@ -502,7 +512,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 
-	statusBufferWidth := g.statusBuffer.chatFontSize * 77
+	statusBufferWidth := text.BoundString(g.statusBuffer.chatFont, strings.Repeat("A", bufferCharacterWidth)).Dx()
 	if statusBufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		statusBufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
