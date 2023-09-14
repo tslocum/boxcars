@@ -293,7 +293,17 @@ func (g *Game) handleEvents() {
 			} else {
 				g.pendingGames = ev.Games
 			}
+		case *bgammon.EventJoined:
+			// TODO if current player name, show board
 		case *bgammon.EventBoard:
+			// Exit create game dialog and show board.
+			if g.lobby.createGame != nil {
+				g.lobby.createGame = nil
+				g.lobby.bufferDirty = true
+				g.lobby.bufferButtonsDirty = true
+				viewBoard = true
+			}
+
 			g.Board.gameState = &ev.GameState
 			g.Board.ProcessState()
 		default:

@@ -14,6 +14,20 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text"
 )
 
+const (
+	lobbyButtonCreateCancel = iota
+	lobbyButtonCreateName
+	lobbyButtonCreateType
+	lobbyButtonCreateConfirm
+)
+
+const (
+	lobbyButtonRefresh = iota
+	lobbyButtonCreate
+	lobbyButtonWatch
+	lobbyButtonJoin
+)
+
 type lobbyButton struct {
 	label string
 	f     func()
@@ -21,16 +35,16 @@ type lobbyButton struct {
 
 var mainButtons = []*lobbyButton{
 	{"Refresh", func() {}},
+	{"Create", func() {}},
 	{"Watch", func() {}},
-	{"Invite", func() {}},
 	{"Join", func() {}},
 }
 
-var inviteButtons = []*lobbyButton{
+var createButtons = []*lobbyButton{
 	{"Cancel", func() {}},
-	{"- Point", func() {}},
-	{"+ Point", func() {}},
-	{"Send", func() {}},
+	{"Name", func() {}},
+	{"Type", func() {}},
+	{"Create", func() {}},
 }
 
 type lobby struct {
@@ -62,8 +76,7 @@ type lobby struct {
 
 	c *Client
 
-	inviteUser   *WhoInfo
-	invitePoints int
+	createGame *bgammon.GameListing
 
 	refresh bool
 }
@@ -94,8 +107,8 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 }
 
 func (l *lobby) getButtons() []*lobbyButton {
-	if l.inviteUser != nil {
-		return inviteButtons
+	if l.createGame != nil {
+		return createButtons
 	}
 	return mainButtons
 }
@@ -139,13 +152,13 @@ func (l *lobby) _drawBufferButtons() {
 func (l *lobby) drawBuffer() {
 	l.buffer.Fill(frameColor)
 
-	// Draw invite user dialog
-	if l.inviteUser != nil {
+	// Draw create game dialog
+	if l.createGame != nil {
 		labels := []string{
-			fmt.Sprintf("Invite %s to a %d point match.", l.inviteUser.Username, l.invitePoints),
+			"Test",
 			"",
-			fmt.Sprintf("    Rating: %d", l.inviteUser.Rating),
-			fmt.Sprintf("    Experience: %d", l.inviteUser.Experience),
+			"    test2",
+			"    test3",
 		}
 
 		lineHeight := 30
@@ -307,47 +320,37 @@ func (l *lobby) click(x, y int) {
 		buttonWidth := l.w / len(l.getButtons())
 		buttonIndex := x / buttonWidth
 
-		if l.inviteUser != nil {
+		if l.createGame != nil {
 			switch buttonIndex {
-			case 0:
-				l.inviteUser = nil
+			case lobbyButtonCreateCancel:
+				l.createGame = nil
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
-			case 1:
-				l.invitePoints--
-				if l.invitePoints < 1 {
-					l.invitePoints = 1
-				}
+			case lobbyButtonCreateName:
+				// TODO
 				l.bufferDirty = true
-			case 2:
-				l.invitePoints++
+			case lobbyButtonCreateType:
+				// TODO
 				l.bufferDirty = true
-			case 3:
-				l.c.Out <- []byte(fmt.Sprintf("invite %s %d", l.inviteUser.Username, l.invitePoints))
-
-				l.inviteUser = nil
-				l.bufferDirty = true
-				l.bufferButtonsDirty = true
-
-				viewBoard = true
+			case lobbyButtonCreateConfirm:
+				//l.c.Out <- []byte(fmt.Sprintf("create %s %d", l.createGame.Username, l.invitePoints))
 			}
 			return
 		}
 
-		// TODO migrate to constants
 		switch buttonIndex {
-		case 0:
+		case lobbyButtonRefresh:
 			l.refresh = true
 			l.c.Out <- []byte("list")
-		case 1:
+		case lobbyButtonCreate:
+			l.createGame = &bgammon.GameListing{}
+			l.bufferButtonsDirty = true
+			l.drawBuffer()
+			ebiten.ScheduleFrame()
+		case lobbyButtonWatch:
 			l.c.Out <- []byte(fmt.Sprintf("watch %d", l.games[l.selected].ID))
 			viewBoard = true
-		case 2:
-			/*l.inviteUser = l.games[l.selected]
-			l.invitePoints = 1
-			l.bufferDirty = true
-			l.bufferButtonsDirty = true*/
-		case 3:
+		case lobbyButtonJoin:
 			l.c.Out <- []byte(fmt.Sprintf("join %d", l.games[l.selected].ID))
 			viewBoard = true
 		}
