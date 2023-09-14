@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image/color"
 
-	"code.rocketnine.space/tslocum/fibs"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -61,7 +60,7 @@ type tabbedBuffers struct {
 
 	inputBuffer []byte
 
-	client *fibs.Client
+	client *Client
 
 	chatFont       font.Face
 	chatFontSize   int
@@ -247,7 +246,7 @@ func (t *tabbedBuffers) update() {
 					}
 				}
 			} else {
-				fibs.StatusWriter.Write([]byte("* You have not connected to a server yet"))
+				StatusWriter.Write([]byte("* You have not connected to a server yet"))
 			}
 			t.inputBuffer = nil
 

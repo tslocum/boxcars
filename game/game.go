@@ -14,7 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"code.rocketnine.space/tslocum/fibs"
+	"code.rocketnine.space/tslocum/messeji"
+
 	"code.rocketnine.space/tslocum/kibodo"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -33,6 +34,28 @@ var debugExtra []byte
 
 var debugGame *Game
 
+var mplusNormalFont font.Face
+
+func init() {
+	tt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	const dpi = 72
+	mplusNormalFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    28,
+		DPI:     dpi,
+		Hinting: font.HintingFull,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	StatusWriter = messeji.NewTextField(mplusNormalFont)
+	GameWriter = messeji.NewTextField(mplusNormalFont)
+}
+
 var (
 	imgCheckerLight *ebiten.Image
 	imgCheckerDark  *ebiten.Image
@@ -41,6 +64,9 @@ var (
 	mediumFont font.Face
 	monoFont   font.Face
 	largeFont  font.Face
+
+	StatusWriter *messeji.TextField
+	GameWriter   *messeji.TextField
 )
 
 var (
@@ -48,7 +74,7 @@ var (
 	darkCheckerColor  = color.RGBA{0, 0, 0, 255}
 )
 
-const defaultServerAddress = "fibs.com:4321"
+const DefaultServerAddress = "ws://localhost:1338" // TODO
 
 const maxStatusWidthRatio = 0.5
 
@@ -179,12 +205,12 @@ type Game struct {
 	Watch bool
 	TV    bool
 
-	Client *fibs.Client
+	Client *Client
 
 	Board *board
 
 	lobby      *lobby
-	pendingWho []*fibs.WhoInfo
+	pendingWho []*WhoInfo
 
 	runeBuffer  []rune
 	inputBuffer string
@@ -227,9 +253,6 @@ func NewGame() *Game {
 
 	g.statusBuffer.acceptInput = true
 
-	fibs.StatusWriter = NewMessageHandler(g.statusBuffer.buffers[0])
-	fibs.GameWriter = NewMessageHandler(g.gameBuffer.buffers[0])
-
 	// TODO
 	go func() {
 		/*
@@ -253,9 +276,9 @@ func NewGame() *Game {
 }
 
 func (g *Game) handleEvents() {
-	for e := range g.Client.Event {
-		switch event := e.(type) {
-		case *fibs.EventWho:
+	for ev := range g.Client.Events {
+		/*switch event := e.(type) {
+		case *EventWho:
 			if viewBoard || g.lobby.refresh {
 				g.lobby.setWhoInfo(event.Who)
 
@@ -266,19 +289,22 @@ func (g *Game) handleEvents() {
 			} else {
 				g.pendingWho = event.Who
 			}
-		case *fibs.EventBoardState:
+		case *EventBoardState:
 			log.Println("EVENTBOARDSTATE START")
-			g.Board.SetState(event.S, event.V)
+			// set gamestate var
+			// TODO
+			b.ProcessState()
 			log.Println("EVENTBOARDSTATE FINISH")
-		case *fibs.EventMove:
+		case *EventMove:
 			log.Printf("EVENTMOVE START %d %d", event.From, event.To)
 			g.Board.movePiece(event.From, event.To)
 			log.Println("EVENTMOVE FINISH")
-		case *fibs.EventDraw:
+		case *EventDraw:
 			log.Println("EVENTDRAW START")
 			g.Board.ProcessState()
 			log.Println("EVENTDRAW FINISH")
-		}
+		}*/
+		log.Printf("EVENT %+v", ev)
 	}
 }
 
@@ -287,9 +313,9 @@ func (g *Game) Connect() {
 
 	address := g.ServerAddress
 	if address == "" {
-		address = defaultServerAddress
+		address = DefaultServerAddress
 	}
-	g.Client = fibs.NewClient(address, g.Username, g.Password)
+	g.Client = newClient(address, g.Username, g.Password)
 	g.lobby.c = g.Client
 	g.Board.Client = g.Client
 	g.statusBuffer.client = g.Client
@@ -310,12 +336,7 @@ func (g *Game) Connect() {
 		}()
 	}
 
-	go func() {
-		err := c.Connect()
-		if err != nil {
-			fibs.StatusWriter.Write([]byte(err.Error()))
-		}
-	}()
+	go c.Connect()
 }
 
 // Separate update function for all normal update logic, as Update may only be
@@ -454,7 +475,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 		const welcomeText = `Please enter your FIBS username and password.
 If you do not have a FIBS account yet, visit
-http://www.fibs.com/help.html#register`
+http://www.com/help.html#register`
 		debugBox := image.NewRGBA(image.Rect(0, 0, g.screenW, g.screenH))
 		debugImg := ebiten.NewImageFromImage(debugBox)
 
@@ -670,4 +691,31 @@ func (m *messageHandler) Write(p []byte) (n int, err error) {
 
 	m.t.Write(p)
 	return len(p), nil
+}
+
+// TODO
+
+type WhoInfo struct {
+	Username   string
+	Opponent   string
+	Watching   string
+	Ready      bool
+	Away       bool
+	Rating     int
+	Experience int
+	Idle       int
+	LoginTime  int
+	ClientName string
+}
+
+func (w *WhoInfo) String() string {
+	opponent := "In the lobby"
+	if w.Opponent != "" && w.Opponent != "-" {
+		opponent = "playing against " + w.Opponent
+	}
+	clientName := ""
+	if w.ClientName != "" && w.ClientName != "-" {
+		clientName = " using " + w.ClientName
+	}
+	return fmt.Sprintf("%s (rated %d with %d exp) is %s%s", w.Username, w.Rating, w.Experience, opponent, clientName)
 }

@@ -8,7 +8,6 @@ import (
 	"sort"
 	"strings"
 
-	"code.rocketnine.space/tslocum/fibs"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -43,7 +42,7 @@ type lobby struct {
 	entryH          float64
 	buttonBarHeight int
 
-	who []*fibs.WhoInfo
+	who []*WhoInfo
 
 	touchIDs []ebiten.TouchID
 
@@ -59,9 +58,9 @@ type lobby struct {
 
 	op *ebiten.DrawImageOptions
 
-	c *fibs.Client
+	c *Client
 
-	inviteUser   *fibs.WhoInfo
+	inviteUser   *WhoInfo
 	invitePoints int
 
 	refresh bool
@@ -75,7 +74,7 @@ func NewLobby() *lobby {
 	return l
 }
 
-func (l *lobby) setWhoInfo(who []*fibs.WhoInfo) {
+func (l *lobby) setWhoInfo(who []*WhoInfo) {
 	l.who = who
 
 	sort.Slice(l.who, func(i, j int) bool {

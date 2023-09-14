@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"syscall/js"
 
-	"code.rocketnine.space/tslocum/boxcars/game"
+	"code.rocket9labs.com/tslocum/boxcars/game"
 )
 
 func parseFlags(g *game.Game) {

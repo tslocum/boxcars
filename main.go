@@ -9,8 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"code.rocketnine.space/tslocum/boxcars/game"
-	"code.rocketnine.space/tslocum/fibs"
+	"code.rocket9labs.com/tslocum/boxcars/game"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -22,7 +21,7 @@ const (
 var AutoWatch bool // WASM only
 
 func main() {
-	ebiten.SetWindowTitle("Boxcars")
+	ebiten.SetWindowTitle("bgammon.org - Free Online Backgammon")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowResizable(true)
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMinimum)
@@ -38,8 +37,6 @@ func main() {
 	g := game.NewGame()
 
 	parseFlags(g)
-
-	fibs.Debug = g.Debug
 
 	if g.Debug > 0 {
 		go func() {

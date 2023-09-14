@@ -1,29 +1,28 @@
-module code.rocketnine.space/tslocum/boxcars
+module code.rocket9labs.com/tslocum/boxcars
 
 go 1.17
 
 require (
-	code.rocketnine.space/tslocum/fibs v0.0.0-20211112042838-16c24d47934a
-	code.rocketnine.space/tslocum/kibodo v0.0.0-20211027223129-7b870790d865
-	github.com/hajimehoshi/ebiten/v2 v2.2.2
-	github.com/llgcode/draw2d v0.0.0-20210904075650-80aa0a2a901d
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20230913074653-cf99329267a8
+	code.rocketnine.space/tslocum/kibodo v1.0.0
+	code.rocketnine.space/tslocum/messeji v1.0.3
+	github.com/gobwas/ws v1.3.0
+	github.com/hajimehoshi/ebiten/v2 v2.5.9
+	github.com/llgcode/draw2d v0.0.0-20230723155556-e595d7c7e75e
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
+	golang.org/x/image v0.12.0
 )
 
 require (
-	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20211024062804-40e447a793be // indirect
+	github.com/ebitengine/purego v0.4.0 // indirect
+	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
+	github.com/gobwas/httphead v0.1.0 // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/jezek/xgb v0.0.0-20210312150743-0e0f116e1240 // indirect
-	github.com/klauspost/compress v1.13.6 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/reiver/go-oi v1.0.0 // indirect
-	github.com/reiver/go-telnet v0.0.0-20180421082511-9ff0b2ab096e // indirect
-	golang.org/x/exp v0.0.0-20211111183329-cb5df436b1a8 // indirect
-	golang.org/x/mobile v0.0.0-20211109191125-d61a72f26a1a // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211112193437-faf0a1b62c6b // indirect
-	golang.org/x/text v0.3.7 // indirect
-	nhooyr.io/websocket v1.8.7 // indirect
+	github.com/jezek/xgb v1.1.0 // indirect
+	golang.org/x/exp/shiny v0.0.0-20230905200255-921286631fa9 // indirect
+	golang.org/x/mobile v0.0.0-20230906132913-2077a3224571 // indirect
+	golang.org/x/sync v0.3.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 )

@@ -8,8 +8,9 @@ import (
 	"os"
 	"time"
 
-	"code.rocketnine.space/tslocum/fibs"
 	"github.com/hajimehoshi/ebiten/v2"
+
+	"code.rocket9labs.com/tslocum/bgammon"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -30,8 +31,8 @@ type board struct {
 
 	Sprites *Sprites
 
-	spaces     [][]*Sprite // Space contents
-	spaceRects [][4]int
+	spaceSprites     [][]*Sprite // Space contents
+	spaceSpriteRects [][4]int
 
 	dragging *Sprite
 	moving   *Sprite // Moving automatically
@@ -46,16 +47,15 @@ type board struct {
 	verticalBorderSize   float64
 	overlapSize          float64
 
-	lastDirection int
+	lastPlayerNumber int
 
-	s []string
-	v []int
+	gameState *bgammon.GameState
 
 	drawFrame chan bool
 
 	debug int // Print and draw debug information
 
-	Client *fibs.Client
+	Client *Client
 
 	dragX, dragY int
 }
@@ -71,11 +71,12 @@ func NewBoard() *board {
 			sprites: make([]*Sprite, 30),
 			num:     30,
 		},
-		spaces:     make([][]*Sprite, 26),
-		spaceRects: make([][4]int, 26),
-		s:          make([]string, 2),
-		v:          make([]int, 42),
-		drawFrame:  make(chan bool, 10),
+		spaceSprites:     make([][]*Sprite, 26),
+		spaceSpriteRects: make([][4]int, 26),
+		drawFrame:        make(chan bool, 10),
+		gameState: &bgammon.GameState{
+			Game: bgammon.NewGame(),
+		},
 	}
 
 	for i := range b.Sprites.sprites {
@@ -92,7 +93,7 @@ func NewBoard() *board {
 			}
 		}
 
-		b.spaces[space] = append(b.spaces[space], s)
+		b.spaceSprites[space] = append(b.spaceSprites[space], s)
 	}
 
 	go b.handleDraw()
@@ -373,7 +374,7 @@ func (b *board) draw(screen *ebiten.Image) {
 
 	b.iterateSpaces(func(space int) {
 		var numPieces int
-		for i, sprite := range b.spaces[space] {
+		for i, sprite := range b.spaceSprites[space] {
 			if sprite == b.dragging || sprite == b.moving {
 				continue
 			}
@@ -448,7 +449,7 @@ func (b *board) draw(screen *ebiten.Image) {
 	opponentColor := color.Black
 	playerBorderColor := lightCheckerColor
 	opponentBorderColor := darkCheckerColor
-	if b.v[fibs.StatePlayerColor] == -1 {
+	if b.gameState.PlayerNumber == 1 {
 		playerColor = color.Black
 		opponentColor = color.White
 		playerBorderColor = darkCheckerColor
@@ -481,10 +482,11 @@ func (b *board) draw(screen *ebiten.Image) {
 		return img
 	}
 
-	if b.s[fibs.StateOpponentName] != "" {
-		label := fmt.Sprintf("%s  %d %d", b.s[fibs.StateOpponentName], b.v[fibs.StateOpponentDice1], b.v[fibs.StateOpponentDice2])
+	opponent := b.gameState.OpponentPlayer()
+	if opponent.Name != "" {
+		label := fmt.Sprintf("%s  %d %d", opponent.Name, b.gameState.Roll1, b.gameState.Roll2)
 
-		img := drawLabel(label, opponentColor, b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor], opponentBorderColor)
+		img := drawLabel(label, opponentColor, b.gameState.Turn != b.gameState.PlayerNumber, opponentBorderColor)
 		bounds := img.Bounds()
 
 		x := int(((float64(b.innerW) - borderSize) / 4) - (float64(bounds.Dx()) / 2))
@@ -497,10 +499,11 @@ func (b *board) draw(screen *ebiten.Image) {
 
 	// Draw player name and dice
 
-	if b.s[fibs.StatePlayerName] != "" {
-		label := fmt.Sprintf("%s  %d %d", b.s[fibs.StatePlayerName], b.v[fibs.StatePlayerDice1], b.v[fibs.StatePlayerDice2])
+	player := b.gameState.LocalPlayer()
+	if player.Name != "" {
+		label := fmt.Sprintf("%s  %d %d", player.Name, b.gameState.Roll1, b.gameState.Roll2)
 
-		img := drawLabel(label, playerColor, b.v[fibs.StateTurn] == b.v[fibs.StatePlayerColor], playerBorderColor)
+		img := drawLabel(label, playerColor, b.gameState.Turn == b.gameState.PlayerNumber, playerBorderColor)
 		bounds := img.Bounds()
 
 		x := ((b.innerW / 4) * 3) - (bounds.Dx() / 2)
@@ -512,7 +515,7 @@ func (b *board) draw(screen *ebiten.Image) {
 
 	}
 
-	if len(b.Client.Board.GetPreMoves()) > 0 {
+	if len(b.gameState.Moves) > 0 {
 		x, y, w, h := b.resetButtonRect()
 		baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
 
@@ -549,7 +552,7 @@ func (b *board) draw(screen *ebiten.Image) {
 	}
 
 	if b.debug == 2 {
-		homeStart, homeEnd := b.Client.Board.PlayerHomeSpaces()
+		homeStart, homeEnd := bgammon.HomeRange(b.gameState.PlayerNumber)
 		b.iterateSpaces(func(space int) {
 			x, y, w, h := b.spaceRect(space)
 			spaceImage := ebiten.NewImage(w, h)
@@ -557,9 +560,9 @@ func (b *board) draw(screen *ebiten.Image) {
 			if space >= homeStart && space <= homeEnd {
 				br += "H"
 			}
-			if space == b.Client.Board.PlayerBarSpace() {
+			if space == bgammon.SpaceBarPlayer {
 				br += "(PB)"
-			} else if space == 25-b.Client.Board.PlayerBarSpace() {
+			} else if space == bgammon.SpaceBarOpponent {
 				br += "(OB)"
 			}
 			ebitenutil.DebugPrint(spaceImage, fmt.Sprintf(" %d %s", space, br))
@@ -629,7 +632,7 @@ func (b *board) offsetPosition(x, y int) (int, int) {
 // Do not call _positionCheckers directly.  Call ProcessState instead.
 func (b *board) _positionCheckers() {
 	for space := 0; space < 26; space++ {
-		sprites := b.spaces[space]
+		sprites := b.spaceSprites[space]
 
 		for i := range sprites {
 			s := sprites[i]
@@ -652,7 +655,7 @@ func (b *board) spriteAt(x, y int) *Sprite {
 	if space == -1 {
 		return nil
 	}
-	pieces := b.spaces[space]
+	pieces := b.spaceSprites[space]
 	if len(pieces) == 0 {
 		return nil
 	}
@@ -677,7 +680,7 @@ func (b *board) iterateSpaces(f func(space int)) {
 }
 
 func (b *board) translateSpace(space int) int {
-	if b.v[fibs.StateDirection] == -1 {
+	/*if b.gameState.PlayerNumber == 2 {
 		// Spaces range from 24 - 1.
 		if space == 0 || space == 25 {
 			space = 25 - space
@@ -686,7 +689,8 @@ func (b *board) translateSpace(space int) int {
 		} else {
 			space = space - 12
 		}
-	}
+	}*/
+	// TODO
 	return space
 }
 
@@ -728,13 +732,13 @@ func (b *board) setSpaceRects() {
 
 		h = int((float64(b.h) - (b.verticalBorderSize * 2)) / 2)
 
-		b.spaceRects[trueSpace] = [4]int{x, y, w, h}
+		b.spaceSpriteRects[trueSpace] = [4]int{x, y, w, h}
 	}
 }
 
 // relX, relY
 func (b *board) spaceRect(space int) (x, y, w, h int) {
-	rect := b.spaceRects[space]
+	rect := b.spaceSpriteRects[space]
 	return rect[0], rect[1], rect[2], rect[3]
 }
 
@@ -742,7 +746,7 @@ func (b *board) bottomRow(space int) bool {
 	bottomStart := 1
 	bottomEnd := 12
 	bottomBar := 25
-	if b.v[fibs.StateDirection] == 1 {
+	if b.gameState.PlayerNumber == 2 {
 		bottomStart = 13
 		bottomEnd = 24
 		bottomBar = 0
@@ -784,38 +788,20 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 	return x, y, w, h
 }
 
-func (b *board) SetState(s []string, v []int) {
-	log.Printf("OLD %+v", b.v)
-	log.Printf("NEW %+v", v)
-
-	for i := 0; i < 26; i++ {
-		var str string
-		if b.v[fibs.StateBoardSpace0+i] != v[fibs.StateBoardSpace0+i] {
-			str = "^^^"
-		}
-		log.Printf("SPACE %d WAS %d, NOW %d %s", i, b.v[fibs.StateBoardSpace0+i], v[fibs.StateBoardSpace0+i], str)
-	}
-	copy(b.s, s)
-	copy(b.v, v)
-	b.ProcessState()
-}
-
 func (b *board) ProcessState() {
-	v := b.v
-
-	if b.lastDirection != v[fibs.StateDirection] {
+	if b.lastPlayerNumber != b.gameState.PlayerNumber {
 		b.setSpaceRects()
 	}
-	b.lastDirection = v[fibs.StateDirection]
+	b.lastPlayerNumber = b.gameState.PlayerNumber
 
 	b.Sprites = &Sprites{}
-	b.spaces = make([][]*Sprite, 26)
-	for space := 0; space < 26; space++ {
-		spaceValue := v[fibs.StateBoardSpace0+space]
+	b.spaceSprites = make([][]*Sprite, 26)
+	for space := 0; space < bgammon.BoardSpaces; space++ {
+		spaceValue := b.gameState.Board[space]
 
 		white := spaceValue > 0
 		if spaceValue == 0 {
-			white = v[fibs.StatePlayerColor] == 1
+			white = b.gameState.PlayerNumber == 2
 		}
 
 		abs := spaceValue
@@ -825,18 +811,19 @@ func (b *board) ProcessState() {
 
 		var preMovesTo int
 		var preMovesFrom int
-		if b.Client != nil {
+		/*if b.Client != nil {
 			preMovesTo = b.Client.Board.Premoveto[space]
 			preMovesFrom = b.Client.Board.Premovefrom[space]
-		}
+		}*/
+		// TODO
 
 		for i := 0; i < abs+(preMovesTo-preMovesFrom); i++ {
 			s := b.newSprite(white)
 			if i >= abs {
-				s.colorWhite = v[fibs.StatePlayerColor] == 1
+				s.colorWhite = b.gameState.PlayerNumber == 2
 				s.premove = true
 			}
-			b.spaces[space] = append(b.spaces[space], s)
+			b.spaceSprites[space] = append(b.spaceSprites[space], s)
 			b.Sprites.sprites = append(b.Sprites.sprites, s)
 		}
 	}
@@ -847,15 +834,15 @@ func (b *board) ProcessState() {
 
 // _movePiece returns after moving the piece.
 func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bool) {
-	moveTime := (750 * time.Millisecond) / time.Duration(speed)
-	pauseTime := 500 * time.Millisecond
+	moveTime := (650 * time.Millisecond) / time.Duration(speed)
+	pauseTime := 250 * time.Millisecond
 
 	b.moving = sprite
 
 	space := to // Immediately go to target space
 
-	stack := len(b.spaces[space])
-	if stack == 1 && sprite.colorWhite != b.spaces[space][0].colorWhite {
+	stack := len(b.spaceSprites[space])
+	if stack == 1 && sprite.colorWhite != b.spaceSprites[space][0].colorWhite {
 		stack = 0 // Hit
 	} else if space != to {
 		stack++
@@ -879,16 +866,16 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	ebiten.ScheduleFrame()
 
 	/*homeSpace := b.Client.Board.PlayerHomeSpace()
-	if b.v[fibs.StateTurn] != b.v[fibs.StatePlayerColor] {
+	if b.gameState.Turn != b.gameState.Player {
 		homeSpace = 25 - homeSpace
 	}
 
 	if to != homeSpace {*/
-	b.spaces[to] = append(b.spaces[to], sprite)
+	b.spaceSprites[to] = append(b.spaceSprites[to], sprite)
 	/*}*/
-	for i, s := range b.spaces[from] {
+	for i, s := range b.spaceSprites[from] {
 		if s == sprite {
-			b.spaces[from] = append(b.spaces[from][:i], b.spaces[from][i+1:]...)
+			b.spaceSprites[from] = append(b.spaceSprites[from][:i], b.spaceSprites[from][i+1:]...)
 			break
 		}
 	}
@@ -903,7 +890,7 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 
 // movePiece returns when finished moving the piece.
 func (b *board) movePiece(from int, to int) {
-	pieces := b.spaces[from]
+	pieces := b.spaceSprites[from]
 	if len(pieces) == 0 {
 		log.Printf("%d-%d: NO PIECES AT SPACE %d", from, to, from)
 		os.Exit(1)
@@ -913,17 +900,17 @@ func (b *board) movePiece(from int, to int) {
 	sprite := pieces[len(pieces)-1]
 
 	var moveAfter *Sprite
-	if len(b.spaces[to]) == 1 {
-		if sprite.colorWhite != b.spaces[to][0].colorWhite {
-			moveAfter = b.spaces[to][0]
+	if len(b.spaceSprites[to]) == 1 {
+		if sprite.colorWhite != b.spaceSprites[to][0].colorWhite {
+			moveAfter = b.spaceSprites[to][0]
 		}
 	}
 
 	b._movePiece(sprite, from, to, 1, moveAfter == nil)
 	if moveAfter != nil {
-		bar := b.Client.Board.PlayerBarSpace()
-		if b.v[fibs.StateTurn] == b.v[fibs.StatePlayerColor] {
-			bar = 25 - bar
+		bar := bgammon.SpaceBarOpponent
+		if b.gameState.Turn == b.gameState.PlayerNumber {
+			bar = bgammon.SpaceBarPlayer
 		}
 		b._movePiece(moveAfter, to, bar, 1, true)
 	}
@@ -931,16 +918,16 @@ func (b *board) movePiece(from int, to int) {
 
 // WatchingGame returns whether the active game is being watched.
 func (b *board) watchingGame() bool {
-	return !b.playingGame() && b.s[fibs.StatePlayerName] != "" && b.s[fibs.StateOpponentName] != ""
+	return !b.playingGame() && false // TODO
 }
 
 // PlayingGame returns whether the active game is being played.
 func (b *board) playingGame() bool {
-	return b.s[fibs.StatePlayerName] == "You" || b.s[fibs.StateOpponentName] == "You"
+	return b.gameState.Player1.Name != "" || b.gameState.Player2.Name != ""
 }
 
 func (b *board) playerTurn() bool {
-	return b.playingGame() && b.v[fibs.StateTurn] == b.v[fibs.StatePlayerColor]
+	return b.playingGame() && b.gameState.Turn == b.gameState.PlayerNumber
 }
 
 func (b *board) update() {
@@ -952,14 +939,15 @@ func (b *board) update() {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
 		handleReset := func(x, y int) bool {
-			if len(b.Client.Board.GetPreMoves()) > 0 {
+			/*if len(b.gameState.Moves) > 0 {
 				rx, ry, rw, rh := b.resetButtonRect()
 				if x >= rx && x <= rx+rw && y >= ry && y <= ry+rh {
 					b.Client.Board.ResetPreMoves()
 					b.ProcessState()
 					return true
 				}
-			}
+			}*/
+			panic("RESET") // TODO
 			return false
 		}
 
@@ -1017,17 +1005,18 @@ func (b *board) update() {
 	if dropped != nil {
 		index := b.spaceAt(x, y)
 		// Bear off by dragging outside the board.
-		if index == fibs.SpaceUnknown && b.Client.Board.PlayerPieceAreHome() {
-			index = b.Client.Board.PlayerBearOffSpace()
+		if index == -1 {
+			// TODO check if all pieces are home
+			index = bgammon.SpaceHomePlayer
 		}
 		if index >= 0 && b.Client != nil {
 		ADDPREMOVE:
-			for space, pieces := range b.spaces {
+			for space, pieces := range b.spaceSprites {
 				for _, piece := range pieces {
 					if piece == dropped {
 						if space != index {
-							b.Client.Board.SetSelection(1, space)
-							b.Client.Board.AddPreMove(space, index)
+							//b.Client.Board.SetSelection(1, space)
+							b.Client.Out <- []byte(fmt.Sprintf("move %d/%d", space, index))
 						}
 						break ADDPREMOVE
 					}
