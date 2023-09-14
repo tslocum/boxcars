@@ -14,6 +14,8 @@ import (
 	"strings"
 	"time"
 
+	"code.rocket9labs.com/tslocum/bgammon"
+
 	"code.rocketnine.space/tslocum/messeji"
 
 	"code.rocketnine.space/tslocum/kibodo"
@@ -209,8 +211,8 @@ type Game struct {
 
 	Board *board
 
-	lobby      *lobby
-	pendingWho []*WhoInfo
+	lobby        *lobby
+	pendingGames []bgammon.GameListing
 
 	runeBuffer  []rune
 	inputBuffer string
@@ -276,35 +278,27 @@ func NewGame() *Game {
 }
 
 func (g *Game) handleEvents() {
-	for ev := range g.Client.Events {
-		/*switch event := e.(type) {
-		case *EventWho:
+	for e := range g.Client.Events {
+		switch ev := e.(type) {
+		case *bgammon.EventWelcome:
+			log.Printf("got welcome message %+v", ev)
+		case *bgammon.EventList:
 			if viewBoard || g.lobby.refresh {
-				g.lobby.setWhoInfo(event.Who)
+				g.lobby.setGameList(ev.Games)
 
 				if g.lobby.refresh {
 					ebiten.ScheduleFrame()
 					g.lobby.refresh = false
 				}
 			} else {
-				g.pendingWho = event.Who
+				g.pendingGames = ev.Games
 			}
-		case *EventBoardState:
-			log.Println("EVENTBOARDSTATE START")
-			// set gamestate var
-			// TODO
-			b.ProcessState()
-			log.Println("EVENTBOARDSTATE FINISH")
-		case *EventMove:
-			log.Printf("EVENTMOVE START %d %d", event.From, event.To)
-			g.Board.movePiece(event.From, event.To)
-			log.Println("EVENTMOVE FINISH")
-		case *EventDraw:
-			log.Println("EVENTDRAW START")
+		case *bgammon.EventBoard:
+			g.Board.gameState = &ev.GameState
 			g.Board.ProcessState()
-			log.Println("EVENTDRAW FINISH")
-		}*/
-		log.Printf("EVENT %+v", ev)
+		default:
+			log.Printf("UNKNOWN EVENT %+v", ev)
+		}
 	}
 }
 
@@ -355,9 +349,9 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		g.Exit()
 		return nil
 	}
-	if g.pendingWho != nil && viewBoard {
-		g.lobby.setWhoInfo(g.pendingWho)
-		g.pendingWho = nil
+	if g.pendingGames != nil && viewBoard {
+		g.lobby.setGameList(g.pendingGames)
+		g.pendingGames = nil
 	}
 
 	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyP) {

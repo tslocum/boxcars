@@ -515,7 +515,8 @@ func (b *board) draw(screen *ebiten.Image) {
 
 	}
 
-	if len(b.gameState.Moves) > 0 {
+	drawResetButton := b.gameState.Turn == b.gameState.PlayerNumber && len(b.gameState.Moves) > 0
+	if drawResetButton {
 		x, y, w, h := b.resetButtonRect()
 		baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
 
@@ -939,15 +940,13 @@ func (b *board) update() {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
 		handleReset := func(x, y int) bool {
-			/*if len(b.gameState.Moves) > 0 {
+			if b.gameState.Turn == b.gameState.PlayerNumber && len(b.gameState.Moves) > 0 {
 				rx, ry, rw, rh := b.resetButtonRect()
 				if x >= rx && x <= rx+rw && y >= ry && y <= ry+rh {
-					b.Client.Board.ResetPreMoves()
-					b.ProcessState()
+					b.Client.Out <- []byte("reset")
 					return true
 				}
-			}*/
-			panic("RESET") // TODO
+			}
 			return false
 		}
 

@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"code.rocket9labs.com/tslocum/bgammon"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -42,7 +43,7 @@ type lobby struct {
 	entryH          float64
 	buttonBarHeight int
 
-	who []*WhoInfo
+	games []bgammon.GameListing
 
 	touchIDs []ebiten.TouchID
 
@@ -74,20 +75,17 @@ func NewLobby() *lobby {
 	return l
 }
 
-func (l *lobby) setWhoInfo(who []*WhoInfo) {
-	l.who = who
+func (l *lobby) setGameList(games []bgammon.GameListing) {
+	l.games = games
 
-	sort.Slice(l.who, func(i, j int) bool {
-		if (l.who[i].Opponent != "") != (l.who[j].Opponent != "") {
-			return l.who[j].Opponent != ""
+	sort.Slice(l.games, func(i, j int) bool {
+		if (l.games[i].Players) != (l.games[j].Players) {
+			return l.games[i].Players < l.games[j].Players
 		}
-		if l.who[i].Ready != l.who[j].Ready {
-			return l.who[i].Ready
+		if (l.games[i].Password) != (l.games[j].Password) {
+			return !l.games[i].Password
 		}
-		if l.who[i].Rating != l.who[j].Rating {
-			return l.who[i].Rating > l.who[j].Rating
-		}
-		return strings.ToLower(l.who[i].Username) < strings.ToLower(l.who[j].Username)
+		return strings.ToLower(l.games[i].Name) < strings.ToLower(l.games[j].Name)
 	})
 
 	l.bufferDirty = true
@@ -161,7 +159,7 @@ func (l *lobby) drawBuffer() {
 		}
 	} else {
 		var img *ebiten.Image
-		drawEntry := func(cx float64, cy float64, colA string, colB string, colC string, highlight bool, title bool) {
+		drawEntry := func(cx float64, cy float64, colA string, colB string, highlight bool, title bool) {
 			labelColor := triangleA
 			if highlight {
 				labelColor = lightCheckerColor
@@ -188,7 +186,7 @@ func (l *lobby) drawBuffer() {
 
 			text.Draw(img, colA, mediumFont, 4, standardLineHeight, labelColor)
 			text.Draw(img, colB, mediumFont, int(250*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
-			text.Draw(img, colC, mediumFont, int(500*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
+			//text.Draw(img, colC, mediumFont, int(500*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
 
 			l.op.GeoM.Reset()
 			l.op.GeoM.Translate(cx, cy)
@@ -197,8 +195,8 @@ func (l *lobby) drawBuffer() {
 
 		titleOffset := 2.0
 
-		if len(l.who) == 0 {
-			drawEntry(l.padding, l.padding-titleOffset, "Loading...", "Please wait...", "Loading...", false, true)
+		if len(l.games) == 0 {
+			drawEntry(l.padding, l.padding-titleOffset, "Loading...", "Please wait...", false, true)
 			return
 		}
 
@@ -209,21 +207,23 @@ func (l *lobby) drawBuffer() {
 		}
 
 		cx, cy := 0.0, 0.0 // Cursor
-		drawEntry(cx+l.padding, cy+l.padding-titleOffset, "Username", "Rating (Experience)", "Status", false, true)
+		drawEntry(cx+l.padding, cy+l.padding-titleOffset, "Status", "Name", false, true)
 		cy += l.entryH
 		i := 0
-		for _, who := range l.who {
+		var status string
+		for _, entry := range l.games {
 			if i >= l.offset {
-				details := fmt.Sprintf("%d   (%d)", who.Rating, who.Experience)
-
-				status := "In the lobby"
-				if who.Opponent != "" {
-					status = fmt.Sprintf("Playing versus %s", who.Opponent)
-				} else if who.Ready {
-					status = "Ready to play"
+				if entry.Players == 2 {
+					status = "Full"
+				} else {
+					if !entry.Password {
+						status = "Open"
+					} else {
+						status = "Private"
+					}
 				}
 
-				drawEntry(cx+l.padding, cy+l.padding, who.Username, details, status, i == l.selected, false)
+				drawEntry(cx+l.padding, cy+l.padding, status, entry.Name, i == l.selected, false)
 
 				cy += l.entryH
 			}
@@ -251,7 +251,7 @@ func (l *lobby) draw(screen *ebiten.Image) {
 	var p bool
 
 	if l.bufferDirty {
-		if len(l.who) > 1 {
+		if len(l.games) > 1 {
 			p = true
 			//debugGame.toggleProfiling()
 		}
@@ -337,15 +337,15 @@ func (l *lobby) click(x, y int) {
 			l.refresh = true
 			l.c.Out <- []byte("rawwho")
 		case 1:
-			l.c.Out <- []byte(fmt.Sprintf("watch %s", l.who[l.selected].Username))
+			l.c.Out <- []byte(fmt.Sprintf("watch %d", l.games[l.selected].ID))
 			viewBoard = true
 		case 2:
-			l.inviteUser = l.who[l.selected]
+			/*l.inviteUser = l.games[l.selected]
 			l.invitePoints = 1
 			l.bufferDirty = true
-			l.bufferButtonsDirty = true
+			l.bufferButtonsDirty = true*/
 		case 3:
-			l.c.Out <- []byte(fmt.Sprintf("join %s", l.who[l.selected].Username))
+			l.c.Out <- []byte(fmt.Sprintf("join %d", l.games[l.selected].ID))
 			viewBoard = true
 		}
 		return

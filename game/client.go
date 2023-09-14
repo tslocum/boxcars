@@ -54,7 +54,7 @@ func (c *Client) Connect() {
 	if c.Username != "" && c.Password != "" {
 		loginInfo = fmt.Sprintf("%s %s", c.Username, c.Password)
 	}
-	c.Out <- []byte(fmt.Sprintf("lj %s\nlist\n", loginInfo))
+	c.Out <- []byte(fmt.Sprintf("lj %s\nlist\ncreate public\n", loginInfo))
 
 	go c.handleWrite()
 	c.handleRead()
