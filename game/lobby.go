@@ -43,7 +43,8 @@ type lobby struct {
 	entryH          float64
 	buttonBarHeight int
 
-	games []bgammon.GameListing
+	loaded bool
+	games  []bgammon.GameListing
 
 	touchIDs []ebiten.TouchID
 
@@ -77,6 +78,7 @@ func NewLobby() *lobby {
 
 func (l *lobby) setGameList(games []bgammon.GameListing) {
 	l.games = games
+	l.loaded = true
 
 	sort.Slice(l.games, func(i, j int) bool {
 		if (l.games[i].Players) != (l.games[j].Players) {
@@ -195,7 +197,7 @@ func (l *lobby) drawBuffer() {
 
 		titleOffset := 2.0
 
-		if len(l.games) == 0 {
+		if !l.loaded {
 			drawEntry(l.padding, l.padding-titleOffset, "Loading...", "Please wait...", false, true)
 			return
 		}

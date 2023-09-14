@@ -54,7 +54,7 @@ func (c *Client) Connect() {
 	if c.Username != "" && c.Password != "" {
 		loginInfo = fmt.Sprintf("%s %s", c.Username, c.Password)
 	}
-	c.Out <- []byte(fmt.Sprintf("lj %s\nlist\ncreate public\n", loginInfo))
+	c.Out <- []byte(fmt.Sprintf("lj %s\nlist\n", loginInfo))
 
 	go c.handleWrite()
 	c.handleRead()
@@ -86,12 +86,7 @@ func (c *Client) handleRead() {
 
 	var messages []wsutil.Message
 	var err error
-
-	var i int
 	for {
-		log.Printf("READ FRAME %d", i)
-		i++
-
 		messages, err = wsutil.ReadServerMessage(c.conn, messages[:0])
 		if err != nil {
 			panic(err)

@@ -281,7 +281,7 @@ func (g *Game) handleEvents() {
 	for e := range g.Client.Events {
 		switch ev := e.(type) {
 		case *bgammon.EventWelcome:
-			log.Printf("got welcome message %+v", ev)
+			log.Printf("got welcome message %+v", ev) // TODO
 		case *bgammon.EventList:
 			if viewBoard || g.lobby.refresh {
 				g.lobby.setGameList(ev.Games)
@@ -297,7 +297,7 @@ func (g *Game) handleEvents() {
 			g.Board.gameState = &ev.GameState
 			g.Board.ProcessState()
 		default:
-			log.Printf("UNKNOWN EVENT %+v", ev)
+			log.Printf("Error: Received unknown event: %+v", ev)
 		}
 	}
 }

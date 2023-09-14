@@ -31,8 +31,8 @@ type board struct {
 
 	Sprites *Sprites
 
-	spaceSprites     [][]*Sprite // Space contents
-	spaceSpriteRects [][4]int
+	spaceRects   [][4]int
+	spaceSprites [][]*Sprite // Space contents
 
 	dragging *Sprite
 	moving   *Sprite // Moving automatically
@@ -71,29 +71,16 @@ func NewBoard() *board {
 			sprites: make([]*Sprite, 30),
 			num:     30,
 		},
-		spaceSprites:     make([][]*Sprite, 26),
-		spaceSpriteRects: make([][4]int, 26),
-		drawFrame:        make(chan bool, 10),
+		spaceSprites: make([][]*Sprite, bgammon.BoardSpaces),
+		spaceRects:   make([][4]int, bgammon.BoardSpaces),
+		drawFrame:    make(chan bool, 10),
 		gameState: &bgammon.GameState{
 			Game: bgammon.NewGame(),
 		},
 	}
 
 	for i := range b.Sprites.sprites {
-		s := b.newSprite(i%2 == 1)
-
-		b.Sprites.sprites[i] = s
-
-		space := i
-		if space > 25 {
-			if space%2 == 0 {
-				space = 0
-			} else {
-				space = 25
-			}
-		}
-
-		b.spaceSprites[space] = append(b.spaceSprites[space], s)
+		b.Sprites.sprites[i] = b.newSprite(false)
 	}
 
 	go b.handleDraw()
@@ -282,7 +269,7 @@ func (b *board) draw(screen *ebiten.Image) {
 	screen.DrawImage(b.backgroundImage, b.op)
 
 	if b.debug == 2 {
-		b.iterateSpaces(func(space int) {
+		for space := 0; space < bgammon.BoardSpaces; space++ {
 			x, y, w, h := b.spaceRect(space)
 			spaceImage := ebiten.NewImage(w, h)
 			if space%2 == 0 {
@@ -294,7 +281,7 @@ func (b *board) draw(screen *ebiten.Image) {
 			b.op.GeoM.Reset()
 			b.op.GeoM.Translate(float64(x), float64(y))
 			screen.DrawImage(spaceImage, b.op)
-		})
+		}
 	}
 
 	drawSprite := func(sprite *Sprite) {
@@ -372,7 +359,7 @@ func (b *board) draw(screen *ebiten.Image) {
 		b.op.Filter = ebiten.FilterNearest
 	}
 
-	b.iterateSpaces(func(space int) {
+	for space := 0; space < bgammon.BoardSpaces; space++ {
 		var numPieces int
 		for i, sprite := range b.spaceSprites[space] {
 			if sprite == b.dragging || sprite == b.moving {
@@ -414,7 +401,7 @@ func (b *board) draw(screen *ebiten.Image) {
 			b.op.GeoM.Translate(float64(x), float64(y))
 			screen.DrawImage(overlayImage, b.op)
 		}
-	})
+	}
 
 	// Draw hover overlay
 
@@ -554,7 +541,7 @@ func (b *board) draw(screen *ebiten.Image) {
 
 	if b.debug == 2 {
 		homeStart, homeEnd := bgammon.HomeRange(b.gameState.PlayerNumber)
-		b.iterateSpaces(func(space int) {
+		for space := 0; space < bgammon.BoardSpaces; space++ {
 			x, y, w, h := b.spaceRect(space)
 			spaceImage := ebiten.NewImage(w, h)
 			br := ""
@@ -572,7 +559,7 @@ func (b *board) draw(screen *ebiten.Image) {
 			b.op.GeoM.Scale(2, 2)
 			b.op.GeoM.Translate(float64(x), float64(y))
 			screen.DrawImage(spaceImage, b.op)
-		})
+		}
 	}
 }
 
@@ -632,7 +619,7 @@ func (b *board) offsetPosition(x, y int) (int, int) {
 
 // Do not call _positionCheckers directly.  Call ProcessState instead.
 func (b *board) _positionCheckers() {
-	for space := 0; space < 26; space++ {
+	for space := 0; space < bgammon.BoardSpaces; space++ {
 		sprites := b.spaceSprites[space]
 
 		for i := range sprites {
@@ -664,7 +651,7 @@ func (b *board) spriteAt(x, y int) *Sprite {
 }
 
 func (b *board) spaceAt(x, y int) int {
-	for i := 0; i < 26; i++ {
+	for i := 0; i < bgammon.BoardSpaces; i++ {
 		sx, sy, sw, sh := b.spaceRect(i)
 		sx, sy = b.offsetPosition(sx, sy)
 		if x >= sx && x <= sx+sw && y >= sy && y <= sy+sh {
@@ -672,12 +659,6 @@ func (b *board) spaceAt(x, y int) int {
 		}
 	}
 	return -1
-}
-
-func (b *board) iterateSpaces(f func(space int)) {
-	for space := 0; space <= 25; space++ {
-		f(space)
-	}
 }
 
 func (b *board) translateSpace(space int) int {
@@ -697,11 +678,8 @@ func (b *board) translateSpace(space int) int {
 
 func (b *board) setSpaceRects() {
 	var x, y, w, h int
-	for i := 0; i < 26; i++ {
-		trueSpace := i
-
-		space := b.translateSpace(i)
-		if !b.bottomRow(trueSpace) {
+	for space := 0; space < bgammon.BoardSpaces; space++ {
+		if !b.bottomRow(space) {
 			y = 0
 		} else {
 			y = int((float64(b.h) / 2) - b.verticalBorderSize)
@@ -711,10 +689,10 @@ func (b *board) setSpaceRects() {
 
 		var hspace int // horizontal space
 		var add int
-		if space == 0 {
+		if space == bgammon.SpaceBarPlayer {
 			hspace = 6
 			w = int(b.barWidth)
-		} else if space == 25 {
+		} else if space == bgammon.SpaceBarOpponent {
 			hspace = 6
 			w = int(b.barWidth)
 		} else if space <= 6 {
@@ -733,24 +711,33 @@ func (b *board) setSpaceRects() {
 
 		h = int((float64(b.h) - (b.verticalBorderSize * 2)) / 2)
 
-		b.spaceSpriteRects[trueSpace] = [4]int{x, y, w, h}
+		b.spaceRects[space] = [4]int{x, y, w, h}
+	}
+
+	// Flip board.
+	if b.gameState.PlayerNumber == 1 {
+		for i := 0; i < 6; i++ {
+			j, k, l, m := 1+i, 12-i, 13+i, 24-i
+			b.spaceRects[j], b.spaceRects[k], b.spaceRects[l], b.spaceRects[m] = b.spaceRects[k], b.spaceRects[j], b.spaceRects[m], b.spaceRects[l]
+		}
+		b.spaceRects[bgammon.SpaceBarPlayer], b.spaceRects[bgammon.SpaceBarOpponent] = b.spaceRects[bgammon.SpaceBarOpponent], b.spaceRects[bgammon.SpaceBarPlayer]
 	}
 }
 
 // relX, relY
 func (b *board) spaceRect(space int) (x, y, w, h int) {
-	rect := b.spaceSpriteRects[space]
+	rect := b.spaceRects[space]
 	return rect[0], rect[1], rect[2], rect[3]
 }
 
 func (b *board) bottomRow(space int) bool {
 	bottomStart := 1
 	bottomEnd := 12
-	bottomBar := 25
+	bottomBar := bgammon.SpaceBarPlayer
 	if b.gameState.PlayerNumber == 2 {
-		bottomStart = 13
-		bottomEnd = 24
-		bottomBar = 0
+		bottomStart = 1
+		bottomEnd = 12
+		//bottomBar = bgammon.SpaceBarOpponent
 	}
 	return space == bottomBar || (space >= bottomStart && space <= bottomEnd)
 }
@@ -796,14 +783,11 @@ func (b *board) ProcessState() {
 	b.lastPlayerNumber = b.gameState.PlayerNumber
 
 	b.Sprites = &Sprites{}
-	b.spaceSprites = make([][]*Sprite, 26)
+	b.spaceSprites = make([][]*Sprite, bgammon.BoardSpaces)
 	for space := 0; space < bgammon.BoardSpaces; space++ {
 		spaceValue := b.gameState.Board[space]
 
-		white := spaceValue > 0
-		if spaceValue == 0 {
-			white = b.gameState.PlayerNumber == 2
-		}
+		white := spaceValue < 0
 
 		abs := spaceValue
 		if abs < 0 {
