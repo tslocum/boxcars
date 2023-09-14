@@ -5,13 +5,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net"
-
-	"github.com/gobwas/ws/wsutil"
 
 	"code.rocket9labs.com/tslocum/bgammon"
-
-	"github.com/gobwas/ws"
+	"nhooyr.io/websocket"
 )
 
 type Client struct {
@@ -20,7 +16,7 @@ type Client struct {
 	Password string
 	Events   chan interface{}
 	Out      chan []byte
-	conn     *net.TCPConn
+	conn     *websocket.Conn
 }
 
 func newClient(address string, username string, password string) *Client {
@@ -39,15 +35,11 @@ func (c *Client) Connect() {
 		return // TODO reconnect
 	}
 
-	conn, br, _, err := ws.Dial(context.Background(), c.Address)
+	conn, _, err := websocket.Dial(context.Background(), c.Address, nil)
 	if err != nil {
 		panic(err)
 	}
-	c.conn = conn.(*net.TCPConn)
-
-	if br != nil {
-		ws.PutReader(br)
-	}
+	c.conn = conn
 
 	// Log in.
 	loginInfo := c.Username
@@ -67,7 +59,7 @@ func (c *Client) handleWrite() {
 				continue
 			}
 
-			err := wsutil.WriteClientMessage(c.conn, ws.OpText, split[i])
+			err := c.conn.Write(context.Background(), websocket.MessageText, split[i])
 			if err != nil {
 				panic(err)
 			}
@@ -84,26 +76,24 @@ func (c *Client) handleRead() {
 		panic("nil con")
 	}
 
-	var messages []wsutil.Message
-	var err error
 	for {
-		messages, err = wsutil.ReadServerMessage(c.conn, messages[:0])
+		msgType, msg, err := c.conn.Read(context.Background())
 		if err != nil {
 			panic(err)
+		} else if msgType != websocket.MessageText {
+			panic("received unexpected message type")
 		}
 
-		for _, msg := range messages {
-			ev, err := bgammon.DecodeEvent(msg.Payload)
-			if err != nil {
-				log.Printf("message: %s", msg.Payload)
-				panic(err)
-			}
-			c.Events <- ev
-
-			//if debug > 0 {
-			log.Println(fmt.Sprintf("<- %s", msg.Payload))
-			//}
+		ev, err := bgammon.DecodeEvent(msg)
+		if err != nil {
+			log.Printf("message: %s", msg)
+			panic(err)
 		}
+		c.Events <- ev
+
+		//if debug > 0 {
+		log.Println(fmt.Sprintf("<- %s", msg))
+		//}
 	}
 }
 
