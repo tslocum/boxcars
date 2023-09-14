@@ -546,12 +546,12 @@ func (b *board) draw(screen *ebiten.Image) {
 			spaceImage := ebiten.NewImage(w, h)
 			br := ""
 			if space >= homeStart && space <= homeEnd {
-				br += "H"
+				br += "\n(H)"
 			}
 			if space == bgammon.SpaceBarPlayer {
-				br += "(PB)"
+				br += "\n(PB)"
 			} else if space == bgammon.SpaceBarOpponent {
-				br += "(OB)"
+				br += "\n(OB)"
 			}
 			ebitenutil.DebugPrint(spaceImage, fmt.Sprintf(" %d %s", space, br))
 			x, y = b.offsetPosition(x, y)

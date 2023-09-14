@@ -171,7 +171,7 @@ func (l *lobby) drawBuffer() {
 
 			img = ebiten.NewImage(l.w-int(l.padding*2), int(l.entryH))
 			if highlight {
-				highlightColor := color.RGBA{triangleA.R, triangleA.G, triangleA.B, 15}
+				highlightColor := color.RGBA{17, 17, 17, 10}
 				img.SubImage(image.Rect(0, 0, l.w, int(l.entryH))).(*ebiten.Image).Fill(highlightColor)
 
 				div := 1.75
@@ -334,10 +334,11 @@ func (l *lobby) click(x, y int) {
 			return
 		}
 
+		// TODO migrate to constants
 		switch buttonIndex {
 		case 0:
 			l.refresh = true
-			l.c.Out <- []byte("rawwho")
+			l.c.Out <- []byte("list")
 		case 1:
 			l.c.Out <- []byte(fmt.Sprintf("watch %d", l.games[l.selected].ID))
 			viewBoard = true
