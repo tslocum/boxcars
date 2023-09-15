@@ -65,7 +65,7 @@ func (c *Client) handleWrite() {
 			}
 
 			//if debug > 0 {
-			log.Println(fmt.Sprintf("-> %s", split[i]))
+			l(fmt.Sprintf("-> %s", split[i]))
 			//}
 		}
 	}
@@ -92,7 +92,7 @@ func (c *Client) handleRead() {
 		c.Events <- ev
 
 		//if debug > 0 {
-		log.Println(fmt.Sprintf("<- %s", msg))
+		l(fmt.Sprintf("<- %s", msg))
 		//}
 	}
 }

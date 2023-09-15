@@ -14,9 +14,9 @@ import (
 	"strings"
 	"time"
 
-	"code.rocket9labs.com/tslocum/bgammon"
-
 	"code.rocketnine.space/tslocum/messeji"
+
+	"code.rocket9labs.com/tslocum/bgammon"
 
 	"code.rocketnine.space/tslocum/kibodo"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -34,30 +34,6 @@ var assetsFS embed.FS
 
 var debugExtra []byte
 
-var debugGame *Game
-
-var mplusNormalFont font.Face
-
-func init() {
-	tt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	const dpi = 72
-	mplusNormalFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    28,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	StatusWriter = messeji.NewTextField(mplusNormalFont)
-	GameWriter = messeji.NewTextField(mplusNormalFont)
-}
-
 var (
 	imgCheckerLight *ebiten.Image
 	imgCheckerDark  *ebiten.Image
@@ -66,9 +42,6 @@ var (
 	mediumFont font.Face
 	monoFont   font.Face
 	largeFont  font.Face
-
-	StatusWriter *messeji.TextField
-	GameWriter   *messeji.TextField
 )
 
 var (
@@ -91,10 +64,67 @@ const (
 	minHeight = 240
 )
 
+var (
+	bufferTextColor       = triangleALight
+	bufferBackgroundColor = color.RGBA{0, 0, 0, 100}
+)
+
+var (
+	statusBuffer = messeji.NewTextField(defaultFont())
+	gameBuffer   = messeji.NewTextField(defaultFont())
+
+	statusLogged bool
+)
+
+func l(s string) {
+	m := time.Now().Format("15:04") + " " + s
+	if statusBuffer != nil {
+		if statusLogged {
+			statusBuffer.Write([]byte("\n" + m))
+			return
+		}
+		statusBuffer.Write([]byte(m))
+		statusLogged = true
+		return
+	}
+	log.Print(m)
+}
+
+var defaultFontFace font.Face
+
+func defaultFont() font.Face {
+	if defaultFontFace != nil {
+		return defaultFontFace
+	}
+
+	tt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	const dpi = 72
+	defaultFontFace, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    16,
+		DPI:     dpi,
+		Hinting: font.HintingFull,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	return defaultFontFace
+}
+
 func init() {
+	//statusBuffer.acceptInput = true
+	initializeFonts()
+
 	loadAssets(0)
 
-	initializeFonts()
+	statusBuffer.SetForegroundColor(bufferTextColor)
+	statusBuffer.SetBackgroundColor(bufferBackgroundColor)
+
+	gameBuffer.SetForegroundColor(bufferTextColor)
+	gameBuffer.SetBackgroundColor(bufferBackgroundColor)
 }
 
 func loadAssets(width int) {
@@ -225,9 +255,6 @@ type Game struct {
 	keyboardInput []*kibodo.Input
 	shownKeyboard bool
 
-	statusBuffer *tabbedBuffers
-	gameBuffer   *tabbedBuffers
-
 	cpuProfile *os.File
 
 	op *ebiten.DrawImageOptions
@@ -246,14 +273,9 @@ func NewGame() *Game {
 
 		keyboard: kibodo.NewKeyboard(),
 
-		statusBuffer: newTabbedBuffers(),
-		gameBuffer:   newTabbedBuffers(),
-
 		debugImg: ebiten.NewImage(200, 200),
 	}
 	g.keyboard.SetKeys(kibodo.KeysQWERTY)
-
-	g.statusBuffer.acceptInput = true
 
 	// TODO
 	go func() {
@@ -273,7 +295,6 @@ func NewGame() *Game {
 		}
 	}()
 
-	debugGame = g // TODO
 	return g
 }
 
@@ -281,7 +302,21 @@ func (g *Game) handleEvents() {
 	for e := range g.Client.Events {
 		switch ev := e.(type) {
 		case *bgammon.EventWelcome:
-			log.Printf("got welcome message %+v", ev) // TODO
+			//c.Username = ev.PlayerName
+
+			areIs := "are"
+			if ev.Clients == 1 {
+				areIs = "is"
+			}
+			clientsPlural := "s"
+			if ev.Clients == 1 {
+				clientsPlural = ""
+			}
+			gamesPlural := "s"
+			if ev.Games == 1 {
+				gamesPlural = ""
+			}
+			l(fmt.Sprintf("Welcome, %s. There %s currently %d client%s playing %d game%s.", ev.PlayerName, areIs, ev.Clients, clientsPlural, ev.Games, gamesPlural))
 		case *bgammon.EventList:
 			if viewBoard || g.lobby.refresh {
 				g.lobby.setGameList(ev.Games)
@@ -296,18 +331,16 @@ func (g *Game) handleEvents() {
 		case *bgammon.EventJoined:
 			// TODO if current player name, show board
 		case *bgammon.EventBoard:
-			// Exit create game dialog and show board.
-			if g.lobby.createGame != nil {
-				g.lobby.createGame = nil
-				g.lobby.bufferDirty = true
-				g.lobby.bufferButtonsDirty = true
-				viewBoard = true
-			}
+			// Exit create game dialog (if open) and show board.
+			g.lobby.createGame = nil
+			g.lobby.bufferDirty = true
+			g.lobby.bufferButtonsDirty = true
+			viewBoard = true
 
 			g.Board.gameState = &ev.GameState
 			g.Board.ProcessState()
 		default:
-			log.Printf("Error: Received unknown event: %+v", ev)
+			l(fmt.Sprintf("Warning: Received unknown event: %+v", ev))
 		}
 	}
 }
@@ -322,7 +355,7 @@ func (g *Game) Connect() {
 	g.Client = newClient(address, g.Username, g.Password)
 	g.lobby.c = g.Client
 	g.Board.Client = g.Client
-	g.statusBuffer.client = g.Client
+	//statusBuffer.client = g.Client
 
 	go g.handleEvents()
 
@@ -456,7 +489,10 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	} else {
 		g.Board.update()
 
-		g.statusBuffer.update()
+		err = statusBuffer.Update()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -495,8 +531,8 @@ http://www.com/help.html#register`
 		return
 	}
 
-	g.gameBuffer.draw(screen)
-	g.statusBuffer.draw(screen)
+	gameBuffer.Draw(screen)
+	statusBuffer.Draw(screen)
 	if !viewBoard {
 		// Lobby screen
 		g.lobby.draw(screen)
@@ -552,7 +588,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 
-	statusBufferWidth := text.BoundString(g.statusBuffer.chatFont, strings.Repeat("A", bufferCharacterWidth)).Dx()
+	statusBufferWidth := text.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
 	if statusBufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		statusBufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
@@ -571,20 +607,21 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.Board.setRect(0, 0, g.Board.w, g.Board.w)
 	}
 
-	if g.screenW > 200 {
-		g.statusBuffer.padding = 2
-		g.gameBuffer.padding = 2
+	/*if g.screenW > 200 {
+		statusBuffer.padding = 2
+		gameBuffer.padding = 2
 	} else if g.screenW > 100 {
-		g.statusBuffer.padding = 1
-		g.gameBuffer.padding = 1
+		statusBuffer.padding = 1
+		gameBuffer.padding = 1
 	} else {
-		g.statusBuffer.padding = 0
-		g.gameBuffer.padding = 0
-	}
+		statusBuffer.padding = 0
+		gameBuffer.padding = 0
+	}*/
 
 	bufferPadding := int(g.Board.horizontalBorderSize / 2)
 
-	gameBufferHeight := (g.gameBuffer.chatLineHeight * showGameBufferLines) + (g.gameBuffer.padding * 4)
+	//gameBufferHeight := (gameBuffer.chatLineHeight * showGameBufferLines) + (gameBuffer.padding * 4)
+	gameBufferHeight := 1 // TODO
 
 	g.lobby.buttonBarHeight = gameBufferHeight + int(float64(bufferPadding)*1.5)
 	minLobbyWidth := text.BoundString(mediumFont, strings.Repeat("A", lobbyCharacterWidth)).Dx()
@@ -599,16 +636,18 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	if true || availableWidth >= 150 { // TODO allow chat window to be repositioned
 		statusBufferHeight := g.screenH - gameBufferHeight - bufferPadding*3
 
-		g.statusBuffer.docked = true
-		g.statusBuffer.setRect((g.screenW-statusBufferWidth)+bufferPadding, bufferPadding, statusBufferWidth-(bufferPadding*2), statusBufferHeight)
+		//statusBuffer.docked = true
+		x, y, w, h := (g.screenW-statusBufferWidth)+bufferPadding, bufferPadding, statusBufferWidth-(bufferPadding*2), statusBufferHeight
+		statusBuffer.SetRect(image.Rect(x, y, x+w, y+h))
 
-		g.gameBuffer.docked = true
-		g.gameBuffer.setRect((g.screenW-statusBufferWidth)+bufferPadding, (g.screenH-(gameBufferHeight))-bufferPadding, statusBufferWidth-(bufferPadding*2), gameBufferHeight)
-	} else {
+		//gameBuffer.docked = true
+		x, y, w, h = (g.screenW-statusBufferWidth)+bufferPadding, (g.screenH-(gameBufferHeight))-bufferPadding, statusBufferWidth-(bufferPadding*2), gameBufferHeight
+		gameBuffer.SetRect(image.Rect(x, y, x+w, y+h))
+	} /* else {
 		// Clamp buffer position.
-		bx, by := g.statusBuffer.x, g.statusBuffer.y
+		bx, by := statusBuffer.x, statusBuffer.y
 		var bw, bh int
-		if g.statusBuffer.w == 0 && g.statusBuffer.h == 0 {
+		if statusBuffer.w == 0 && statusBuffer.h == 0 {
 			// Set initial buffer position.
 			bx = 0
 			by = g.screenH / 2
@@ -618,7 +657,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		} else {
 			// Scale existing buffer size
 			bx, by = bx*(outsideWidth/g.screenW), by*(outsideHeight/g.screenH)
-			bw, bh = g.statusBuffer.w*(outsideWidth/g.screenW), g.statusBuffer.h*(outsideHeight/g.screenH)
+			bw, bh = statusBuffer.w*(outsideWidth/g.screenW), statusBuffer.h*(outsideHeight/g.screenH)
 			if bw < 200 {
 				bw = 200
 			}
@@ -634,9 +673,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 			by = g.screenH - padding
 		}
 
-		g.statusBuffer.docked = false
-		g.statusBuffer.setRect(bx, by, bw, bh)
-	}
+		statusBuffer.docked = false
+		statusBuffer.setRect(bx, by, bw, bh)
+	}*/
 
 	displayArea := 200
 	g.keyboard.SetRect(0, displayArea, g.screenW, g.screenH-displayArea)

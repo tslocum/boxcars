@@ -7,6 +7,7 @@ import (
 	"math"
 	"sort"
 	"strings"
+	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -59,6 +60,8 @@ type lobby struct {
 
 	loaded bool
 	games  []bgammon.GameListing
+
+	lastClick time.Time
 
 	touchIDs []ebiten.TouchID
 
@@ -360,7 +363,19 @@ func (l *lobby) click(x, y int) {
 	// Handle entry click
 	clickedEntry := (((y - int(l.padding)) - l.y) / int(l.entryH)) - 1
 	if clickedEntry >= 0 {
-		l.selected = l.offset + clickedEntry
+		const doubleClickDuration = 200 * time.Millisecond
+		newSelection := l.offset + clickedEntry
+		if l.selected == newSelection {
+			if time.Since(l.lastClick) <= doubleClickDuration {
+				entry := l.games[l.selected]
+				l.c.Out <- []byte(fmt.Sprintf("join %d", entry.ID))
+				l.lastClick = time.Time{}
+				return
+			}
+		}
+
+		l.lastClick = time.Now()
+		l.selected = newSelection
 		l.bufferDirty = true
 	}
 }

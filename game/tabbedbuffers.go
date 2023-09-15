@@ -81,9 +81,9 @@ func newTabbedBuffers() *tabbedBuffers {
 	}
 
 	// TODO
-	tab.chatFont = smallFont
+	/*tab.chatFont = smallFont
 	tab.chatFontSize = smallFontSize
-	tab.chatLineHeight = standardLineHeight
+	tab.chatLineHeight = standardLineHeight*/
 
 	b := &textBuffer{
 		tab: tab,
@@ -246,7 +246,7 @@ func (t *tabbedBuffers) update() {
 					}
 				}
 			} else {
-				StatusWriter.Write([]byte("* You have not connected to a server yet"))
+				t.buffers[0].Write([]byte("* You have not connected to a server yet"))
 			}
 			t.inputBuffer = nil
 
