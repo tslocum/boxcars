@@ -64,6 +64,18 @@ const (
 	minHeight = 240
 )
 
+const (
+	smallFontSize  = 20
+	monoFontSize   = 10
+	mediumFontSize = 24
+	largeFontSize  = 32
+)
+
+const (
+	monoLineHeight     = 14
+	standardLineHeight = 24
+)
+
 var (
 	bufferTextColor       = triangleALight
 	bufferBackgroundColor = color.RGBA{0, 0, 0, 100}
@@ -72,8 +84,10 @@ var (
 var (
 	statusBuffer = messeji.NewTextField(defaultFont())
 	gameBuffer   = messeji.NewTextField(defaultFont())
+	inputBuffer  = messeji.NewInputField(defaultFont())
 
 	statusLogged bool
+	gameLogged   bool
 )
 
 func l(s string) {
@@ -85,6 +99,20 @@ func l(s string) {
 		}
 		statusBuffer.Write([]byte(m))
 		statusLogged = true
+		return
+	}
+	log.Print(m)
+}
+
+func lg(s string) {
+	m := time.Now().Format("15:04") + " " + s
+	if gameBuffer != nil {
+		if gameLogged {
+			gameBuffer.Write([]byte("\n" + m))
+			return
+		}
+		gameBuffer.Write([]byte(m))
+		gameLogged = true
 		return
 	}
 	log.Print(m)
@@ -125,6 +153,10 @@ func init() {
 
 	gameBuffer.SetForegroundColor(bufferTextColor)
 	gameBuffer.SetBackgroundColor(bufferBackgroundColor)
+
+	inputBuffer.SetForegroundColor(bufferTextColor)
+	inputBuffer.SetBackgroundColor(bufferBackgroundColor)
+	inputBuffer.SetSuffix("")
 }
 
 func loadAssets(width int) {
@@ -197,6 +229,16 @@ func initializeFonts() {
 	}
 }
 
+func setViewBoard(view bool) {
+	viewBoard = view
+	inputBuffer.SetHandleKeyboard(viewBoard)
+	if viewBoard {
+		inputBuffer.SetSuffix("_")
+	} else {
+		inputBuffer.SetSuffix("")
+	}
+}
+
 type Sprite struct {
 	image      *ebiten.Image
 	w          int
@@ -244,8 +286,8 @@ type Game struct {
 	lobby        *lobby
 	pendingGames []bgammon.GameListing
 
-	runeBuffer  []rune
-	inputBuffer string
+	runeBuffer []rune
+	userInput  string
 
 	Debug int
 
@@ -276,6 +318,8 @@ func NewGame() *Game {
 		debugImg: ebiten.NewImage(200, 200),
 	}
 	g.keyboard.SetKeys(kibodo.KeysQWERTY)
+
+	inputBuffer.SetSelectedFunc(g.acceptInput)
 
 	// TODO
 	go func() {
@@ -317,6 +361,12 @@ func (g *Game) handleEvents() {
 				gamesPlural = ""
 			}
 			l(fmt.Sprintf("Welcome, %s. There %s currently %d client%s playing %d game%s.", ev.PlayerName, areIs, ev.Clients, clientsPlural, ev.Games, gamesPlural))
+		case *bgammon.EventHelp:
+			l(fmt.Sprintf("Help: %s", ev.Message))
+		case *bgammon.EventNotice:
+			l(fmt.Sprintf("*** %s", ev.Message))
+		case *bgammon.EventSay:
+			l(fmt.Sprintf("<%s> %s", ev.Player, ev.Message))
 		case *bgammon.EventList:
 			if viewBoard || g.lobby.refresh {
 				g.lobby.setGameList(ev.Games)
@@ -328,17 +378,83 @@ func (g *Game) handleEvents() {
 			} else {
 				g.pendingGames = ev.Games
 			}
+
 		case *bgammon.EventJoined:
-			// TODO if current player name, show board
+			if ev.PlayerNumber == 1 {
+				g.Board.gameState.Player1.Name = ev.Player
+			} else if ev.PlayerNumber == 2 {
+				g.Board.gameState.Player2.Name = ev.Player
+			}
+
+			// Exit create game dialog (if open) and show board.
+			g.lobby.createGame = nil
+			g.lobby.bufferDirty = true
+			g.lobby.bufferButtonsDirty = true
+			setViewBoard(true)
+
+			g.Board.ProcessState()
+
+			if ev.Player != g.Client.Username {
+				lg(fmt.Sprintf("%s joined the match.", ev.Player))
+			}
+		case *bgammon.EventFailedJoin:
+			l(fmt.Sprintf("*** Failed to join match: %s", ev.Reason))
+		case *bgammon.EventLeft:
+			if g.Board.gameState.Player1.Name == ev.Player {
+				g.Board.gameState.Player1.Name = ""
+			} else if g.Board.gameState.Player2.Name == ev.Player {
+				g.Board.gameState.Player2.Name = ""
+			}
+			g.Board.ProcessState()
+
+			if ev.Player != g.Client.Username {
+				lg(fmt.Sprintf("%s left the match.", ev.Player))
+			}
 		case *bgammon.EventBoard:
 			// Exit create game dialog (if open) and show board.
 			g.lobby.createGame = nil
 			g.lobby.bufferDirty = true
 			g.lobby.bufferButtonsDirty = true
-			viewBoard = true
+			setViewBoard(true)
 
 			g.Board.gameState = &ev.GameState
 			g.Board.ProcessState()
+
+		case *bgammon.EventRolled:
+			g.Board.gameState.Roll1 = ev.Roll1
+			g.Board.gameState.Roll2 = ev.Roll2
+			var diceFormatted string
+			if g.Board.gameState.Turn == 0 {
+				if g.Board.gameState.Player1.Name == ev.Player {
+					diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll1)
+				} else {
+					diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll2)
+				}
+			} else {
+				diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
+			}
+			g.Board.ProcessState()
+			lg(fmt.Sprintf("%s rolled %s.", ev.Player, diceFormatted))
+		case *bgammon.EventFailedRoll:
+			l(fmt.Sprintf("*** Failed to roll: %s", ev.Reason))
+		case *bgammon.EventMoved:
+			lg(fmt.Sprintf("%s moved %s.", ev.Player, bgammon.FormatMoves(ev.Moves)))
+		case *bgammon.EventFailedMove:
+			g.Client.Out <- []byte("board") // Refresh game state.
+
+			var extra string
+			if ev.From != 0 || ev.To != 0 {
+				extra = fmt.Sprintf(" from %s to %s", bgammon.FormatSpace(ev.From), bgammon.FormatSpace(ev.To))
+			}
+			l(fmt.Sprintf("*** Failed to move checker%s: %s", extra, ev.Reason))
+			l(fmt.Sprintf("*** Legal moves: %s", bgammon.FormatMoves(g.Board.gameState.Available)))
+		case *bgammon.EventFailedOk:
+			g.Client.Out <- []byte("board") // Refresh game state.
+			l(fmt.Sprintf("*** Failed to submit moves: %s", ev.Reason))
+		case *bgammon.EventWin:
+			lg(fmt.Sprintf("%s wins!", ev.Player))
+		case *bgammon.EventPing:
+			g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
 		default:
 			l(fmt.Sprintf("Warning: Received unknown event: %+v", ev))
 		}
@@ -404,27 +520,27 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		}
 	}
 
-	err = g.keyboard.Update()
-	if err != nil {
-		return fmt.Errorf("failed to update virtual keyboard: %s", err)
-	}
-
 	if !g.loggedIn {
+		err = g.keyboard.Update()
+		if err != nil {
+			return fmt.Errorf("failed to update virtual keyboard: %s", err)
+		}
+
 		f := func() {
 			var clearBuffer bool
 			defer func() {
-				if strings.ContainsRune(g.inputBuffer, '\n') {
-					g.inputBuffer = strings.Split(g.inputBuffer, "\n")[0]
+				if strings.ContainsRune(g.userInput, '\n') {
+					g.userInput = strings.Split(g.userInput, "\n")[0]
 					clearBuffer = true
 				}
 				if !g.usernameConfirmed {
-					g.Username = g.inputBuffer
+					g.Username = g.userInput
 				} else {
-					g.Password = g.inputBuffer
+					g.Password = g.userInput
 				}
 
 				if clearBuffer {
-					g.inputBuffer = ""
+					g.userInput = ""
 
 					if !g.usernameConfirmed {
 						g.usernameConfirmed = true
@@ -432,6 +548,8 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 						g.Connect()
 					}
 				}
+
+				inputBuffer.SetText(g.userInput)
 			}()
 
 			if !g.shownKeyboard {
@@ -439,8 +557,8 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 				g.shownKeyboard = true
 			}
 
-			if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(g.inputBuffer) > 0 {
-				g.inputBuffer = g.inputBuffer[:len(g.inputBuffer)-1]
+			if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(g.userInput) > 0 {
+				g.userInput = g.userInput[:len(g.userInput)-1]
 			}
 
 			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
@@ -449,22 +567,22 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 
 			g.runeBuffer = ebiten.AppendInputChars(g.runeBuffer[:0])
 			if len(g.runeBuffer) > 0 {
-				g.inputBuffer += string(g.runeBuffer)
+				g.userInput += string(g.runeBuffer)
 			}
 
 			// Process on-screen keyboard input.
 			g.keyboardInput = g.keyboard.AppendInput(g.keyboardInput[:0])
 			for _, input := range g.keyboardInput {
 				if input.Rune > 0 {
-					g.inputBuffer += string(input.Rune)
+					g.userInput += string(input.Rune)
 					continue
 				}
 				if input.Key == ebiten.KeyBackspace {
-					if len(g.inputBuffer) > 0 {
-						g.inputBuffer = g.inputBuffer[:len(g.inputBuffer)-1]
+					if len(g.userInput) > 0 {
+						g.userInput = g.userInput[:len(g.userInput)-1]
 					}
 				} else if input.Key == ebiten.KeyEnter {
-					g.inputBuffer += "\n"
+					g.userInput += "\n"
 				}
 			}
 		}
@@ -481,7 +599,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		viewBoard = !viewBoard
+		setViewBoard(!viewBoard)
 	}
 
 	if !viewBoard {
@@ -489,7 +607,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	} else {
 		g.Board.update()
 
-		err = statusBuffer.Update()
+		err = inputBuffer.Update()
 		if err != nil {
 			return err
 		}
@@ -531,8 +649,9 @@ http://www.com/help.html#register`
 		return
 	}
 
-	gameBuffer.Draw(screen)
 	statusBuffer.Draw(screen)
+	gameBuffer.Draw(screen)
+	inputBuffer.Draw(screen)
 	if !viewBoard {
 		// Lobby screen
 		g.lobby.draw(screen)
@@ -588,18 +707,18 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 
-	statusBufferWidth := text.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
-	if statusBufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
-		statusBufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
+	bufferWidth := text.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
+	if bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
+		bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
 
 	g.Board.fullHeight = true
-	g.Board.setRect(0, 0, g.screenW-statusBufferWidth, g.screenH)
+	g.Board.setRect(0, 0, g.screenW-bufferWidth, g.screenH)
 
 	availableWidth := g.screenW - (g.Board.innerW + int(g.Board.horizontalBorderSize*2))
-	if availableWidth > statusBufferWidth {
-		statusBufferWidth = availableWidth
-		g.Board.setRect(0, 0, g.screenW-statusBufferWidth, g.screenH)
+	if availableWidth > bufferWidth {
+		bufferWidth = availableWidth
+		g.Board.setRect(0, 0, g.screenW-bufferWidth, g.screenH)
 	}
 
 	if g.Board.h > g.Board.w {
@@ -607,23 +726,26 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.Board.setRect(0, 0, g.Board.w, g.Board.w)
 	}
 
-	/*if g.screenW > 200 {
-		statusBuffer.padding = 2
-		gameBuffer.padding = 2
+	if g.screenW > 200 {
+		statusBuffer.SetPadding(4)
+		gameBuffer.SetPadding(4)
+		inputBuffer.SetPadding(4)
 	} else if g.screenW > 100 {
-		statusBuffer.padding = 1
-		gameBuffer.padding = 1
+		statusBuffer.SetPadding(2)
+		gameBuffer.SetPadding(2)
+		inputBuffer.SetPadding(2)
 	} else {
-		statusBuffer.padding = 0
-		gameBuffer.padding = 0
-	}*/
+		statusBuffer.SetPadding(0)
+		gameBuffer.SetPadding(0)
+		inputBuffer.SetPadding(0)
+	}
 
 	bufferPadding := int(g.Board.horizontalBorderSize / 2)
 
-	//gameBufferHeight := (gameBuffer.chatLineHeight * showGameBufferLines) + (gameBuffer.padding * 4)
-	gameBufferHeight := 1 // TODO
+	//inputBufferHeight := (gameBuffer.chatLineHeight * showGameBufferLines) + (gameBuffer.padding * 4)
+	inputBufferHeight := 50
 
-	g.lobby.buttonBarHeight = gameBufferHeight + int(float64(bufferPadding)*1.5)
+	g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPadding)*1.5)
 	minLobbyWidth := text.BoundString(mediumFont, strings.Repeat("A", lobbyCharacterWidth)).Dx()
 	if g.Board.w >= minLobbyWidth {
 		g.lobby.fullscreen = false
@@ -633,16 +755,15 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.lobby.setRect(0, 0, g.screenW, g.screenH)
 	}
 
-	if true || availableWidth >= 150 { // TODO allow chat window to be repositioned
-		statusBufferHeight := g.screenH - gameBufferHeight - bufferPadding*3
+	if true || availableWidth >= 150 { // TODO allow buffers to be repositioned
+		statusBufferHeight := g.screenH - inputBufferHeight - bufferPadding*3
 
-		//statusBuffer.docked = true
-		x, y, w, h := (g.screenW-statusBufferWidth)+bufferPadding, bufferPadding, statusBufferWidth-(bufferPadding*2), statusBufferHeight
-		statusBuffer.SetRect(image.Rect(x, y, x+w, y+h))
+		x, y, w, h := (g.screenW-bufferWidth)+bufferPadding, bufferPadding, bufferWidth-(bufferPadding*2), statusBufferHeight
+		statusBuffer.SetRect(image.Rect(x, y, x+w, y+h/2-bufferPadding/2))
 
-		//gameBuffer.docked = true
-		x, y, w, h = (g.screenW-statusBufferWidth)+bufferPadding, (g.screenH-(gameBufferHeight))-bufferPadding, statusBufferWidth-(bufferPadding*2), gameBufferHeight
-		gameBuffer.SetRect(image.Rect(x, y, x+w, y+h))
+		gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPadding/2, x+w, y+h))
+
+		inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPadding-inputBufferHeight, x+w, g.screenH-bufferPadding))
 	} /* else {
 		// Clamp buffer position.
 		bx, by := statusBuffer.x, statusBuffer.y
@@ -686,6 +807,23 @@ func (g *Game) resetImageOptions() {
 	g.op.GeoM.Reset()
 }
 
+func (g *Game) acceptInput() bool {
+	input := inputBuffer.Text()
+	if len(input) == 0 {
+		return true
+	}
+
+	if input[0] == '/' {
+		input = input[1:]
+	} else {
+		l(fmt.Sprintf("<%s> %s", g.Client.Username, input))
+		input = "say " + input
+	}
+
+	g.Client.Out <- []byte(input)
+	return true
+}
+
 func (g *Game) toggleProfiling() error {
 	if g.cpuProfile == nil {
 		log.Println("Profiling started...")
@@ -717,48 +855,4 @@ func (g *Game) toggleProfiling() error {
 func (g *Game) Exit() {
 	g.Board.drawFrame <- false
 	os.Exit(0)
-}
-
-type messageHandler struct {
-	t *textBuffer
-}
-
-func NewMessageHandler(t *textBuffer) *messageHandler {
-	return &messageHandler{
-		t: t,
-	}
-}
-
-func (m *messageHandler) Write(p []byte) (n int, err error) {
-	fmt.Print(string(p))
-
-	m.t.Write(p)
-	return len(p), nil
-}
-
-// TODO
-
-type WhoInfo struct {
-	Username   string
-	Opponent   string
-	Watching   string
-	Ready      bool
-	Away       bool
-	Rating     int
-	Experience int
-	Idle       int
-	LoginTime  int
-	ClientName string
-}
-
-func (w *WhoInfo) String() string {
-	opponent := "In the lobby"
-	if w.Opponent != "" && w.Opponent != "-" {
-		opponent = "playing against " + w.Opponent
-	}
-	clientName := ""
-	if w.ClientName != "" && w.ClientName != "-" {
-		clientName = " using " + w.ClientName
-	}
-	return fmt.Sprintf("%s (rated %d with %d exp) is %s%s", w.Username, w.Rating, w.Experience, opponent, clientName)
 }

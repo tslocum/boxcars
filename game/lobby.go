@@ -352,10 +352,10 @@ func (l *lobby) click(x, y int) {
 			ebiten.ScheduleFrame()
 		case lobbyButtonWatch:
 			l.c.Out <- []byte(fmt.Sprintf("watch %d", l.games[l.selected].ID))
-			viewBoard = true
+			setViewBoard(true)
 		case lobbyButtonJoin:
 			l.c.Out <- []byte(fmt.Sprintf("join %d", l.games[l.selected].ID))
-			viewBoard = true
+			setViewBoard(true)
 		}
 		return
 	}

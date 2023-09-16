@@ -37,7 +37,7 @@ func (c *Client) Connect() {
 
 	conn, _, err := websocket.Dial(context.Background(), c.Address, nil)
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to connect: %s", err)
 	}
 	c.conn = conn
 
