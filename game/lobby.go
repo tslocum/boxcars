@@ -227,26 +227,31 @@ func (l *lobby) drawBuffer() {
 		cx, cy := 0.0, 0.0 // Cursor
 		drawEntry(cx+l.padding, cy+l.padding-titleOffset, "Status", "Name", false, true)
 		cy += l.entryH
-		i := 0
-		var status string
-		for _, entry := range l.games {
-			if i >= l.offset {
-				if entry.Players == 2 {
-					status = "Full"
-				} else {
-					if !entry.Password {
-						status = "Open"
+
+		if len(l.games) == 0 {
+			drawEntry(cx+l.padding, cy+l.padding, "No matches available. Please create one.", "", false, false)
+		} else {
+			i := 0
+			var status string
+			for _, entry := range l.games {
+				if i >= l.offset {
+					if entry.Players == 2 {
+						status = "Full"
 					} else {
-						status = "Private"
+						if !entry.Password {
+							status = "Open"
+						} else {
+							status = "Private"
+						}
 					}
+
+					drawEntry(cx+l.padding, cy+l.padding, status, entry.Name, i == l.selected, false)
+
+					cy += l.entryH
 				}
 
-				drawEntry(cx+l.padding, cy+l.padding, status, entry.Name, i == l.selected, false)
-
-				cy += l.entryH
+				i++
 			}
-
-			i++
 		}
 	}
 

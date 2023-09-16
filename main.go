@@ -38,7 +38,7 @@ func main() {
 
 	parseFlags(g)
 
-	if g.Debug > 0 {
+	if game.Debug > 0 {
 		go func() {
 			log.Fatal(http.ListenAndServe("localhost:8880", nil))
 		}()

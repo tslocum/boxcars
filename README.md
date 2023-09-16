@@ -11,7 +11,7 @@ Please share issues and suggestions [here](https://code.rocket9labs.com/tslocum/
 ## Dependencies
 
 - [ebitengine](https://github.com/hajimehoshi/ebiten) - Game engine
-- [draw2d](https://github.com/llgcode/draw2d) - Shape drawing
 - [messeji](https://code.rocket9labs.com/tslocum/messeji) - Text display and input widgets
 - [kibodo](https://code.rocket9labs.com/tslocum/kibodo) - On-screen keyboard
+- [draw2d](https://github.com/llgcode/draw2d) - Shape drawing
 - [resize](https://github.com/nfnt/resize) - Image resizing

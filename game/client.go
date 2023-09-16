@@ -64,9 +64,9 @@ func (c *Client) handleWrite() {
 				panic(err)
 			}
 
-			//if debug > 0 {
-			l(fmt.Sprintf("-> %s", split[i]))
-			//}
+			if Debug > 0 {
+				l(fmt.Sprintf("-> %s", split[i]))
+			}
 		}
 	}
 }
@@ -91,9 +91,9 @@ func (c *Client) handleRead() {
 		}
 		c.Events <- ev
 
-		//if debug > 0 {
-		l(fmt.Sprintf("<- %s", msg))
-		//}
+		if Debug > 0 {
+			l(fmt.Sprintf("<- %s", msg))
+		}
 	}
 }
 

@@ -88,6 +88,8 @@ var (
 
 	statusLogged bool
 	gameLogged   bool
+
+	Debug int
 )
 
 func l(s string) {
@@ -288,8 +290,6 @@ type Game struct {
 
 	runeBuffer []rune
 	userInput  string
-
-	Debug int
 
 	debugImg *ebiten.Image
 
@@ -591,11 +591,11 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	}
 
 	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyD) {
-		g.Debug++
-		if g.Debug == 3 {
-			g.Debug = 0
+		Debug++
+		if Debug == 3 {
+			Debug = 0
 		}
-		g.Board.debug = g.Debug
+		g.Board.debug = Debug
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
@@ -631,16 +631,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if !g.loggedIn {
 		g.keyboard.Draw(screen)
 
-		const welcomeText = `Please enter your FIBS username and password.
-If you do not have a FIBS account yet, visit
-http://www.com/help.html#register`
+		const welcomeText = `Connect to bgammon.org
+  To log in as a guest, enter a username (if you want) and
+  do not enter a password.`
 		debugBox := image.NewRGBA(image.Rect(0, 0, g.screenW, g.screenH))
 		debugImg := ebiten.NewImageFromImage(debugBox)
 
 		if !g.usernameConfirmed {
-			ebitenutil.DebugPrint(debugImg, welcomeText+fmt.Sprintf("\n\nUsername: %s", g.Username))
+			ebitenutil.DebugPrint(debugImg, welcomeText+fmt.Sprintf("\n\nUsername: %s_", g.Username))
 		} else {
-			ebitenutil.DebugPrint(debugImg, welcomeText+fmt.Sprintf("\n\nPassword: %s", strings.Repeat("*", len(g.Password))))
+			ebitenutil.DebugPrint(debugImg, welcomeText+fmt.Sprintf("\n\nPassword: %s_", strings.Repeat("*", len(g.Password))))
 		}
 
 		g.resetImageOptions()
@@ -660,7 +660,7 @@ http://www.com/help.html#register`
 		g.Board.draw(screen)
 	}
 
-	if g.Debug > 0 {
+	if Debug > 0 {
 		g.drawBuffer.Reset()
 
 		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %c %0.0f", spinner[g.spinnerIndex], ebiten.CurrentFPS())))

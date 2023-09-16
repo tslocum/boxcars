@@ -15,6 +15,6 @@ func parseFlags(g *game.Game) {
 	flag.StringVar(&g.ServerAddress, "address", game.DefaultServerAddress, "Server address")
 	flag.BoolVar(&g.Watch, "watch", false, "Watch random game")
 	flag.BoolVar(&g.TV, "tv", false, "Watch random games continuously")
-	flag.IntVar(&g.Debug, "debug", 0, "Print debug information")
+	flag.IntVar(&game.Debug, "debug", 0, "Print debug information")
 	flag.Parse()
 }
