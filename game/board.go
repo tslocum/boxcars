@@ -17,6 +17,12 @@ import (
 	"github.com/llgcode/draw2d/draw2dimg"
 )
 
+type boardButton struct {
+	label    string
+	selected func()
+	rect     image.Rectangle
+}
+
 type board struct {
 	x, y int
 	w, h int
@@ -58,6 +64,8 @@ type board struct {
 	Client *Client
 
 	dragX, dragY int
+
+	buttons []*boardButton
 }
 
 func NewBoard() *board {
@@ -78,6 +86,18 @@ func NewBoard() *board {
 			Game: bgammon.NewGame(),
 		},
 	}
+	b.buttons = []*boardButton{
+		{
+			label:    "Roll",
+			selected: b.selectRoll,
+		}, {
+			label:    "OK",
+			selected: b.selectOK,
+		}, {
+			label:    "Reset",
+			selected: b.selectReset,
+		},
+	}
 
 	for i := range b.Sprites.sprites {
 		b.Sprites.sprites[i] = b.newSprite(false)
@@ -90,6 +110,18 @@ func NewBoard() *board {
 	b.dragTouchId = -1
 
 	return b
+}
+
+func (b *board) selectRoll() {
+
+}
+
+func (b *board) selectOK() {
+
+}
+
+func (b *board) selectReset() {
+
 }
 
 func (b *board) handleDraw() {
@@ -261,6 +293,39 @@ func (b *board) resetButtonRect() (int, int, int, int) {
 	w := 200
 	h := 75
 	return (b.w - w) / 2, (b.h - h) / 2, w, h
+}
+
+func (b *board) drawButtons(screen *ebiten.Image) {
+	for i, btn := range b.buttons {
+		if (i == 0 && b.gameState.MayRoll()) ||
+			(i == 1 && b.gameState.MayReset()) ||
+			(i == 2 && b.gameState.MayOK()) {
+			w, h := btn.rect.Dx(), btn.rect.Dy()
+
+			baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
+
+			gc := draw2dimg.NewGraphicContext(baseImg)
+			gc.SetLineWidth(5)
+			gc.SetStrokeColor(color.Black)
+			gc.MoveTo(0, 0)
+			gc.LineTo(float64(w), 0)
+			gc.LineTo(float64(w), float64(h))
+			gc.LineTo(0, float64(h))
+			gc.Close()
+			gc.Stroke()
+
+			img := ebiten.NewImage(w, h)
+			img.Fill(color.RGBA{225.0, 188, 125, 255})
+			img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
+
+			bounds := text.BoundString(mediumFont, btn.label)
+			text.Draw(img, btn.label, mediumFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
+
+			b.op.GeoM.Reset()
+			b.op.GeoM.Translate(float64(btn.rect.Min.X), float64(btn.rect.Min.Y))
+			screen.DrawImage(img, b.op)
+		}
+	}
 }
 
 func (b *board) draw(screen *ebiten.Image) {
@@ -502,33 +567,6 @@ func (b *board) draw(screen *ebiten.Image) {
 
 	}
 
-	drawResetButton := b.gameState.Turn == b.gameState.PlayerNumber && len(b.gameState.Moves) > 0
-	if drawResetButton {
-		x, y, w, h := b.resetButtonRect()
-		baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
-
-		gc := draw2dimg.NewGraphicContext(baseImg)
-		gc.SetLineWidth(5)
-		gc.SetStrokeColor(color.Black)
-		gc.MoveTo(0, 0)
-		gc.LineTo(float64(w), 0)
-		gc.LineTo(float64(w), float64(h))
-		gc.LineTo(0, float64(h))
-		gc.Close()
-		gc.Stroke()
-		img := ebiten.NewImage(w, h)
-		img.Fill(color.RGBA{225.0, 188, 125, 255})
-		img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
-
-		label := "Reset"
-		bounds := text.BoundString(mediumFont, label)
-		text.Draw(img, label, mediumFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
-
-		b.op.GeoM.Reset()
-		b.op.GeoM.Translate(float64(x), float64(y))
-		screen.DrawImage(img, b.op)
-	}
-
 	// Draw moving sprite
 	if b.moving != nil {
 		drawSprite(b.moving)
@@ -561,6 +599,23 @@ func (b *board) draw(screen *ebiten.Image) {
 			screen.DrawImage(spaceImage, b.op)
 		}
 	}
+
+	b.drawButtons(screen)
+}
+
+func (b *board) updateButtonRects() {
+	btnRoll := b.buttons[0]
+	btnOK := b.buttons[1]
+	btnReset := b.buttons[2]
+
+	w := 200
+	h := 75
+	x, y := (b.w-w)/2, (b.h-h)/2
+
+	btnRoll.rect = image.Rect(x, y, x+w, y+h)
+
+	btnOK.rect = image.Rect(x, y, x+w/2, y+h)
+	btnReset.rect = image.Rect(x+w/2, y, x+w, y+h)
 }
 
 func (b *board) setRect(x, y, w, h int) {
@@ -569,6 +624,7 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 
 	b.x, b.y, b.w, b.h = x, y, w, h
+	b.updateButtonRects()
 
 	b.triangleOffset = (float64(b.h) - (b.verticalBorderSize * 2)) / 15
 

@@ -79,7 +79,8 @@ func (c *Client) handleRead() {
 	for {
 		msgType, msg, err := c.conn.Read(context.Background())
 		if err != nil {
-			panic(err)
+			l("*** Disconnected.")
+			return
 		} else if msgType != websocket.MessageText {
 			panic("received unexpected message type")
 		}

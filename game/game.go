@@ -76,6 +76,8 @@ const (
 	standardLineHeight = 24
 )
 
+const lobbyStatusBufferHeight = 75
+
 var (
 	bufferTextColor       = triangleALight
 	bufferBackgroundColor = color.RGBA{0, 0, 0, 100}
@@ -89,7 +91,11 @@ var (
 	statusLogged bool
 	gameLogged   bool
 
+	statusBufferRect image.Rectangle // In-game rect of status buffer.
+
 	Debug int
+
+	game *Game
 )
 
 func l(s string) {
@@ -97,10 +103,12 @@ func l(s string) {
 	if statusBuffer != nil {
 		if statusLogged {
 			statusBuffer.Write([]byte("\n" + m))
+			ebiten.ScheduleFrame()
 			return
 		}
 		statusBuffer.Write([]byte(m))
 		statusLogged = true
+		ebiten.ScheduleFrame()
 		return
 	}
 	log.Print(m)
@@ -111,10 +119,12 @@ func lg(s string) {
 	if gameBuffer != nil {
 		if gameLogged {
 			gameBuffer.Write([]byte("\n" + m))
+			ebiten.ScheduleFrame()
 			return
 		}
 		gameBuffer.Write([]byte(m))
 		gameLogged = true
+		ebiten.ScheduleFrame()
 		return
 	}
 	log.Print(m)
@@ -236,9 +246,17 @@ func setViewBoard(view bool) {
 	inputBuffer.SetHandleKeyboard(viewBoard)
 	if viewBoard {
 		inputBuffer.SetSuffix("_")
+
+		// Exit create game dialog, if open.
+		game.lobby.showCreateGame = 0
+		game.lobby.createGameName = ""
+		game.lobby.createGamePassword = ""
+		game.lobby.bufferDirty = true
+		game.lobby.bufferButtonsDirty = true
 	} else {
 		inputBuffer.SetSuffix("")
 	}
+	game.updateStatusBufferPosition()
 }
 
 type Sprite struct {
@@ -268,7 +286,6 @@ type Game struct {
 	screenW, screenH int
 
 	drawBuffer bytes.Buffer
-	lastDraw   time.Time
 
 	spinnerIndex int
 
@@ -317,27 +334,11 @@ func NewGame() *Game {
 
 		debugImg: ebiten.NewImage(200, 200),
 	}
+	game = g
+
 	g.keyboard.SetKeys(kibodo.KeysQWERTY)
 
 	inputBuffer.SetSelectedFunc(g.acceptInput)
-
-	// TODO
-	go func() {
-		/*
-			time.Sleep(5 * time.Second)
-			g.lobby.offset += 10
-			g.lobby.bufferDirty = true
-			g.toggleProfiling()
-			g.lobby.drawBuffer()
-			g.toggleProfiling()
-			os.Exit(0)
-		*/
-
-		t := time.NewTicker(time.Second / 4)
-		for range t.C {
-			_ = g.update()
-		}
-	}()
 
 	return g
 }
@@ -346,7 +347,7 @@ func (g *Game) handleEvents() {
 	for e := range g.Client.Events {
 		switch ev := e.(type) {
 		case *bgammon.EventWelcome:
-			//c.Username = ev.PlayerName
+			g.Client.Username = ev.PlayerName
 
 			areIs := "are"
 			if ev.Clients == 1 {
@@ -356,13 +357,13 @@ func (g *Game) handleEvents() {
 			if ev.Clients == 1 {
 				clientsPlural = ""
 			}
-			gamesPlural := "s"
+			matchesPlural := "es"
 			if ev.Games == 1 {
-				gamesPlural = ""
+				matchesPlural = ""
 			}
-			l(fmt.Sprintf("Welcome, %s. There %s currently %d client%s playing %d game%s.", ev.PlayerName, areIs, ev.Clients, clientsPlural, ev.Games, gamesPlural))
+			l(fmt.Sprintf("*** Welcome, %s. There %s %d client%s playing %d match%s.", ev.PlayerName, areIs, ev.Clients, clientsPlural, ev.Games, matchesPlural))
 		case *bgammon.EventHelp:
-			l(fmt.Sprintf("Help: %s", ev.Message))
+			l(fmt.Sprintf("*** Help: %s", ev.Message))
 		case *bgammon.EventNotice:
 			l(fmt.Sprintf("*** %s", ev.Message))
 		case *bgammon.EventSay:
@@ -385,14 +386,8 @@ func (g *Game) handleEvents() {
 			} else if ev.PlayerNumber == 2 {
 				g.Board.gameState.Player2.Name = ev.Player
 			}
-
-			// Exit create game dialog (if open) and show board.
-			g.lobby.createGame = nil
-			g.lobby.bufferDirty = true
-			g.lobby.bufferButtonsDirty = true
-			setViewBoard(true)
-
 			g.Board.ProcessState()
+			setViewBoard(true)
 
 			if ev.Player != g.Client.Username {
 				lg(fmt.Sprintf("%s joined the match.", ev.Player))
@@ -411,15 +406,9 @@ func (g *Game) handleEvents() {
 				lg(fmt.Sprintf("%s left the match.", ev.Player))
 			}
 		case *bgammon.EventBoard:
-			// Exit create game dialog (if open) and show board.
-			g.lobby.createGame = nil
-			g.lobby.bufferDirty = true
-			g.lobby.bufferButtonsDirty = true
-			setViewBoard(true)
-
 			g.Board.gameState = &ev.GameState
 			g.Board.ProcessState()
-
+			setViewBoard(true)
 		case *bgammon.EventRolled:
 			g.Board.gameState.Roll1 = ev.Roll1
 			g.Board.gameState.Roll2 = ev.Roll2
@@ -456,13 +445,14 @@ func (g *Game) handleEvents() {
 		case *bgammon.EventPing:
 			g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
 		default:
-			l(fmt.Sprintf("Warning: Received unknown event: %+v", ev))
+			l(fmt.Sprintf("*** Warning: Received unknown event: %+v", ev))
 		}
 	}
 }
 
 func (g *Game) Connect() {
 	g.loggedIn = true
+	l(fmt.Sprintf("*** Connecting..."))
 
 	address := g.ServerAddress
 	if address == "" {
@@ -492,18 +482,7 @@ func (g *Game) Connect() {
 	go c.Connect()
 }
 
-// Separate update function for all normal update logic, as Update may only be
-// called when there is user input when vsync is disabled.
-func (g *Game) update() error {
-	return nil
-}
-
 func (g *Game) Update() error { // Called by ebiten only when input occurs
-	err := g.update()
-	if err != nil {
-		return err
-	}
-
 	if ebiten.IsWindowBeingClosed() {
 		g.Exit()
 		return nil
@@ -514,14 +493,14 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	}
 
 	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyP) {
-		err = g.toggleProfiling()
+		err := g.toggleProfiling()
 		if err != nil {
 			return err
 		}
 	}
 
 	if !g.loggedIn {
-		err = g.keyboard.Update()
+		err := g.keyboard.Update()
 		if err != nil {
 			return fmt.Errorf("failed to update virtual keyboard: %s", err)
 		}
@@ -607,7 +586,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	} else {
 		g.Board.update()
 
-		err = inputBuffer.Update()
+		err := inputBuffer.Update()
 		if err != nil {
 			return err
 		}
@@ -617,14 +596,6 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	frameTime := time.Second / 175
-	if time.Since(g.lastDraw) < frameTime {
-		//time.Sleep(time.Until(g.lastDraw.Add(frameTime)))
-		// TODO causes panics on WASM
-		// draw offscreen and cache, redraw cached image instead of sleeping?
-	}
-	g.lastDraw = time.Now()
-
 	screen.Fill(tableColor)
 
 	// Log in screen
@@ -650,13 +621,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	statusBuffer.Draw(screen)
-	gameBuffer.Draw(screen)
-	inputBuffer.Draw(screen)
-	if !viewBoard {
-		// Lobby screen
+	if !viewBoard { // Lobby
 		g.lobby.draw(screen)
-	} else {
-		// Game board screen
+	} else { // Game board
+		gameBuffer.Draw(screen)
+		inputBuffer.Draw(screen)
 		g.Board.draw(screen)
 	}
 
@@ -689,6 +658,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.op.GeoM.Translate(3, 0)
 		g.op.GeoM.Scale(2, 2)
 		screen.DrawImage(g.debugImg, g.op)
+	}
+}
+
+func (g *Game) updateStatusBufferPosition() {
+	if viewBoard {
+		statusBuffer.SetRect(statusBufferRect)
+	} else {
+		statusBuffer.SetRect(image.Rect(0, g.screenH-lobbyStatusBufferHeight, g.screenW, g.screenH))
 	}
 }
 
@@ -746,20 +723,21 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	inputBufferHeight := 50
 
 	g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPadding)*1.5)
-	minLobbyWidth := text.BoundString(mediumFont, strings.Repeat("A", lobbyCharacterWidth)).Dx()
+	/*minLobbyWidth := text.BoundString(mediumFont, strings.Repeat("A", lobbyCharacterWidth)).Dx()
 	if g.Board.w >= minLobbyWidth {
 		g.lobby.fullscreen = false
-		g.lobby.setRect(0, 0, g.Board.w, g.screenH)
-	} else {
-		g.lobby.fullscreen = true
-		g.lobby.setRect(0, 0, g.screenW, g.screenH)
-	}
+		g.lobby.setRect(0, 0, g.Board.w, g.screenH-lobbyStatusBufferHeight)
+	} else {*/
+	g.lobby.fullscreen = true
+	g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
+	/*}*/
 
 	if true || availableWidth >= 150 { // TODO allow buffers to be repositioned
 		statusBufferHeight := g.screenH - inputBufferHeight - bufferPadding*3
 
 		x, y, w, h := (g.screenW-bufferWidth)+bufferPadding, bufferPadding, bufferWidth-(bufferPadding*2), statusBufferHeight
-		statusBuffer.SetRect(image.Rect(x, y, x+w, y+h/2-bufferPadding/2))
+		statusBufferRect = image.Rect(x, y, x+w, y+h/2-bufferPadding/2)
+		g.updateStatusBufferPosition()
 
 		gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPadding/2, x+w, y+h))
 
