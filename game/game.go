@@ -14,11 +14,9 @@ import (
 	"strings"
 	"time"
 
-	"code.rocketnine.space/tslocum/messeji"
-
 	"code.rocket9labs.com/tslocum/bgammon"
-
 	"code.rocketnine.space/tslocum/kibodo"
+	"code.rocketnine.space/tslocum/messeji"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
@@ -500,10 +498,10 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	}
 
 	if !g.loggedIn {
-		err := g.keyboard.Update()
+		/*err := g.keyboard.Update()
 		if err != nil {
 			return fmt.Errorf("failed to update virtual keyboard: %s", err)
-		}
+		}*/
 
 		f := func() {
 			var clearBuffer bool
@@ -522,8 +520,12 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 					g.userInput = ""
 
 					if !g.usernameConfirmed {
-						g.usernameConfirmed = true
-					} else if g.Password != "" {
+						if g.Username != "" {
+							g.usernameConfirmed = true
+						} else {
+							g.Connect()
+						}
+					} else {
 						g.Connect()
 					}
 				}
@@ -531,10 +533,10 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 				inputBuffer.SetText(g.userInput)
 			}()
 
-			if !g.shownKeyboard {
+			/*if !g.shownKeyboard {
 				g.keyboard.Show()
 				g.shownKeyboard = true
-			}
+			}*/
 
 			if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(g.userInput) > 0 {
 				g.userInput = g.userInput[:len(g.userInput)-1]
@@ -550,7 +552,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 			}
 
 			// Process on-screen keyboard input.
-			g.keyboardInput = g.keyboard.AppendInput(g.keyboardInput[:0])
+			/*g.keyboardInput = g.keyboard.AppendInput(g.keyboardInput[:0])
 			for _, input := range g.keyboardInput {
 				if input.Rune > 0 {
 					g.userInput += string(input.Rune)
@@ -563,7 +565,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 				} else if input.Key == ebiten.KeyEnter {
 					g.userInput += "\n"
 				}
-			}
+			}*/
 		}
 
 		f()
@@ -600,18 +602,22 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Log in screen
 	if !g.loggedIn {
-		g.keyboard.Draw(screen)
+		//g.keyboard.Draw(screen)
 
-		const welcomeText = `Connect to bgammon.org
-  To log in as a guest, enter a username (if you want) and
-  do not enter a password.`
+		const headerText = `
+ Connect to bgammon.org`
+		const footerText = `
+
+   To log in as a guest, enter a username (if you want) and
+     do not enter a password.`
+
 		debugBox := image.NewRGBA(image.Rect(0, 0, g.screenW, g.screenH))
 		debugImg := ebiten.NewImageFromImage(debugBox)
 
 		if !g.usernameConfirmed {
-			ebitenutil.DebugPrint(debugImg, welcomeText+fmt.Sprintf("\n\nUsername: %s_", g.Username))
+			ebitenutil.DebugPrint(debugImg, headerText+fmt.Sprintf("\n\n   Username: %s_\n   Password:", g.Username)+footerText)
 		} else {
-			ebitenutil.DebugPrint(debugImg, welcomeText+fmt.Sprintf("\n\nPassword: %s_", strings.Repeat("*", len(g.Password))))
+			ebitenutil.DebugPrint(debugImg, headerText+fmt.Sprintf("\n\n   Username: %s\n   Password: %s_"+footerText, g.Username, strings.Repeat("*", len(g.Password))))
 		}
 
 		g.resetImageOptions()
