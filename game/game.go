@@ -442,7 +442,10 @@ func (g *Game) handleEvents() {
 			setViewBoard(true)
 			ebiten.ScheduleFrame()
 
-			if ev.Player != g.Client.Username {
+			if ev.Player == g.Client.Username {
+				gameBuffer.SetText("")
+				gameLogged = false
+			} else {
 				lg(fmt.Sprintf("%s joined the match.", ev.Player))
 			}
 		case *bgammon.EventFailedJoin:
@@ -454,6 +457,9 @@ func (g *Game) handleEvents() {
 				g.Board.gameState.Player2.Name = ""
 			}
 			g.Board.ProcessState()
+			if ev.Player == g.Client.Username {
+				setViewBoard(false)
+			}
 			ebiten.ScheduleFrame()
 
 			if ev.Player != g.Client.Username {
