@@ -36,6 +36,14 @@ var (
 	imgCheckerLight *ebiten.Image
 	imgCheckerDark  *ebiten.Image
 
+	imgDice  *ebiten.Image
+	imgDice1 *ebiten.Image
+	imgDice2 *ebiten.Image
+	imgDice3 *ebiten.Image
+	imgDice4 *ebiten.Image
+	imgDice5 *ebiten.Image
+	imgDice6 *ebiten.Image
+
 	smallFont  font.Face
 	mediumFont font.Face
 	monoFont   font.Face
@@ -94,6 +102,8 @@ var (
 	Debug int
 
 	game *Game
+
+	diceSize int
 )
 
 func l(s string) {
@@ -173,9 +183,27 @@ func loadAssets(width int) {
 	imgCheckerLight = loadAsset("assets/checker_white.png", width)
 	imgCheckerDark = loadAsset("assets/checker_white.png", width)
 	//imgCheckerDark = loadAsset("assets/checker_black.png", width)
+
+	resizeDice := func(img image.Image) *ebiten.Image {
+		const maxSize = 70
+		diceSize = width
+		if diceSize > maxSize {
+			diceSize = maxSize
+		}
+		return ebiten.NewImageFromImage(resize.Resize(uint(diceSize), 0, img, resize.Lanczos3))
+	}
+
+	const size = 184
+	imgDice = ebiten.NewImageFromImage(loadImage("assets/dice.png"))
+	imgDice1 = resizeDice(imgDice.SubImage(image.Rect(0, 0, size*1, size*1)))
+	imgDice2 = resizeDice(imgDice.SubImage(image.Rect(size*1, 0, size*2, size*1)))
+	imgDice3 = resizeDice(imgDice.SubImage(image.Rect(size*2, 0, size*3, size*1)))
+	imgDice4 = resizeDice(imgDice.SubImage(image.Rect(0, size*1, size*1, size*2)))
+	imgDice5 = resizeDice(imgDice.SubImage(image.Rect(size*1, size*1, size*2, size*2)))
+	imgDice6 = resizeDice(imgDice.SubImage(image.Rect(size*2, size*1, size*3, size*2)))
 }
 
-func loadAsset(assetPath string, width int) *ebiten.Image {
+func loadImage(assetPath string) image.Image {
 	f, err := assetsFS.Open(assetPath)
 	if err != nil {
 		panic(err)
@@ -185,6 +213,12 @@ func loadAsset(assetPath string, width int) *ebiten.Image {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	return img
+}
+
+func loadAsset(assetPath string, width int) *ebiten.Image {
+	img := loadImage(assetPath)
 
 	if width > 0 {
 		imgResized := resize.Resize(uint(width), 0, img, resize.Lanczos3)
@@ -239,6 +273,26 @@ func initializeFonts() {
 	}
 }
 
+func diceImage(roll int) *ebiten.Image {
+	switch roll {
+	case 1:
+		return imgDice1
+	case 2:
+		return imgDice2
+	case 3:
+		return imgDice3
+	case 4:
+		return imgDice4
+	case 5:
+		return imgDice5
+	case 6:
+		return imgDice6
+	default:
+		log.Panicf("unknown dice roll: %d", roll)
+		return nil
+	}
+}
+
 func setViewBoard(view bool) {
 	viewBoard = view
 	inputBuffer.SetHandleKeyboard(viewBoard)
@@ -255,6 +309,7 @@ func setViewBoard(view bool) {
 		inputBuffer.SetSuffix("")
 	}
 	game.updateStatusBufferPosition()
+	ebiten.ScheduleFrame()
 }
 
 type Sprite struct {
@@ -377,7 +432,6 @@ func (g *Game) handleEvents() {
 			} else {
 				g.pendingGames = ev.Games
 			}
-
 		case *bgammon.EventJoined:
 			if ev.PlayerNumber == 1 {
 				g.Board.gameState.Player1.Name = ev.Player
@@ -386,6 +440,7 @@ func (g *Game) handleEvents() {
 			}
 			g.Board.ProcessState()
 			setViewBoard(true)
+			ebiten.ScheduleFrame()
 
 			if ev.Player != g.Client.Username {
 				lg(fmt.Sprintf("%s joined the match.", ev.Player))
@@ -399,6 +454,7 @@ func (g *Game) handleEvents() {
 				g.Board.gameState.Player2.Name = ""
 			}
 			g.Board.ProcessState()
+			ebiten.ScheduleFrame()
 
 			if ev.Player != g.Client.Username {
 				lg(fmt.Sprintf("%s left the match.", ev.Player))
@@ -407,6 +463,7 @@ func (g *Game) handleEvents() {
 			g.Board.gameState = &ev.GameState
 			g.Board.ProcessState()
 			setViewBoard(true)
+			ebiten.ScheduleFrame()
 		case *bgammon.EventRolled:
 			g.Board.gameState.Roll1 = ev.Roll1
 			g.Board.gameState.Roll2 = ev.Roll2
@@ -421,6 +478,7 @@ func (g *Game) handleEvents() {
 				diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
 			}
 			g.Board.ProcessState()
+			ebiten.ScheduleFrame()
 			lg(fmt.Sprintf("%s rolled %s.", ev.Player, diceFormatted))
 		case *bgammon.EventFailedRoll:
 			l(fmt.Sprintf("*** Failed to roll: %s", ev.Reason))
@@ -581,6 +639,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		setViewBoard(!viewBoard)
+		ebiten.ScheduleFrame()
 	}
 
 	if !viewBoard {
@@ -837,6 +896,5 @@ func (g *Game) toggleProfiling() error {
 }
 
 func (g *Game) Exit() {
-	g.Board.drawFrame <- false
 	os.Exit(0)
 }

@@ -57,8 +57,6 @@ type board struct {
 
 	gameState *bgammon.GameState
 
-	drawFrame chan bool
-
 	debug int // Print and draw debug information
 
 	Client *Client
@@ -83,7 +81,6 @@ func NewBoard() *board {
 		},
 		spaceSprites: make([][]*Sprite, bgammon.BoardSpaces),
 		spaceRects:   make([][4]int, bgammon.BoardSpaces),
-		drawFrame:    make(chan bool, 10),
 		gameState: &bgammon.GameState{
 			Game: bgammon.NewGame(),
 		},
@@ -106,8 +103,6 @@ func NewBoard() *board {
 		b.Sprites.sprites[i] = b.newSprite(false)
 	}
 
-	go b.handleDraw()
-
 	b.op = &ebiten.DrawImageOptions{}
 
 	b.dragTouchId = -1
@@ -125,31 +120,6 @@ func (b *board) selectOK() {
 
 func (b *board) selectReset() {
 	b.Client.Out <- []byte("reset")
-}
-
-func (b *board) handleDraw() {
-	drawFreq := time.Second / 144 // TODO
-	lastDraw := time.Now()
-	for v := range b.drawFrame {
-		if !v {
-			return
-		}
-		since := time.Since(lastDraw)
-		if since < drawFreq {
-			t := time.NewTimer(drawFreq - since)
-		DELAYDRAW:
-			for {
-				select {
-				case <-b.drawFrame:
-					continue DELAYDRAW
-				case <-t.C:
-					break DELAYDRAW
-				}
-			}
-		}
-		ebiten.ScheduleFrame()
-		lastDraw = time.Now()
-	}
 }
 
 func (b *board) newSprite(white bool) *Sprite {
@@ -303,10 +273,6 @@ func (b *board) updateBackgroundImage() {
 		}
 		ebitenutil.DebugPrintAt(b.backgroundImage, sp, x, y)
 	}
-}
-
-func (b *board) ScheduleFrame() {
-	b.drawFrame <- true
 }
 
 func (b *board) drawButtons(screen *ebiten.Image) {
@@ -523,6 +489,12 @@ func (b *board) draw(screen *ebiten.Image) {
 		opponentBorderColor = lightCheckerColor
 	}
 
+	playerRoll := b.gameState.Roll1
+	opponentRoll := b.gameState.Roll2
+	if b.gameState.PlayerNumber == 2 {
+		playerRoll, opponentRoll = opponentRoll, playerRoll
+	}
+
 	drawLabel := func(label string, labelColor color.Color, border bool, borderColor color.Color) *ebiten.Image {
 		bounds := text.BoundString(mediumFont, label)
 
@@ -551,35 +523,66 @@ func (b *board) draw(screen *ebiten.Image) {
 
 	opponent := b.gameState.OpponentPlayer()
 	if opponent.Name != "" {
-		label := fmt.Sprintf("%s  %d %d", opponent.Name, b.gameState.Roll1, b.gameState.Roll2)
+		label := fmt.Sprintf("%s", opponent.Name)
 
 		img := drawLabel(label, opponentColor, b.gameState.Turn != b.gameState.PlayerNumber, opponentBorderColor)
 		bounds := img.Bounds()
 
-		x := int(((float64(b.innerW) - borderSize) / 4) - (float64(bounds.Dx()) / 2))
-		y := (b.innerH / 2) - (bounds.Dy() / 2)
-		x, y = b.offsetPosition(x, y)
+		x := b.x + int(((float64(b.innerW))/4)-(float64(bounds.Dx()/2))) - int(b.horizontalBorderSize)/2
+		y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
 		b.op.GeoM.Reset()
 		b.op.GeoM.Translate(float64(x), float64(y))
 		screen.DrawImage(img, b.op)
+
+		gapSize := 5
+		if b.gameState.Turn == 0 {
+			if opponentRoll != 0 {
+				b.op.GeoM.Reset()
+				b.op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				screen.DrawImage(diceImage(opponentRoll), b.op)
+			}
+		} else if b.gameState.Turn != b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
+			b.op.GeoM.Reset()
+			b.op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2-diceSize-gapSize), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+			screen.DrawImage(diceImage(b.gameState.Roll1), b.op)
+
+			b.op.GeoM.Reset()
+			b.op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2+gapSize), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+			screen.DrawImage(diceImage(b.gameState.Roll2), b.op)
+		}
 	}
 
 	// Draw player name and dice
 
 	player := b.gameState.LocalPlayer()
 	if player.Name != "" {
-		label := fmt.Sprintf("%s  %d %d", player.Name, b.gameState.Roll1, b.gameState.Roll2)
+		label := fmt.Sprintf("%s", player.Name)
 
 		img := drawLabel(label, playerColor, b.gameState.Turn == b.gameState.PlayerNumber, playerBorderColor)
 		bounds := img.Bounds()
 
-		x := ((b.innerW / 4) * 3) - (bounds.Dx() / 2)
-		y := (b.innerH / 2) - (bounds.Dy() / 2)
-		x, y = b.offsetPosition(x, y)
+		x := b.x + int((((float64(b.innerW))/4)*3)-(float64(bounds.Dx()/2))) + int(b.horizontalBorderSize)/2
+		y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
 		b.op.GeoM.Reset()
 		b.op.GeoM.Translate(float64(x), float64(y))
 		screen.DrawImage(img, b.op)
 
+		gapSize := 5
+		if b.gameState.Turn == 0 {
+			if playerRoll != 0 {
+				b.op.GeoM.Reset()
+				b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)-int(b.horizontalBorderSize)/2-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				screen.DrawImage(diceImage(playerRoll), b.op)
+			}
+		} else if b.gameState.Turn == b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
+			b.op.GeoM.Reset()
+			b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2-diceSize-gapSize), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+			screen.DrawImage(diceImage(b.gameState.Roll1), b.op)
+
+			b.op.GeoM.Reset()
+			b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2+gapSize), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+			screen.DrawImage(diceImage(b.gameState.Roll2), b.op)
+		}
 	}
 
 	// Draw moving sprite
@@ -714,8 +717,6 @@ func (b *board) _positionCheckers() {
 			s.x += (w - s.w) / 2
 		}
 	}
-
-	b.ScheduleFrame()
 }
 
 func (b *board) spriteAt(x, y int) *Sprite {

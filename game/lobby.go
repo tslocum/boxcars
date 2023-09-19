@@ -51,6 +51,11 @@ var cancelConfirmButtons = []*lobbyButton{
 	{"Confirm", func() {}},
 }
 
+var cancelJoinButtons = []*lobbyButton{
+	{"Cancel", func() {}},
+	{"Join", func() {}},
+}
+
 type lobby struct {
 	x, y int
 	w, h int
@@ -88,6 +93,11 @@ type lobby struct {
 	createGamePassword     string
 	createGamePasswordPrev string
 
+	showJoinGame     bool
+	joinGameID       int
+	joinGameName     string
+	joinGamePassword string
+
 	refresh bool
 
 	runeBuffer []rune
@@ -124,6 +134,8 @@ func (l *lobby) getButtons() []*lobbyButton {
 		} else {
 			return createButtons
 		}
+	} else if l.showJoinGame {
+		return cancelJoinButtons
 	}
 	return mainButtons
 }
@@ -167,7 +179,7 @@ func (l *lobby) drawBuffer() {
 	l.buffer.Fill(frameColor)
 
 	// Draw create game dialog
-	if l.showCreateGame > 0 {
+	if l.showCreateGame > 0 || l.showJoinGame {
 		var labels []string
 		switch l.showCreateGame {
 		case 1:
@@ -207,6 +219,13 @@ func (l *lobby) drawBuffer() {
 				"",
 				"  Password:",
 				"      " + l.createGamePassword + "_",
+			}
+		default:
+			labels = []string{
+				"Join match: " + l.joinGameName,
+				"",
+				"  Password:",
+				"      " + l.joinGamePassword + "_",
 			}
 		}
 
@@ -414,6 +433,15 @@ func (l *lobby) click(x, y int) {
 				l.c.Out <- []byte(fmt.Sprintf("c %s %s", typeAndPassword, l.createGameName))
 			}
 			return
+		} else if l.showJoinGame {
+			if buttonIndex == 0 { // Cancel
+				l.showJoinGame = false
+				l.bufferDirty = true
+				l.bufferButtonsDirty = true
+			} else {
+				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword))
+			}
+			return
 		}
 
 		switch buttonIndex {
@@ -436,8 +464,18 @@ func (l *lobby) click(x, y int) {
 			if l.selected < 0 || l.selected >= len(l.games) {
 				return
 			}
-			l.c.Out <- []byte(fmt.Sprintf("join %d", l.games[l.selected].ID))
-			setViewBoard(true)
+			if l.games[l.selected].Password {
+				l.showJoinGame = true
+				l.joinGameID = l.games[l.selected].ID
+				l.joinGameName = l.games[l.selected].Name
+				l.joinGamePassword = ""
+				l.bufferDirty = true
+				l.bufferButtonsDirty = true
+			} else {
+				l.c.Out <- []byte(fmt.Sprintf("j %d", l.games[l.selected].ID))
+				setViewBoard(true)
+				ebiten.ScheduleFrame()
+			}
 		}
 		return
 	}
@@ -450,7 +488,16 @@ func (l *lobby) click(x, y int) {
 		if l.selected == newSelection && l.selected >= 0 && l.selected < len(l.games) {
 			if time.Since(l.lastClick) <= doubleClickDuration {
 				entry := l.games[l.selected]
-				l.c.Out <- []byte(fmt.Sprintf("join %d", entry.ID))
+				if entry.Password {
+					l.showJoinGame = true
+					l.joinGameID = entry.ID
+					l.joinGameName = entry.Name
+					l.joinGamePassword = ""
+					l.bufferDirty = true
+					l.bufferButtonsDirty = true
+				} else {
+					l.c.Out <- []byte(fmt.Sprintf("j %d", entry.ID))
+				}
 				l.lastClick = time.Time{}
 				return
 			}
@@ -463,7 +510,50 @@ func (l *lobby) click(x, y int) {
 }
 
 func (l *lobby) update() {
-	if l.showCreateGame == 0 {
+	if l.showCreateGame > 1 || l.showJoinGame {
+		var str string
+		var changed bool
+		if l.showCreateGame == 2 {
+			str = l.createGameName
+		} else if l.showCreateGame > 1 {
+			str = l.createGamePassword
+		} else {
+			str = l.joinGamePassword
+		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(str) > 0 {
+			str = str[:len(str)-1]
+			changed = true
+		}
+
+		l.runeBuffer = ebiten.AppendInputChars(l.runeBuffer[:0])
+		if len(l.runeBuffer) > 0 {
+			str += string(l.runeBuffer)
+			changed = true
+		}
+
+		if changed {
+			if l.showCreateGame == 2 {
+				l.createGameName = str
+			} else if l.showCreateGame > 1 {
+				l.createGamePassword = str
+			} else {
+				l.joinGamePassword = str
+			}
+			l.bufferDirty = true
+		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+			if l.showCreateGame > 1 {
+				l.showCreateGame = 1
+				l.bufferDirty = true
+				l.bufferButtonsDirty = true
+			} else {
+				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword))
+			}
+			return
+		}
+	} else {
 		scrollLength := 3
 
 		if _, y := ebiten.Wheel(); y != 0 {
@@ -500,41 +590,6 @@ func (l *lobby) update() {
 		}
 		if l.offset < 0 {
 			l.offset = 0
-		}
-	} else if l.showCreateGame > 1 {
-		var str string
-		var changed bool
-		if l.showCreateGame == 2 {
-			str = l.createGameName
-		} else {
-			str = l.createGamePassword
-		}
-
-		if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(str) > 0 {
-			str = str[:len(str)-1]
-			changed = true
-		}
-
-		l.runeBuffer = ebiten.AppendInputChars(l.runeBuffer[:0])
-		if len(l.runeBuffer) > 0 {
-			str += string(l.runeBuffer)
-			changed = true
-		}
-
-		if changed {
-			if l.showCreateGame == 2 {
-				l.createGameName = str
-			} else {
-				l.createGamePassword = str
-			}
-			l.bufferDirty = true
-		}
-
-		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-			l.showCreateGame = 1
-			l.bufferDirty = true
-			l.bufferButtonsDirty = true
-			return
 		}
 	}
 
