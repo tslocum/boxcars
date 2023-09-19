@@ -138,30 +138,25 @@ func (b *board) updateBackgroundImage() {
 	innerW := float64(b.w) - b.horizontalBorderSize*2 // Outer board width (including frame)
 
 	// Table
-	box := image.NewRGBA(image.Rect(0, 0, b.w, b.h))
-	img := ebiten.NewImageFromImage(box)
-	img.Fill(tableColor)
-	b.backgroundImage = ebiten.NewImageFromImage(img)
+	b.backgroundImage = ebiten.NewImage(b.w, b.h)
+	b.backgroundImage.Fill(tableColor)
 
 	// Frame
-	box = image.NewRGBA(image.Rect(0, 0, frameW, b.h))
-	img = ebiten.NewImageFromImage(box)
+	img := ebiten.NewImage(frameW, b.h)
 	img.Fill(frameColor)
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(float64(b.horizontalBorderSize-borderSize), 0)
 	b.backgroundImage.DrawImage(img, b.op)
 
 	// Face
-	box = image.NewRGBA(image.Rect(0, 0, int(innerW), b.h-int(b.verticalBorderSize*2)))
-	img = ebiten.NewImageFromImage(box)
+	img = ebiten.NewImage(int(innerW), b.h-int(b.verticalBorderSize*2))
 	img.Fill(faceColor)
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(float64(b.horizontalBorderSize), float64(b.verticalBorderSize))
 	b.backgroundImage.DrawImage(img, b.op)
 
 	// Bar
-	box = image.NewRGBA(image.Rect(0, 0, int(b.barWidth), b.h))
-	img = ebiten.NewImageFromImage(box)
+	img = ebiten.NewImage(int(b.barWidth), b.h)
 	img.Fill(frameColor)
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(float64((b.w/2)-int(b.barWidth/2)), 0)
@@ -261,13 +256,16 @@ func (b *board) updateBackgroundImage() {
 	for space, r := range b.spaceRects {
 		if space < 1 || space > 24 {
 			continue
+		} else if b.gameState.PlayerNumber == 1 {
+			space = 24 - space + 1
 		}
+
 		sp := strconv.Itoa(space)
 		if space < 10 {
 			sp = " " + sp
 		}
 		x := r[0] + r[2]/2 + int(b.horizontalBorderSize/2) + 4
-		y := r[1] + 2
+		y := 2
 		if b.bottomRow(space) {
 			y = b.h - int(b.verticalBorderSize) + 2
 		}
@@ -571,7 +569,7 @@ func (b *board) draw(screen *ebiten.Image) {
 		if b.gameState.Turn == 0 {
 			if playerRoll != 0 {
 				b.op.GeoM.Reset()
-				b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)-int(b.horizontalBorderSize)/2-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 				screen.DrawImage(diceImage(playerRoll), b.op)
 			}
 		} else if b.gameState.Turn == b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
@@ -867,6 +865,7 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 func (b *board) ProcessState() {
 	if b.lastPlayerNumber != b.gameState.PlayerNumber {
 		b.setSpaceRects()
+		b.updateBackgroundImage()
 	}
 	b.updateButtonRects()
 	b.lastPlayerNumber = b.gameState.PlayerNumber
