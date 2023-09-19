@@ -447,7 +447,7 @@ func (l *lobby) click(x, y int) {
 	if clickedEntry >= 0 {
 		const doubleClickDuration = 200 * time.Millisecond
 		newSelection := l.offset + clickedEntry
-		if l.selected == newSelection {
+		if l.selected == newSelection && l.selected >= 0 && l.selected < len(l.games) {
 			if time.Since(l.lastClick) <= doubleClickDuration {
 				entry := l.games[l.selected]
 				l.c.Out <- []byte(fmt.Sprintf("join %d", entry.ID))

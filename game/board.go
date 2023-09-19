@@ -66,6 +66,8 @@ type board struct {
 	dragX, dragY int
 
 	buttons []*boardButton
+
+	spaceHighlight *ebiten.Image
 }
 
 func NewBoard() *board {
@@ -85,6 +87,7 @@ func NewBoard() *board {
 		gameState: &bgammon.GameState{
 			Game: bgammon.NewGame(),
 		},
+		spaceHighlight: ebiten.NewImage(1, 1),
 	}
 	b.buttons = []*boardButton{
 		{
@@ -479,7 +482,7 @@ func (b *board) draw(screen *ebiten.Image) {
 		}
 	}
 
-	// Draw hover overlay
+	// Draw space hover overlay when dragging
 
 	if b.dragging != nil {
 		dx, dy := b.dragX, b.dragY
@@ -491,13 +494,14 @@ func (b *board) draw(screen *ebiten.Image) {
 
 		space := b.spaceAt(dx, dy)
 		if space > 0 && space < 25 {
-			x, y, w, h := b.spaceRect(space)
-			spaceImage := ebiten.NewImage(w, h)
-			spaceImage.Fill(color.RGBA{255, 255, 255, 50})
+			x, y, _, _ := b.spaceRect(space)
 			x, y = b.offsetPosition(x, y)
 			b.op.GeoM.Reset()
 			b.op.GeoM.Translate(float64(x), float64(y))
-			screen.DrawImage(spaceImage, b.op)
+			b.op.ColorM.Reset()
+			b.op.ColorM.Scale(1, 1, 1, 0.2)
+			screen.DrawImage(b.spaceHighlight, b.op)
+			b.op.ColorM.Reset()
 		}
 	}
 
@@ -627,7 +631,6 @@ func (b *board) updateButtonRects() {
 
 	const padding = 20
 	if b.gameState.MayReset() && b.gameState.MayOK() {
-		log.Println("BOTH")
 		btnReset.rect = image.Rect(b.w/2-padding/2-w, y, b.w/2-padding/2, y+h)
 		btnOK.rect = image.Rect(b.w/2+padding/2, y, b.w/2+padding/2+w, y+h)
 	} else {
@@ -642,6 +645,9 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 
 	b.x, b.y, b.w, b.h = x, y, w, h
+	if b.w > b.h {
+		b.w = b.h
+	}
 	b.updateButtonRects()
 
 	b.triangleOffset = (float64(b.h) - (b.verticalBorderSize * 2)) / 15
@@ -795,6 +801,13 @@ func (b *board) setSpaceRects() {
 			b.spaceRects[j], b.spaceRects[k], b.spaceRects[l], b.spaceRects[m] = b.spaceRects[k], b.spaceRects[j], b.spaceRects[m], b.spaceRects[l]
 		}
 		b.spaceRects[bgammon.SpaceBarPlayer], b.spaceRects[bgammon.SpaceBarOpponent] = b.spaceRects[bgammon.SpaceBarOpponent], b.spaceRects[bgammon.SpaceBarPlayer]
+	}
+
+	r := b.spaceRects[1]
+	bounds := b.spaceHighlight.Bounds()
+	if bounds.Dx() != r[2] || bounds.Dy() != r[3] {
+		b.spaceHighlight = ebiten.NewImage(r[2], r[3])
+		b.spaceHighlight.Fill(color.RGBA{255, 255, 255, 255})
 	}
 }
 
@@ -1017,9 +1030,9 @@ func (b *board) update() {
 			if b.dragging == nil {
 				x, y := ebiten.CursorPosition()
 				handled := b.handleClick(x, y)
-				if !handled {
+				if !handled && len(b.gameState.Available) > 0 {
 					s := b.spriteAt(x, y)
-					if s != nil {
+					if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
 						b.dragging = s
 						// TODO set dragFrom instead of calculating later
 					}
@@ -1031,11 +1044,11 @@ func (b *board) update() {
 		for _, id := range b.touchIDs {
 			x, y := ebiten.TouchPosition(id)
 			handled := b.handleClick(x, y)
-			if !handled {
+			if !handled && len(b.gameState.Available) > 0 {
 				b.dragX, b.dragY = x, y
 
 				s := b.spriteAt(x, y)
-				if s != nil {
+				if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
 					b.dragging = s
 					b.dragTouchId = id
 				}
