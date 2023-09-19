@@ -55,7 +55,7 @@ var (
 	darkCheckerColor  = color.RGBA{0, 0, 0, 255}
 )
 
-const DefaultServerAddress = "ws://localhost:1338" // TODO
+const DefaultServerAddress = "ws://bgammon.org:1338"
 
 const maxStatusWidthRatio = 0.5
 
