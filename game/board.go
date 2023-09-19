@@ -6,11 +6,11 @@ import (
 	"image/color"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
-
 	"code.rocket9labs.com/tslocum/bgammon"
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -73,7 +73,7 @@ func NewBoard() *board {
 		barWidth:             100,
 		triangleOffset:       float64(50),
 		horizontalBorderSize: 20,
-		verticalBorderSize:   10,
+		verticalBorderSize:   20,
 		overlapSize:          97,
 		Sprites: &Sprites{
 			sprites: make([]*Sprite, 30),
@@ -91,11 +91,11 @@ func NewBoard() *board {
 			label:    "Roll",
 			selected: b.selectRoll,
 		}, {
-			label:    "OK",
-			selected: b.selectOK,
-		}, {
 			label:    "Reset",
 			selected: b.selectReset,
+		}, {
+			label:    "OK",
+			selected: b.selectOK,
 		},
 	}
 
@@ -113,15 +113,15 @@ func NewBoard() *board {
 }
 
 func (b *board) selectRoll() {
-
+	b.Client.Out <- []byte("roll")
 }
 
 func (b *board) selectOK() {
-
+	b.Client.Out <- []byte("ok")
 }
 
 func (b *board) selectReset() {
-
+	b.Client.Out <- []byte("reset")
 }
 
 func (b *board) handleDraw() {
@@ -283,16 +283,27 @@ func (b *board) updateBackgroundImage() {
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(b.horizontalBorderSize-borderSize, 0)
 	b.backgroundImage.DrawImage(img, b.op)
+
+	// Draw space numbers.
+	for space, r := range b.spaceRects {
+		if space < 1 || space > 24 {
+			continue
+		}
+		sp := strconv.Itoa(space)
+		if space < 10 {
+			sp = " " + sp
+		}
+		x := r[0] + r[2]/2 + int(b.horizontalBorderSize/2) + 4
+		y := r[1] + 2
+		if b.bottomRow(space) {
+			y = b.h - int(b.verticalBorderSize) + 2
+		}
+		ebitenutil.DebugPrintAt(b.backgroundImage, sp, x, y)
+	}
 }
 
 func (b *board) ScheduleFrame() {
 	b.drawFrame <- true
-}
-
-func (b *board) resetButtonRect() (int, int, int, int) {
-	w := 200
-	h := 75
-	return (b.w - w) / 2, (b.h - h) / 2, w, h
 }
 
 func (b *board) drawButtons(screen *ebiten.Image) {
@@ -605,8 +616,8 @@ func (b *board) draw(screen *ebiten.Image) {
 
 func (b *board) updateButtonRects() {
 	btnRoll := b.buttons[0]
-	btnOK := b.buttons[1]
-	btnReset := b.buttons[2]
+	btnReset := b.buttons[1]
+	btnOK := b.buttons[2]
 
 	w := 200
 	h := 75
@@ -614,8 +625,15 @@ func (b *board) updateButtonRects() {
 
 	btnRoll.rect = image.Rect(x, y, x+w, y+h)
 
-	btnOK.rect = image.Rect(x, y, x+w/2, y+h)
-	btnReset.rect = image.Rect(x+w/2, y, x+w, y+h)
+	const padding = 20
+	if b.gameState.MayReset() && b.gameState.MayOK() {
+		log.Println("BOTH")
+		btnReset.rect = image.Rect(b.w/2-padding/2-w, y, b.w/2-padding/2, y+h)
+		btnOK.rect = image.Rect(b.w/2+padding/2, y, b.w/2+padding/2+w, y+h)
+	} else {
+		btnReset.rect = image.Rect(x, y, x+w, y+h)
+		btnOK.rect = image.Rect(x, y, x+w, y+h)
+	}
 }
 
 func (b *board) setRect(x, y, w, h int) {
@@ -836,6 +854,7 @@ func (b *board) ProcessState() {
 	if b.lastPlayerNumber != b.gameState.PlayerNumber {
 		b.setSpaceRects()
 	}
+	b.updateButtonRects()
 	b.lastPlayerNumber = b.gameState.PlayerNumber
 
 	b.Sprites = &Sprites{}
@@ -968,7 +987,22 @@ func (b *board) playingGame() bool {
 }
 
 func (b *board) playerTurn() bool {
-	return b.playingGame() && b.gameState.Turn == b.gameState.PlayerNumber
+	return b.playingGame() && (b.gameState.MayRoll() || b.gameState.Turn == b.gameState.PlayerNumber)
+}
+
+func (b *board) handleClick(x int, y int) bool {
+	p := image.Point{x, y}
+	for i, btn := range b.buttons {
+		if (i == 0 && b.gameState.MayRoll()) ||
+			(i == 1 && b.gameState.MayReset()) ||
+			(i == 2 && b.gameState.MayOK()) {
+			if p.In(btn.rect) {
+				btn.selected()
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (b *board) update() {
@@ -979,21 +1013,10 @@ func (b *board) update() {
 	if b.dragging == nil && b.playerTurn() {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
-		handleReset := func(x, y int) bool {
-			if b.gameState.Turn == b.gameState.PlayerNumber && len(b.gameState.Moves) > 0 {
-				rx, ry, rw, rh := b.resetButtonRect()
-				if x >= rx && x <= rx+rw && y >= ry && y <= ry+rh {
-					b.Client.Out <- []byte("reset")
-					return true
-				}
-			}
-			return false
-		}
-
 		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			if b.dragging == nil {
 				x, y := ebiten.CursorPosition()
-				handled := handleReset(x, y)
+				handled := b.handleClick(x, y)
 				if !handled {
 					s := b.spriteAt(x, y)
 					if s != nil {
@@ -1007,7 +1030,7 @@ func (b *board) update() {
 		b.touchIDs = inpututil.AppendJustPressedTouchIDs(b.touchIDs[:0])
 		for _, id := range b.touchIDs {
 			x, y := ebiten.TouchPosition(id)
-			handled := handleReset(x, y)
+			handled := b.handleClick(x, y)
 			if !handled {
 				b.dragX, b.dragY = x, y
 

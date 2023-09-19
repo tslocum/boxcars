@@ -18,8 +18,6 @@ const (
 	screenHeight = 768
 )
 
-var AutoWatch bool // WASM only
-
 func main() {
 	ebiten.SetWindowTitle("bgammon.org - Free Online Backgammon")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
@@ -42,10 +40,6 @@ func main() {
 		go func() {
 			log.Fatal(http.ListenAndServe("localhost:8880", nil))
 		}()
-	}
-
-	if AutoWatch {
-		g.Watch = true
 	}
 
 	// Auto-connect

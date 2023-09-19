@@ -3,15 +3,15 @@ project_name: boxcars
 builds:
   -
     id: boxcars
-#    ldflags:
-#      - -s -w -X code.rocket9labs.com/tslocum/boxcars/main.Version={{.Version}}
     goos:
+      - js
       - linux
       - windows
 #      - darwin
 #      - freebsd
     goarch:
       - amd64
+      - wasm
 archives:
   -
     id: boxcars
@@ -24,7 +24,6 @@ archives:
         format: zip
     files:
       - ./*.md
-#      - CHANGELOG
       - LICENSE
 checksum:
   name_template: 'checksums.txt'
