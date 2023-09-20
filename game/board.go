@@ -771,9 +771,11 @@ func (b *board) setSpaceRects() {
 		if space == bgammon.SpaceBarPlayer {
 			hspace = 6
 			w = int(b.barWidth)
+			add = int(b.barWidth)/2 - int(b.spaceWidth)/2
 		} else if space == bgammon.SpaceBarOpponent {
 			hspace = 6
 			w = int(b.barWidth)
+			add = int(b.barWidth)/2 - int(b.spaceWidth)/2
 		} else if space <= 6 {
 			hspace = space - 1
 		} else if space <= 12 {
@@ -1090,16 +1092,15 @@ func (b *board) update() {
 				for _, piece := range pieces {
 					if piece == dropped {
 						if space != index {
-							//b.Client.Board.SetSelection(1, space)
-							b.Client.Out <- []byte(fmt.Sprintf("move %d/%d", space, index))
+							b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
+							b.gameState.AddMoves([][]int{{space, index}})
+							b.ProcessState()
 						}
 						break ADDPREMOVE
 					}
 				}
 			}
 		}
-
-		b.ProcessState()
 	}
 
 	if b.dragging != nil {
