@@ -42,11 +42,6 @@ func main() {
 		}()
 	}
 
-	// Auto-connect
-	if g.Username != "" && g.Password != "" {
-		g.Connect()
-	}
-
 	go func() {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {

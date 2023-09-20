@@ -370,6 +370,8 @@ type Game struct {
 	cpuProfile *os.File
 
 	op *ebiten.DrawImageOptions
+
+	loaded bool
 }
 
 func NewGame() *Game {
@@ -514,6 +516,7 @@ func (g *Game) handleEvents() {
 
 func (g *Game) Connect() {
 	g.loggedIn = true
+
 	l(fmt.Sprintf("*** Connecting..."))
 
 	address := g.ServerAddress
@@ -524,6 +527,9 @@ func (g *Game) Connect() {
 	g.lobby.c = g.Client
 	g.Board.Client = g.Client
 	//statusBuffer.client = g.Client
+
+	g.Username = ""
+	g.Password = ""
 
 	go g.handleEvents()
 
@@ -549,6 +555,16 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		g.Exit()
 		return nil
 	}
+
+	if !g.loaded {
+		g.loaded = true
+
+		// Auto-connect
+		if g.Username != "" && g.Password != "" {
+			g.Connect()
+		}
+	}
+
 	if g.pendingGames != nil && viewBoard {
 		g.lobby.setGameList(g.pendingGames)
 		g.pendingGames = nil
