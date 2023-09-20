@@ -801,7 +801,6 @@ func (b *board) setSpaceRects() {
 			j, k, l, m := 1+i, 12-i, 13+i, 24-i
 			b.spaceRects[j], b.spaceRects[k], b.spaceRects[l], b.spaceRects[m] = b.spaceRects[k], b.spaceRects[j], b.spaceRects[m], b.spaceRects[l]
 		}
-		b.spaceRects[bgammon.SpaceBarPlayer], b.spaceRects[bgammon.SpaceBarOpponent] = b.spaceRects[bgammon.SpaceBarOpponent], b.spaceRects[bgammon.SpaceBarPlayer]
 	}
 
 	r := b.spaceRects[1]
@@ -825,7 +824,6 @@ func (b *board) bottomRow(space int) bool {
 	if b.gameState.PlayerNumber == 2 {
 		bottomStart = 1
 		bottomEnd = 12
-		//bottomBar = bgammon.SpaceBarOpponent
 	}
 	return space == bottomBar || (space >= bottomStart && space <= bottomEnd)
 }
@@ -1094,13 +1092,13 @@ func (b *board) update() {
 						if space != index {
 							b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
 							b.gameState.AddMoves([][]int{{space, index}})
-							b.ProcessState()
 						}
 						break ADDPREMOVE
 					}
 				}
 			}
 		}
+		b.ProcessState()
 	}
 
 	if b.dragging != nil {
