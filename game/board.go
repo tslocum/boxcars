@@ -518,6 +518,8 @@ func (b *board) draw(screen *ebiten.Image) {
 		return img
 	}
 
+	const diceGap = 10
+
 	opponent := b.gameState.OpponentPlayer()
 	if opponent.Name != "" {
 		label := fmt.Sprintf("%s", opponent.Name)
@@ -531,7 +533,6 @@ func (b *board) draw(screen *ebiten.Image) {
 		b.op.GeoM.Translate(float64(x), float64(y))
 		screen.DrawImage(img, b.op)
 
-		gapSize := 5
 		if b.gameState.Turn == 0 {
 			if opponentRoll != 0 {
 				b.op.GeoM.Reset()
@@ -540,11 +541,11 @@ func (b *board) draw(screen *ebiten.Image) {
 			}
 		} else if b.gameState.Turn != b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
 			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2-diceSize-gapSize), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+			b.op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 			screen.DrawImage(diceImage(b.gameState.Roll1), b.op)
 
 			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2+gapSize), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+			b.op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 			screen.DrawImage(diceImage(b.gameState.Roll2), b.op)
 		}
 	}
@@ -564,7 +565,6 @@ func (b *board) draw(screen *ebiten.Image) {
 		b.op.GeoM.Translate(float64(x), float64(y))
 		screen.DrawImage(img, b.op)
 
-		gapSize := 5
 		if b.gameState.Turn == 0 {
 			if playerRoll != 0 {
 				b.op.GeoM.Reset()
@@ -573,11 +573,11 @@ func (b *board) draw(screen *ebiten.Image) {
 			}
 		} else if b.gameState.Turn == b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
 			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2-diceSize-gapSize), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+			b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 			screen.DrawImage(diceImage(b.gameState.Roll1), b.op)
 
 			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2+gapSize), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+			b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 			screen.DrawImage(diceImage(b.gameState.Roll2), b.op)
 		}
 	}
