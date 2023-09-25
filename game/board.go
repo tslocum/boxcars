@@ -791,6 +791,10 @@ func (b *board) setSpaceRects() {
 
 		h = int((float64(b.h) - (b.verticalBorderSize * 2)) / 2)
 
+		if space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent {
+			x = -int(b.spaceWidth * 2)
+		}
+
 		b.spaceRects[space] = [4]int{x, y, w, h}
 	}
 
