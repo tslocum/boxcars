@@ -12,7 +12,6 @@ import (
 	"path"
 	"runtime/pprof"
 	"strings"
-	"sync"
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
@@ -373,8 +372,6 @@ type Game struct {
 	op *ebiten.DrawImageOptions
 
 	loaded bool
-
-	stateLock *sync.Mutex
 }
 
 func NewGame() *Game {
@@ -391,8 +388,6 @@ func NewGame() *Game {
 		keyboard: kibodo.NewKeyboard(),
 
 		debugImg: ebiten.NewImage(200, 200),
-
-		stateLock: &sync.Mutex{},
 	}
 	game = g
 
@@ -473,14 +468,10 @@ func (g *Game) handleEvents() {
 				lg(fmt.Sprintf("%s left the match.", ev.Player))
 			}
 		case *bgammon.EventBoard:
-			g.stateLock.Lock()
-			go func() {
-				g.Board.gameState = &ev.GameState
-				g.Board.ProcessState()
-				setViewBoard(true)
-				ebiten.ScheduleFrame()
-				g.stateLock.Unlock()
-			}()
+			g.Board.gameState = &ev.GameState
+			g.Board.ProcessState()
+			setViewBoard(true)
+			ebiten.ScheduleFrame()
 		case *bgammon.EventRolled:
 			g.Board.gameState.Roll1 = ev.Roll1
 			g.Board.gameState.Roll2 = ev.Roll2
@@ -504,14 +495,9 @@ func (g *Game) handleEvents() {
 			if ev.Player == g.Client.Username {
 				continue
 			}
-
-			g.stateLock.Lock()
-			go func() {
-				for _, move := range ev.Moves {
-					g.Board.movePiece(move[0], move[1])
-				}
-				g.stateLock.Unlock()
-			}()
+			for _, move := range ev.Moves {
+				g.Board.movePiece(move[0], move[1])
+			}
 		case *bgammon.EventFailedMove:
 			g.Client.Out <- []byte("board") // Refresh game state.
 

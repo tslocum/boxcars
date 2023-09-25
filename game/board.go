@@ -929,7 +929,20 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	sprite.toY = y
 	sprite.toTime = moveTime
 	sprite.toStart = time.Now()
-	ebiten.ScheduleFrame()
+
+	t := time.NewTimer(moveTime)
+	mt := time.NewTicker(time.Second / 144)
+DRAWMOVE:
+	for {
+		select {
+		case <-t.C:
+			mt.Stop()
+			break DRAWMOVE
+		case <-mt.C:
+			ebiten.ScheduleFrame()
+		}
+
+	}
 	time.Sleep(moveTime)
 
 	sprite.x = x
