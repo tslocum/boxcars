@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/color"
 	"log"
-	"os"
 	"strconv"
 	"time"
 
@@ -965,8 +964,7 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 func (b *board) movePiece(from int, to int) {
 	pieces := b.spaceSprites[from]
 	if len(pieces) == 0 {
-		log.Printf("%d-%d: NO PIECES AT SPACE %d", from, to, from)
-		os.Exit(1)
+		log.Printf("ERROR: NO SPRITE FOR MOVE %d/%d", from, to)
 		return
 	}
 
