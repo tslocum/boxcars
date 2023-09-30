@@ -310,9 +310,6 @@ func (b *board) drawButtons(screen *ebiten.Image) {
 }
 
 func (b *board) Draw(screen *ebiten.Image) {
-	b.Lock()
-	defer b.Unlock()
-
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(float64(b.x), float64(b.y))
 	screen.DrawImage(b.backgroundImage, b.op)
@@ -358,6 +355,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 		b.op.GeoM.Reset()
 		b.op.GeoM.Translate(x, y)
+
 		b.op.ColorScale.Scale(0, 0, 0, 1)
 
 		b.op.Filter = ebiten.FilterLinear
@@ -454,7 +452,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 			x, y = b.offsetPosition(x, y)
 			b.op.GeoM.Reset()
 			b.op.GeoM.Translate(float64(x), float64(y))
-			b.op.ColorScale.Scale(1, 1, 1, 0.2)
+			b.op.ColorScale.Scale(0.1, 0.1, 0.1, 0.1)
 			screen.DrawImage(b.spaceHighlight, b.op)
 			b.op.ColorScale.Reset()
 		}
@@ -764,7 +762,7 @@ func (b *board) setSpaceRects() {
 	bounds := b.spaceHighlight.Bounds()
 	if bounds.Dx() != r[2] || bounds.Dy() != r[3] {
 		b.spaceHighlight = ebiten.NewImage(r[2], r[3])
-		b.spaceHighlight.Fill(color.RGBA{255, 255, 255, 255})
+		b.spaceHighlight.Fill(color.RGBA{255, 255, 255, 51})
 	}
 }
 
@@ -892,7 +890,6 @@ DRAWMOVE:
 		}
 
 	}
-	time.Sleep(moveTime)
 
 	sprite.x = x
 	sprite.y = y
@@ -941,9 +938,9 @@ func (b *board) movePiece(from int, to int) {
 
 	b._movePiece(sprite, from, to, 1, moveAfter == nil)
 	if moveAfter != nil {
-		bar := bgammon.SpaceBarOpponent
+		bar := bgammon.SpaceBarPlayer
 		if b.gameState.Turn == b.gameState.PlayerNumber {
-			bar = bgammon.SpaceBarPlayer
+			bar = bgammon.SpaceBarOpponent
 		}
 		b._movePiece(moveAfter, to, bar, 1, true)
 	}
@@ -979,9 +976,6 @@ func (b *board) handleClick(x int, y int) bool {
 }
 
 func (b *board) Update() {
-	b.Lock()
-	defer b.Unlock()
-
 	if b.Client == nil {
 		return
 	}
