@@ -62,10 +62,6 @@ const maxStatusWidthRatio = 0.5
 
 const bufferCharacterWidth = 54
 
-const lobbyCharacterWidth = 48
-
-const showGameBufferLines = 4
-
 const (
 	minWidth  = 320
 	minHeight = 240
@@ -117,11 +113,11 @@ func l(s string) {
 	m := time.Now().Format("15:04") + " " + s
 	if statusBuffer != nil {
 		if statusLogged {
-			statusBuffer.Write([]byte("\n" + m))
+			_, _ = statusBuffer.Write([]byte("\n" + m))
 			ebiten.ScheduleFrame()
 			return
 		}
-		statusBuffer.Write([]byte(m))
+		_, _ = statusBuffer.Write([]byte(m))
 		statusLogged = true
 		ebiten.ScheduleFrame()
 		return
@@ -133,11 +129,11 @@ func lg(s string) {
 	m := time.Now().Format("15:04") + " " + s
 	if gameBuffer != nil {
 		if gameLogged {
-			gameBuffer.Write([]byte("\n" + m))
+			_, _ = gameBuffer.Write([]byte("\n" + m))
 			ebiten.ScheduleFrame()
 			return
 		}
-		gameBuffer.Write([]byte(m))
+		_, _ = gameBuffer.Write([]byte(m))
 		gameLogged = true
 		ebiten.ScheduleFrame()
 		return
@@ -651,7 +647,9 @@ func (g *Game) Connect() {
 	go c.Connect()
 }
 
-func (g *Game) Update() error { // Called by ebiten only when input occurs
+// Update is called by Ebitengine only when user input occurs, or a frame is
+// explicitly scheduled.
+func (g *Game) Update() error {
 	if ebiten.IsWindowBeingClosed() {
 		g.Exit()
 		return nil
@@ -822,8 +820,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if Debug > 0 {
 		g.drawBuffer.Reset()
 
-		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %c %0.0f", spinner[g.spinnerIndex], ebiten.CurrentFPS())))
-
 		g.spinnerIndex++
 		if g.spinnerIndex == 4 {
 			g.spinnerIndex = 0
@@ -831,9 +827,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 		scaleFactor := ebiten.DeviceScaleFactor()
 		if scaleFactor != 1.0 {
-			g.drawBuffer.WriteRune('\n')
-			g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f", scaleFactor)))
+			g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f\n", scaleFactor)))
 		}
+
+		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %c %0.0f", spinner[g.spinnerIndex], ebiten.ActualFPS())))
 
 		if debugExtra != nil {
 			g.drawBuffer.WriteRune('\n')
@@ -975,7 +972,7 @@ func (g *Game) toggleProfiling() error {
 	}
 
 	pprof.StopCPUProfile()
-	g.cpuProfile.Close()
+	_ = g.cpuProfile.Close()
 	g.cpuProfile = nil
 
 	log.Println("Profiling stopped")
