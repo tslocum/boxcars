@@ -114,12 +114,12 @@ func l(s string) {
 	if statusBuffer != nil {
 		if statusLogged {
 			_, _ = statusBuffer.Write([]byte("\n" + m))
-			ebiten.ScheduleFrame()
+			scheduleFrame()
 			return
 		}
 		_, _ = statusBuffer.Write([]byte(m))
 		statusLogged = true
-		ebiten.ScheduleFrame()
+		scheduleFrame()
 		return
 	}
 	log.Print(m)
@@ -130,12 +130,12 @@ func lg(s string) {
 	if gameBuffer != nil {
 		if gameLogged {
 			_, _ = gameBuffer.Write([]byte("\n" + m))
-			ebiten.ScheduleFrame()
+			scheduleFrame()
 			return
 		}
 		_, _ = gameBuffer.Write([]byte(m))
 		gameLogged = true
-		ebiten.ScheduleFrame()
+		scheduleFrame()
 		return
 	}
 	log.Print(m)
@@ -312,7 +312,7 @@ func setViewBoard(view bool) {
 		inputBuffer.SetSuffix("")
 	}
 	game.updateStatusBufferPosition()
-	ebiten.ScheduleFrame()
+	scheduleFrame()
 }
 
 type Sprite struct {
@@ -337,6 +337,12 @@ type Sprites struct {
 var spinner = []byte(`-\|/`)
 
 var viewBoard bool // View board or lobby
+
+var drawScreen = true
+
+func scheduleFrame() {
+	drawScreen = true
+}
 
 type Game struct {
 	screenW, screenH int
@@ -378,6 +384,8 @@ type Game struct {
 
 	connectUsername *etk.Input
 	connectPassword *etk.Input
+
+	pressedKeys []ebiten.Key
 }
 
 func NewGame() *Game {
@@ -520,21 +528,22 @@ func (g *Game) handleEvents() {
 				g.lobby.setGameList(ev.Games)
 
 				if g.lobby.refresh {
-					ebiten.ScheduleFrame()
+					scheduleFrame()
 					g.lobby.refresh = false
 				}
 			} else {
 				g.pendingGames = ev.Games
 			}
 		case *bgammon.EventJoined:
+			g.Board.Lock()
 			if ev.PlayerNumber == 1 {
 				g.Board.gameState.Player1.Name = ev.Player
 			} else if ev.PlayerNumber == 2 {
 				g.Board.gameState.Player2.Name = ev.Player
 			}
-			g.Board.ProcessState()
+			g.Board.processState()
+			g.Board.Unlock()
 			setViewBoard(true)
-			ebiten.ScheduleFrame()
 
 			if ev.Player == g.Client.Username {
 				gameBuffer.SetText("")
@@ -545,26 +554,29 @@ func (g *Game) handleEvents() {
 		case *bgammon.EventFailedJoin:
 			l(fmt.Sprintf("*** Failed to join match: %s", ev.Reason))
 		case *bgammon.EventLeft:
+			g.Board.Lock()
 			if g.Board.gameState.Player1.Name == ev.Player {
 				g.Board.gameState.Player1.Name = ""
 			} else if g.Board.gameState.Player2.Name == ev.Player {
 				g.Board.gameState.Player2.Name = ""
 			}
-			g.Board.ProcessState()
+			g.Board.processState()
+			g.Board.Unlock()
 			if ev.Player == g.Client.Username {
 				setViewBoard(false)
 			}
-			ebiten.ScheduleFrame()
 
 			if ev.Player != g.Client.Username {
 				lg(fmt.Sprintf("%s left the match.", ev.Player))
 			}
 		case *bgammon.EventBoard:
+			g.Board.Lock()
 			g.Board.gameState = &ev.GameState
-			g.Board.ProcessState()
+			g.Board.processState()
+			g.Board.Unlock()
 			setViewBoard(true)
-			ebiten.ScheduleFrame()
 		case *bgammon.EventRolled:
+			g.Board.Lock()
 			g.Board.gameState.Roll1 = ev.Roll1
 			g.Board.gameState.Roll2 = ev.Roll2
 			var diceFormatted string
@@ -577,8 +589,9 @@ func (g *Game) handleEvents() {
 			} else {
 				diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
 			}
-			g.Board.ProcessState()
-			ebiten.ScheduleFrame()
+			g.Board.processState()
+			g.Board.Unlock()
+			scheduleFrame()
 			lg(fmt.Sprintf("%s rolled %s.", ev.Player, diceFormatted))
 		case *bgammon.EventFailedRoll:
 			l(fmt.Sprintf("*** Failed to roll: %s", ev.Reason))
@@ -587,9 +600,11 @@ func (g *Game) handleEvents() {
 			if ev.Player == g.Client.Username {
 				continue
 			}
+			g.Board.Lock()
 			for _, move := range ev.Moves {
 				g.Board.movePiece(move[0], move[1])
 			}
+			g.Board.Unlock()
 		case *bgammon.EventFailedMove:
 			g.Client.Out <- []byte("board") // Refresh game state.
 
@@ -653,6 +668,15 @@ func (g *Game) Update() error {
 	if ebiten.IsWindowBeingClosed() {
 		g.Exit()
 		return nil
+	}
+
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) || ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+		drawScreen = true
+	}
+
+	g.pressedKeys = inpututil.AppendPressedKeys(g.pressedKeys[:0])
+	if len(g.pressedKeys) > 0 {
+		drawScreen = true
 	}
 
 	if !g.loaded {
@@ -730,7 +754,6 @@ func (g *Game) Update() error {
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		setViewBoard(!viewBoard)
-		ebiten.ScheduleFrame()
 	}
 
 	if !viewBoard {
@@ -778,7 +801,7 @@ func (g *Game) Update() error {
 			}
 		}
 	} else {
-		g.Board.update()
+		g.Board.Update()
 
 		err := inputBuffer.Update()
 		if err != nil {
@@ -790,6 +813,11 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	if !drawScreen {
+		return
+	}
+	drawScreen = false
+
 	screen.Fill(tableColor)
 
 	// Log in screen
@@ -814,7 +842,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	} else { // Game board
 		gameBuffer.Draw(screen)
 		inputBuffer.Draw(screen)
-		g.Board.draw(screen)
+		g.Board.Draw(screen)
 	}
 
 	if Debug > 0 {
@@ -870,11 +898,14 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	}
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
+	drawScreen = true
 
 	bufferWidth := text.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
 	if bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
+
+	g.Board.Lock()
 
 	g.Board.fullHeight = true
 	g.Board.setRect(0, 0, g.screenW-bufferWidth, g.screenH)
@@ -889,6 +920,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.Board.fullHeight = false
 		g.Board.setRect(0, 0, g.Board.w, g.Board.w)
 	}
+
+	g.Board.Unlock()
 
 	if g.screenW > 200 {
 		statusBuffer.SetPadding(4)

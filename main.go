@@ -22,8 +22,9 @@ func main() {
 	ebiten.SetWindowTitle("bgammon.org - Free Online Backgammon")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMinimum)
-	ebiten.SetTPS(60)
+	ebiten.SetVsyncEnabled(true)
+	ebiten.SetScreenClearedEveryFrame(false)
+	ebiten.SetTPS(144)
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetWindowClosingHandled(true)
 

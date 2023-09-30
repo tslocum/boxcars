@@ -374,7 +374,7 @@ func (l *lobby) click(x, y int) {
 			l.bufferDirty = true
 			l.bufferButtonsDirty = true
 			l.drawBuffer()
-			ebiten.ScheduleFrame()
+			scheduleFrame()
 		/*case lobbyButtonWatch:
 		if l.selected < 0 || l.selected >= len(l.games) {
 			return
@@ -396,7 +396,7 @@ func (l *lobby) click(x, y int) {
 			} else {
 				l.c.Out <- []byte(fmt.Sprintf("j %d", l.games[l.selected].ID))
 				setViewBoard(true)
-				ebiten.ScheduleFrame()
+				scheduleFrame()
 			}
 		}
 		return

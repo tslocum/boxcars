@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"log"
 	"strconv"
+	"sync"
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
@@ -65,6 +66,8 @@ type board struct {
 	buttons []*boardButton
 
 	spaceHighlight *ebiten.Image
+
+	*sync.Mutex
 }
 
 func NewBoard() *board {
@@ -84,6 +87,7 @@ func NewBoard() *board {
 			Game: bgammon.NewGame(),
 		},
 		spaceHighlight: ebiten.NewImage(1, 1),
+		Mutex:          &sync.Mutex{},
 	}
 	b.buttons = []*boardButton{
 		{
@@ -305,7 +309,10 @@ func (b *board) drawButtons(screen *ebiten.Image) {
 	}
 }
 
-func (b *board) draw(screen *ebiten.Image) {
+func (b *board) Draw(screen *ebiten.Image) {
+	b.Lock()
+	defer b.Unlock()
+
 	b.op.GeoM.Reset()
 	b.op.GeoM.Translate(float64(b.x), float64(b.y))
 	screen.DrawImage(b.backgroundImage, b.op)
@@ -344,7 +351,7 @@ func (b *board) draw(screen *ebiten.Image) {
 				}
 			}
 			// Schedule another frame
-			ebiten.ScheduleFrame()
+			scheduleFrame()
 		}
 
 		// Draw shadow.
@@ -651,14 +658,14 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.setSpaceRects()
 	b.updateBackgroundImage()
-	b.ProcessState()
+	b.processState()
 }
 
 func (b *board) offsetPosition(x, y int) (int, int) {
 	return b.x + x + int(b.horizontalBorderSize), b.y + y + int(b.verticalBorderSize)
 }
 
-// Do not call _positionCheckers directly.  Call ProcessState instead.
+// Do not call _positionCheckers directly.  Call processState instead.
 func (b *board) _positionCheckers() {
 	for space := 0; space < bgammon.BoardSpaces; space++ {
 		sprites := b.spaceSprites[space]
@@ -811,7 +818,7 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 	return x, y, w, h
 }
 
-func (b *board) ProcessState() {
+func (b *board) processState() {
 	if b.lastPlayerNumber != b.gameState.PlayerNumber {
 		b.setSpaceRects()
 		b.updateBackgroundImage()
@@ -880,7 +887,7 @@ DRAWMOVE:
 			mt.Stop()
 			break DRAWMOVE
 		case <-mt.C:
-			ebiten.ScheduleFrame()
+			scheduleFrame()
 		}
 
 	}
@@ -889,7 +896,7 @@ DRAWMOVE:
 	sprite.x = x
 	sprite.y = y
 	sprite.toStart = time.Time{}
-	ebiten.ScheduleFrame()
+	scheduleFrame()
 
 	/*homeSpace := b.ClientWebSocket.Board.PlayerHomeSpace()
 	if b.gameState.Turn != b.gameState.Player {
@@ -970,7 +977,10 @@ func (b *board) handleClick(x int, y int) bool {
 	return false
 }
 
-func (b *board) update() {
+func (b *board) Update() {
+	b.Lock()
+	defer b.Unlock()
+
 	if b.Client == nil {
 		return
 	}
@@ -1034,21 +1044,28 @@ func (b *board) update() {
 		if index == -1 {
 			index = bgammon.SpaceHomePlayer
 		}
+		var processed bool
 		if index >= 0 && b.Client != nil {
 		ADDPREMOVE:
 			for space, pieces := range b.spaceSprites {
 				for _, piece := range pieces {
 					if piece == dropped {
 						if space != index {
+							b.gameState.AddLocalMove([]int{space, index})
+							b.processState()
+							scheduleFrame()
+							processed = true
 							b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
-							b.gameState.AddMoves([][]int{{space, index}})
 						}
 						break ADDPREMOVE
 					}
 				}
 			}
 		}
-		b.ProcessState()
+		if !processed {
+			b.processState()
+			scheduleFrame()
+		}
 	}
 
 	if b.dragging != nil {
