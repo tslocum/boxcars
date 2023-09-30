@@ -104,8 +104,11 @@ var (
 
 	diceSize int
 
+	connectGrid    *etk.Grid
 	createGameGrid *etk.Grid
 	joinGameGrid   *etk.Grid
+
+	connectFocusPassword bool
 )
 
 func l(s string) {
@@ -374,6 +377,9 @@ type Game struct {
 	op *ebiten.DrawImageOptions
 
 	loaded bool
+
+	connectUsername *etk.Input
+	connectPassword *etk.Input
 }
 
 func NewGame() *Game {
@@ -402,8 +408,38 @@ func NewGame() *Game {
 	etk.Style.InputBgColor = color.RGBA{40, 24, 9, 255}
 
 	{
+		headerLabel := etk.NewText("Welcome to bgammon.org")
+		nameLabel := etk.NewText("Username")
+		passwordLabel := etk.NewText("Password")
+
+		infoLabel := etk.NewText("To log in as a guest, enter a username (if you want) and do not enter a password. Press Enter to log in.")
+
+		g.connectUsername = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		g.connectUsername.Field.SetHandleKeyboard(true)
+
+		g.connectPassword = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		g.connectPassword.Field.SetHandleKeyboard(false)
+
+		grid := etk.NewGrid()
+		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
+		grid.SetRowPadding(20)
+		grid.SetColumnSizes(10, 200)
+		grid.SetRowSizes(60, 50, 50)
+		grid.AddChildAt(headerLabel, 0, 0, 3, 1)
+		grid.AddChildAt(nameLabel, 1, 1, 1, 1)
+		grid.AddChildAt(g.connectUsername, 2, 1, 1, 1)
+		grid.AddChildAt(passwordLabel, 1, 2, 1, 1)
+		grid.AddChildAt(g.connectPassword, 2, 2, 1, 1)
+		grid.AddChildAt(infoLabel, 0, 3, 3, 1)
+		connectGrid = grid
+	}
+
+	{
 		headerLabel := etk.NewText("Create match")
-		headerLabel.SetHorizontal(messeji.AlignStart)
 		nameLabel := etk.NewText("Name")
 		passwordLabel := etk.NewText("Password")
 
@@ -432,7 +468,6 @@ func NewGame() *Game {
 
 	{
 		g.lobby.joinGameLabel = etk.NewText("Join match")
-		g.lobby.joinGameLabel.SetHorizontal(messeji.AlignStart)
 
 		passwordLabel := etk.NewText("Password")
 
@@ -452,7 +487,7 @@ func NewGame() *Game {
 		joinGameGrid = grid
 	}
 
-	etk.SetRoot(createGameGrid)
+	etk.SetRoot(connectGrid)
 
 	return g
 }
@@ -624,7 +659,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		g.loaded = true
 
 		// Auto-connect
-		if g.Username != "" && g.Password != "" {
+		if g.Username != "" || g.Password != "" {
 			g.Connect()
 		}
 	}
@@ -642,77 +677,47 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 	}
 
 	if !g.loggedIn {
-		/*err := g.keyboard.Update()
-		if err != nil {
-			return fmt.Errorf("failed to update virtual keyboard: %s", err)
-		}*/
+		lastFocus := connectFocusPassword
 
-		f := func() {
-			var clearBuffer bool
-			defer func() {
-				if strings.ContainsRune(g.userInput, '\n') {
-					g.userInput = strings.Split(g.userInput, "\n")[0]
-					clearBuffer = true
-				}
-				if !g.usernameConfirmed {
-					g.Username = g.userInput
-				} else {
-					g.Password = g.userInput
-				}
-
-				if clearBuffer {
-					g.userInput = ""
-
-					if !g.usernameConfirmed {
-						if g.Username != "" {
-							g.usernameConfirmed = true
-						} else {
-							g.Connect()
-						}
-					} else {
-						g.Connect()
-					}
-				}
-
-				inputBuffer.SetText(g.userInput)
-			}()
-
-			/*if !g.shownKeyboard {
-				g.keyboard.Show()
-				g.shownKeyboard = true
-			}*/
-
-			if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(g.userInput) > 0 {
-				g.userInput = g.userInput[:len(g.userInput)-1]
+		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			x, y := ebiten.CursorPosition()
+			p := image.Point{x, y}
+			if p.In(g.connectUsername.Rect()) {
+				connectFocusPassword = false
+			} else if p.In(g.connectPassword.Rect()) {
+				connectFocusPassword = true
 			}
-
-			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-				clearBuffer = true
-			}
-
-			g.runeBuffer = ebiten.AppendInputChars(g.runeBuffer[:0])
-			if len(g.runeBuffer) > 0 {
-				g.userInput += string(g.runeBuffer)
-			}
-
-			// Process on-screen keyboard input.
-			/*g.keyboardInput = g.keyboard.AppendInput(g.keyboardInput[:0])
-			for _, input := range g.keyboardInput {
-				if input.Rune > 0 {
-					g.userInput += string(input.Rune)
-					continue
-				}
-				if input.Key == ebiten.KeyBackspace {
-					if len(g.userInput) > 0 {
-						g.userInput = g.userInput[:len(g.userInput)-1]
-					}
-				} else if input.Key == ebiten.KeyEnter {
-					g.userInput += "\n"
-				}
-			}*/
 		}
 
-		f()
+		if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
+			connectFocusPassword = !connectFocusPassword
+		}
+
+		if connectFocusPassword != lastFocus {
+			if connectFocusPassword {
+				g.connectUsername.Field.SetHandleKeyboard(false)
+				g.connectUsername.Field.SetSuffix("")
+				g.connectPassword.Field.SetHandleKeyboard(true)
+				g.connectPassword.Field.SetSuffix("_")
+			} else {
+				g.connectUsername.Field.SetHandleKeyboard(true)
+				g.connectUsername.Field.SetSuffix("_")
+				g.connectPassword.Field.SetHandleKeyboard(false)
+				g.connectPassword.Field.SetSuffix("")
+			}
+		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyKPEnter) {
+			g.Username = g.connectUsername.Text()
+			g.Password = g.connectPassword.Text()
+			g.Connect()
+		}
+
+		err := etk.Update()
+		if err != nil {
+			log.Fatal(err)
+		}
+		return nil
 	}
 
 	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyD) {
@@ -732,36 +737,38 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 		g.lobby.update()
 
 		if g.lobby.showCreateGame || g.lobby.showJoinGame {
-			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-				x, y := ebiten.CursorPosition()
-				p := image.Point{x, y}
-				if p.In(g.lobby.createGameName.Rect()) {
-					g.lobby.createGameFocusPassword = false
-					g.lobby.createGameName.Field.SetHandleKeyboard(true)
-					g.lobby.createGameName.Field.SetSuffix("_")
-					g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
-					g.lobby.createGamePassword.Field.SetSuffix("")
-				} else if p.In(g.lobby.createGamePassword.Rect()) {
-					g.lobby.createGameFocusPassword = true
-					g.lobby.createGameName.Field.SetHandleKeyboard(false)
-					g.lobby.createGameName.Field.SetSuffix("")
-					g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
-					g.lobby.createGamePassword.Field.SetSuffix("_")
+			if g.lobby.showCreateGame {
+				if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+					x, y := ebiten.CursorPosition()
+					p := image.Point{x, y}
+					if p.In(g.lobby.createGameName.Rect()) {
+						g.lobby.createGameFocusPassword = false
+						g.lobby.createGameName.Field.SetHandleKeyboard(true)
+						g.lobby.createGameName.Field.SetSuffix("_")
+						g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
+						g.lobby.createGamePassword.Field.SetSuffix("")
+					} else if p.In(g.lobby.createGamePassword.Rect()) {
+						g.lobby.createGameFocusPassword = true
+						g.lobby.createGameName.Field.SetHandleKeyboard(false)
+						g.lobby.createGameName.Field.SetSuffix("")
+						g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
+						g.lobby.createGamePassword.Field.SetSuffix("_")
+					}
 				}
-			}
 
-			if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
-				g.lobby.createGameFocusPassword = !g.lobby.createGameFocusPassword
-				if g.lobby.createGameFocusPassword {
-					g.lobby.createGameName.Field.SetHandleKeyboard(false)
-					g.lobby.createGameName.Field.SetSuffix("")
-					g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
-					g.lobby.createGamePassword.Field.SetSuffix("_")
-				} else {
-					g.lobby.createGameName.Field.SetHandleKeyboard(true)
-					g.lobby.createGameName.Field.SetSuffix("_")
-					g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
-					g.lobby.createGamePassword.Field.SetSuffix("")
+				if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
+					g.lobby.createGameFocusPassword = !g.lobby.createGameFocusPassword
+					if g.lobby.createGameFocusPassword {
+						g.lobby.createGameName.Field.SetHandleKeyboard(false)
+						g.lobby.createGameName.Field.SetSuffix("")
+						g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
+						g.lobby.createGamePassword.Field.SetSuffix("_")
+					} else {
+						g.lobby.createGameName.Field.SetHandleKeyboard(true)
+						g.lobby.createGameName.Field.SetSuffix("_")
+						g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
+						g.lobby.createGamePassword.Field.SetSuffix("")
+					}
 				}
 			}
 
@@ -787,27 +794,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	// Log in screen
 	if !g.loggedIn {
-		//g.keyboard.Draw(screen)
-
-		const headerText = `
- Connect to bgammon.org`
-		const footerText = `
-
-   To log in as a guest, enter a username (if you want) and
-     do not enter a password.`
-
-		debugBox := image.NewRGBA(image.Rect(0, 0, g.screenW, g.screenH))
-		debugImg := ebiten.NewImageFromImage(debugBox)
-
-		if !g.usernameConfirmed {
-			ebitenutil.DebugPrint(debugImg, headerText+fmt.Sprintf("\n\n   Username: %s_\n   Password:", g.Username)+footerText)
-		} else {
-			ebitenutil.DebugPrint(debugImg, headerText+fmt.Sprintf("\n\n   Username: %s\n   Password: %s_"+footerText, g.Username, strings.Repeat("*", len(g.Password))))
+		err := etk.Draw(screen)
+		if err != nil {
+			log.Fatal(err)
 		}
-
-		g.resetImageOptions()
-		g.op.GeoM.Scale(2, 2)
-		screen.DrawImage(debugImg, g.op)
 		return
 	}
 
