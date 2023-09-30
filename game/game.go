@@ -28,6 +28,8 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
+const MaxDebug = 1
+
 //go:embed assets
 var assetsFS embed.FS
 
@@ -722,7 +724,7 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 
 	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		Debug++
-		if Debug == 3 {
+		if Debug > MaxDebug {
 			Debug = 0
 		}
 		g.Board.debug = Debug

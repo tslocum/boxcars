@@ -310,22 +310,6 @@ func (b *board) draw(screen *ebiten.Image) {
 	b.op.GeoM.Translate(float64(b.x), float64(b.y))
 	screen.DrawImage(b.backgroundImage, b.op)
 
-	if b.debug == 2 {
-		for space := 0; space < bgammon.BoardSpaces; space++ {
-			x, y, w, h := b.spaceRect(space)
-			spaceImage := ebiten.NewImage(w, h)
-			if space%2 == 0 {
-				spaceImage.Fill(color.RGBA{50, 50, 50, 150})
-			} else {
-				spaceImage.Fill(color.RGBA{255, 255, 255, 150})
-			}
-			x, y = b.offsetPosition(x, y)
-			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(x), float64(y))
-			screen.DrawImage(spaceImage, b.op)
-		}
-	}
-
 	drawSprite := func(sprite *Sprite) {
 		x, y := float64(sprite.x), float64(sprite.y)
 		if !sprite.toStart.IsZero() {
@@ -590,29 +574,6 @@ func (b *board) draw(screen *ebiten.Image) {
 	// Draw dragged sprite
 	if b.dragging != nil {
 		drawSprite(b.dragging)
-	}
-
-	if b.debug == 2 {
-		homeStart, homeEnd := bgammon.HomeRange(b.gameState.PlayerNumber)
-		for space := 0; space < bgammon.BoardSpaces; space++ {
-			x, y, w, h := b.spaceRect(space)
-			spaceImage := ebiten.NewImage(w, h)
-			br := ""
-			if space >= homeStart && space <= homeEnd {
-				br += "\n(H)"
-			}
-			if space == bgammon.SpaceBarPlayer {
-				br += "\n(PB)"
-			} else if space == bgammon.SpaceBarOpponent {
-				br += "\n(OB)"
-			}
-			ebitenutil.DebugPrint(spaceImage, fmt.Sprintf(" %d %s", space, br))
-			x, y = b.offsetPosition(x, y)
-			b.op.GeoM.Reset()
-			b.op.GeoM.Scale(2, 2)
-			b.op.GeoM.Translate(float64(x), float64(y))
-			screen.DrawImage(spaceImage, b.op)
-		}
 	}
 
 	b.drawButtons(screen)

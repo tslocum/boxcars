@@ -16,4 +16,8 @@ func parseFlags(g *game.Game) {
 	flag.BoolVar(&g.TV, "tv", false, "Watch random games continuously")
 	flag.IntVar(&game.Debug, "debug", 0, "Print debug information")
 	flag.Parse()
+
+	if game.Debug > game.MaxDebug {
+		game.Debug = game.MaxDebug
+	}
 }
