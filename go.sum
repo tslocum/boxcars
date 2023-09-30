@@ -1,9 +1,11 @@
 code.rocket9labs.com/tslocum/bgammon v0.0.0-20230920151014-e179df3fbc70 h1:aHXWRVJax9GEuekCM2Zf8bl7LDfpHYFdcfKy4/jn5is=
 code.rocket9labs.com/tslocum/bgammon v0.0.0-20230920151014-e179df3fbc70/go.mod h1:LS/m5Zq7/93dP8XJrLkL1T5ZTwtddkN8X9TyRrrdCkQ=
+code.rocketnine.space/tslocum/etk v0.0.0-20230930052629-6c8d555b7d99 h1:mpNRo6zUdHlpZnxiqfF/1ZoiC1SBvnfAYPVbNpZjWfU=
+code.rocketnine.space/tslocum/etk v0.0.0-20230930052629-6c8d555b7d99/go.mod h1:WmeSEakGsdgM/dmfUbEQrL5ueFAdoozlwCVUOz8j1mg=
 code.rocketnine.space/tslocum/kibodo v1.0.0 h1:/xs59UCuo+NGs89ABilARlowQnmIsjbNVjss57W5O7k=
 code.rocketnine.space/tslocum/kibodo v1.0.0/go.mod h1:xYmBfho98sIbB+Gtf8SU5GDQD9HOSqOtZ64eZnlHmRI=
-code.rocketnine.space/tslocum/messeji v1.0.3 h1:o0HqUckStFUFE2SkYrkzRHoAY7QT7cTsuRQ7JEmfw6w=
-code.rocketnine.space/tslocum/messeji v1.0.3/go.mod h1:bSXsyjvKhFXQ7GsUxWZdO2JX83xOT/VTqFCR04thk+c=
+code.rocketnine.space/tslocum/messeji v1.0.4-0.20230929042029-6dd617c348a7 h1:XpXCx/kAO2SMTpPDzPWMTuzPUFJRD/t+I25yfHyGX8Y=
+code.rocketnine.space/tslocum/messeji v1.0.4-0.20230929042029-6dd617c348a7/go.mod h1:0bn7Ansm3z51Auw2TmHr2q3g0vjuUxLr3RcXnZfQA+Q=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/ebitengine/purego v0.5.0 h1:JrMGKfRIAM4/QVKaesIIT7m/UVjTj5GYhRSQYwfVdpo=
@@ -12,8 +14,6 @@ github.com/gin-contrib/sse v0.1.0 h1:Y/yl/+YNO8GZSjAhjMsSuLt29uWRFHdHYUb5lYOV9qE
 github.com/gin-contrib/sse v0.1.0/go.mod h1:RHrZQHXnP2xjPF+u1gW/2HnVO7nvIa9PG3Gm+fLHvGI=
 github.com/gin-gonic/gin v1.6.3 h1:ahKqKTFpO5KTPHxWZjEdPScmYaGtLo8Y4DMHoEsnp14=
 github.com/gin-gonic/gin v1.6.3/go.mod h1:75u5sXoLsGZoRN5Sgbi1eraJ4GU3++wFwWzhwvtwp4M=
-github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b h1:GgabKamyOYguHqHjSkDACcgoPIz3w0Dis/zJ1wyHHHU=
-github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-playground/assert/v2 v2.0.1/go.mod h1:VDjEfimB/XKnb+ZQfWdccd7VUvScMdVu0Titje2rxJ4=
 github.com/go-playground/locales v0.13.0 h1:HyWk6mgj5qFqCT5fjGBuRArbVDfE4hi8+e8ceBS/t7Q=
 github.com/go-playground/locales v0.13.0/go.mod h1:taPMhCMXrRLJO55olJkUXHZBHCxTMfnGwq/HNwmWNS8=
@@ -37,9 +37,9 @@ github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/gorilla/websocket v1.4.1 h1:q7AeDBpnBk8AogcD4DSag/Ukw/KV+YhzLj2bP5HvKCM=
 github.com/gorilla/websocket v1.4.1/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
-github.com/hajimehoshi/bitmapfont/v2 v2.2.3 h1:jmq/TMNj352V062Tr5e3hAoipkoxCbY1JWTzor0zNps=
-github.com/hajimehoshi/ebiten/v2 v2.5.10 h1:phngaIDLfF7VRumWJp9J89xx0UG8ekCdyez09cMN0hg=
-github.com/hajimehoshi/ebiten/v2 v2.5.10/go.mod h1:PiQysbh5ZRNrcsP1qbeEUORsKlVoKKtg5ycfTkL8Nfw=
+github.com/hajimehoshi/bitmapfont/v3 v3.0.0 h1:r2+6gYK38nfztS/et50gHAswb9hXgxXECYgE8Nczmi4=
+github.com/hajimehoshi/ebiten/v2 v2.6.0 h1:nh09FUhjNGFVcUUPsx6oTMbD1pHerNvTKPE+494y3cU=
+github.com/hajimehoshi/ebiten/v2 v2.6.0/go.mod h1:TZtorL713an00UW4LyvMeKD8uXWnuIuCPtlH11b0pgI=
 github.com/jezek/xgb v1.1.0 h1:wnpxJzP1+rkbGclEkmwpVFQWpuE2PUGNUzP8SbfFobk=
 github.com/jezek/xgb v1.1.0/go.mod h1:nrhwO0FX/enq75I7Y7G8iN1ubpSGZEiA3v9e9GyRFlk=
 github.com/json-iterator/go v1.1.9 h1:9yzud/Ht36ygwatGx56VwCZtlI/2AD15T1X2sjSuGns=

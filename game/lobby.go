@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
+	"code.rocketnine.space/tslocum/etk"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -17,8 +18,6 @@ import (
 
 const (
 	lobbyButtonCreateCancel = iota
-	lobbyButtonCreateName
-	lobbyButtonCreateType
 	lobbyButtonCreateConfirm
 )
 
@@ -41,8 +40,6 @@ var mainButtons = []*lobbyButton{
 
 var createButtons = []*lobbyButton{
 	{"Cancel", func() {}},
-	{"Change Name", func() {}},
-	{"Change Type", func() {}},
 	{"Create", func() {}},
 }
 
@@ -87,20 +84,21 @@ type lobby struct {
 
 	c *Client
 
-	showCreateGame         int // 0 - hidden, 1 - main screen, 2 - change name, 3 - change type
-	createGameName         string
-	createGameNamePrev     string
-	createGamePassword     string
-	createGamePasswordPrev string
-
-	showJoinGame     bool
-	joinGameID       int
-	joinGameName     string
-	joinGamePassword string
-
 	refresh bool
 
 	runeBuffer []rune
+
+	showCreateGame          bool
+	createGameNamePrev      string
+	createGamePasswordPrev  string
+	createGameName          *etk.Input
+	createGamePassword      *etk.Input
+	createGameFocusPassword bool
+
+	showJoinGame     bool
+	joinGameID       int
+	joinGameLabel    *etk.Text
+	joinGamePassword *etk.Input
 }
 
 func NewLobby() *lobby {
@@ -128,12 +126,8 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 }
 
 func (l *lobby) getButtons() []*lobbyButton {
-	if l.showCreateGame > 0 {
-		if l.showCreateGame > 1 {
-			return cancelConfirmButtons
-		} else {
-			return createButtons
-		}
+	if l.showCreateGame {
+		return createButtons
 	} else if l.showJoinGame {
 		return cancelJoinButtons
 	}
@@ -178,68 +172,8 @@ func (l *lobby) _drawBufferButtons() {
 func (l *lobby) drawBuffer() {
 	l.buffer.Fill(frameColor)
 
-	// Draw create game dialog
-	if l.showCreateGame > 0 || l.showJoinGame {
-		var labels []string
-		switch l.showCreateGame {
-		case 1:
-			abbr := "'s"
-			lastLetter := game.Client.Username[len(game.Client.Username)-1]
-			if lastLetter == 's' || lastLetter == 'S' {
-				abbr = "'"
-			}
-			gameName := fmt.Sprintf("%s%s match", game.Client.Username, abbr)
-			if l.createGameName != "" {
-				gameName = l.createGameName
-			}
-
-			gameType := "Public"
-			if l.createGamePassword != "" {
-				gameType = "Private"
-			}
-
-			labels = []string{
-				"Create match",
-				"",
-				"  Name:",
-				"      " + gameName,
-				"  Type:",
-				"      " + gameType,
-			}
-		case 2:
-			labels = []string{
-				"Create match",
-				"",
-				"  Name:",
-				"      " + l.createGameName + "_",
-			}
-		case 3:
-			labels = []string{
-				"Create match",
-				"",
-				"  Password:",
-				"      " + l.createGamePassword + "_",
-			}
-		default:
-			labels = []string{
-				"Join match: " + l.joinGameName,
-				"",
-				"  Password:",
-				"      " + l.joinGamePassword + "_",
-			}
-		}
-
-		lineHeight := 30
-		padding := 24.0
-		for i, label := range labels {
-			bounds := text.BoundString(mediumFont, label)
-			labelColor := triangleA
-			img := ebiten.NewImage(l.w-int(l.padding*2), int(l.entryH))
-			text.Draw(img, label, mediumFont, 4, bounds.Dy(), labelColor)
-			l.op.GeoM.Reset()
-			l.op.GeoM.Translate(padding, padding+float64(i*lineHeight))
-			l.buffer.DrawImage(img, l.op)
-		}
+	if l.showCreateGame || l.showJoinGame {
+		// Create game dialog is drawn by etk.
 	} else {
 		var img *ebiten.Image
 		drawEntry := func(cx float64, cy float64, colA string, colB string, highlight bool, title bool) {
@@ -393,44 +327,21 @@ func (l *lobby) click(x, y int) {
 		buttonWidth := l.w / len(l.getButtons())
 		buttonIndex := x / buttonWidth
 
-		if l.showCreateGame > 0 {
-			if l.showCreateGame > 1 {
-				if buttonIndex == 0 { // Cancel
-					if l.showCreateGame == 2 {
-						game.lobby.createGameName = game.lobby.createGameNamePrev
-					} else {
-						game.lobby.createGamePassword = game.lobby.createGamePasswordPrev
-					}
-				}
-				l.showCreateGame = 1
-				l.bufferDirty = true
-				l.bufferButtonsDirty = true
-				return
-			}
-
+		if l.showCreateGame {
 			switch buttonIndex {
 			case lobbyButtonCreateCancel:
-				game.lobby.showCreateGame = 0
-				game.lobby.createGameName = ""
-				game.lobby.createGamePassword = ""
-				l.bufferDirty = true
-				l.bufferButtonsDirty = true
-			case lobbyButtonCreateName:
-				game.lobby.showCreateGame = 2
-				game.lobby.createGameNamePrev = game.lobby.createGameName
-				l.bufferDirty = true
-				l.bufferButtonsDirty = true
-			case lobbyButtonCreateType:
-				game.lobby.showCreateGame = 3
-				game.lobby.createGamePasswordPrev = game.lobby.createGamePassword
+				game.lobby.showCreateGame = false
+				game.lobby.createGameFocusPassword = false
+				game.lobby.createGameName.Field.SetText("")
+				game.lobby.createGamePassword.Field.SetText("")
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
 			case lobbyButtonCreateConfirm:
 				typeAndPassword := "public"
-				if len(strings.TrimSpace(l.createGamePassword)) > 0 {
-					typeAndPassword = fmt.Sprintf("private %s", l.createGamePassword)
+				if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
+					typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
 				}
-				l.c.Out <- []byte(fmt.Sprintf("c %s %s", typeAndPassword, l.createGameName))
+				l.c.Out <- []byte(fmt.Sprintf("c %s %s", typeAndPassword, game.lobby.createGameName.Text()))
 			}
 			return
 		} else if l.showJoinGame {
@@ -439,7 +350,7 @@ func (l *lobby) click(x, y int) {
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
 			} else {
-				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword))
+				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
 			}
 			return
 		}
@@ -449,7 +360,17 @@ func (l *lobby) click(x, y int) {
 			l.refresh = true
 			l.c.Out <- []byte("list")
 		case lobbyButtonCreate:
-			l.showCreateGame = 1
+			l.showCreateGame = true
+			etk.SetRoot(createGameGrid)
+			namePlural := l.c.Username
+			lastLetter := namePlural[len(namePlural)-1]
+			if lastLetter == 's' || lastLetter == 'S' {
+				namePlural += "'"
+			} else {
+				namePlural += "'s"
+			}
+			l.createGameName.Field.SetText(namePlural + " match")
+			l.createGamePassword.Field.SetText("")
 			l.bufferDirty = true
 			l.bufferButtonsDirty = true
 			l.drawBuffer()
@@ -466,9 +387,10 @@ func (l *lobby) click(x, y int) {
 			}
 			if l.games[l.selected].Password {
 				l.showJoinGame = true
+				etk.SetRoot(joinGameGrid)
+				l.joinGameLabel.SetText(fmt.Sprintf("Join match: %s", l.games[l.selected].Name))
+				l.joinGamePassword.Field.SetText("")
 				l.joinGameID = l.games[l.selected].ID
-				l.joinGameName = l.games[l.selected].Name
-				l.joinGamePassword = ""
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
 			} else {
@@ -490,9 +412,10 @@ func (l *lobby) click(x, y int) {
 				entry := l.games[l.selected]
 				if entry.Password {
 					l.showJoinGame = true
+					etk.SetRoot(joinGameGrid)
+					l.joinGameLabel.SetText(fmt.Sprintf("Join match: %s", entry.Name))
+					l.joinGamePassword.Field.SetText("")
 					l.joinGameID = entry.ID
-					l.joinGameName = entry.Name
-					l.joinGamePassword = ""
 					l.bufferDirty = true
 					l.bufferButtonsDirty = true
 				} else {
@@ -510,46 +433,16 @@ func (l *lobby) click(x, y int) {
 }
 
 func (l *lobby) update() {
-	if l.showCreateGame > 1 || l.showJoinGame {
-		var str string
-		var changed bool
-		if l.showCreateGame == 2 {
-			str = l.createGameName
-		} else if l.showCreateGame > 1 {
-			str = l.createGamePassword
-		} else {
-			str = l.joinGamePassword
-		}
-
-		if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(str) > 0 {
-			str = str[:len(str)-1]
-			changed = true
-		}
-
-		l.runeBuffer = ebiten.AppendInputChars(l.runeBuffer[:0])
-		if len(l.runeBuffer) > 0 {
-			str += string(l.runeBuffer)
-			changed = true
-		}
-
-		if changed {
-			if l.showCreateGame == 2 {
-				l.createGameName = str
-			} else if l.showCreateGame > 1 {
-				l.createGamePassword = str
-			} else {
-				l.joinGamePassword = str
-			}
-			l.bufferDirty = true
-		}
-
+	if l.showCreateGame || l.showJoinGame {
 		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-			if l.showCreateGame > 1 {
-				l.showCreateGame = 1
-				l.bufferDirty = true
-				l.bufferButtonsDirty = true
+			if l.showCreateGame {
+				typeAndPassword := "public"
+				if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
+					typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
+				}
+				l.c.Out <- []byte(fmt.Sprintf("c %s %s", typeAndPassword, game.lobby.createGameName.Text()))
 			} else {
-				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword))
+				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
 			}
 			return
 		}

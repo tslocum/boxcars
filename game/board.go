@@ -739,21 +739,6 @@ func (b *board) spaceAt(x, y int) int {
 	return -1
 }
 
-func (b *board) translateSpace(space int) int {
-	/*if b.gameState.PlayerNumber == 2 {
-		// Spaces range from 24 - 1.
-		if space == 0 || space == 25 {
-			space = 25 - space
-		} else if space <= 12 {
-			space = 12 + space
-		} else {
-			space = space - 12
-		}
-	}*/
-	// TODO
-	return space
-}
-
 func (b *board) setSpaceRects() {
 	var x, y, w, h int
 	for space := 0; space < bgammon.BoardSpaces; space++ {
@@ -884,16 +869,7 @@ func (b *board) ProcessState() {
 		if abs < 0 {
 			abs *= -1
 		}
-
-		var preMovesTo int
-		var preMovesFrom int
-		/*if b.Client != nil {
-			preMovesTo = b.Client.Board.Premoveto[space]
-			preMovesFrom = b.Client.Board.Premovefrom[space]
-		}*/
-		// TODO
-
-		for i := 0; i < abs+(preMovesTo-preMovesFrom); i++ {
+		for i := 0; i < abs; i++ {
 			s := b.newSprite(white)
 			if i >= abs {
 				s.colorWhite = b.gameState.PlayerNumber == 2
@@ -954,7 +930,7 @@ DRAWMOVE:
 	sprite.toStart = time.Time{}
 	ebiten.ScheduleFrame()
 
-	/*homeSpace := b.Client.Board.PlayerHomeSpace()
+	/*homeSpace := b.ClientWebSocket.Board.PlayerHomeSpace()
 	if b.gameState.Turn != b.gameState.Player {
 		homeSpace = 25 - homeSpace
 	}
@@ -1049,7 +1025,6 @@ func (b *board) update() {
 					s := b.spriteAt(x, y)
 					if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
 						b.dragging = s
-						// TODO set dragFrom instead of calculating later
 					}
 				}
 			}
@@ -1096,7 +1071,6 @@ func (b *board) update() {
 		index := b.spaceAt(x, y)
 		// Bear off by dragging outside the board.
 		if index == -1 {
-			// TODO check if all pieces are home
 			index = bgammon.SpaceHomePlayer
 		}
 		if index >= 0 && b.Client != nil {

@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
+	"code.rocketnine.space/tslocum/etk"
 	"code.rocketnine.space/tslocum/kibodo"
 	"code.rocketnine.space/tslocum/messeji"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -54,8 +55,6 @@ var (
 	lightCheckerColor = color.RGBA{232, 211, 162, 255}
 	darkCheckerColor  = color.RGBA{0, 0, 0, 255}
 )
-
-const DefaultServerAddress = "wss://ws.bgammon.org"
 
 const maxStatusWidthRatio = 0.5
 
@@ -104,6 +103,9 @@ var (
 	game *Game
 
 	diceSize int
+
+	createGameGrid *etk.Grid
+	joinGameGrid   *etk.Grid
 )
 
 func l(s string) {
@@ -163,7 +165,6 @@ func defaultFont() font.Face {
 }
 
 func init() {
-	//statusBuffer.acceptInput = true
 	initializeFonts()
 
 	loadAssets(0)
@@ -300,9 +301,10 @@ func setViewBoard(view bool) {
 		inputBuffer.SetSuffix("_")
 
 		// Exit create game dialog, if open.
-		game.lobby.showCreateGame = 0
-		game.lobby.createGameName = ""
-		game.lobby.createGamePassword = ""
+		game.lobby.showCreateGame = false
+		game.lobby.createGameFocusPassword = false
+		game.lobby.createGameName.Field.SetText("")
+		game.lobby.createGamePassword.Field.SetText("")
 		game.lobby.bufferDirty = true
 		game.lobby.bufferButtonsDirty = true
 	} else {
@@ -394,6 +396,63 @@ func NewGame() *Game {
 	g.keyboard.SetKeys(kibodo.KeysQWERTY)
 
 	inputBuffer.SetSelectedFunc(g.acceptInput)
+
+	etk.Style.TextColorLight = triangleA
+	etk.Style.TextColorDark = triangleA
+	etk.Style.InputBgColor = color.RGBA{40, 24, 9, 255}
+
+	{
+		headerLabel := etk.NewText("Create match")
+		headerLabel.SetHorizontal(messeji.AlignStart)
+		nameLabel := etk.NewText("Name")
+		passwordLabel := etk.NewText("Password")
+
+		g.lobby.createGameName = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		g.lobby.createGameName.Field.SetHandleKeyboard(true)
+
+		g.lobby.createGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
+
+		grid := etk.NewGrid()
+		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
+		grid.SetRowPadding(20)
+		grid.SetColumnSizes(10, 200)
+		grid.SetRowSizes(60, 50, 50)
+		grid.AddChildAt(headerLabel, 0, 0, 3, 1)
+		grid.AddChildAt(nameLabel, 1, 1, 1, 1)
+		grid.AddChildAt(g.lobby.createGameName, 2, 1, 1, 1)
+		grid.AddChildAt(passwordLabel, 1, 2, 1, 1)
+		grid.AddChildAt(g.lobby.createGamePassword, 2, 2, 1, 1)
+		createGameGrid = grid
+	}
+
+	{
+		g.lobby.joinGameLabel = etk.NewText("Join match")
+		g.lobby.joinGameLabel.SetHorizontal(messeji.AlignStart)
+
+		passwordLabel := etk.NewText("Password")
+
+		g.lobby.joinGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		g.lobby.joinGamePassword.Field.SetHandleKeyboard(true)
+
+		grid := etk.NewGrid()
+		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
+		grid.SetRowPadding(20)
+		grid.SetColumnSizes(10, 200)
+		grid.SetRowSizes(60, 50, 50)
+		grid.AddChildAt(g.lobby.joinGameLabel, 0, 0, 3, 1)
+		grid.AddChildAt(passwordLabel, 1, 1, 1, 1)
+		grid.AddChildAt(g.lobby.joinGamePassword, 2, 1, 1, 1)
+		joinGameGrid = grid
+	}
+
+	etk.SetRoot(createGameGrid)
 
 	return g
 }
@@ -532,7 +591,6 @@ func (g *Game) Connect() {
 	g.Client = newClient(address, g.Username, g.Password)
 	g.lobby.c = g.Client
 	g.Board.Client = g.Client
-	//statusBuffer.client = g.Client
 
 	g.Username = ""
 	g.Password = ""
@@ -672,6 +730,46 @@ func (g *Game) Update() error { // Called by ebiten only when input occurs
 
 	if !viewBoard {
 		g.lobby.update()
+
+		if g.lobby.showCreateGame || g.lobby.showJoinGame {
+			if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+				x, y := ebiten.CursorPosition()
+				p := image.Point{x, y}
+				if p.In(g.lobby.createGameName.Rect()) {
+					g.lobby.createGameFocusPassword = false
+					g.lobby.createGameName.Field.SetHandleKeyboard(true)
+					g.lobby.createGameName.Field.SetSuffix("_")
+					g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
+					g.lobby.createGamePassword.Field.SetSuffix("")
+				} else if p.In(g.lobby.createGamePassword.Rect()) {
+					g.lobby.createGameFocusPassword = true
+					g.lobby.createGameName.Field.SetHandleKeyboard(false)
+					g.lobby.createGameName.Field.SetSuffix("")
+					g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
+					g.lobby.createGamePassword.Field.SetSuffix("_")
+				}
+			}
+
+			if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
+				g.lobby.createGameFocusPassword = !g.lobby.createGameFocusPassword
+				if g.lobby.createGameFocusPassword {
+					g.lobby.createGameName.Field.SetHandleKeyboard(false)
+					g.lobby.createGameName.Field.SetSuffix("")
+					g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
+					g.lobby.createGamePassword.Field.SetSuffix("_")
+				} else {
+					g.lobby.createGameName.Field.SetHandleKeyboard(true)
+					g.lobby.createGameName.Field.SetSuffix("_")
+					g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
+					g.lobby.createGamePassword.Field.SetSuffix("")
+				}
+			}
+
+			err := etk.Update()
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 	} else {
 		g.Board.update()
 
@@ -716,6 +814,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	statusBuffer.Draw(screen)
 	if !viewBoard { // Lobby
 		g.lobby.draw(screen)
+
+		if g.lobby.showCreateGame || g.lobby.showJoinGame {
+			err := etk.Draw(screen)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 	} else { // Game board
 		gameBuffer.Draw(screen)
 		inputBuffer.Draw(screen)
@@ -812,65 +917,27 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	bufferPadding := int(g.Board.horizontalBorderSize / 2)
 
-	//inputBufferHeight := (gameBuffer.chatLineHeight * showGameBufferLines) + (gameBuffer.padding * 4)
 	inputBufferHeight := 50
 
 	g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPadding)*1.5)
-	/*minLobbyWidth := text.BoundString(mediumFont, strings.Repeat("A", lobbyCharacterWidth)).Dx()
-	if g.Board.w >= minLobbyWidth {
-		g.lobby.fullscreen = false
-		g.lobby.setRect(0, 0, g.Board.w, g.screenH-lobbyStatusBufferHeight)
-	} else {*/
 	g.lobby.fullscreen = true
 	g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
-	/*}*/
 
-	if true || availableWidth >= 150 { // TODO allow buffers to be repositioned
-		statusBufferHeight := g.screenH - inputBufferHeight - bufferPadding*3
+	statusBufferHeight := g.screenH - inputBufferHeight - bufferPadding*3
 
-		x, y, w, h := (g.screenW-bufferWidth)+bufferPadding, bufferPadding, bufferWidth-(bufferPadding*2), statusBufferHeight
-		statusBufferRect = image.Rect(x, y, x+w, y+h/2-bufferPadding/2)
-		g.updateStatusBufferPosition()
+	x, y, w, h := (g.screenW-bufferWidth)+bufferPadding, bufferPadding, bufferWidth-(bufferPadding*2), statusBufferHeight
+	statusBufferRect = image.Rect(x, y, x+w, y+h/2-bufferPadding/2)
+	g.updateStatusBufferPosition()
 
-		gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPadding/2, x+w, y+h))
+	gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPadding/2, x+w, y+h))
 
-		inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPadding-inputBufferHeight, x+w, g.screenH-bufferPadding))
-	} /* else {
-		// Clamp buffer position.
-		bx, by := statusBuffer.x, statusBuffer.y
-		var bw, bh int
-		if statusBuffer.w == 0 && statusBuffer.h == 0 {
-			// Set initial buffer position.
-			bx = 0
-			by = g.screenH / 2
-			// Set initial buffer size.
-			bw = g.screenW
-			bh = g.screenH / 2
-		} else {
-			// Scale existing buffer size
-			bx, by = bx*(outsideWidth/g.screenW), by*(outsideHeight/g.screenH)
-			bw, bh = statusBuffer.w*(outsideWidth/g.screenW), statusBuffer.h*(outsideHeight/g.screenH)
-			if bw < 200 {
-				bw = 200
-			}
-			if bh < 100 {
-				bh = 100
-			}
-		}
-		padding := 7
-		if bx > g.screenW-padding {
-			bx = g.screenW - padding
-		}
-		if by > g.screenH-padding {
-			by = g.screenH - padding
-		}
-
-		statusBuffer.docked = false
-		statusBuffer.setRect(bx, by, bw, bh)
-	}*/
+	inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPadding-inputBufferHeight, x+w, g.screenH-bufferPadding))
 
 	displayArea := 200
 	g.keyboard.SetRect(0, displayArea, g.screenW, g.screenH-displayArea)
+
+	etk.Layout(g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
+
 	return outsideWidth, outsideHeight
 }
 
