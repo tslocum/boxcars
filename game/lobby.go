@@ -80,8 +80,6 @@ type lobby struct {
 	bufferButtons      *ebiten.Image
 	bufferButtonsDirty bool
 
-	op *ebiten.DrawImageOptions
-
 	c *Client
 
 	refresh bool
@@ -104,7 +102,6 @@ type lobby struct {
 func NewLobby() *lobby {
 	return &lobby{
 		refresh: true,
-		op:      &ebiten.DrawImageOptions{},
 	}
 }
 
@@ -162,9 +159,9 @@ func (l *lobby) _drawBufferButtons() {
 		img := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
 		text.Draw(img, button.label, mediumFont, 0, standardLineHeight, labelColor)
 
-		l.op.GeoM.Reset()
-		l.op.GeoM.Translate(float64(buttonWidth*i)+float64((buttonWidth-bounds.Dx())/2), float64(l.buttonBarHeight-standardLineHeight*1.5)/2)
-		l.bufferButtons.DrawImage(img, l.op)
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(buttonWidth*i)+float64((buttonWidth-bounds.Dx())/2), float64(l.buttonBarHeight-standardLineHeight*1.5)/2)
+		l.bufferButtons.DrawImage(img, op)
 	}
 }
 
@@ -205,9 +202,9 @@ func (l *lobby) drawBuffer() {
 			text.Draw(img, colB, mediumFont, int(250*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
 			//text.Draw(img, colC, mediumFont, int(500*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
 
-			l.op.GeoM.Reset()
-			l.op.GeoM.Translate(cx, cy)
-			l.buffer.DrawImage(img, l.op)
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(cx, cy)
+			l.buffer.DrawImage(img, op)
 		}
 
 		titleOffset := 2.0
@@ -259,9 +256,9 @@ func (l *lobby) drawBuffer() {
 		l.bufferButtonsDirty = false
 	}
 
-	l.op.GeoM.Reset()
-	l.op.GeoM.Translate(float64(l.x), float64(l.h-l.buttonBarHeight))
-	l.buffer.DrawImage(l.bufferButtons, l.op)
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(l.x), float64(l.h-l.buttonBarHeight))
+	l.buffer.DrawImage(l.bufferButtons, op)
 }
 
 // Draw to the screen.
@@ -282,9 +279,9 @@ func (l *lobby) draw(screen *ebiten.Image) {
 		l.bufferDirty = false
 	}
 
-	l.op.GeoM.Reset()
-	l.op.GeoM.Translate(float64(l.x), float64(l.y))
-	screen.DrawImage(l.buffer, l.op)
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(l.x), float64(l.y))
+	screen.DrawImage(l.buffer, op)
 
 	if p {
 		//debugGame.toggleProfiling()

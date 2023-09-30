@@ -378,8 +378,6 @@ type Game struct {
 
 	cpuProfile *os.File
 
-	op *ebiten.DrawImageOptions
-
 	loaded bool
 
 	connectUsername *etk.Input
@@ -390,9 +388,6 @@ type Game struct {
 
 func NewGame() *Game {
 	g := &Game{
-		op: &ebiten.DrawImageOptions{
-			Filter: ebiten.FilterNearest,
-		},
 		Board: NewBoard(),
 
 		lobby: NewLobby(),
@@ -869,10 +864,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 		ebitenutil.DebugPrint(g.debugImg, g.drawBuffer.String())
 
-		g.resetImageOptions()
-		g.op.GeoM.Translate(3, 0)
-		g.op.GeoM.Scale(2, 2)
-		screen.DrawImage(g.debugImg, g.op)
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(3, 0)
+		op.GeoM.Scale(2, 2)
+		screen.DrawImage(g.debugImg, op)
 	}
 }
 
@@ -961,10 +956,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	etk.Layout(g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
 
 	return outsideWidth, outsideHeight
-}
-
-func (g *Game) resetImageOptions() {
-	g.op.GeoM.Reset()
 }
 
 func (g *Game) acceptInput() bool {

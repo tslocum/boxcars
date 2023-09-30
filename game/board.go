@@ -31,8 +31,6 @@ type board struct {
 
 	innerW, innerH int
 
-	op *ebiten.DrawImageOptions
-
 	backgroundImage *ebiten.Image
 
 	Sprites *Sprites
@@ -106,8 +104,6 @@ func NewBoard() *board {
 		b.Sprites.sprites[i] = b.newSprite(false)
 	}
 
-	b.op = &ebiten.DrawImageOptions{}
-
 	b.dragTouchId = -1
 
 	return b
@@ -147,23 +143,29 @@ func (b *board) updateBackgroundImage() {
 	// Frame
 	img := ebiten.NewImage(frameW, b.h)
 	img.Fill(frameColor)
-	b.op.GeoM.Reset()
-	b.op.GeoM.Translate(float64(b.horizontalBorderSize-borderSize), 0)
-	b.backgroundImage.DrawImage(img, b.op)
+	{
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(b.horizontalBorderSize-borderSize), 0)
+		b.backgroundImage.DrawImage(img, op)
+	}
 
 	// Face
 	img = ebiten.NewImage(int(innerW), b.h-int(b.verticalBorderSize*2))
 	img.Fill(faceColor)
-	b.op.GeoM.Reset()
-	b.op.GeoM.Translate(float64(b.horizontalBorderSize), float64(b.verticalBorderSize))
-	b.backgroundImage.DrawImage(img, b.op)
+	{
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(b.horizontalBorderSize), float64(b.verticalBorderSize))
+		b.backgroundImage.DrawImage(img, op)
+	}
 
 	// Bar
 	img = ebiten.NewImage(int(b.barWidth), b.h)
 	img.Fill(frameColor)
-	b.op.GeoM.Reset()
-	b.op.GeoM.Translate(float64((b.w/2)-int(b.barWidth/2)), 0)
-	b.backgroundImage.DrawImage(img, b.op)
+	{
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64((b.w/2)-int(b.barWidth/2)), 0)
+		b.backgroundImage.DrawImage(img, op)
+	}
 
 	// Draw triangles
 	baseImg := image.NewRGBA(image.Rect(0, 0, b.w-int(b.horizontalBorderSize*2), b.h-int(b.verticalBorderSize*2)))
@@ -200,9 +202,11 @@ func (b *board) updateBackgroundImage() {
 		}
 	}
 	img = ebiten.NewImageFromImage(baseImg)
-	b.op.GeoM.Reset()
-	b.op.GeoM.Translate(float64(b.horizontalBorderSize), float64(b.verticalBorderSize))
-	b.backgroundImage.DrawImage(img, b.op)
+	{
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(b.horizontalBorderSize), float64(b.verticalBorderSize))
+		b.backgroundImage.DrawImage(img, op)
+	}
 
 	// Border
 	borderImage := image.NewRGBA(image.Rect(0, 0, b.w, b.h))
@@ -251,9 +255,11 @@ func (b *board) updateBackgroundImage() {
 		gc.Stroke()
 	}
 	img = ebiten.NewImageFromImage(borderImage)
-	b.op.GeoM.Reset()
-	b.op.GeoM.Translate(b.horizontalBorderSize-borderSize, 0)
-	b.backgroundImage.DrawImage(img, b.op)
+	{
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(b.horizontalBorderSize-borderSize, 0)
+		b.backgroundImage.DrawImage(img, op)
+	}
 
 	// Draw space numbers.
 	for space, r := range b.spaceRects {
@@ -302,17 +308,19 @@ func (b *board) drawButtons(screen *ebiten.Image) {
 			bounds := text.BoundString(mediumFont, btn.label)
 			text.Draw(img, btn.label, mediumFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
 
-			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(btn.rect.Min.X), float64(btn.rect.Min.Y))
-			screen.DrawImage(img, b.op)
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(btn.rect.Min.X), float64(btn.rect.Min.Y))
+			screen.DrawImage(img, op)
 		}
 	}
 }
 
 func (b *board) Draw(screen *ebiten.Image) {
-	b.op.GeoM.Reset()
-	b.op.GeoM.Translate(float64(b.x), float64(b.y))
-	screen.DrawImage(b.backgroundImage, b.op)
+	{
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(b.x), float64(b.y))
+		screen.DrawImage(b.backgroundImage, op)
+	}
 
 	drawSprite := func(sprite *Sprite) {
 		x, y := float64(sprite.x), float64(sprite.y)
@@ -352,44 +360,37 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 
 		// Draw shadow.
-
-		b.op.GeoM.Reset()
-		b.op.GeoM.Translate(x, y)
-
-		b.op.ColorScale.Scale(0, 0, 0, 1)
-
-		b.op.Filter = ebiten.FilterLinear
-
-		screen.DrawImage(imgCheckerLight, b.op)
-
-		b.op.ColorScale.Reset()
+		{
+			op := &ebiten.DrawImageOptions{}
+			op.Filter = ebiten.FilterLinear
+			op.GeoM.Translate(x, y)
+			op.ColorScale.Scale(0, 0, 0, 1)
+			screen.DrawImage(imgCheckerLight, op)
+		}
 
 		// Draw checker.
 
 		checkerScale := 0.94
 
-		b.op.GeoM.Reset()
-		b.op.GeoM.Translate(-b.spaceWidth/2, -b.spaceWidth/2)
-		b.op.GeoM.Scale(checkerScale, checkerScale)
-		b.op.GeoM.Translate((b.spaceWidth/2)+x, (b.spaceWidth/2)+y)
+		op := &ebiten.DrawImageOptions{}
+		op.Filter = ebiten.FilterLinear
+		op.GeoM.Translate(-b.spaceWidth/2, -b.spaceWidth/2)
+		op.GeoM.Scale(checkerScale, checkerScale)
+		op.GeoM.Translate((b.spaceWidth/2)+x, (b.spaceWidth/2)+y)
 
 		c := lightCheckerColor
 		if !sprite.colorWhite {
 			c = darkCheckerColor
 		}
-		b.op.ColorScale.Scale(0, 0, 0, 1)
+		op.ColorScale.Scale(0, 0, 0, 1)
 		r := float32(c.R) / 0xff
 		g := float32(c.G) / 0xff
 		bl := float32(c.B) / 0xff
-		b.op.ColorScale.SetR(r)
-		b.op.ColorScale.SetG(g)
-		b.op.ColorScale.SetB(bl)
+		op.ColorScale.SetR(r)
+		op.ColorScale.SetG(g)
+		op.ColorScale.SetB(bl)
 
-		screen.DrawImage(imgCheckerLight, b.op)
-
-		b.op.ColorScale.Reset()
-
-		b.op.Filter = ebiten.FilterNearest
+		screen.DrawImage(imgCheckerLight, op)
 	}
 
 	for space := 0; space < bgammon.BoardSpaces; space++ {
@@ -430,9 +431,9 @@ func (b *board) Draw(screen *ebiten.Image) {
 			y += (h / 2) - (bounds.Dy() / 2)
 			x, y = b.offsetPosition(x, y)
 
-			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(x), float64(y))
-			screen.DrawImage(overlayImage, b.op)
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(x), float64(y))
+			screen.DrawImage(overlayImage, op)
 		}
 	}
 
@@ -450,11 +451,10 @@ func (b *board) Draw(screen *ebiten.Image) {
 		if space > 0 && space < 25 {
 			x, y, _, _ := b.spaceRect(space)
 			x, y = b.offsetPosition(x, y)
-			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(x), float64(y))
-			b.op.ColorScale.Scale(0.1, 0.1, 0.1, 0.1)
-			screen.DrawImage(b.spaceHighlight, b.op)
-			b.op.ColorScale.Reset()
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(x), float64(y))
+			op.ColorScale.Scale(0.1, 0.1, 0.1, 0.1)
+			screen.DrawImage(b.spaceHighlight, op)
 		}
 	}
 
@@ -519,24 +519,30 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 		x := b.x + int(((float64(b.innerW))/4)-(float64(bounds.Dx()/2))) - int(b.horizontalBorderSize)/2
 		y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
-		b.op.GeoM.Reset()
-		b.op.GeoM.Translate(float64(x), float64(y))
-		screen.DrawImage(img, b.op)
+		{
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(x), float64(y))
+			screen.DrawImage(img, op)
+		}
 
 		if b.gameState.Turn == 0 {
 			if opponentRoll != 0 {
-				b.op.GeoM.Reset()
-				b.op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
-				screen.DrawImage(diceImage(opponentRoll), b.op)
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				screen.DrawImage(diceImage(opponentRoll), op)
 			}
 		} else if b.gameState.Turn != b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
-			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
-			screen.DrawImage(diceImage(b.gameState.Roll1), b.op)
+			{
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				screen.DrawImage(diceImage(b.gameState.Roll1), op)
+			}
 
-			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
-			screen.DrawImage(diceImage(b.gameState.Roll2), b.op)
+			{
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				screen.DrawImage(diceImage(b.gameState.Roll2), op)
+			}
 		}
 	}
 
@@ -551,24 +557,30 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 		x := b.x + int((((float64(b.innerW))/4)*3)-(float64(bounds.Dx()/2))) + int(b.horizontalBorderSize)/2
 		y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
-		b.op.GeoM.Reset()
-		b.op.GeoM.Translate(float64(x), float64(y))
-		screen.DrawImage(img, b.op)
+		{
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(x), float64(y))
+			screen.DrawImage(img, op)
+		}
 
 		if b.gameState.Turn == 0 {
 			if playerRoll != 0 {
-				b.op.GeoM.Reset()
-				b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
-				screen.DrawImage(diceImage(playerRoll), b.op)
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				screen.DrawImage(diceImage(playerRoll), op)
 			}
 		} else if b.gameState.Turn == b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
-			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
-			screen.DrawImage(diceImage(b.gameState.Roll1), b.op)
+			{
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				screen.DrawImage(diceImage(b.gameState.Roll1), op)
+			}
 
-			b.op.GeoM.Reset()
-			b.op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
-			screen.DrawImage(diceImage(b.gameState.Roll2), b.op)
+			{
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				screen.DrawImage(diceImage(b.gameState.Roll2), op)
+			}
 		}
 	}
 
