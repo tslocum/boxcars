@@ -128,7 +128,7 @@ func (b *board) selectReset() {
 func (b *board) newSprite(white bool) *Sprite {
 	s := &Sprite{}
 	s.colorWhite = white
-	s.w, s.h = imgCheckerLight.Size()
+	s.w, s.h = imgCheckerLight.Bounds().Dx(), imgCheckerLight.Bounds().Dy()
 	return s
 }
 
@@ -358,13 +358,13 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 		b.op.GeoM.Reset()
 		b.op.GeoM.Translate(x, y)
-		b.op.ColorM.Scale(0, 0, 0, 1)
+		b.op.ColorScale.Scale(0, 0, 0, 1)
 
 		b.op.Filter = ebiten.FilterLinear
 
 		screen.DrawImage(imgCheckerLight, b.op)
 
-		b.op.ColorM.Reset()
+		b.op.ColorScale.Reset()
 
 		// Draw checker.
 
@@ -379,15 +379,17 @@ func (b *board) Draw(screen *ebiten.Image) {
 		if !sprite.colorWhite {
 			c = darkCheckerColor
 		}
-		b.op.ColorM.Scale(0.0, 0.0, 0.0, 1)
-		r := float64(c.R) / 0xff
-		g := float64(c.G) / 0xff
-		bl := float64(c.B) / 0xff
-		b.op.ColorM.Translate(r, g, bl, 0)
+		b.op.ColorScale.Scale(0, 0, 0, 1)
+		r := float32(c.R) / 0xff
+		g := float32(c.G) / 0xff
+		bl := float32(c.B) / 0xff
+		b.op.ColorScale.SetR(r)
+		b.op.ColorScale.SetG(g)
+		b.op.ColorScale.SetB(bl)
 
 		screen.DrawImage(imgCheckerLight, b.op)
 
-		b.op.ColorM.Reset()
+		b.op.ColorScale.Reset()
 
 		b.op.Filter = ebiten.FilterNearest
 	}
@@ -452,10 +454,9 @@ func (b *board) Draw(screen *ebiten.Image) {
 			x, y = b.offsetPosition(x, y)
 			b.op.GeoM.Reset()
 			b.op.GeoM.Translate(float64(x), float64(y))
-			b.op.ColorM.Reset()
-			b.op.ColorM.Scale(1, 1, 1, 0.2)
+			b.op.ColorScale.Scale(1, 1, 1, 0.2)
 			screen.DrawImage(b.spaceHighlight, b.op)
-			b.op.ColorM.Reset()
+			b.op.ColorScale.Reset()
 		}
 	}
 
@@ -653,7 +654,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	for i := 0; i < b.Sprites.num; i++ {
 		s := b.Sprites.sprites[i]
-		s.w, s.h = imgCheckerLight.Size()
+		s.w, s.h = imgCheckerLight.Bounds().Dx(), imgCheckerLight.Bounds().Dy()
 	}
 
 	b.setSpaceRects()

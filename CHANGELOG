@@ -1,5 +1,6 @@
 1.0.1:
 - Fix checker alignment when bearing off
+- Fix checker borders
 
 1.0.0:
 - Initial release
