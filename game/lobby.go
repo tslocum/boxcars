@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"math"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -86,12 +87,13 @@ type lobby struct {
 
 	runeBuffer []rune
 
-	showCreateGame          bool
-	createGameNamePrev      string
-	createGamePasswordPrev  string
-	createGameName          *etk.Input
-	createGamePassword      *etk.Input
-	createGameFocusPassword bool
+	showCreateGame         bool
+	createGameNamePrev     string
+	createGamePasswordPrev string
+	createGameName         *etk.Input
+	createGamePoints       *etk.Input
+	createGamePassword     *etk.Input
+	createGameFocus        int
 
 	showJoinGame     bool
 	joinGameID       int
@@ -173,7 +175,7 @@ func (l *lobby) drawBuffer() {
 		// Create game dialog is drawn by etk.
 	} else {
 		var img *ebiten.Image
-		drawEntry := func(cx float64, cy float64, colA string, colB string, highlight bool, title bool) {
+		drawEntry := func(cx float64, cy float64, colA string, colB string, colC string, highlight bool, title bool) {
 			labelColor := triangleA
 			if highlight {
 				labelColor = lightCheckerColor
@@ -200,6 +202,7 @@ func (l *lobby) drawBuffer() {
 
 			text.Draw(img, colA, mediumFont, 4, standardLineHeight, labelColor)
 			text.Draw(img, colB, mediumFont, int(250*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
+			text.Draw(img, colC, mediumFont, int(500*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
 			//text.Draw(img, colC, mediumFont, int(500*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
 
 			op := &ebiten.DrawImageOptions{}
@@ -210,7 +213,7 @@ func (l *lobby) drawBuffer() {
 		titleOffset := 2.0
 
 		if !l.loaded {
-			drawEntry(l.padding, l.padding-titleOffset, "Loading...", "Please wait...", false, true)
+			drawEntry(l.padding, l.padding-titleOffset, "Loading...", "Please", "wait...", false, true)
 			return
 		}
 
@@ -221,11 +224,11 @@ func (l *lobby) drawBuffer() {
 		}
 
 		cx, cy := 0.0, 0.0 // Cursor
-		drawEntry(cx+l.padding, cy+l.padding-titleOffset, "Status", "Name", false, true)
+		drawEntry(cx+l.padding, cy+l.padding-titleOffset, "Status", "Points", "Name", false, true)
 		cy += l.entryH
 
 		if len(l.games) == 0 {
-			drawEntry(cx+l.padding, cy+l.padding, "No matches available. Please create one.", "", false, false)
+			drawEntry(cx+l.padding, cy+l.padding, "No matches available. Please create one.", "", "", false, false)
 		} else {
 			i := 0
 			var status string
@@ -241,7 +244,7 @@ func (l *lobby) drawBuffer() {
 						}
 					}
 
-					drawEntry(cx+l.padding, cy+l.padding, status, entry.Name, i == l.selected, false)
+					drawEntry(cx+l.padding, cy+l.padding, status, strconv.Itoa(entry.Points), entry.Name, i == l.selected, false)
 
 					cy += l.entryH
 				}
@@ -328,7 +331,7 @@ func (l *lobby) click(x, y int) {
 			switch buttonIndex {
 			case lobbyButtonCreateCancel:
 				game.lobby.showCreateGame = false
-				game.lobby.createGameFocusPassword = false
+				game.lobby.createGameFocus = 0
 				game.lobby.createGameName.Field.SetText("")
 				game.lobby.createGamePassword.Field.SetText("")
 				l.bufferDirty = true
@@ -338,7 +341,11 @@ func (l *lobby) click(x, y int) {
 				if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
 					typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
 				}
-				l.c.Out <- []byte(fmt.Sprintf("c %s %s", typeAndPassword, game.lobby.createGameName.Text()))
+				points, err := strconv.Atoi(game.lobby.createGamePoints.Text())
+				if err != nil {
+					points = 1
+				}
+				l.c.Out <- []byte(fmt.Sprintf("c %s %d %s", typeAndPassword, points, game.lobby.createGameName.Text()))
 			}
 			return
 		} else if l.showJoinGame {
@@ -367,6 +374,7 @@ func (l *lobby) click(x, y int) {
 				namePlural += "'s"
 			}
 			l.createGameName.Field.SetText(namePlural + " match")
+			l.createGamePoints.Field.SetText("1")
 			l.createGamePassword.Field.SetText("")
 			l.bufferDirty = true
 			l.bufferButtonsDirty = true

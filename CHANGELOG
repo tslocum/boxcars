@@ -1,3 +1,6 @@
+1.0.2:
+- Allow specifying match points
+
 1.0.1:
 - Fix checker alignment issues
 - Fix checker borders

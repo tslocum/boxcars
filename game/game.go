@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"regexp"
 	"runtime/pprof"
 	"strings"
 	"time"
@@ -29,6 +30,8 @@ import (
 )
 
 const MaxDebug = 1
+
+var onlyNumbers = regexp.MustCompile(`[0-9]+`)
 
 //go:embed assets
 var assetsFS embed.FS
@@ -303,7 +306,7 @@ func setViewBoard(view bool) {
 
 		// Exit create game dialog, if open.
 		game.lobby.showCreateGame = false
-		game.lobby.createGameFocusPassword = false
+		game.lobby.createGameFocus = 0
 		game.lobby.createGameName.Field.SetText("")
 		game.lobby.createGamePassword.Field.SetText("")
 		game.lobby.bufferDirty = true
@@ -442,12 +445,18 @@ func NewGame() *Game {
 	{
 		headerLabel := etk.NewText("Create match")
 		nameLabel := etk.NewText("Name")
+		pointsLabel := etk.NewText("Points")
 		passwordLabel := etk.NewText("Password")
 
 		g.lobby.createGameName = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
 		g.lobby.createGameName.Field.SetHandleKeyboard(true)
+
+		g.lobby.createGamePoints = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		g.lobby.createGamePoints.Field.SetHandleKeyboard(false)
 
 		g.lobby.createGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
@@ -458,12 +467,14 @@ func NewGame() *Game {
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
 		grid.SetRowPadding(20)
 		grid.SetColumnSizes(10, 200)
-		grid.SetRowSizes(60, 50, 50)
+		grid.SetRowSizes(60, 50, 50, 50)
 		grid.AddChildAt(headerLabel, 0, 0, 3, 1)
 		grid.AddChildAt(nameLabel, 1, 1, 1, 1)
 		grid.AddChildAt(g.lobby.createGameName, 2, 1, 1, 1)
-		grid.AddChildAt(passwordLabel, 1, 2, 1, 1)
-		grid.AddChildAt(g.lobby.createGamePassword, 2, 2, 1, 1)
+		grid.AddChildAt(pointsLabel, 1, 2, 1, 1)
+		grid.AddChildAt(g.lobby.createGamePoints, 2, 2, 1, 1)
+		grid.AddChildAt(passwordLabel, 1, 3, 1, 1)
+		grid.AddChildAt(g.lobby.createGamePassword, 2, 3, 1, 1)
 		createGameGrid = grid
 	}
 
@@ -760,32 +771,66 @@ func (g *Game) Update() error {
 					x, y := ebiten.CursorPosition()
 					p := image.Point{x, y}
 					if p.In(g.lobby.createGameName.Rect()) {
-						g.lobby.createGameFocusPassword = false
+						g.lobby.createGameFocus = 0
 						g.lobby.createGameName.Field.SetHandleKeyboard(true)
 						g.lobby.createGameName.Field.SetSuffix("_")
+						g.lobby.createGamePoints.Field.SetHandleKeyboard(false)
+						g.lobby.createGamePoints.Field.SetSuffix("")
+						g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
+						g.lobby.createGamePassword.Field.SetSuffix("")
+					} else if p.In(g.lobby.createGamePoints.Rect()) {
+						g.lobby.createGameFocus = 1
+						g.lobby.createGameName.Field.SetHandleKeyboard(false)
+						g.lobby.createGameName.Field.SetSuffix("")
+						g.lobby.createGamePoints.Field.SetHandleKeyboard(true)
+						g.lobby.createGamePoints.Field.SetSuffix("_")
 						g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
 						g.lobby.createGamePassword.Field.SetSuffix("")
 					} else if p.In(g.lobby.createGamePassword.Rect()) {
-						g.lobby.createGameFocusPassword = true
+						g.lobby.createGameFocus = 2
 						g.lobby.createGameName.Field.SetHandleKeyboard(false)
 						g.lobby.createGameName.Field.SetSuffix("")
+						g.lobby.createGamePoints.Field.SetHandleKeyboard(false)
+						g.lobby.createGamePoints.Field.SetSuffix("")
 						g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
 						g.lobby.createGamePassword.Field.SetSuffix("_")
 					}
 				}
 
 				if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
-					g.lobby.createGameFocusPassword = !g.lobby.createGameFocusPassword
-					if g.lobby.createGameFocusPassword {
-						g.lobby.createGameName.Field.SetHandleKeyboard(false)
-						g.lobby.createGameName.Field.SetSuffix("")
-						g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
-						g.lobby.createGamePassword.Field.SetSuffix("_")
+					if ebiten.IsKeyPressed(ebiten.KeyShift) {
+						g.lobby.createGameFocus--
+						if g.lobby.createGameFocus < 0 {
+							g.lobby.createGameFocus = 2
+						}
 					} else {
+						g.lobby.createGameFocus++
+						if g.lobby.createGameFocus > 2 {
+							g.lobby.createGameFocus = 0
+						}
+					}
+
+					if g.lobby.createGameFocus == 0 {
 						g.lobby.createGameName.Field.SetHandleKeyboard(true)
 						g.lobby.createGameName.Field.SetSuffix("_")
+						g.lobby.createGamePoints.Field.SetHandleKeyboard(false)
+						g.lobby.createGamePoints.Field.SetSuffix("")
 						g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
 						g.lobby.createGamePassword.Field.SetSuffix("")
+					} else if g.lobby.createGameFocus == 1 {
+						g.lobby.createGameName.Field.SetHandleKeyboard(false)
+						g.lobby.createGameName.Field.SetSuffix("")
+						g.lobby.createGamePoints.Field.SetHandleKeyboard(true)
+						g.lobby.createGamePoints.Field.SetSuffix("_")
+						g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
+						g.lobby.createGamePassword.Field.SetSuffix("")
+					} else {
+						g.lobby.createGameName.Field.SetHandleKeyboard(false)
+						g.lobby.createGameName.Field.SetSuffix("")
+						g.lobby.createGamePoints.Field.SetHandleKeyboard(false)
+						g.lobby.createGamePoints.Field.SetSuffix("")
+						g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
+						g.lobby.createGamePassword.Field.SetSuffix("_")
 					}
 				}
 			}
@@ -793,6 +838,13 @@ func (g *Game) Update() error {
 			err := etk.Update()
 			if err != nil {
 				log.Fatal(err)
+			}
+
+			if g.lobby.showCreateGame {
+				pointsText := g.lobby.createGamePoints.Text()
+				if pointsText != "" {
+					g.lobby.createGamePoints.Field.SetText(strings.Join(onlyNumbers.FindAllString(pointsText, -1), ""))
+				}
 			}
 		}
 	} else {
