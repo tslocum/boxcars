@@ -174,13 +174,15 @@ func (l *lobby) drawBuffer() {
 	if l.showCreateGame || l.showJoinGame {
 		// Create game dialog is drawn by etk.
 	} else {
+		titleColor := color.RGBA{R: 205, G: 205, B: 0, A: 255}
+
 		var img *ebiten.Image
 		drawEntry := func(cx float64, cy float64, colA string, colB string, colC string, highlight bool, title bool) {
 			labelColor := triangleA
 			if highlight {
 				labelColor = lightCheckerColor
 			} else if title {
-				labelColor = lightCheckerColor
+				labelColor = titleColor
 			}
 
 			img = ebiten.NewImage(l.w-int(l.padding*2), int(l.entryH))
@@ -203,7 +205,6 @@ func (l *lobby) drawBuffer() {
 			text.Draw(img, colA, mediumFont, 4, standardLineHeight, labelColor)
 			text.Draw(img, colB, mediumFont, int(250*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
 			text.Draw(img, colC, mediumFont, int(500*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
-			//text.Draw(img, colC, mediumFont, int(500*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
 
 			op := &ebiten.DrawImageOptions{}
 			op.GeoM.Translate(cx, cy)
