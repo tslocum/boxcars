@@ -387,6 +387,8 @@ type Game struct {
 	connectPassword *etk.Input
 
 	pressedKeys []ebiten.Key
+
+	cursorX, cursorY int
 }
 
 func NewGame() *Game {
@@ -577,7 +579,8 @@ func (g *Game) handleEvents() {
 			}
 		case *bgammon.EventBoard:
 			g.Board.Lock()
-			g.Board.gameState = &ev.GameState
+			*g.Board.gameState = ev.GameState
+			*g.Board.gameState.Game = *ev.GameState.Game
 			g.Board.processState()
 			g.Board.Unlock()
 			setViewBoard(true)
@@ -676,6 +679,12 @@ func (g *Game) Update() error {
 		return nil
 	}
 
+	cx, cy := ebiten.CursorPosition()
+	if cx != g.cursorX || cy != g.cursorY {
+		g.cursorX, g.cursorY = cx, cy
+		drawScreen = true
+	}
+
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) || ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
 		drawScreen = true
 	}
@@ -710,8 +719,7 @@ func (g *Game) Update() error {
 		lastFocus := connectFocusPassword
 
 		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			x, y := ebiten.CursorPosition()
-			p := image.Point{x, y}
+			p := image.Point{cx, cy}
 			if p.In(g.connectUsername.Rect()) {
 				connectFocusPassword = false
 			} else if p.In(g.connectPassword.Rect()) {
@@ -768,8 +776,7 @@ func (g *Game) Update() error {
 		if g.lobby.showCreateGame || g.lobby.showJoinGame {
 			if g.lobby.showCreateGame {
 				if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-					x, y := ebiten.CursorPosition()
-					p := image.Point{x, y}
+					p := image.Point{cx, cy}
 					if p.In(g.lobby.createGameName.Rect()) {
 						g.lobby.createGameFocus = 0
 						g.lobby.createGameName.Field.SetHandleKeyboard(true)

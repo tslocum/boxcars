@@ -97,6 +97,15 @@ func NewBoard() *board {
 		}, {
 			label:    "OK",
 			selected: b.selectOK,
+		}, {
+			label:    "Double",
+			selected: b.selectDouble,
+		}, {
+			label:    "Resign",
+			selected: b.selectResign,
+		}, {
+			label:    "Accept",
+			selected: b.selectOK,
 		},
 	}
 
@@ -119,6 +128,14 @@ func (b *board) selectOK() {
 
 func (b *board) selectReset() {
 	b.Client.Out <- []byte("reset")
+}
+
+func (b *board) selectDouble() {
+	b.Client.Out <- []byte("double")
+}
+
+func (b *board) selectResign() {
+	b.Client.Out <- []byte("resign")
 }
 
 func (b *board) newSprite(white bool) *Sprite {
@@ -286,7 +303,10 @@ func (b *board) drawButtons(screen *ebiten.Image) {
 	for i, btn := range b.buttons {
 		if (i == 0 && b.gameState.MayRoll()) ||
 			(i == 1 && b.gameState.MayReset()) ||
-			(i == 2 && b.gameState.MayOK()) {
+			(i == 2 && b.gameState.MayOK()) ||
+			(i == 3 && b.gameState.MayDouble()) ||
+			(i == 4 && b.gameState.MayResign()) ||
+			(i == 5 && (b.gameState.MayOK() && b.gameState.MayResign())) {
 			w, h := btn.rect.Dx(), btn.rect.Dy()
 
 			baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
@@ -601,20 +621,27 @@ func (b *board) updateButtonRects() {
 	btnRoll := b.buttons[0]
 	btnReset := b.buttons[1]
 	btnOK := b.buttons[2]
+	btnDouble := b.buttons[3]
+	btnResign := b.buttons[4]
+	btnAccept := b.buttons[5]
 
 	w := 200
 	h := 75
 	x, y := (b.w-w)/2, (b.h-h)/2
 
-	btnRoll.rect = image.Rect(x, y, x+w, y+h)
-
 	const padding = 20
-	if b.gameState.MayReset() && b.gameState.MayOK() {
+	btnReset.rect = image.Rect(x, y, x+w, y+h)
+	btnRoll.rect = image.Rect(x, y, x+w, y+h)
+	btnResign.rect = image.Rect(b.w/2-padding/2-w, y, b.w/2-padding/2, y+h)
+	btnOK.rect = image.Rect(b.w/2+padding/2, y, b.w/2+padding/2+w, y+h)
+	btnAccept.rect = image.Rect(b.w/2+padding/2, y, b.w/2+padding/2+w, y+h)
+
+	if b.gameState.MayDouble() && b.gameState.MayRoll() {
+		btnDouble.rect = image.Rect(b.w/2-padding/2-w, y, b.w/2-padding/2, y+h)
+		btnRoll.rect = image.Rect(b.w/2+padding/2, y, b.w/2+padding/2+w, y+h)
+	} else if b.gameState.MayReset() && b.gameState.MayOK() {
 		btnReset.rect = image.Rect(b.w/2-padding/2-w, y, b.w/2-padding/2, y+h)
 		btnOK.rect = image.Rect(b.w/2+padding/2, y, b.w/2+padding/2+w, y+h)
-	} else {
-		btnReset.rect = image.Rect(x, y, x+w, y+h)
-		btnOK.rect = image.Rect(x, y, x+w, y+h)
 	}
 }
 
@@ -974,10 +1001,14 @@ func (b *board) playerTurn() bool {
 
 func (b *board) handleClick(x int, y int) bool {
 	p := image.Point{x, y}
-	for i, btn := range b.buttons {
+	for i := len(b.buttons) - 1; i >= 0; i-- {
+		btn := b.buttons[i]
 		if (i == 0 && b.gameState.MayRoll()) ||
 			(i == 1 && b.gameState.MayReset()) ||
-			(i == 2 && b.gameState.MayOK()) {
+			(i == 2 && b.gameState.MayOK()) ||
+			(i == 3 && b.gameState.MayDouble()) ||
+			(i == 4 && b.gameState.MayResign()) ||
+			(i == 5 && (b.gameState.MayOK() && b.gameState.MayResign())) {
 			if p.In(btn.rect) {
 				btn.selected()
 				return true
@@ -992,19 +1023,19 @@ func (b *board) Update() {
 		return
 	}
 
+	var handled bool
+	cx, cy := ebiten.CursorPosition()
+	if b.dragging == nil && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		handled = b.handleClick(cx, cy)
+	}
+
 	if b.dragging == nil && b.playerTurn() {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
-		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			if b.dragging == nil {
-				x, y := ebiten.CursorPosition()
-				handled := b.handleClick(x, y)
-				if !handled && len(b.gameState.Available) > 0 {
-					s := b.spriteAt(x, y)
-					if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
-						b.dragging = s
-					}
-				}
+		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && !handled && len(b.gameState.Available) > 0 {
+			s := b.spriteAt(cx, cy)
+			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
+				b.dragging = s
 			}
 		}
 

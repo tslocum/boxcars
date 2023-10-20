@@ -1,5 +1,6 @@
 1.0.2:
 - Allow specifying match points
+- Add doubling cube
 
 1.0.1:
 - Fix checker alignment issues
