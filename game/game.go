@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
-	"code.rocketnine.space/tslocum/etk"
+	"code.rocket9labs.com/tslocum/etk"
 	"code.rocketnine.space/tslocum/kibodo"
 	"code.rocketnine.space/tslocum/messeji"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -413,34 +413,43 @@ func NewGame() *Game {
 	etk.Style.TextColorDark = triangleA
 	etk.Style.InputBgColor = color.RGBA{40, 24, 9, 255}
 
+	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
+	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
+
 	{
 		headerLabel := etk.NewText("Welcome to bgammon.org")
 		nameLabel := etk.NewText("Username")
 		passwordLabel := etk.NewText("Password")
 
-		infoLabel := etk.NewText("To log in as a guest, enter a username (if you want) and do not enter a password. Press Enter to log in.")
+		connectButton := etk.NewButton("Connect", func() error {
+			g.Username = g.connectUsername.Text()
+			g.Password = g.connectPassword.Text()
+			g.Connect()
+			return nil
+		})
+
+		infoLabel := etk.NewText("To log in as a guest, enter a username (if you want) and do not enter a password.")
 
 		g.connectUsername = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
-		g.connectUsername.Field.SetHandleKeyboard(true)
 
 		g.connectPassword = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
-		g.connectPassword.Field.SetHandleKeyboard(false)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
 		grid.SetRowPadding(20)
 		grid.SetColumnSizes(10, 200)
-		grid.SetRowSizes(60, 50, 50)
+		grid.SetRowSizes(60, 50, 50, 75)
 		grid.AddChildAt(headerLabel, 0, 0, 3, 1)
 		grid.AddChildAt(nameLabel, 1, 1, 1, 1)
 		grid.AddChildAt(g.connectUsername, 2, 1, 1, 1)
 		grid.AddChildAt(passwordLabel, 1, 2, 1, 1)
 		grid.AddChildAt(g.connectPassword, 2, 2, 1, 1)
-		grid.AddChildAt(infoLabel, 0, 3, 3, 1)
+		grid.AddChildAt(connectButton, 2, 3, 1, 1)
+		grid.AddChildAt(infoLabel, 1, 4, 2, 1)
 		connectGrid = grid
 	}
 
@@ -453,17 +462,14 @@ func NewGame() *Game {
 		g.lobby.createGameName = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
-		g.lobby.createGameName.Field.SetHandleKeyboard(true)
 
 		g.lobby.createGamePoints = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
-		g.lobby.createGamePoints.Field.SetHandleKeyboard(false)
 
 		g.lobby.createGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
-		g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
@@ -488,7 +494,6 @@ func NewGame() *Game {
 		g.lobby.joinGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
-		g.lobby.joinGamePassword.Field.SetHandleKeyboard(true)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
@@ -502,6 +507,7 @@ func NewGame() *Game {
 	}
 
 	etk.SetRoot(connectGrid)
+	etk.SetFocus(g.connectUsername)
 
 	return g
 }
@@ -637,6 +643,9 @@ func (g *Game) handleEvents() {
 }
 
 func (g *Game) Connect() {
+	if g.loggedIn {
+		return
+	}
 	g.loggedIn = true
 
 	l(fmt.Sprintf("*** Connecting..."))
@@ -733,15 +742,9 @@ func (g *Game) Update() error {
 
 		if connectFocusPassword != lastFocus {
 			if connectFocusPassword {
-				g.connectUsername.Field.SetHandleKeyboard(false)
-				g.connectUsername.Field.SetSuffix("")
-				g.connectPassword.Field.SetHandleKeyboard(true)
-				g.connectPassword.Field.SetSuffix("_")
+				etk.SetFocus(g.connectPassword)
 			} else {
-				g.connectUsername.Field.SetHandleKeyboard(true)
-				g.connectUsername.Field.SetSuffix("_")
-				g.connectPassword.Field.SetHandleKeyboard(false)
-				g.connectPassword.Field.SetSuffix("")
+				etk.SetFocus(g.connectUsername)
 			}
 		}
 
@@ -779,28 +782,13 @@ func (g *Game) Update() error {
 					p := image.Point{cx, cy}
 					if p.In(g.lobby.createGameName.Rect()) {
 						g.lobby.createGameFocus = 0
-						g.lobby.createGameName.Field.SetHandleKeyboard(true)
-						g.lobby.createGameName.Field.SetSuffix("_")
-						g.lobby.createGamePoints.Field.SetHandleKeyboard(false)
-						g.lobby.createGamePoints.Field.SetSuffix("")
-						g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
-						g.lobby.createGamePassword.Field.SetSuffix("")
+						etk.SetFocus(g.lobby.createGameName)
 					} else if p.In(g.lobby.createGamePoints.Rect()) {
 						g.lobby.createGameFocus = 1
-						g.lobby.createGameName.Field.SetHandleKeyboard(false)
-						g.lobby.createGameName.Field.SetSuffix("")
-						g.lobby.createGamePoints.Field.SetHandleKeyboard(true)
-						g.lobby.createGamePoints.Field.SetSuffix("_")
-						g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
-						g.lobby.createGamePassword.Field.SetSuffix("")
+						etk.SetFocus(g.lobby.createGamePoints)
 					} else if p.In(g.lobby.createGamePassword.Rect()) {
 						g.lobby.createGameFocus = 2
-						g.lobby.createGameName.Field.SetHandleKeyboard(false)
-						g.lobby.createGameName.Field.SetSuffix("")
-						g.lobby.createGamePoints.Field.SetHandleKeyboard(false)
-						g.lobby.createGamePoints.Field.SetSuffix("")
-						g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
-						g.lobby.createGamePassword.Field.SetSuffix("_")
+						etk.SetFocus(g.lobby.createGamePassword)
 					}
 				}
 
@@ -818,26 +806,11 @@ func (g *Game) Update() error {
 					}
 
 					if g.lobby.createGameFocus == 0 {
-						g.lobby.createGameName.Field.SetHandleKeyboard(true)
-						g.lobby.createGameName.Field.SetSuffix("_")
-						g.lobby.createGamePoints.Field.SetHandleKeyboard(false)
-						g.lobby.createGamePoints.Field.SetSuffix("")
-						g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
-						g.lobby.createGamePassword.Field.SetSuffix("")
+						etk.SetFocus(g.lobby.createGameName)
 					} else if g.lobby.createGameFocus == 1 {
-						g.lobby.createGameName.Field.SetHandleKeyboard(false)
-						g.lobby.createGameName.Field.SetSuffix("")
-						g.lobby.createGamePoints.Field.SetHandleKeyboard(true)
-						g.lobby.createGamePoints.Field.SetSuffix("_")
-						g.lobby.createGamePassword.Field.SetHandleKeyboard(false)
-						g.lobby.createGamePassword.Field.SetSuffix("")
+						etk.SetFocus(g.lobby.createGamePoints)
 					} else {
-						g.lobby.createGameName.Field.SetHandleKeyboard(false)
-						g.lobby.createGameName.Field.SetSuffix("")
-						g.lobby.createGamePoints.Field.SetHandleKeyboard(false)
-						g.lobby.createGamePoints.Field.SetSuffix("")
-						g.lobby.createGamePassword.Field.SetHandleKeyboard(true)
-						g.lobby.createGamePassword.Field.SetSuffix("_")
+						etk.SetFocus(g.lobby.createGamePassword)
 					}
 				}
 			}

@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
-	"code.rocketnine.space/tslocum/etk"
+	"code.rocket9labs.com/tslocum/etk"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -367,6 +367,7 @@ func (l *lobby) click(x, y int) {
 		case lobbyButtonCreate:
 			l.showCreateGame = true
 			etk.SetRoot(createGameGrid)
+			etk.SetFocus(l.createGameName)
 			namePlural := l.c.Username
 			lastLetter := namePlural[len(namePlural)-1]
 			if lastLetter == 's' || lastLetter == 'S' {
@@ -394,6 +395,7 @@ func (l *lobby) click(x, y int) {
 			if l.games[l.selected].Password {
 				l.showJoinGame = true
 				etk.SetRoot(joinGameGrid)
+				etk.SetFocus(l.joinGamePassword)
 				l.joinGameLabel.SetText(fmt.Sprintf("Join match: %s", l.games[l.selected].Name))
 				l.joinGamePassword.Field.SetText("")
 				l.joinGameID = l.games[l.selected].ID
@@ -419,6 +421,7 @@ func (l *lobby) click(x, y int) {
 				if entry.Password {
 					l.showJoinGame = true
 					etk.SetRoot(joinGameGrid)
+					etk.SetFocus(l.joinGamePassword)
 					l.joinGameLabel.SetText(fmt.Sprintf("Join match: %s", entry.Name))
 					l.joinGamePassword.Field.SetText("")
 					l.joinGameID = entry.ID
