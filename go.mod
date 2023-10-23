@@ -3,12 +3,12 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231020215337-c4aa14d514fb
-	code.rocket9labs.com/tslocum/etk v0.0.0-20231021231204-5c6a4b870885
-	code.rocketnine.space/tslocum/kibodo v1.0.0
-	code.rocketnine.space/tslocum/messeji v1.0.4-0.20231021230727-3fa5b72a505d
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231023071513-07e9c3dc1e6a
+	code.rocket9labs.com/tslocum/etk v0.0.0-20231023073039-12d99f9f6d25
+	code.rocketnine.space/tslocum/kibodo v1.0.1
+	code.rocketnine.space/tslocum/messeji v1.0.4-0.20231022192419-8bc4edaf3b20
 	github.com/hajimehoshi/ebiten/v2 v2.6.2
-	github.com/llgcode/draw2d v0.0.0-20230723155556-e595d7c7e75e
+	github.com/llgcode/draw2d v0.0.0-20231022063514-1acb54133d2a
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	golang.org/x/image v0.13.0
 	nhooyr.io/websocket v1.8.9

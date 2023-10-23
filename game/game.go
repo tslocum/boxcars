@@ -108,8 +108,6 @@ var (
 	connectGrid    *etk.Grid
 	createGameGrid *etk.Grid
 	joinGameGrid   *etk.Grid
-
-	connectFocusPassword bool
 )
 
 func l(s string) {
@@ -306,7 +304,6 @@ func setViewBoard(view bool) {
 
 		// Exit create game dialog, if open.
 		game.lobby.showCreateGame = false
-		game.lobby.createGameFocus = 0
 		game.lobby.createGameName.Field.SetText("")
 		game.lobby.createGamePassword.Field.SetText("")
 		game.lobby.bufferDirty = true
@@ -315,6 +312,18 @@ func setViewBoard(view bool) {
 		inputBuffer.SetSuffix("")
 	}
 	game.updateStatusBufferPosition()
+
+	if !game.loggedIn {
+		displayArea := 450
+		game.keyboard.SetRect(0, displayArea, game.screenW, game.screenH-displayArea)
+	} else if !viewBoard {
+		displayArea := 400
+		game.keyboard.SetRect(0, displayArea, game.screenW, game.screenH-displayArea)
+	} else {
+		displayArea := 400
+		game.keyboard.SetRect(0, displayArea, game.screenW, game.screenH-displayArea)
+	}
+
 	scheduleFrame()
 }
 
@@ -383,8 +392,9 @@ type Game struct {
 
 	loaded bool
 
-	connectUsername *etk.Input
-	connectPassword *etk.Input
+	connectUsername       *etk.Input
+	connectPassword       *etk.Input
+	connectKeyboardButton *etk.Button
 
 	pressedKeys []ebiten.Key
 
@@ -428,6 +438,17 @@ func NewGame() *Game {
 			return nil
 		})
 
+		g.connectKeyboardButton = etk.NewButton("Show Keyboard", func() error {
+			if g.keyboard.Visible() {
+				g.keyboard.Hide()
+				g.connectKeyboardButton.Label.SetText("Show Keyboard")
+			} else {
+				g.keyboard.Show()
+				g.connectKeyboardButton.Label.SetText("Hide Keyboard")
+			}
+			return nil
+		})
+
 		infoLabel := etk.NewText("To log in as a guest, enter a username (if you want) and do not enter a password.")
 
 		g.connectUsername = etk.NewInput("", "", func(text string) (handled bool) {
@@ -443,12 +464,13 @@ func NewGame() *Game {
 		grid.SetRowPadding(20)
 		grid.SetColumnSizes(10, 200)
 		grid.SetRowSizes(60, 50, 50, 75)
-		grid.AddChildAt(headerLabel, 0, 0, 3, 1)
-		grid.AddChildAt(nameLabel, 1, 1, 1, 1)
-		grid.AddChildAt(g.connectUsername, 2, 1, 1, 1)
-		grid.AddChildAt(passwordLabel, 1, 2, 1, 1)
-		grid.AddChildAt(g.connectPassword, 2, 2, 1, 1)
+		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
+		grid.AddChildAt(nameLabel, 1, 1, 2, 1)
+		grid.AddChildAt(g.connectUsername, 2, 1, 2, 1)
+		grid.AddChildAt(passwordLabel, 1, 2, 2, 1)
+		grid.AddChildAt(g.connectPassword, 2, 2, 2, 1)
 		grid.AddChildAt(connectButton, 2, 3, 1, 1)
+		grid.AddChildAt(g.connectKeyboardButton, 3, 3, 1, 1)
 		grid.AddChildAt(infoLabel, 1, 4, 2, 1)
 		connectGrid = grid
 	}
@@ -650,6 +672,8 @@ func (g *Game) Connect() {
 
 	l(fmt.Sprintf("*** Connecting..."))
 
+	g.keyboard.Hide()
+
 	address := g.ServerAddress
 	if address == "" {
 		address = DefaultServerAddress
@@ -678,6 +702,64 @@ func (g *Game) Connect() {
 	}
 
 	go c.Connect()
+}
+
+func (g *Game) handleInput(keys []ebiten.Key) error {
+	if !g.loggedIn {
+		for _, key := range keys {
+			switch key {
+			case ebiten.KeyTab:
+				focusedWidget := etk.Focused()
+				switch focusedWidget {
+				case g.connectUsername:
+					etk.SetFocus(g.connectPassword)
+				case g.connectPassword:
+					etk.SetFocus(g.connectUsername)
+				}
+			case ebiten.KeyEnter, ebiten.KeyKPEnter:
+				g.Username = g.connectUsername.Text()
+				g.Password = g.connectPassword.Text()
+				g.Connect()
+			}
+		}
+		return nil
+	}
+
+	for _, key := range keys {
+		switch key {
+		case ebiten.KeyEscape:
+			setViewBoard(!viewBoard)
+		}
+	}
+
+	if !viewBoard && g.lobby.showCreateGame {
+		for _, key := range keys {
+			switch key {
+			case ebiten.KeyTab:
+				focusedWidget := etk.Focused()
+				if ebiten.IsKeyPressed(ebiten.KeyShift) {
+					switch focusedWidget {
+					case g.lobby.createGameName:
+						etk.SetFocus(g.lobby.createGamePassword)
+					case g.lobby.createGamePoints:
+						etk.SetFocus(g.lobby.createGameName)
+					case g.lobby.createGamePassword:
+						etk.SetFocus(g.lobby.createGamePoints)
+					}
+				} else {
+					switch focusedWidget {
+					case g.lobby.createGameName:
+						etk.SetFocus(g.lobby.createGamePoints)
+					case g.lobby.createGamePoints:
+						etk.SetFocus(g.lobby.createGamePassword)
+					case g.lobby.createGamePassword:
+						etk.SetFocus(g.lobby.createGameName)
+					}
+				}
+			}
+		}
+	}
+	return nil
 }
 
 // Update is called by Ebitengine only when user input occurs, or a frame is
@@ -724,43 +806,6 @@ func (g *Game) Update() error {
 		}
 	}
 
-	if !g.loggedIn {
-		lastFocus := connectFocusPassword
-
-		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			p := image.Point{cx, cy}
-			if p.In(g.connectUsername.Rect()) {
-				connectFocusPassword = false
-			} else if p.In(g.connectPassword.Rect()) {
-				connectFocusPassword = true
-			}
-		}
-
-		if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
-			connectFocusPassword = !connectFocusPassword
-		}
-
-		if connectFocusPassword != lastFocus {
-			if connectFocusPassword {
-				etk.SetFocus(g.connectPassword)
-			} else {
-				etk.SetFocus(g.connectUsername)
-			}
-		}
-
-		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) || inpututil.IsKeyJustPressed(ebiten.KeyKPEnter) {
-			g.Username = g.connectUsername.Text()
-			g.Password = g.connectPassword.Text()
-			g.Connect()
-		}
-
-		err := etk.Update()
-		if err != nil {
-			log.Fatal(err)
-		}
-		return nil
-	}
-
 	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		Debug++
 		if Debug > MaxDebug {
@@ -769,8 +814,52 @@ func (g *Game) Update() error {
 		g.Board.debug = Debug
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		setViewBoard(!viewBoard)
+	// Handle on-screen keyboard.
+	err := g.keyboard.Update()
+	if err != nil {
+		return err
+	}
+	g.keyboardInput = g.keyboard.AppendInput(g.keyboardInput[:0])
+
+	var keys []ebiten.Key
+	for _, input := range g.keyboardInput {
+		if input.Rune == 0 {
+			keys = append(keys, input.Key)
+		}
+	}
+	if keys != nil {
+		err = g.handleInput(keys)
+		if err != nil {
+			return err
+		}
+	}
+
+	// TODO move key handling to function and handle normal input and on-screen input in serial
+	g.pressedKeys = inpututil.AppendJustPressedKeys(g.pressedKeys[:0])
+	err = g.handleInput(g.pressedKeys)
+	if err != nil {
+		return err
+	}
+
+	if !g.loggedIn {
+		if len(g.keyboardInput) > 0 {
+			w := etk.Focused()
+			if w != nil {
+				for _, event := range g.keyboardInput {
+					if event.Rune > 0 {
+						w.HandleKeyboardEvent(-1, event.Rune)
+					} else {
+						w.HandleKeyboardEvent(event.Key, 0)
+					}
+				}
+			}
+		}
+
+		err := etk.Update()
+		if err != nil {
+			log.Fatal(err)
+		}
+		return nil
 	}
 
 	if !viewBoard {
@@ -781,35 +870,10 @@ func (g *Game) Update() error {
 				if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 					p := image.Point{cx, cy}
 					if p.In(g.lobby.createGameName.Rect()) {
-						g.lobby.createGameFocus = 0
 						etk.SetFocus(g.lobby.createGameName)
 					} else if p.In(g.lobby.createGamePoints.Rect()) {
-						g.lobby.createGameFocus = 1
 						etk.SetFocus(g.lobby.createGamePoints)
 					} else if p.In(g.lobby.createGamePassword.Rect()) {
-						g.lobby.createGameFocus = 2
-						etk.SetFocus(g.lobby.createGamePassword)
-					}
-				}
-
-				if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
-					if ebiten.IsKeyPressed(ebiten.KeyShift) {
-						g.lobby.createGameFocus--
-						if g.lobby.createGameFocus < 0 {
-							g.lobby.createGameFocus = 2
-						}
-					} else {
-						g.lobby.createGameFocus++
-						if g.lobby.createGameFocus > 2 {
-							g.lobby.createGameFocus = 0
-						}
-					}
-
-					if g.lobby.createGameFocus == 0 {
-						etk.SetFocus(g.lobby.createGameName)
-					} else if g.lobby.createGameFocus == 1 {
-						etk.SetFocus(g.lobby.createGamePoints)
-					} else {
 						etk.SetFocus(g.lobby.createGamePassword)
 					}
 				}
@@ -853,6 +917,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		game.keyboard.Draw(screen)
 		return
 	}
 
@@ -871,6 +936,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		inputBuffer.Draw(screen)
 		g.Board.Draw(screen)
 	}
+
+	game.keyboard.Draw(screen)
 
 	if Debug > 0 {
 		g.drawBuffer.Reset()
@@ -982,10 +1049,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPadding-inputBufferHeight, x+w, g.screenH-bufferPadding))
 
-	displayArea := 200
-	g.keyboard.SetRect(0, displayArea, g.screenW, g.screenH-displayArea)
-
 	etk.Layout(g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
+
+	setViewBoard(viewBoard)
 
 	return outsideWidth, outsideHeight
 }

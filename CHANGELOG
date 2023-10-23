@@ -1,5 +1,6 @@
 1.0.3:
 - Add connect button
+- Support touch input
 
 1.0.2:
 - Allow specifying match points

@@ -49,9 +49,9 @@ func (c *Client) Connect() {
 func (c *Client) logIn() {
 	loginInfo := c.Username
 	if c.Username != "" && c.Password != "" {
-		loginInfo = fmt.Sprintf("%s %s", c.Username, c.Password)
+		loginInfo = fmt.Sprintf("%s %s", strings.ReplaceAll(c.Username, " ", "_"), strings.ReplaceAll(c.Password, " ", "_"))
 	}
-	c.Out <- []byte(fmt.Sprintf("lj %s\nlist\n", loginInfo))
+	c.Out <- []byte(fmt.Sprintf("lj boxcars %s\nlist\n", loginInfo))
 }
 
 func (c *Client) LoggedIn() bool {

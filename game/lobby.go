@@ -93,7 +93,6 @@ type lobby struct {
 	createGameName         *etk.Input
 	createGamePoints       *etk.Input
 	createGamePassword     *etk.Input
-	createGameFocus        int
 
 	showJoinGame     bool
 	joinGameID       int
@@ -332,7 +331,6 @@ func (l *lobby) click(x, y int) {
 			switch buttonIndex {
 			case lobbyButtonCreateCancel:
 				game.lobby.showCreateGame = false
-				game.lobby.createGameFocus = 0
 				game.lobby.createGameName.Field.SetText("")
 				game.lobby.createGamePassword.Field.SetText("")
 				l.bufferDirty = true
