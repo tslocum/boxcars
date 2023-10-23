@@ -12,6 +12,10 @@ Visit https://play.bgammon.org
 
 Download Boxcars at https://bgammon.org/download
 
+## Screenshot
+
+[![Screenshot](https://code.rocketnine.space/tslocum/boxcars/raw/branch/main/screenshot.png)](https://code.rocketnine.space/tslocum/boxcars/src/branch/main/screenshot.png)
+
 ## Build
 
 **Note:** You will need to install the dependencies listed for [your platform](https://github.com/hajimehoshi/ebiten/blob/main/README.md#platforms).
