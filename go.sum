@@ -1,11 +1,11 @@
 code.rocket9labs.com/tslocum/bgammon v0.0.0-20231023071513-07e9c3dc1e6a h1:gUrDw8cVAWMFgjHZsiwPNj7Dl8TSe/3uoFJQOGO8haE=
 code.rocket9labs.com/tslocum/bgammon v0.0.0-20231023071513-07e9c3dc1e6a/go.mod h1:LS/m5Zq7/93dP8XJrLkL1T5ZTwtddkN8X9TyRrrdCkQ=
-code.rocket9labs.com/tslocum/etk v0.0.0-20231023073039-12d99f9f6d25 h1:p8sg2ij8HG43Brtd+WaBbrr5HPh4Nr5ggAkLyRanMk4=
-code.rocket9labs.com/tslocum/etk v0.0.0-20231023073039-12d99f9f6d25/go.mod h1:mQyHbj5b+CRwTvV4jtJs0vhQORnlXT9+usavCxP+U+k=
-code.rocketnine.space/tslocum/kibodo v1.0.1 h1:5b/dmxx22HB/g1ZMIm3tA3rGKRoGLfeHWDTQ0LG4IDA=
-code.rocketnine.space/tslocum/kibodo v1.0.1/go.mod h1:C7M1NUuVi0Mv+/xraUurjl4XSLRIILmWDWCBBOY4UeM=
-code.rocketnine.space/tslocum/messeji v1.0.4-0.20231022192419-8bc4edaf3b20 h1:cnTDOm9qgrfSLlvg3linckRIoTzxIVazaVROIYib5n8=
-code.rocketnine.space/tslocum/messeji v1.0.4-0.20231022192419-8bc4edaf3b20/go.mod h1:xszLyTZtpyjCVaGmznizLSAlnvraPOSoanlzUBeqGco=
+code.rocket9labs.com/tslocum/etk v0.0.0-20231024214653-dcce2a48933c h1:Dn/9QddkbhpTZqluGEve5HGgh6JQSNEXXDiwdI70F38=
+code.rocket9labs.com/tslocum/etk v0.0.0-20231024214653-dcce2a48933c/go.mod h1:rJ62XnzCl3crN13IBnA1j7xR9Hji/CIO4vcy9wX2zZY=
+code.rocketnine.space/tslocum/kibodo v1.0.2-0.20231024233002-77bb43ba6fe8 h1:i1NzTMQA1DAAUIpFh2bnHVnH5j9hUkG6F3tqzsdD16Y=
+code.rocketnine.space/tslocum/kibodo v1.0.2-0.20231024233002-77bb43ba6fe8/go.mod h1:C7M1NUuVi0Mv+/xraUurjl4XSLRIILmWDWCBBOY4UeM=
+code.rocketnine.space/tslocum/messeji v1.0.5-0.20231024221604-21ce90e7eb52 h1:rAAz4Z1fHqaqsx9MadIJeRr1S5tk7qDoQwGRBHywuEU=
+code.rocketnine.space/tslocum/messeji v1.0.5-0.20231024221604-21ce90e7eb52/go.mod h1:xszLyTZtpyjCVaGmznizLSAlnvraPOSoanlzUBeqGco=
 github.com/ebitengine/purego v0.5.0 h1:JrMGKfRIAM4/QVKaesIIT7m/UVjTj5GYhRSQYwfVdpo=
 github.com/ebitengine/purego v0.5.0/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
 github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 h1:DACJavvAHhabrF08vX0COfcOBJRhZ8lUbR+ZWIs0Y5g=

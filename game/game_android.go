@@ -1,6 +1,6 @@
-//go:build (!js || !wasm) && !android
+//go:build android
 
 package game
 
 const DefaultServerAddress = "tcp://bgammon.org:1337"
-const OptimizeDraws = true
+const OptimizeDraws = false

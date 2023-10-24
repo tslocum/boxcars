@@ -355,6 +355,7 @@ func (l *lobby) click(x, y int) {
 				game.lobby.createGamePassword.Field.SetText("")
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
+				game.setRoot(nil)
 			case lobbyButtonCreateConfirm:
 				typeAndPassword := "public"
 				if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
@@ -372,6 +373,11 @@ func (l *lobby) click(x, y int) {
 				l.showJoinGame = false
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
+				if viewBoard {
+					game.setRoot(game.Board.window)
+				} else {
+					game.setRoot(nil)
+				}
 			} else {
 				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
 			}
@@ -384,7 +390,7 @@ func (l *lobby) click(x, y int) {
 			l.c.Out <- []byte("ls")
 		case lobbyButtonCreate:
 			l.showCreateGame = true
-			etk.SetRoot(createGameGrid)
+			game.setRoot(createGameGrid)
 			etk.SetFocus(l.createGameName)
 			namePlural := l.c.Username
 			lastLetter := namePlural[len(namePlural)-1]
@@ -412,7 +418,7 @@ func (l *lobby) click(x, y int) {
 			}
 			if l.games[l.selected].Password {
 				l.showJoinGame = true
-				etk.SetRoot(joinGameGrid)
+				game.setRoot(joinGameGrid)
 				etk.SetFocus(l.joinGamePassword)
 				l.joinGameLabel.SetText(fmt.Sprintf("Join match: %s", l.games[l.selected].Name))
 				l.joinGamePassword.Field.SetText("")
@@ -438,7 +444,7 @@ func (l *lobby) click(x, y int) {
 				entry := l.games[l.selected]
 				if entry.Password {
 					l.showJoinGame = true
-					etk.SetRoot(joinGameGrid)
+					game.setRoot(joinGameGrid)
 					etk.SetFocus(l.joinGamePassword)
 					l.joinGameLabel.SetText(fmt.Sprintf("Join match: %s", entry.Name))
 					l.joinGamePassword.Field.SetText("")
@@ -520,6 +526,7 @@ func (l *lobby) update() {
 
 	l.touchIDs = inpututil.AppendJustPressedTouchIDs(l.touchIDs[:0])
 	for _, id := range l.touchIDs {
+		game.enableTouchInput()
 		x, y := ebiten.TouchPosition(id)
 		l.click(x, y)
 	}

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
+	"code.rocket9labs.com/tslocum/etk"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -65,6 +66,10 @@ type board struct {
 
 	spaceHighlight *ebiten.Image
 
+	inputGrid          *etk.Grid
+	showKeyboardButton *etk.Button
+	window             *etk.Window
+
 	*sync.Mutex
 }
 
@@ -85,8 +90,16 @@ func NewBoard() *board {
 			Game: bgammon.NewGame(),
 		},
 		spaceHighlight: ebiten.NewImage(1, 1),
+		inputGrid:      etk.NewGrid(),
+		window:         etk.NewWindow(),
 		Mutex:          &sync.Mutex{},
 	}
+
+	b.showKeyboardButton = etk.NewButton("Show Keyboard", b.toggleKeyboard)
+	b.inputGrid.AddChildAt(b.showKeyboardButton, 0, 0, 1, 1)
+	b.window.SetRepositionChildren(false)
+	b.window.AddChild(b.inputGrid)
+
 	b.buttons = []*boardButton{
 		{
 			label:    "Roll",
@@ -116,6 +129,26 @@ func NewBoard() *board {
 	b.dragTouchId = -1
 
 	return b
+}
+
+func (b *board) setKeyboardRect() {
+	heightOffset := 76
+	if game.portraitView() {
+		heightOffset += 44
+	}
+	game.keyboard.SetRect(0, game.screenH/2, game.screenW, (game.screenH - game.screenH/2 - heightOffset))
+}
+
+func (b *board) toggleKeyboard() error {
+	if game.keyboard.Visible() {
+		game.keyboard.Hide()
+		b.showKeyboardButton.Label.SetText("Show Keyboard")
+	} else {
+		b.setKeyboardRect()
+		game.keyboard.Show()
+		b.showKeyboardButton.Label.SetText("Hide Keyboard")
+	}
+	return nil
 }
 
 func (b *board) selectRoll() {
@@ -299,6 +332,33 @@ func (b *board) updateBackgroundImage() {
 	}
 }
 
+func (b *board) drawButton(target *ebiten.Image, r image.Rectangle, label string) {
+	w, h := r.Dx(), r.Dy()
+
+	baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
+
+	gc := draw2dimg.NewGraphicContext(baseImg)
+	gc.SetLineWidth(5)
+	gc.SetStrokeColor(color.Black)
+	gc.MoveTo(0, 0)
+	gc.LineTo(float64(w), 0)
+	gc.LineTo(float64(w), float64(h))
+	gc.LineTo(0, float64(h))
+	gc.Close()
+	gc.Stroke()
+
+	img := ebiten.NewImage(w, h)
+	img.Fill(color.RGBA{225.0, 188, 125, 255})
+	img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
+
+	bounds := text.BoundString(mediumFont, label)
+	text.Draw(img, label, mediumFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
+
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(r.Min.X), float64(r.Min.Y))
+	target.DrawImage(img, op)
+}
+
 func (b *board) drawButtons(screen *ebiten.Image) {
 	for i, btn := range b.buttons {
 		if (i == 0 && b.gameState.MayRoll()) ||
@@ -307,30 +367,7 @@ func (b *board) drawButtons(screen *ebiten.Image) {
 			(i == 3 && b.gameState.MayDouble()) ||
 			(i == 4 && b.gameState.MayResign()) ||
 			(i == 5 && (b.gameState.MayOK() && b.gameState.MayResign())) {
-			w, h := btn.rect.Dx(), btn.rect.Dy()
-
-			baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
-
-			gc := draw2dimg.NewGraphicContext(baseImg)
-			gc.SetLineWidth(5)
-			gc.SetStrokeColor(color.Black)
-			gc.MoveTo(0, 0)
-			gc.LineTo(float64(w), 0)
-			gc.LineTo(float64(w), float64(h))
-			gc.LineTo(0, float64(h))
-			gc.Close()
-			gc.Stroke()
-
-			img := ebiten.NewImage(w, h)
-			img.Fill(color.RGBA{225.0, 188, 125, 255})
-			img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
-
-			bounds := text.BoundString(mediumFont, btn.label)
-			text.Draw(img, btn.label, mediumFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
-
-			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(btn.rect.Min.X), float64(btn.rect.Min.Y))
-			screen.DrawImage(img, op)
+			b.drawButton(screen, btn.rect, btn.label)
 		}
 	}
 }
@@ -648,6 +685,10 @@ func (b *board) updateButtonRects() {
 func (b *board) setRect(x, y, w, h int) {
 	if b.x == x && b.y == y && b.w == w && b.h == h {
 		return
+	}
+
+	if game.keyboard.Visible() {
+		b.setKeyboardRect()
 	}
 
 	b.x, b.y, b.w, b.h = x, y, w, h
@@ -1025,6 +1066,13 @@ func (b *board) Update() {
 
 	var handled bool
 	cx, cy := ebiten.CursorPosition()
+	if (cx != 0 || cy != 0) && game.keyboard.Visible() {
+		p := image.Point{X: cx, Y: cy}
+		if p.In(game.keyboard.Rect()) {
+			return
+		}
+	}
+
 	if b.dragging == nil && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		handled = b.handleClick(cx, cy)
 	}
@@ -1041,6 +1089,7 @@ func (b *board) Update() {
 
 		b.touchIDs = inpututil.AppendJustPressedTouchIDs(b.touchIDs[:0])
 		for _, id := range b.touchIDs {
+			game.enableTouchInput()
 			x, y := ebiten.TouchPosition(id)
 			handled := b.handleClick(x, y)
 			if !handled && len(b.gameState.Available) > 0 {

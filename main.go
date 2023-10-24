@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"log"
-	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
@@ -28,20 +27,9 @@ func main() {
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetWindowClosingHandled(true)
 
-	fullscreenWidth, fullscreenHeight := ebiten.ScreenSizeInFullscreen()
-	if fullscreenWidth <= screenWidth || fullscreenHeight <= screenHeight {
-		ebiten.SetFullscreen(true)
-	}
-
 	g := game.NewGame()
 
 	parseFlags(g)
-
-	if game.Debug > 0 {
-		go func() {
-			log.Fatal(http.ListenAndServe("localhost:8880", nil))
-		}()
-	}
 
 	go func() {
 		scanner := bufio.NewScanner(os.Stdin)

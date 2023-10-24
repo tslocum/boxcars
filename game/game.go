@@ -297,30 +297,41 @@ func diceImage(roll int) *ebiten.Image {
 }
 
 func setViewBoard(view bool) {
+	if viewBoard != view {
+		game.keyboard.Hide()
+	}
+
 	viewBoard = view
 	inputBuffer.SetHandleKeyboard(viewBoard)
 	if viewBoard {
 		inputBuffer.SetSuffix("_")
 
-		// Exit create game dialog, if open.
+		// Exit dialogs.
+		game.lobby.showJoinGame = false
 		game.lobby.showCreateGame = false
 		game.lobby.createGameName.Field.SetText("")
 		game.lobby.createGamePassword.Field.SetText("")
 		game.lobby.bufferDirty = true
 		game.lobby.bufferButtonsDirty = true
+
+		etk.SetRoot(game.Board.window)
 	} else {
 		inputBuffer.SetSuffix("")
+
+		if !game.loggedIn {
+			game.setRoot(connectGrid)
+		} else if game.lobby.showCreateGame {
+			game.setRoot(createGameGrid)
+		} else if game.lobby.showJoinGame {
+			game.setRoot(joinGameGrid)
+		} else {
+			game.setRoot(nil)
+		}
 	}
 	game.updateStatusBufferPosition()
 
 	if !game.loggedIn {
 		displayArea := 450
-		game.keyboard.SetRect(0, displayArea, game.screenW, game.screenH-displayArea)
-	} else if !viewBoard {
-		displayArea := 400
-		game.keyboard.SetRect(0, displayArea, game.screenW, game.screenH-displayArea)
-	} else {
-		displayArea := 400
 		game.keyboard.SetRect(0, displayArea, game.screenW, game.screenH-displayArea)
 	}
 
@@ -398,8 +409,13 @@ type Game struct {
 	pressedKeys []ebiten.Key
 
 	cursorX, cursorY int
+	touchInput       bool
+
+	rootWidget etk.Widget
 
 	lastRefresh time.Time
+
+	forceLayout bool
 }
 
 func NewGame() *Game {
@@ -529,12 +545,19 @@ func NewGame() *Game {
 		joinGameGrid = grid
 	}
 
-	etk.SetRoot(connectGrid)
+	g.setRoot(connectGrid)
 	etk.SetFocus(g.connectUsername)
 
 	go g.handleAutoRefresh()
 
 	return g
+}
+
+func (g *Game) setRoot(w etk.Widget) {
+	if w != g.Board.window {
+		g.rootWidget = w
+	}
+	etk.SetRoot(w)
 }
 
 func (g *Game) handleAutoRefresh() {
@@ -685,6 +708,8 @@ func (g *Game) Connect() {
 	l(fmt.Sprintf("*** Connecting..."))
 
 	g.keyboard.Hide()
+
+	g.setRoot(nil)
 
 	address := g.ServerAddress
 	if address == "" {
@@ -861,11 +886,7 @@ func (g *Game) Update() error {
 			}
 		}
 
-		err := etk.Update()
-		if err != nil {
-			log.Fatal(err)
-		}
-		return nil
+		return etk.Update()
 	}
 
 	if !viewBoard {
@@ -885,9 +906,15 @@ func (g *Game) Update() error {
 				}
 			}
 
-			err := etk.Update()
-			if err != nil {
-				log.Fatal(err)
+			w := etk.Focused()
+			if w != nil {
+				for _, event := range g.keyboardInput {
+					if event.Rune > 0 {
+						w.HandleKeyboardEvent(-1, event.Rune)
+					} else {
+						w.HandleKeyboardEvent(event.Key, 0)
+					}
+				}
 			}
 
 			if g.lobby.showCreateGame {
@@ -900,17 +927,25 @@ func (g *Game) Update() error {
 	} else {
 		g.Board.Update()
 
-		err := inputBuffer.Update()
+		for _, event := range g.keyboardInput {
+			if event.Rune > 0 {
+				inputBuffer.HandleKeyboardEvent(-1, event.Rune)
+			} else {
+				inputBuffer.HandleKeyboardEvent(event.Key, 0)
+			}
+		}
+
+		err = inputBuffer.Update()
 		if err != nil {
 			return err
 		}
 	}
 
-	return nil
+	return etk.Update()
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	if !drawScreen {
+	if OptimizeDraws && !drawScreen {
 		return
 	}
 	drawScreen = false
@@ -930,17 +965,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	statusBuffer.Draw(screen)
 	if !viewBoard { // Lobby
 		g.lobby.draw(screen)
-
-		if g.lobby.showCreateGame || g.lobby.showJoinGame {
-			err := etk.Draw(screen)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
 	} else { // Game board
 		gameBuffer.Draw(screen)
 		inputBuffer.Draw(screen)
 		g.Board.Draw(screen)
+	}
+
+	err := etk.Draw(screen)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	game.keyboard.Draw(screen)
@@ -984,6 +1017,10 @@ func (g *Game) updateStatusBufferPosition() {
 	}
 }
 
+func (g *Game) portraitView() bool {
+	return g.screenH-g.screenW >= 100
+}
+
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	s := ebiten.DeviceScaleFactor()
 	outsideWidth, outsideHeight = int(float64(outsideWidth)*s), int(float64(outsideHeight)*s)
@@ -993,20 +1030,27 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	if outsideHeight < minHeight {
 		outsideHeight = minHeight
 	}
-	if g.screenW == outsideWidth && g.screenH == outsideHeight {
+	if g.screenW == outsideWidth && g.screenH == outsideHeight && !g.forceLayout {
 		return outsideWidth, outsideHeight
 	}
+	g.forceLayout = false
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 	drawScreen = true
+
+	if !g.loggedIn || viewBoard {
+		etk.Layout(g.screenW, g.screenH)
+	} else {
+		etk.Layout(g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
+	}
 
 	bufferWidth := text.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
 	if bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
 
-	const inputBufferHeight = 50
-	if g.screenH-g.screenW >= 100 { // Portrait view.
+	const inputBufferHeight = 56
+	if g.portraitView() { // Portrait view.
 		g.Board.Lock()
 
 		g.Board.fullHeight = false
@@ -1019,12 +1063,27 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 		y := g.screenW
 		availableHeight := g.screenH - y - inputBufferHeight
+		if game.touchInput {
+			availableHeight -= inputBufferHeight
+		}
+		if availableHeight < 1 {
+			availableHeight = 1
+		}
 
 		statusBufferRect = image.Rect(bufferPaddingX, y+bufferPaddingY, g.screenW-bufferPaddingX, y+availableHeight/2-bufferPaddingY/2)
 
 		gameBuffer.SetRect(image.Rect(bufferPaddingX, y+bufferPaddingY/2+availableHeight/2, g.screenW-bufferPaddingX, y+availableHeight-bufferPaddingY))
 
-		inputBuffer.SetRect(image.Rect(bufferPaddingX, g.screenH-inputBufferHeight, g.screenW-bufferPaddingX, g.screenH-bufferPaddingY))
+		w := g.screenW - bufferPaddingX
+		x1 := bufferPaddingX
+		y1 := g.screenH - inputBufferHeight
+		y2 := g.screenH - bufferPaddingY
+		if game.touchInput {
+			g.Board.inputGrid.SetRect(image.Rect(x1, y1, g.screenW-bufferPaddingX, y2))
+			y1, y2 = y1-inputBufferHeight, y2-inputBufferHeight
+		}
+		x2 := w
+		inputBuffer.SetRect(image.Rect(x1, y1, x2, y2))
 
 		g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPaddingY)*1.5)
 		g.lobby.fullscreen = true
@@ -1063,9 +1122,12 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 		gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPaddingX, x+w, y+h))
 
-		inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPaddingX-inputBufferHeight, x+w, g.screenH-bufferPaddingY))
-
-		etk.Layout(g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
+		if game.touchInput {
+			w = w / 2
+			g.Board.inputGrid.SetRect(image.Rect(x+w+bufferPaddingX, g.screenH-bufferPaddingX-inputBufferHeight, g.screenW-bufferPaddingX, g.screenH-bufferPaddingY))
+		}
+		x1 := x + w
+		inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPaddingX-inputBufferHeight, x1, g.screenH-bufferPaddingY))
 	}
 
 	if g.screenW > 200 {
@@ -1102,6 +1164,16 @@ func (g *Game) acceptInput() bool {
 
 	g.Client.Out <- []byte(input)
 	return true
+}
+
+func (g *Game) enableTouchInput() {
+	if g.touchInput {
+		return
+	}
+	g.touchInput = true
+
+	// Update layout.
+	g.forceLayout = true
 }
 
 func (g *Game) toggleProfiling() error {

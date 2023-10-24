@@ -4,9 +4,9 @@ go 1.17
 
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231023071513-07e9c3dc1e6a
-	code.rocket9labs.com/tslocum/etk v0.0.0-20231023073039-12d99f9f6d25
-	code.rocketnine.space/tslocum/kibodo v1.0.1
-	code.rocketnine.space/tslocum/messeji v1.0.4-0.20231022192419-8bc4edaf3b20
+	code.rocket9labs.com/tslocum/etk v0.0.0-20231024214653-dcce2a48933c
+	code.rocketnine.space/tslocum/kibodo v1.0.2-0.20231024233002-77bb43ba6fe8
+	code.rocketnine.space/tslocum/messeji v1.0.5-0.20231024221604-21ce90e7eb52
 	github.com/hajimehoshi/ebiten/v2 v2.6.2
 	github.com/llgcode/draw2d v0.0.0-20231022063514-1acb54133d2a
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
