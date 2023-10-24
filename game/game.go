@@ -376,8 +376,7 @@ type Game struct {
 
 	Board *board
 
-	lobby        *lobby
-	pendingGames []bgammon.GameListing
+	lobby *lobby
 
 	runeBuffer []rune
 	userInput  string
@@ -399,6 +398,8 @@ type Game struct {
 	pressedKeys []ebiten.Key
 
 	cursorX, cursorY int
+
+	lastRefresh time.Time
 }
 
 func NewGame() *Game {
@@ -531,7 +532,24 @@ func NewGame() *Game {
 	etk.SetRoot(connectGrid)
 	etk.SetFocus(g.connectUsername)
 
+	go g.handleAutoRefresh()
+
 	return g
+}
+
+func (g *Game) handleAutoRefresh() {
+	g.lastRefresh = time.Now()
+	t := time.NewTicker(19 * time.Second)
+	for range t.C {
+		if viewBoard {
+			continue
+		}
+
+		if g.Client != nil && g.Client.Username != "" {
+			g.Client.Out <- []byte("ls")
+			g.lastRefresh = time.Now()
+		}
+	}
 }
 
 func (g *Game) handleEvents() {
@@ -560,15 +578,9 @@ func (g *Game) handleEvents() {
 		case *bgammon.EventSay:
 			l(fmt.Sprintf("<%s> %s", ev.Player, ev.Message))
 		case *bgammon.EventList:
-			if viewBoard || g.lobby.refresh {
-				g.lobby.setGameList(ev.Games)
-
-				if g.lobby.refresh {
-					scheduleFrame()
-					g.lobby.refresh = false
-				}
-			} else {
-				g.pendingGames = ev.Games
+			g.lobby.setGameList(ev.Games)
+			if !viewBoard {
+				scheduleFrame()
 			}
 		case *bgammon.EventJoined:
 			g.Board.Lock()
@@ -794,11 +806,6 @@ func (g *Game) Update() error {
 		}
 	}
 
-	if g.pendingGames != nil && viewBoard {
-		g.lobby.setGameList(g.pendingGames)
-		g.pendingGames = nil
-	}
-
 	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyP) {
 		err := g.toggleProfiling()
 		if err != nil {
@@ -1007,18 +1014,19 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 		g.Board.Unlock()
 
-		bufferPadding := int(g.Board.horizontalBorderSize / 2)
+		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
+		bufferPaddingY := int(g.Board.verticalBorderSize / 2)
 
 		y := g.screenW
 		availableHeight := g.screenH - y - inputBufferHeight
 
-		statusBufferRect = image.Rect(bufferPadding, y+bufferPadding, g.screenW-bufferPadding, y+availableHeight/2-bufferPadding/2)
+		statusBufferRect = image.Rect(bufferPaddingX, y+bufferPaddingY, g.screenW-bufferPaddingX, y+availableHeight/2-bufferPaddingY/2)
 
-		gameBuffer.SetRect(image.Rect(bufferPadding, y+bufferPadding/2+availableHeight/2, g.screenW-bufferPadding, y+availableHeight-bufferPadding))
+		gameBuffer.SetRect(image.Rect(bufferPaddingX, y+bufferPaddingY/2+availableHeight/2, g.screenW-bufferPaddingX, y+availableHeight-bufferPaddingY))
 
-		inputBuffer.SetRect(image.Rect(bufferPadding, g.screenH-inputBufferHeight, g.screenW-bufferPadding, g.screenH-bufferPadding))
+		inputBuffer.SetRect(image.Rect(bufferPaddingX, g.screenH-inputBufferHeight, g.screenW-bufferPaddingX, g.screenH-bufferPaddingY))
 
-		g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPadding)*1.5)
+		g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPaddingY)*1.5)
 		g.lobby.fullscreen = true
 		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
 	} else { // Landscape view.
@@ -1040,21 +1048,22 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 		g.Board.Unlock()
 
-		bufferPadding := int(g.Board.horizontalBorderSize / 2)
+		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
+		bufferPaddingY := int(g.Board.verticalBorderSize)
 
-		g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPadding)*1.5)
+		g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPaddingY)*1.5)
 		g.lobby.fullscreen = true
 		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
 
-		statusBufferHeight := g.screenH - inputBufferHeight - bufferPadding*3
+		statusBufferHeight := g.screenH - inputBufferHeight - bufferPaddingY*2 - bufferPaddingX
 
-		x, y, w, h := (g.screenW-bufferWidth)+bufferPadding, bufferPadding, bufferWidth-(bufferPadding*2), statusBufferHeight
-		statusBufferRect = image.Rect(x, y, x+w, y+h/2-bufferPadding/2)
+		x, y, w, h := (g.screenW-bufferWidth)+bufferPaddingX, bufferPaddingY, bufferWidth-(bufferPaddingX*2), statusBufferHeight
+		statusBufferRect = image.Rect(x, y, x+w, y+h/2-bufferPaddingY/2)
 		g.updateStatusBufferPosition()
 
-		gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPadding/2, x+w, y+h))
+		gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPaddingX, x+w, y+h))
 
-		inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPadding-inputBufferHeight, x+w, g.screenH-bufferPadding))
+		inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPaddingX-inputBufferHeight, x+w, g.screenH-bufferPaddingY))
 
 		etk.Layout(g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
 	}

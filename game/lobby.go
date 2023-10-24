@@ -101,8 +101,23 @@ type lobby struct {
 }
 
 func NewLobby() *lobby {
-	return &lobby{
+	l := &lobby{
 		refresh: true,
+	}
+	go l.handleRefreshTimer()
+	return l
+}
+
+func (l *lobby) handleRefreshTimer() {
+	t := time.NewTicker(time.Second)
+	for range t.C {
+		if !game.loggedIn || viewBoard {
+			continue
+		}
+
+		l.bufferDirty = true
+		l.bufferButtonsDirty = true
+		scheduleFrame()
 	}
 }
 
@@ -145,6 +160,11 @@ func (l *lobby) _drawBufferButtons() {
 
 	buttonWidth := l.w / len(buttons)
 	for i, button := range buttons {
+		label := button.label
+		if i == 0 && label == "Refresh" {
+			label = fmt.Sprintf("Refresh (%02.0f)", 19-(time.Since(game.lastRefresh)%(time.Second*19)).Seconds())
+		}
+
 		// Draw border
 		if i > 0 {
 			for ly := 0; ly < l.buttonBarHeight; ly++ {
@@ -153,12 +173,12 @@ func (l *lobby) _drawBufferButtons() {
 				}
 			}
 		}
-		bounds := text.BoundString(mediumFont, button.label)
+		bounds := text.BoundString(mediumFont, label)
 
 		labelColor := lightCheckerColor
 
 		img := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-		text.Draw(img, button.label, mediumFont, 0, standardLineHeight, labelColor)
+		text.Draw(img, label, mediumFont, 0, standardLineHeight, labelColor)
 
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(float64(buttonWidth*i)+float64((buttonWidth-bounds.Dx())/2), float64(l.buttonBarHeight-standardLineHeight*1.5)/2)
@@ -361,7 +381,7 @@ func (l *lobby) click(x, y int) {
 		switch buttonIndex {
 		case lobbyButtonRefresh:
 			l.refresh = true
-			l.c.Out <- []byte("list")
+			l.c.Out <- []byte("ls")
 		case lobbyButtonCreate:
 			l.showCreateGame = true
 			etk.SetRoot(createGameGrid)
