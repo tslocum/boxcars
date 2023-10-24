@@ -814,31 +814,30 @@ func (g *Game) Update() error {
 		g.Board.debug = Debug
 	}
 
+	// Handle physical keyboard.
+	g.pressedKeys = inpututil.AppendJustPressedKeys(g.pressedKeys[:0])
+	err := g.handleInput(g.pressedKeys)
+	if err != nil {
+		return err
+	}
+
 	// Handle on-screen keyboard.
-	err := g.keyboard.Update()
+	err = g.keyboard.Update()
 	if err != nil {
 		return err
 	}
 	g.keyboardInput = g.keyboard.AppendInput(g.keyboardInput[:0])
-
-	var keys []ebiten.Key
+	g.pressedKeys = g.pressedKeys[:0]
 	for _, input := range g.keyboardInput {
 		if input.Rune == 0 {
-			keys = append(keys, input.Key)
+			g.pressedKeys = append(g.pressedKeys, input.Key)
 		}
 	}
-	if keys != nil {
-		err = g.handleInput(keys)
+	if len(g.pressedKeys) > 0 {
+		err = g.handleInput(g.pressedKeys)
 		if err != nil {
 			return err
 		}
-	}
-
-	// TODO move key handling to function and handle normal input and on-screen input in serial
-	g.pressedKeys = inpututil.AppendJustPressedKeys(g.pressedKeys[:0])
-	err = g.handleInput(g.pressedKeys)
-	if err != nil {
-		return err
 	}
 
 	if !g.loggedIn {
@@ -999,23 +998,66 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
 
-	g.Board.Lock()
+	const inputBufferHeight = 50
+	if g.screenH-g.screenW >= 100 { // Portrait view.
+		g.Board.Lock()
 
-	g.Board.fullHeight = true
-	g.Board.setRect(0, 0, g.screenW-bufferWidth, g.screenH)
-
-	availableWidth := g.screenW - (g.Board.innerW + int(g.Board.horizontalBorderSize*2))
-	if availableWidth > bufferWidth {
-		bufferWidth = availableWidth
-		g.Board.setRect(0, 0, g.screenW-bufferWidth, g.screenH)
-	}
-
-	if g.Board.h > g.Board.w {
 		g.Board.fullHeight = false
-		g.Board.setRect(0, 0, g.Board.w, g.Board.w)
-	}
+		g.Board.setRect(0, 0, g.screenW, g.screenW)
 
-	g.Board.Unlock()
+		g.Board.Unlock()
+
+		bufferPadding := int(g.Board.horizontalBorderSize / 2)
+
+		y := g.screenW
+		availableHeight := g.screenH - y - inputBufferHeight
+
+		statusBufferRect = image.Rect(bufferPadding, y+bufferPadding, g.screenW-bufferPadding, y+availableHeight/2-bufferPadding/2)
+
+		gameBuffer.SetRect(image.Rect(bufferPadding, y+bufferPadding/2+availableHeight/2, g.screenW-bufferPadding, y+availableHeight-bufferPadding))
+
+		inputBuffer.SetRect(image.Rect(bufferPadding, g.screenH-inputBufferHeight, g.screenW-bufferPadding, g.screenH-bufferPadding))
+
+		g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPadding)*1.5)
+		g.lobby.fullscreen = true
+		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
+	} else { // Landscape view.
+		g.Board.Lock()
+
+		g.Board.fullHeight = true
+		g.Board.setRect(0, 0, g.screenW-bufferWidth, g.screenH)
+
+		availableWidth := g.screenW - (g.Board.innerW + int(g.Board.horizontalBorderSize*2))
+		if availableWidth > bufferWidth {
+			bufferWidth = availableWidth
+			g.Board.setRect(0, 0, g.screenW-bufferWidth, g.screenH)
+		}
+
+		if g.Board.h > g.Board.w {
+			g.Board.fullHeight = false
+			g.Board.setRect(0, 0, g.Board.w, g.Board.w)
+		}
+
+		g.Board.Unlock()
+
+		bufferPadding := int(g.Board.horizontalBorderSize / 2)
+
+		g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPadding)*1.5)
+		g.lobby.fullscreen = true
+		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
+
+		statusBufferHeight := g.screenH - inputBufferHeight - bufferPadding*3
+
+		x, y, w, h := (g.screenW-bufferWidth)+bufferPadding, bufferPadding, bufferWidth-(bufferPadding*2), statusBufferHeight
+		statusBufferRect = image.Rect(x, y, x+w, y+h/2-bufferPadding/2)
+		g.updateStatusBufferPosition()
+
+		gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPadding/2, x+w, y+h))
+
+		inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPadding-inputBufferHeight, x+w, g.screenH-bufferPadding))
+
+		etk.Layout(g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
+	}
 
 	if g.screenW > 200 {
 		statusBuffer.SetPadding(4)
@@ -1030,26 +1072,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		gameBuffer.SetPadding(0)
 		inputBuffer.SetPadding(0)
 	}
-
-	bufferPadding := int(g.Board.horizontalBorderSize / 2)
-
-	inputBufferHeight := 50
-
-	g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPadding)*1.5)
-	g.lobby.fullscreen = true
-	g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
-
-	statusBufferHeight := g.screenH - inputBufferHeight - bufferPadding*3
-
-	x, y, w, h := (g.screenW-bufferWidth)+bufferPadding, bufferPadding, bufferWidth-(bufferPadding*2), statusBufferHeight
-	statusBufferRect = image.Rect(x, y, x+w, y+h/2-bufferPadding/2)
-	g.updateStatusBufferPosition()
-
-	gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPadding/2, x+w, y+h))
-
-	inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPadding-inputBufferHeight, x+w, g.screenH-bufferPadding))
-
-	etk.Layout(g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
 
 	setViewBoard(viewBoard)
 
