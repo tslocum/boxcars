@@ -52,8 +52,10 @@ var (
 
 	smallFont  font.Face
 	mediumFont font.Face
-	monoFont   font.Face
 	largeFont  font.Face
+	monoFont   font.Face
+
+	gameFont font.Face
 )
 
 var (
@@ -74,12 +76,11 @@ const (
 	smallFontSize  = 20
 	monoFontSize   = 10
 	mediumFontSize = 24
-	largeFontSize  = 32
+	largeFontSize  = 36
 )
 
 const (
-	monoLineHeight     = 14
-	standardLineHeight = 24
+	monoLineHeight = 14
 )
 
 const lobbyStatusBufferHeight = 75
@@ -1149,7 +1150,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	}
 
 	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
-	g.lobby.showKeyboardButton.SetRect(image.Rect(g.screenW-400, 0, g.screenW, 36))
+	g.lobby.showKeyboardButton.SetRect(image.Rect(g.screenW-400, 0, g.screenW, int(2+game.lobby.entryH)))
 
 	if g.screenW > 200 {
 		statusBuffer.SetPadding(4)

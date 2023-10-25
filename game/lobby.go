@@ -15,6 +15,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"golang.org/x/image/font"
 )
 
 const (
@@ -101,17 +102,29 @@ type lobby struct {
 
 	showKeyboardButton *etk.Button
 	frame              *etk.Frame
+
+	fontFace   font.Face
+	lineHeight int
+	lineOffset int
 }
 
 func NewLobby() *lobby {
 	l := &lobby{
-		refresh: true,
+		refresh:  true,
+		fontFace: mediumFont,
 	}
+	l.fontUpdated()
 	l.showKeyboardButton = etk.NewButton("Show Keyboard", l.toggleKeyboard)
 	l.frame = etk.NewFrame()
 	l.frame.AddChild(l.showKeyboardButton)
 	go l.handleRefreshTimer()
 	return l
+}
+
+func (l *lobby) fontUpdated() {
+	m := l.fontFace.Metrics()
+	l.lineHeight = m.Height.Round()
+	l.lineOffset = m.Ascent.Round()
 }
 
 func (l *lobby) setKeyboardRect() {
@@ -196,15 +209,15 @@ func (l *lobby) _drawBufferButtons() {
 				}
 			}
 		}
-		bounds := text.BoundString(mediumFont, label)
+		bounds := text.BoundString(l.fontFace, label)
 
 		labelColor := lightCheckerColor
 
 		img := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-		text.Draw(img, label, mediumFont, 0, standardLineHeight, labelColor)
+		text.Draw(img, label, l.fontFace, 0, l.lineHeight, labelColor)
 
 		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64(buttonWidth*i)+float64((buttonWidth-bounds.Dx())/2), float64(l.buttonBarHeight-standardLineHeight*1.5)/2)
+		op.GeoM.Translate(float64(buttonWidth*i)+float64((buttonWidth-bounds.Dx())/2), 10+float64(l.buttonBarHeight)/2-float64(l.lineHeight))
 		l.bufferButtons.DrawImage(img, op)
 	}
 }
@@ -244,9 +257,9 @@ func (l *lobby) drawBuffer() {
 				}
 			}
 
-			text.Draw(img, colA, mediumFont, 4, standardLineHeight, labelColor)
-			text.Draw(img, colB, mediumFont, int(250*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
-			text.Draw(img, colC, mediumFont, int(500*ebiten.DeviceScaleFactor()), standardLineHeight, labelColor)
+			text.Draw(img, colA, l.fontFace, 4, l.lineOffset, labelColor)
+			text.Draw(img, colB, l.fontFace, 250, l.lineOffset, labelColor)
+			text.Draw(img, colC, l.fontFace, 500, l.lineOffset, labelColor)
 
 			op := &ebiten.DrawImageOptions{}
 			op.GeoM.Translate(cx, cy)
@@ -340,13 +353,24 @@ func (l *lobby) setRect(x, y, w, h int) {
 		return
 	}
 
-	if game.keyboard.Visible() {
+	if game.loggedIn && viewBoard && game.keyboard.Visible() {
 		l.setKeyboardRect()
 	}
 
 	s := ebiten.DeviceScaleFactor()
-	l.padding = 4 * s
-	l.entryH = 32 * s
+	if s >= 1.25 {
+		if l.fontFace != largeFont {
+			l.fontFace = largeFont
+			l.fontUpdated()
+		}
+	} else {
+		if l.fontFace != mediumFont {
+			l.fontFace = mediumFont
+			l.fontUpdated()
+		}
+	}
+	l.padding = 4
+	l.entryH = float64(l.lineHeight)
 
 	if l.w != w || l.h != h {
 		l.buffer = ebiten.NewImage(w, h)

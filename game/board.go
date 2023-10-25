@@ -16,6 +16,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/llgcode/draw2d/draw2dimg"
+	"golang.org/x/image/font"
 )
 
 type boardButton struct {
@@ -70,6 +71,10 @@ type board struct {
 	showKeyboardButton *etk.Button
 	frame              *etk.Frame
 
+	fontFace   font.Face
+	lineHeight int
+	lineOffset int
+
 	*sync.Mutex
 }
 
@@ -92,8 +97,10 @@ func NewBoard() *board {
 		spaceHighlight: ebiten.NewImage(1, 1),
 		inputGrid:      etk.NewGrid(),
 		frame:          etk.NewFrame(),
+		fontFace:       mediumFont,
 		Mutex:          &sync.Mutex{},
 	}
+	b.fontUpdated()
 
 	b.showKeyboardButton = etk.NewButton("Show Keyboard", b.toggleKeyboard)
 	b.inputGrid.AddChildAt(b.showKeyboardButton, 0, 0, 1, 1)
@@ -128,6 +135,16 @@ func NewBoard() *board {
 	b.dragTouchId = -1
 
 	return b
+}
+
+func (b *board) fontUpdated() {
+	m := b.fontFace.Metrics()
+	b.lineHeight = m.Height.Round()
+	b.lineOffset = m.Ascent.Round()
+
+	statusBuffer.SetFont(b.fontFace)
+	gameBuffer.SetFont(b.fontFace)
+	inputBuffer.SetFont(b.fontFace)
 }
 
 func (b *board) setKeyboardRect() {
@@ -350,8 +367,8 @@ func (b *board) drawButton(target *ebiten.Image, r image.Rectangle, label string
 	img.Fill(color.RGBA{225.0, 188, 125, 255})
 	img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
 
-	bounds := text.BoundString(mediumFont, label)
-	text.Draw(img, label, mediumFont, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
+	bounds := text.BoundString(b.fontFace, label)
+	text.Draw(img, label, b.fontFace, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
 
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(r.Min.X), float64(r.Min.Y))
@@ -478,9 +495,9 @@ func (b *board) Draw(screen *ebiten.Image) {
 				labelColor = color.RGBA{0, 0, 0, 255}
 			}
 
-			bounds := text.BoundString(mediumFont, overlayText)
+			bounds := text.BoundString(b.fontFace, overlayText)
 			overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-			text.Draw(overlayImage, overlayText, mediumFont, 0, bounds.Dy(), labelColor)
+			text.Draw(overlayImage, overlayText, b.fontFace, 0, bounds.Dy(), labelColor)
 
 			x, y, w, h := b.stackSpaceRect(space, numPieces-1)
 			x += (w / 2) - (bounds.Dx() / 2)
@@ -539,7 +556,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 	}
 
 	drawLabel := func(label string, labelColor color.Color, border bool, borderColor color.Color) *ebiten.Image {
-		bounds := text.BoundString(mediumFont, label)
+		bounds := text.BoundString(b.fontFace, label)
 
 		w := int(float64(bounds.Dx()) * 1.5)
 		h := int(float64(bounds.Dy()) * 2)
@@ -559,7 +576,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 
 		img := ebiten.NewImageFromImage(baseImg)
-		text.Draw(img, label, mediumFont, (w-bounds.Dx())/2, int(float64(h-(bounds.Max.Y/2))*0.75), labelColor)
+		text.Draw(img, label, b.fontFace, (w-bounds.Dx())/2, int(float64(h-(bounds.Max.Y/2))*0.75), labelColor)
 
 		return img
 	}
@@ -686,8 +703,17 @@ func (b *board) setRect(x, y, w, h int) {
 		return
 	}
 
-	if game.keyboard.Visible() {
-		b.setKeyboardRect()
+	s := ebiten.DeviceScaleFactor()
+	if s >= 1.25 {
+		if b.fontFace != largeFont {
+			b.fontFace = largeFont
+			b.fontUpdated()
+		}
+	} else {
+		if b.fontFace != mediumFont {
+			b.fontFace = mediumFont
+			b.fontUpdated()
+		}
 	}
 
 	b.x, b.y, b.w, b.h = x, y, w, h
@@ -737,6 +763,10 @@ func (b *board) setRect(x, y, w, h int) {
 	b.setSpaceRects()
 	b.updateBackgroundImage()
 	b.processState()
+
+	if viewBoard && game.keyboard.Visible() {
+		b.setKeyboardRect()
+	}
 }
 
 func (b *board) offsetPosition(x, y int) (int, int) {
