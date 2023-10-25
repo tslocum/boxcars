@@ -98,14 +98,37 @@ type lobby struct {
 	joinGameID       int
 	joinGameLabel    *etk.Text
 	joinGamePassword *etk.Input
+
+	showKeyboardButton *etk.Button
+	frame              *etk.Frame
 }
 
 func NewLobby() *lobby {
 	l := &lobby{
 		refresh: true,
 	}
+	l.showKeyboardButton = etk.NewButton("Show Keyboard", l.toggleKeyboard)
+	l.frame = etk.NewFrame()
+	l.frame.AddChild(l.showKeyboardButton)
 	go l.handleRefreshTimer()
 	return l
+}
+
+func (l *lobby) setKeyboardRect() {
+	heightOffset := 76
+	game.keyboard.SetRect(0, game.screenH/2, game.screenW, game.screenH/2-heightOffset)
+}
+
+func (l *lobby) toggleKeyboard() error {
+	if game.keyboard.Visible() {
+		game.keyboard.Hide()
+		l.showKeyboardButton.Label.SetText("Show Keyboard")
+	} else {
+		l.setKeyboardRect()
+		game.keyboard.Show()
+		l.showKeyboardButton.Label.SetText("Hide Keyboard")
+	}
+	return nil
 }
 
 func (l *lobby) handleRefreshTimer() {
@@ -317,6 +340,10 @@ func (l *lobby) setRect(x, y, w, h int) {
 		return
 	}
 
+	if game.keyboard.Visible() {
+		l.setKeyboardRect()
+	}
+
 	s := ebiten.DeviceScaleFactor()
 	l.padding = 4 * s
 	l.entryH = 32 * s
@@ -355,7 +382,7 @@ func (l *lobby) click(x, y int) {
 				game.lobby.createGamePassword.Field.SetText("")
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
-				game.setRoot(nil)
+				game.setRoot(game.lobby.frame)
 			case lobbyButtonCreateConfirm:
 				typeAndPassword := "public"
 				if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
@@ -374,9 +401,9 @@ func (l *lobby) click(x, y int) {
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
 				if viewBoard {
-					game.setRoot(game.Board.window)
+					game.setRoot(game.Board.frame)
 				} else {
-					game.setRoot(nil)
+					game.setRoot(game.lobby.frame)
 				}
 			} else {
 				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
@@ -390,7 +417,7 @@ func (l *lobby) click(x, y int) {
 			l.c.Out <- []byte("ls")
 		case lobbyButtonCreate:
 			l.showCreateGame = true
-			game.setRoot(createGameGrid)
+			game.setRoot(createGameFrame)
 			etk.SetFocus(l.createGameName)
 			namePlural := l.c.Username
 			lastLetter := namePlural[len(namePlural)-1]
@@ -418,7 +445,7 @@ func (l *lobby) click(x, y int) {
 			}
 			if l.games[l.selected].Password {
 				l.showJoinGame = true
-				game.setRoot(joinGameGrid)
+				game.setRoot(joinGameFrame)
 				etk.SetFocus(l.joinGamePassword)
 				l.joinGameLabel.SetText(fmt.Sprintf("Join match: %s", l.games[l.selected].Name))
 				l.joinGamePassword.Field.SetText("")
@@ -444,7 +471,7 @@ func (l *lobby) click(x, y int) {
 				entry := l.games[l.selected]
 				if entry.Password {
 					l.showJoinGame = true
-					game.setRoot(joinGameGrid)
+					game.setRoot(joinGameFrame)
 					etk.SetFocus(l.joinGamePassword)
 					l.joinGameLabel.SetText(fmt.Sprintf("Join match: %s", entry.Name))
 					l.joinGamePassword.Field.SetText("")

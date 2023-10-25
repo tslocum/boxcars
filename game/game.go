@@ -108,6 +108,9 @@ var (
 	connectGrid    *etk.Grid
 	createGameGrid *etk.Grid
 	joinGameGrid   *etk.Grid
+
+	createGameFrame *etk.Frame
+	joinGameFrame   *etk.Frame
 )
 
 func l(s string) {
@@ -314,18 +317,18 @@ func setViewBoard(view bool) {
 		game.lobby.bufferDirty = true
 		game.lobby.bufferButtonsDirty = true
 
-		etk.SetRoot(game.Board.window)
+		etk.SetRoot(game.Board.frame)
 	} else {
 		inputBuffer.SetSuffix("")
 
 		if !game.loggedIn {
 			game.setRoot(connectGrid)
 		} else if game.lobby.showCreateGame {
-			game.setRoot(createGameGrid)
+			game.setRoot(createGameFrame)
 		} else if game.lobby.showJoinGame {
-			game.setRoot(joinGameGrid)
+			game.setRoot(joinGameFrame)
 		} else {
-			game.setRoot(nil)
+			game.setRoot(game.lobby.frame)
 		}
 	}
 	game.updateStatusBufferPosition()
@@ -409,7 +412,7 @@ type Game struct {
 	pressedKeys []ebiten.Key
 
 	cursorX, cursorY int
-	touchInput       bool
+	TouchInput       bool
 
 	rootWidget etk.Widget
 
@@ -460,6 +463,7 @@ func NewGame() *Game {
 				g.keyboard.Hide()
 				g.connectKeyboardButton.Label.SetText("Show Keyboard")
 			} else {
+				g.enableTouchInput()
 				g.keyboard.Show()
 				g.connectKeyboardButton.Label.SetText("Hide Keyboard")
 			}
@@ -523,6 +527,13 @@ func NewGame() *Game {
 		grid.AddChildAt(passwordLabel, 1, 3, 1, 1)
 		grid.AddChildAt(g.lobby.createGamePassword, 2, 3, 1, 1)
 		createGameGrid = grid
+
+		createGameFrame = etk.NewFrame()
+		createGameFrame.SetPositionChildren(true)
+		createGameFrame.AddChild(createGameGrid)
+		frame := etk.NewFrame()
+		frame.AddChild(g.lobby.showKeyboardButton)
+		createGameFrame.AddChild(frame)
 	}
 
 	{
@@ -543,6 +554,13 @@ func NewGame() *Game {
 		grid.AddChildAt(passwordLabel, 1, 1, 1, 1)
 		grid.AddChildAt(g.lobby.joinGamePassword, 2, 1, 1, 1)
 		joinGameGrid = grid
+
+		joinGameFrame = etk.NewFrame()
+		joinGameFrame.SetPositionChildren(true)
+		joinGameFrame.AddChild(joinGameGrid)
+		frame := etk.NewFrame()
+		frame.AddChild(g.lobby.showKeyboardButton)
+		joinGameFrame.AddChild(frame)
 	}
 
 	g.setRoot(connectGrid)
@@ -554,7 +572,7 @@ func NewGame() *Game {
 }
 
 func (g *Game) setRoot(w etk.Widget) {
-	if w != g.Board.window {
+	if w != g.Board.frame {
 		g.rootWidget = w
 	}
 	etk.SetRoot(w)
@@ -709,7 +727,7 @@ func (g *Game) Connect() {
 
 	g.keyboard.Hide()
 
-	g.setRoot(nil)
+	g.setRoot(g.lobby.frame)
 
 	address := g.ServerAddress
 	if address == "" {
@@ -1063,7 +1081,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 		y := g.screenW
 		availableHeight := g.screenH - y - inputBufferHeight
-		if game.touchInput {
+		if game.TouchInput {
 			availableHeight -= inputBufferHeight
 		}
 		if availableHeight < 1 {
@@ -1078,7 +1096,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		x1 := bufferPaddingX
 		y1 := g.screenH - inputBufferHeight
 		y2 := g.screenH - bufferPaddingY
-		if game.touchInput {
+		if game.TouchInput {
 			g.Board.inputGrid.SetRect(image.Rect(x1, y1, g.screenW-bufferPaddingX, y2))
 			y1, y2 = y1-inputBufferHeight, y2-inputBufferHeight
 		}
@@ -1122,13 +1140,16 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 		gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPaddingX, x+w, y+h))
 
-		if game.touchInput {
+		if game.TouchInput {
 			w = w / 2
 			g.Board.inputGrid.SetRect(image.Rect(x+w+bufferPaddingX, g.screenH-bufferPaddingX-inputBufferHeight, g.screenW-bufferPaddingX, g.screenH-bufferPaddingY))
 		}
 		x1 := x + w
 		inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPaddingX-inputBufferHeight, x1, g.screenH-bufferPaddingY))
 	}
+
+	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
+	g.lobby.showKeyboardButton.SetRect(image.Rect(g.screenW-400, 0, g.screenW, 36))
 
 	if g.screenW > 200 {
 		statusBuffer.SetPadding(4)
@@ -1167,10 +1188,10 @@ func (g *Game) acceptInput() bool {
 }
 
 func (g *Game) enableTouchInput() {
-	if g.touchInput {
+	if g.TouchInput {
 		return
 	}
-	g.touchInput = true
+	g.TouchInput = true
 
 	// Update layout.
 	g.forceLayout = true

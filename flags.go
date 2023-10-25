@@ -18,6 +18,7 @@ func parseFlags(g *game.Game) {
 	flag.StringVar(&g.ServerAddress, "address", game.DefaultServerAddress, "Server address")
 	flag.BoolVar(&g.Watch, "watch", false, "Watch random game")
 	flag.BoolVar(&g.TV, "tv", false, "Watch random games continuously")
+	flag.BoolVar(&g.TouchInput, "touch", false, "Force touch input related interface elements to be displayed")
 	flag.IntVar(&debug, "debug", 0, "Print debug information and serve pprof on specified port")
 	flag.Parse()
 

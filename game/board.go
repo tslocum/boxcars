@@ -68,7 +68,7 @@ type board struct {
 
 	inputGrid          *etk.Grid
 	showKeyboardButton *etk.Button
-	window             *etk.Window
+	frame              *etk.Frame
 
 	*sync.Mutex
 }
@@ -91,14 +91,13 @@ func NewBoard() *board {
 		},
 		spaceHighlight: ebiten.NewImage(1, 1),
 		inputGrid:      etk.NewGrid(),
-		window:         etk.NewWindow(),
+		frame:          etk.NewFrame(),
 		Mutex:          &sync.Mutex{},
 	}
 
 	b.showKeyboardButton = etk.NewButton("Show Keyboard", b.toggleKeyboard)
 	b.inputGrid.AddChildAt(b.showKeyboardButton, 0, 0, 1, 1)
-	b.window.SetRepositionChildren(false)
-	b.window.AddChild(b.inputGrid)
+	b.frame.AddChild(b.inputGrid)
 
 	b.buttons = []*boardButton{
 		{
