@@ -3,6 +3,7 @@
 - Support touch input
 - Change layout based on portrait or landscape view
 - Automatically refresh match listings
+- Automatically reconnect
 
 1.0.2:
 - Allow specifying match points

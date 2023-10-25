@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"strings"
+	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
 	"nhooyr.io/websocket"
@@ -35,7 +36,7 @@ func newClient(address string, username string, password string) *Client {
 
 func (c *Client) Connect() {
 	if c.connecting {
-		return // TODO reconnect
+		return
 	}
 	c.connecting = true
 
@@ -46,12 +47,12 @@ func (c *Client) Connect() {
 	c.connectTCP()
 }
 
-func (c *Client) logIn() {
+func (c *Client) logIn() []byte {
 	loginInfo := c.Username
 	if c.Username != "" && c.Password != "" {
 		loginInfo = fmt.Sprintf("%s %s", strings.ReplaceAll(c.Username, " ", "_"), strings.ReplaceAll(c.Password, " ", "_"))
 	}
-	c.Out <- []byte(fmt.Sprintf("lj boxcars %s\nlist\n", loginInfo))
+	return []byte(fmt.Sprintf("lj boxcars %s\nlist\n", loginInfo))
 }
 
 func (c *Client) LoggedIn() bool {
@@ -59,18 +60,38 @@ func (c *Client) LoggedIn() bool {
 }
 
 func (c *Client) connectWebSocket() {
-	conn, _, err := websocket.Dial(context.Background(), c.Address, nil)
-	if err != nil {
-		log.Fatalf("failed to connect: %s", err)
+	reconnect := func() {
+		l("*** Reconnecting...")
+		time.Sleep(2 * time.Second)
+		go c.connectWebSocket()
 	}
 
-	c.logIn()
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+	conn, _, err := websocket.Dial(ctx, c.Address, nil)
+	if err != nil {
+		reconnect()
+		return
+	}
+
+	for _, msg := range bytes.Split(c.logIn(), []byte("\n")) {
+		ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+
+		err = conn.Write(ctx, websocket.MessageText, msg)
+		if err != nil {
+			reconnect()
+			return
+		}
+	}
 
 	go c.handleWebSocketWrite(conn)
 	c.handleWebSocketRead(conn)
+
+	reconnect()
 }
 
 func (c *Client) handleWebSocketWrite(conn *websocket.Conn) {
+	var ctx context.Context
 	for buf := range c.Out {
 		split := bytes.Split(buf, []byte("\n"))
 		for i := range split {
@@ -78,9 +99,12 @@ func (c *Client) handleWebSocketWrite(conn *websocket.Conn) {
 				continue
 			}
 
-			err := conn.Write(context.Background(), websocket.MessageText, split[i])
+			ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+
+			err := conn.Write(ctx, websocket.MessageText, split[i])
 			if err != nil {
-				panic(err)
+				conn.Close(websocket.StatusNormalClosure, "Write error")
+				return
 			}
 
 			if Debug > 0 {
@@ -93,17 +117,16 @@ func (c *Client) handleWebSocketWrite(conn *websocket.Conn) {
 func (c *Client) handleWebSocketRead(conn *websocket.Conn) {
 	for {
 		msgType, msg, err := conn.Read(context.Background())
-		if err != nil {
-			l("*** Disconnected.")
+		if err != nil || msgType != websocket.MessageText {
+			conn.Close(websocket.StatusNormalClosure, "Read error")
 			return
-		} else if msgType != websocket.MessageText {
-			panic("received unexpected message type")
 		}
 
 		ev, err := bgammon.DecodeEvent(msg)
 		if err != nil {
-			log.Printf("message: %s", msg)
-			panic(err)
+			log.Printf("error: failed to parse message: %s", msg)
+			conn.Close(websocket.StatusNormalClosure, "Read error")
+			return
 		}
 		c.Events <- ev
 
@@ -119,16 +142,27 @@ func (c *Client) connectTCP() {
 		address = c.Address[6:]
 	}
 
-	conn, err := net.Dial("tcp", address)
+	reconnect := func() {
+		l("*** Reconnecting...")
+		time.Sleep(2 * time.Second)
+		go c.connectTCP()
+	}
+
+	conn, err := net.DialTimeout("tcp", address, 10*time.Second)
 	if err != nil {
-		log.Fatalf("failed to connect: %s", err)
+		reconnect()
+		return
 	}
 
 	// Read a single line of text and parse remaining output as JSON.
 	buf := make([]byte, 1)
 	var readBytes int
 	for {
-		conn.Read(buf)
+		_, err = conn.Read(buf)
+		if err != nil {
+			reconnect()
+			return
+		}
 
 		if buf[0] == '\n' {
 			break
@@ -136,26 +170,41 @@ func (c *Client) connectTCP() {
 
 		readBytes++
 		if readBytes == 512 {
-			panic("failed to read server welcome message")
+			reconnect()
+			return
 		}
 	}
 
-	c.logIn()
+	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+
+	_, err = conn.Write(c.logIn())
+	if err != nil {
+		reconnect()
+		return
+	}
 
 	go c.handleTCPWrite(conn.(*net.TCPConn))
 	c.handleTCPRead(conn.(*net.TCPConn))
+
+	reconnect()
 }
 
 func (c *Client) handleTCPWrite(conn *net.TCPConn) {
 	for buf := range c.Out {
+		conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+
 		_, err := conn.Write(buf)
 		if err != nil {
-			panic(err)
+			conn.Close()
+			return
 		}
+
+		conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 
 		_, err = conn.Write([]byte("\n"))
 		if err != nil {
-			panic(err)
+			conn.Close()
+			return
 		}
 
 		if Debug > 0 {
@@ -165,22 +214,27 @@ func (c *Client) handleTCPWrite(conn *net.TCPConn) {
 }
 
 func (c *Client) handleTCPRead(conn *net.TCPConn) {
+	conn.SetReadDeadline(time.Now().Add(40 * time.Second))
+
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
 		if scanner.Err() != nil {
-			l("*** Disconnected.")
+			conn.Close()
 			return
 		}
 
 		ev, err := bgammon.DecodeEvent(scanner.Bytes())
 		if err != nil {
-			log.Printf("message: %s", scanner.Bytes())
-			panic(err)
+			log.Printf("error: failed to parse message: %s", scanner.Bytes())
+			conn.Close()
+			return
 		}
 		c.Events <- ev
 
 		if Debug > 0 {
 			l(fmt.Sprintf("<- %s", scanner.Bytes()))
 		}
+
+		conn.SetReadDeadline(time.Now().Add(40 * time.Second))
 	}
 }
