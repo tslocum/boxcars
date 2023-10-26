@@ -440,6 +440,10 @@ func (l *lobby) click(x, y int) {
 			l.refresh = true
 			l.c.Out <- []byte("ls")
 		case lobbyButtonCreate:
+			if l.c.Username == "" {
+				return
+			}
+
 			l.showCreateGame = true
 			game.setRoot(createGameFrame)
 			etk.SetFocus(l.createGameName)

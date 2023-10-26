@@ -660,6 +660,9 @@ func (g *Game) handleEvents() {
 			}
 		case *bgammon.EventFailedJoin:
 			l(fmt.Sprintf("*** Failed to join match: %s", ev.Reason))
+		case *bgammon.EventFailedLeave:
+			l(fmt.Sprintf("*** Failed to leave match: %s", ev.Reason))
+			setViewBoard(false)
 		case *bgammon.EventLeft:
 			g.Board.Lock()
 			if g.Board.gameState.Player1.Name == ev.Player {

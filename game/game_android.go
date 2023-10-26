@@ -3,7 +3,7 @@
 package game
 
 const (
-	DefaultServerAddress = "tcp://bgammon.org:1337"
+	DefaultServerAddress = "wss://ws.bgammon.org"
 	OptimizeDraws        = false
 	AutoEnableTouchInput = true
 )

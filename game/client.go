@@ -75,6 +75,10 @@ func (c *Client) connectWebSocket() {
 	}
 
 	for _, msg := range bytes.Split(c.logIn(), []byte("\n")) {
+		if len(msg) == 0 {
+			continue
+		}
+
 		ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
 
 		err = conn.Write(ctx, websocket.MessageText, msg)
