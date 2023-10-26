@@ -1,6 +1,6 @@
 1.0.3:
 - Add connect button
-- Support touch input
+- Add touch input support
 - Change layout based on portrait or landscape view
 - Automatically refresh match listings
 - Automatically reconnect

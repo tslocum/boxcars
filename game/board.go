@@ -11,6 +11,7 @@ import (
 
 	"code.rocket9labs.com/tslocum/bgammon"
 	"code.rocket9labs.com/tslocum/etk"
+	"code.rocketnine.space/tslocum/messeji"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -71,6 +72,9 @@ type board struct {
 	showKeyboardButton *etk.Button
 	frame              *etk.Frame
 
+	leaveGameGrid         *etk.Grid
+	confirmLeaveGameFrame *etk.Frame
+
 	fontFace   font.Face
 	lineHeight int
 	lineOffset int
@@ -94,17 +98,33 @@ func NewBoard() *board {
 		gameState: &bgammon.GameState{
 			Game: bgammon.NewGame(),
 		},
-		spaceHighlight: ebiten.NewImage(1, 1),
-		inputGrid:      etk.NewGrid(),
-		frame:          etk.NewFrame(),
-		fontFace:       mediumFont,
-		Mutex:          &sync.Mutex{},
+		spaceHighlight:        ebiten.NewImage(1, 1),
+		inputGrid:             etk.NewGrid(),
+		frame:                 etk.NewFrame(),
+		confirmLeaveGameFrame: etk.NewFrame(),
+		fontFace:              mediumFont,
+		Mutex:                 &sync.Mutex{},
 	}
 	b.fontUpdated()
 
+	{
+		leaveGameLabel := etk.NewText("Leave match?")
+		leaveGameLabel.SetHorizontal(messeji.AlignCenter)
+
+		b.leaveGameGrid = etk.NewGrid()
+		b.leaveGameGrid.SetBackground(color.RGBA{40, 24, 9, 255})
+		b.leaveGameGrid.AddChildAt(leaveGameLabel, 0, 0, 2, 1)
+		b.leaveGameGrid.AddChildAt(etk.NewButton("No", b.cancelLeaveGame), 0, 1, 1, 1)
+		b.leaveGameGrid.AddChildAt(etk.NewButton("Yes", b.confirmLeaveGame), 1, 1, 1, 1)
+		b.leaveGameGrid.SetVisible(false)
+	}
+
+	leaveGameButton := etk.NewButton("Leave Match", b.leaveGame)
 	b.showKeyboardButton = etk.NewButton("Show Keyboard", b.toggleKeyboard)
-	b.inputGrid.AddChildAt(b.showKeyboardButton, 0, 0, 1, 1)
+	b.inputGrid.AddChildAt(leaveGameButton, 0, 0, 1, 1)
+	b.inputGrid.AddChildAt(b.showKeyboardButton, 1, 0, 1, 1)
 	b.frame.AddChild(b.inputGrid)
+	b.frame.AddChild(b.leaveGameGrid)
 
 	b.buttons = []*boardButton{
 		{
@@ -153,6 +173,21 @@ func (b *board) setKeyboardRect() {
 		heightOffset += 44
 	}
 	game.keyboard.SetRect(0, game.screenH/2, game.screenW, (game.screenH - game.screenH/2 - heightOffset))
+}
+
+func (b *board) cancelLeaveGame() error {
+	b.leaveGameGrid.SetVisible(false)
+	return nil
+}
+
+func (b *board) confirmLeaveGame() error {
+	b.Client.Out <- []byte("leave")
+	return nil
+}
+
+func (b *board) leaveGame() error {
+	b.leaveGameGrid.SetVisible(true)
+	return nil
 }
 
 func (b *board) toggleKeyboard() error {
@@ -763,6 +798,10 @@ func (b *board) setRect(x, y, w, h int) {
 	b.setSpaceRects()
 	b.updateBackgroundImage()
 	b.processState()
+
+	dialogWidth := 400
+	dialogHeight := 100
+	b.leaveGameGrid.SetRect(image.Rect(game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2, game.screenW/2+dialogWidth/2, game.screenH/2+dialogHeight/2))
 
 	if viewBoard && game.keyboard.Visible() {
 		b.setKeyboardRect()

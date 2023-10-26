@@ -331,6 +331,8 @@ func setViewBoard(view bool) {
 		} else {
 			game.setRoot(game.lobby.frame)
 		}
+
+		game.Board.leaveGameGrid.SetVisible(false)
 	}
 	game.updateStatusBufferPosition()
 
@@ -1139,14 +1141,19 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		statusBufferRect = image.Rect(x, y, x+w, y+h/2-bufferPaddingY/2)
 		g.updateStatusBufferPosition()
 
-		gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPaddingX, x+w, y+h))
+		gameBufferY1 := y + h
 
+		y1 := g.screenH - bufferPaddingX - inputBufferHeight
 		if game.TouchInput {
-			w = w / 2
-			g.Board.inputGrid.SetRect(image.Rect(x+w+bufferPaddingX, g.screenH-bufferPaddingX-inputBufferHeight, g.screenW-bufferPaddingX, g.screenH-bufferPaddingY))
+			gameBufferY1 = gameBufferY1 - inputBufferHeight
+
+			g.Board.inputGrid.SetRect(image.Rect(x, y1, g.screenW-bufferPaddingX, g.screenH-bufferPaddingY))
+			y1 = y1 - inputBufferHeight - bufferPaddingX
 		}
 		x1 := x + w
-		inputBuffer.SetRect(image.Rect(x, g.screenH-bufferPaddingX-inputBufferHeight, x1, g.screenH-bufferPaddingY))
+		inputBuffer.SetRect(image.Rect(x, y1, x1, y1+inputBufferHeight))
+
+		gameBuffer.SetRect(image.Rect(x, y+h/2+bufferPaddingX, x+w, gameBufferY1))
 	}
 
 	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
