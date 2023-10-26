@@ -2,5 +2,8 @@
 
 package game
 
-const DefaultServerAddress = "wss://ws.bgammon.org"
-const OptimizeDraws = true
+const (
+	DefaultServerAddress = "wss://ws.bgammon.org"
+	OptimizeDraws        = true
+	AutoEnableTouchInput = false
+)

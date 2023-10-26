@@ -168,11 +168,8 @@ func (b *board) fontUpdated() {
 }
 
 func (b *board) setKeyboardRect() {
-	heightOffset := 76
-	if game.portraitView() {
-		heightOffset += 44
-	}
-	game.keyboard.SetRect(0, game.screenH/2, game.screenW, (game.screenH - game.screenH/2 - heightOffset))
+	heightOffset := 70
+	game.keyboard.SetRect(0, game.screenH/2, game.screenW, (game.screenH - game.screenH/2 - heightOffset*2))
 }
 
 func (b *board) cancelLeaveGame() error {
@@ -799,8 +796,8 @@ func (b *board) setRect(x, y, w, h int) {
 	b.updateBackgroundImage()
 	b.processState()
 
-	dialogWidth := 400
-	dialogHeight := 100
+	dialogWidth := int(400 * s)
+	dialogHeight := int(100 * s)
 	b.leaveGameGrid.SetRect(image.Rect(game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2, game.screenW/2+dialogWidth/2, game.screenH/2+dialogHeight/2))
 
 	if viewBoard && game.keyboard.Visible() {

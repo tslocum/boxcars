@@ -83,8 +83,6 @@ const (
 	monoLineHeight = 14
 )
 
-const lobbyStatusBufferHeight = 75
-
 var (
 	bufferTextColor       = triangleALight
 	bufferBackgroundColor = color.RGBA{0, 0, 0, 100}
@@ -98,7 +96,8 @@ var (
 	statusLogged bool
 	gameLogged   bool
 
-	statusBufferRect image.Rectangle // In-game rect of status buffer.
+	statusBufferRect        image.Rectangle // In-game rect of status buffer.
+	lobbyStatusBufferHeight = 75
 
 	Debug int
 
@@ -302,7 +301,11 @@ func diceImage(roll int) *ebiten.Image {
 
 func setViewBoard(view bool) {
 	if viewBoard != view {
-		game.keyboard.Hide()
+		g := game
+		g.keyboard.Hide()
+		g.connectKeyboardButton.Label.SetText("Show Keyboard")
+		g.lobby.showKeyboardButton.Label.SetText("Show Keyboard")
+		g.Board.showKeyboardButton.Label.SetText("Show Keyboard")
 	}
 
 	viewBoard = view
@@ -434,6 +437,8 @@ func NewGame() *Game {
 
 		keyboard: kibodo.NewKeyboard(),
 
+		TouchInput: AutoEnableTouchInput,
+
 		debugImg: ebiten.NewImage(200, 200),
 	}
 	game = g
@@ -465,6 +470,8 @@ func NewGame() *Game {
 			if g.keyboard.Visible() {
 				g.keyboard.Hide()
 				g.connectKeyboardButton.Label.SetText("Show Keyboard")
+				g.lobby.showKeyboardButton.Label.SetText("Show Keyboard")
+				g.Board.showKeyboardButton.Label.SetText("Show Keyboard")
 			} else {
 				g.enableTouchInput()
 				g.keyboard.Show()
@@ -486,16 +493,17 @@ func NewGame() *Game {
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
 		grid.SetRowPadding(20)
-		grid.SetColumnSizes(10, 200)
+		grid.SetColumnSizes(10, 200, -1, -1, 10)
 		grid.SetRowSizes(60, 50, 50, 75)
 		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
+		grid.AddChildAt(etk.NewBox(), 4, 0, 1, 1)
 		grid.AddChildAt(nameLabel, 1, 1, 2, 1)
 		grid.AddChildAt(g.connectUsername, 2, 1, 2, 1)
 		grid.AddChildAt(passwordLabel, 1, 2, 2, 1)
 		grid.AddChildAt(g.connectPassword, 2, 2, 2, 1)
 		grid.AddChildAt(connectButton, 2, 3, 1, 1)
 		grid.AddChildAt(g.connectKeyboardButton, 3, 3, 1, 1)
-		grid.AddChildAt(infoLabel, 1, 4, 2, 1)
+		grid.AddChildAt(infoLabel, 1, 4, 3, 1)
 		connectGrid = grid
 	}
 
@@ -729,6 +737,9 @@ func (g *Game) Connect() {
 	l(fmt.Sprintf("*** Connecting..."))
 
 	g.keyboard.Hide()
+	g.connectKeyboardButton.Label.SetText("Show Keyboard")
+	g.lobby.showKeyboardButton.Label.SetText("Show Keyboard")
+	g.Board.showKeyboardButton.Label.SetText("Show Keyboard")
 
 	g.setRoot(g.lobby.frame)
 
@@ -1058,6 +1069,10 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 	drawScreen = true
+
+	if s >= 1.25 {
+		lobbyStatusBufferHeight = int(50 * s)
+	}
 
 	if !g.loggedIn || viewBoard {
 		etk.Layout(g.screenW, g.screenH)

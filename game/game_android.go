@@ -2,5 +2,8 @@
 
 package game
 
-const DefaultServerAddress = "tcp://bgammon.org:1337"
-const OptimizeDraws = false
+const (
+	DefaultServerAddress = "tcp://bgammon.org:1337"
+	OptimizeDraws        = false
+	AutoEnableTouchInput = true
+)

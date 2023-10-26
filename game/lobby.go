@@ -353,7 +353,7 @@ func (l *lobby) setRect(x, y, w, h int) {
 		return
 	}
 
-	if game.loggedIn && viewBoard && game.keyboard.Visible() {
+	if game.loggedIn && !viewBoard && game.keyboard.Visible() {
 		l.setKeyboardRect()
 	}
 
