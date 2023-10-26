@@ -29,6 +29,8 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
+const version = "v1.0.3"
+
 const MaxDebug = 1
 
 var onlyNumbers = regexp.MustCompile(`[0-9]+`)
@@ -482,6 +484,10 @@ func NewGame() *Game {
 
 		infoLabel := etk.NewText("To log in as a guest, enter a username (if you want) and do not enter a password.")
 
+		footerLabel := etk.NewText("Boxcars " + version)
+		footerLabel.SetHorizontal(messeji.AlignEnd)
+		footerLabel.SetVertical(messeji.AlignEnd)
+
 		g.connectUsername = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
@@ -504,6 +510,7 @@ func NewGame() *Game {
 		grid.AddChildAt(connectButton, 2, 3, 1, 1)
 		grid.AddChildAt(g.connectKeyboardButton, 3, 3, 1, 1)
 		grid.AddChildAt(infoLabel, 1, 4, 3, 1)
+		grid.AddChildAt(footerLabel, 1, 5, 3, 1)
 		connectGrid = grid
 	}
 
