@@ -125,6 +125,7 @@ func NewBoard() *board {
 	b.inputGrid.AddChildAt(b.showKeyboardButton, 1, 0, 1, 1)
 	b.frame.AddChild(b.inputGrid)
 	b.frame.AddChild(b.leaveGameGrid)
+	b.frame.AddChild(inputBuffer)
 
 	b.buttons = []*boardButton{
 		{
@@ -164,7 +165,7 @@ func (b *board) fontUpdated() {
 
 	statusBuffer.SetFont(b.fontFace)
 	gameBuffer.SetFont(b.fontFace)
-	inputBuffer.SetFont(b.fontFace)
+	inputBuffer.Field.SetFont(b.fontFace)
 }
 
 func (b *board) setKeyboardRect() {

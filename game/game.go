@@ -87,13 +87,13 @@ const (
 
 var (
 	bufferTextColor       = triangleALight
-	bufferBackgroundColor = color.RGBA{0, 0, 0, 100}
+	bufferBackgroundColor = color.RGBA{40, 24, 9, 255}
 )
 
 var (
 	statusBuffer = messeji.NewTextField(defaultFont())
 	gameBuffer   = messeji.NewTextField(defaultFont())
-	inputBuffer  = messeji.NewInputField(defaultFont())
+	inputBuffer  = etk.NewInput("", "", game.acceptInput)
 
 	statusLogged bool
 	gameLogged   bool
@@ -182,9 +182,9 @@ func init() {
 	gameBuffer.SetForegroundColor(bufferTextColor)
 	gameBuffer.SetBackgroundColor(bufferBackgroundColor)
 
-	inputBuffer.SetForegroundColor(bufferTextColor)
-	inputBuffer.SetBackgroundColor(bufferBackgroundColor)
-	inputBuffer.SetSuffix("")
+	inputBuffer.Field.SetForegroundColor(bufferTextColor)
+	inputBuffer.Field.SetBackgroundColor(bufferBackgroundColor)
+	inputBuffer.Field.SetSuffix("")
 }
 
 func loadAssets(width int) {
@@ -311,10 +311,7 @@ func setViewBoard(view bool) {
 	}
 
 	viewBoard = view
-	inputBuffer.SetHandleKeyboard(viewBoard)
 	if viewBoard {
-		inputBuffer.SetSuffix("_")
-
 		// Exit dialogs.
 		game.lobby.showJoinGame = false
 		game.lobby.showCreateGame = false
@@ -324,9 +321,8 @@ func setViewBoard(view bool) {
 		game.lobby.bufferButtonsDirty = true
 
 		etk.SetRoot(game.Board.frame)
+		etk.SetFocus(inputBuffer)
 	} else {
-		inputBuffer.SetSuffix("")
-
 		if !game.loggedIn {
 			game.setRoot(connectGrid)
 		} else if game.lobby.showCreateGame {
@@ -446,8 +442,6 @@ func NewGame() *Game {
 	game = g
 
 	g.keyboard.SetKeys(kibodo.KeysQWERTY)
-
-	inputBuffer.SetSelectedFunc(g.acceptInput)
 
 	etk.Style.TextColorLight = triangleA
 	etk.Style.TextColorDark = triangleA
@@ -976,11 +970,6 @@ func (g *Game) Update() error {
 				inputBuffer.HandleKeyboardEvent(event.Key, 0)
 			}
 		}
-
-		err = inputBuffer.Update()
-		if err != nil {
-			return err
-		}
 	}
 
 	return etk.Update()
@@ -1187,15 +1176,15 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	if g.screenW > 200 {
 		statusBuffer.SetPadding(4)
 		gameBuffer.SetPadding(4)
-		inputBuffer.SetPadding(4)
+		inputBuffer.Field.SetPadding(4)
 	} else if g.screenW > 100 {
 		statusBuffer.SetPadding(2)
 		gameBuffer.SetPadding(2)
-		inputBuffer.SetPadding(2)
+		inputBuffer.Field.SetPadding(2)
 	} else {
 		statusBuffer.SetPadding(0)
 		gameBuffer.SetPadding(0)
-		inputBuffer.SetPadding(0)
+		inputBuffer.Field.SetPadding(0)
 	}
 
 	setViewBoard(viewBoard)
@@ -1203,20 +1192,19 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return outsideWidth, outsideHeight
 }
 
-func (g *Game) acceptInput() bool {
-	input := inputBuffer.Text()
-	if len(input) == 0 {
+func (g *Game) acceptInput(text string) (handled bool) {
+	if len(text) == 0 {
 		return true
 	}
 
-	if input[0] == '/' {
-		input = input[1:]
+	if text[0] == '/' {
+		text = text[1:]
 	} else {
-		l(fmt.Sprintf("<%s> %s", g.Client.Username, input))
-		input = "say " + input
+		l(fmt.Sprintf("<%s> %s", g.Client.Username, text))
+		text = "say " + text
 	}
 
-	g.Client.Out <- []byte(input)
+	g.Client.Out <- []byte(text)
 	return true
 }
 
