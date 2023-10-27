@@ -406,7 +406,7 @@ func (l *lobby) click(x, y int) {
 				game.lobby.createGamePassword.Field.SetText("")
 				l.bufferDirty = true
 				l.bufferButtonsDirty = true
-				game.setRoot(game.lobby.frame)
+				game.setRoot(listGamesFrame)
 			case lobbyButtonCreateConfirm:
 				typeAndPassword := "public"
 				if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
@@ -427,7 +427,7 @@ func (l *lobby) click(x, y int) {
 				if viewBoard {
 					game.setRoot(game.Board.frame)
 				} else {
-					game.setRoot(game.lobby.frame)
+					game.setRoot(listGamesFrame)
 				}
 			} else {
 				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
@@ -528,7 +528,11 @@ func (l *lobby) update() {
 				if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
 					typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
 				}
-				l.c.Out <- []byte(fmt.Sprintf("c %s %s", typeAndPassword, game.lobby.createGameName.Text()))
+				points, err := strconv.Atoi(game.lobby.createGamePoints.Text())
+				if err != nil {
+					points = 1
+				}
+				l.c.Out <- []byte(fmt.Sprintf("c %s %d %s", typeAndPassword, points, game.lobby.createGameName.Text()))
 			} else {
 				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
 			}

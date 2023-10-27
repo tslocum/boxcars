@@ -52,7 +52,7 @@ func (c *Client) logIn() []byte {
 	if c.Username != "" && c.Password != "" {
 		loginInfo = fmt.Sprintf("%s %s", strings.ReplaceAll(c.Username, " ", "_"), strings.ReplaceAll(c.Password, " ", "_"))
 	}
-	return []byte(fmt.Sprintf("lj boxcars %s\nlist\n", loginInfo))
+	return []byte(fmt.Sprintf("lj %s %s\nlist\n", APPNAME, loginInfo))
 }
 
 func (c *Client) LoggedIn() bool {

@@ -70,6 +70,7 @@ type board struct {
 
 	inputGrid          *etk.Grid
 	showKeyboardButton *etk.Button
+	uiGrid             *etk.Grid
 	frame              *etk.Frame
 
 	leaveGameGrid         *etk.Grid
@@ -99,7 +100,7 @@ func NewBoard() *board {
 			Game: bgammon.NewGame(),
 		},
 		spaceHighlight:        ebiten.NewImage(1, 1),
-		inputGrid:             etk.NewGrid(),
+		uiGrid:                etk.NewGrid(),
 		frame:                 etk.NewFrame(),
 		confirmLeaveGameFrame: etk.NewFrame(),
 		fontFace:              mediumFont,
@@ -119,13 +120,17 @@ func NewBoard() *board {
 		b.leaveGameGrid.SetVisible(false)
 	}
 
-	leaveGameButton := etk.NewButton("Leave Match", b.leaveGame)
 	b.showKeyboardButton = etk.NewButton("Show Keyboard", b.toggleKeyboard)
-	b.inputGrid.AddChildAt(leaveGameButton, 0, 0, 1, 1)
-	b.inputGrid.AddChildAt(b.showKeyboardButton, 1, 0, 1, 1)
-	b.frame.AddChild(b.inputGrid)
+	b.recreateInputGrid()
+
+	b.uiGrid.AddChildAt(statusBuffer, 0, 0, 1, 1)
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 1, 1, 1)
+	b.uiGrid.AddChildAt(gameBuffer, 0, 2, 1, 1)
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 3, 1, 1)
+	b.uiGrid.AddChildAt(b.inputGrid, 0, 4, 1, 1)
+
+	b.frame.AddChild(b.uiGrid)
 	b.frame.AddChild(b.leaveGameGrid)
-	b.frame.AddChild(inputBuffer)
 
 	b.buttons = []*boardButton{
 		{
@@ -166,6 +171,28 @@ func (b *board) fontUpdated() {
 	statusBuffer.SetFont(b.fontFace)
 	gameBuffer.SetFont(b.fontFace)
 	inputBuffer.Field.SetFont(b.fontFace)
+}
+
+func (b *board) recreateInputGrid() {
+	if b.inputGrid == nil {
+		b.inputGrid = etk.NewGrid()
+	} else {
+		*b.inputGrid = *etk.NewGrid()
+	}
+
+	if game.TouchInput {
+		b.inputGrid.AddChildAt(inputBuffer, 0, 0, 2, 1)
+
+		b.inputGrid.AddChildAt(etk.NewBox(), 0, 1, 2, 1)
+
+		leaveGameButton := etk.NewButton("Leave Match", b.leaveGame)
+		b.inputGrid.AddChildAt(leaveGameButton, 0, 2, 1, 1)
+		b.inputGrid.AddChildAt(b.showKeyboardButton, 1, 2, 1, 1)
+
+		b.inputGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1)
+	} else {
+		b.inputGrid.AddChildAt(inputBuffer, 0, 0, 1, 1)
+	}
 }
 
 func (b *board) setKeyboardRect() {
@@ -796,6 +823,14 @@ func (b *board) setRect(x, y, w, h int) {
 	b.setSpaceRects()
 	b.updateBackgroundImage()
 	b.processState()
+
+	b.recreateInputGrid()
+
+	if game.TouchInput {
+		b.uiGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), 112)
+	} else {
+		b.uiGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), 56)
+	}
 
 	dialogWidth := int(400 * s)
 	dialogHeight := int(100 * s)

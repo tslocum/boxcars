@@ -6,4 +6,5 @@ const (
 	DefaultServerAddress = "tcp://bgammon.org:1337"
 	OptimizeDraws        = true
 	AutoEnableTouchInput = false
+	APPNAME              = "boxcars"
 )
