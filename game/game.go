@@ -1146,6 +1146,13 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	connectGrid.SetRowSizes(60, 50, 50, 100, int(56*s))
 
+	{
+		scrollBarWidth := int(32 * s)
+		statusBuffer.SetScrollBarWidth(scrollBarWidth)
+		gameBuffer.SetScrollBarWidth(scrollBarWidth)
+		inputBuffer.Field.SetScrollBarWidth(scrollBarWidth)
+	}
+
 	etk.Layout(g.screenW, g.screenH)
 
 	bufferWidth := text.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
