@@ -110,6 +110,10 @@ var (
 	createGameGrid *etk.Grid
 	joinGameGrid   *etk.Grid
 
+	createGameContainer *etk.Grid
+	joinGameContainer   *etk.Grid
+	listGamesContainer  *etk.Grid
+
 	createGameFrame *etk.Frame
 	joinGameFrame   *etk.Frame
 	listGamesFrame  *etk.Frame
@@ -500,13 +504,6 @@ func NewGame() *Game {
 		connectGrid = grid
 	}
 
-	s := ebiten.DeviceScaleFactor()
-
-	statusBufferHeight := 75
-	if s >= 1.25 {
-		statusBufferHeight = int(50 * s)
-	}
-
 	{
 		headerLabel := etk.NewText("Create match")
 		nameLabel := etk.NewText("Name")
@@ -539,10 +536,9 @@ func NewGame() *Game {
 		grid.AddChildAt(g.lobby.createGamePassword, 2, 3, 1, 1)
 		createGameGrid = grid
 
-		createGameContainer := etk.NewGrid()
+		createGameContainer = etk.NewGrid()
 		createGameContainer.AddChildAt(createGameGrid, 0, 0, 1, 1)
 		createGameContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
-		createGameContainer.SetRowSizes(-1, statusBufferHeight)
 
 		createGameFrame = etk.NewFrame()
 		createGameFrame.SetPositionChildren(true)
@@ -571,10 +567,9 @@ func NewGame() *Game {
 		grid.AddChildAt(g.lobby.joinGamePassword, 2, 1, 1, 1)
 		joinGameGrid = grid
 
-		joinGameContainer := etk.NewGrid()
+		joinGameContainer = etk.NewGrid()
 		joinGameContainer.AddChildAt(joinGameGrid, 0, 0, 1, 1)
 		joinGameContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
-		joinGameContainer.SetRowSizes(-1, statusBufferHeight)
 
 		joinGameFrame = etk.NewFrame()
 		joinGameFrame.SetPositionChildren(true)
@@ -585,10 +580,9 @@ func NewGame() *Game {
 	}
 
 	{
-		listGamesContainer := etk.NewGrid()
+		listGamesContainer = etk.NewGrid()
 		listGamesContainer.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
 		listGamesContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
-		listGamesContainer.SetRowSizes(-1, statusBufferHeight)
 
 		listGamesFrame = etk.NewFrame()
 		listGamesFrame.SetPositionChildren(true)
@@ -611,6 +605,19 @@ func (g *Game) setRoot(w etk.Widget) {
 		g.rootWidget = w
 	}
 	etk.SetRoot(w)
+}
+
+func (g *Game) setBufferRects() {
+	s := ebiten.DeviceScaleFactor()
+
+	statusBufferHeight := 75
+	if s >= 1.25 {
+		statusBufferHeight = int(50 * s)
+	}
+
+	createGameContainer.SetRowSizes(-1, statusBufferHeight)
+	joinGameContainer.SetRowSizes(-1, statusBufferHeight)
+	listGamesContainer.SetRowSizes(-1, statusBufferHeight)
 }
 
 func (g *Game) handleAutoRefresh() {
@@ -937,9 +944,9 @@ func (g *Game) Update() error {
 			if w != nil {
 				for _, event := range g.keyboardInput {
 					if event.Rune > 0 {
-						w.HandleKeyboardEvent(-1, event.Rune)
+						w.HandleKeyboard(-1, event.Rune)
 					} else {
-						w.HandleKeyboardEvent(event.Key, 0)
+						w.HandleKeyboard(event.Key, 0)
 					}
 				}
 			}
@@ -969,9 +976,9 @@ func (g *Game) Update() error {
 			if w != nil {
 				for _, event := range g.keyboardInput {
 					if event.Rune > 0 {
-						w.HandleKeyboardEvent(-1, event.Rune)
+						w.HandleKeyboard(-1, event.Rune)
 					} else {
-						w.HandleKeyboardEvent(event.Key, 0)
+						w.HandleKeyboard(event.Key, 0)
 					}
 				}
 			}
@@ -988,9 +995,9 @@ func (g *Game) Update() error {
 
 		for _, event := range g.keyboardInput {
 			if event.Rune > 0 {
-				inputBuffer.HandleKeyboardEvent(-1, event.Rune)
+				inputBuffer.HandleKeyboard(-1, event.Rune)
 			} else {
-				inputBuffer.HandleKeyboardEvent(event.Key, 0)
+				inputBuffer.HandleKeyboard(event.Key, 0)
 			}
 		}
 	}
@@ -1089,6 +1096,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	}
 
 	etk.Layout(g.screenW, g.screenH)
+
+	g.setBufferRects()
 
 	bufferWidth := text.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
 	if bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
