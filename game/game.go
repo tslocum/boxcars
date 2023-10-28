@@ -314,7 +314,7 @@ func setViewBoard(view bool) {
 		game.lobby.createGameName.Field.SetText("")
 		game.lobby.createGamePassword.Field.SetText("")
 		game.lobby.bufferDirty = true
-		game.lobby.bufferButtonsDirty = true
+		game.lobby.rebuildButtonsGrid()
 
 		etk.SetRoot(game.Board.frame)
 		etk.SetFocus(inputBuffer)
@@ -416,6 +416,8 @@ type Game struct {
 	TouchInput       bool
 
 	rootWidget etk.Widget
+
+	touchIDs []ebiten.TouchID
 
 	lastRefresh time.Time
 
@@ -538,7 +540,8 @@ func NewGame() *Game {
 
 		createGameContainer = etk.NewGrid()
 		createGameContainer.AddChildAt(createGameGrid, 0, 0, 1, 1)
-		createGameContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
+		createGameContainer.AddChildAt(g.lobby.buttonsGrid, 0, 1, 1, 1)
+		createGameContainer.AddChildAt(statusBuffer, 0, 2, 1, 1)
 
 		createGameFrame = etk.NewFrame()
 		createGameFrame.SetPositionChildren(true)
@@ -569,7 +572,8 @@ func NewGame() *Game {
 
 		joinGameContainer = etk.NewGrid()
 		joinGameContainer.AddChildAt(joinGameGrid, 0, 0, 1, 1)
-		joinGameContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
+		joinGameContainer.AddChildAt(g.lobby.buttonsGrid, 0, 1, 1, 1)
+		joinGameContainer.AddChildAt(statusBuffer, 0, 2, 1, 1)
 
 		joinGameFrame = etk.NewFrame()
 		joinGameFrame.SetPositionChildren(true)
@@ -580,11 +584,15 @@ func NewGame() *Game {
 	}
 
 	{
+		listGamesFrame = etk.NewFrame()
+
+		g.lobby.rebuildButtonsGrid()
+
 		listGamesContainer = etk.NewGrid()
 		listGamesContainer.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
-		listGamesContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
+		listGamesContainer.AddChildAt(g.lobby.buttonsGrid, 0, 1, 1, 1)
+		listGamesContainer.AddChildAt(statusBuffer, 0, 2, 1, 1)
 
-		listGamesFrame = etk.NewFrame()
 		listGamesFrame.SetPositionChildren(true)
 		listGamesFrame.AddChild(listGamesContainer)
 		frame := etk.NewFrame()
@@ -615,9 +623,9 @@ func (g *Game) setBufferRects() {
 		statusBufferHeight = int(50 * s)
 	}
 
-	createGameContainer.SetRowSizes(-1, statusBufferHeight)
-	joinGameContainer.SetRowSizes(-1, statusBufferHeight)
-	listGamesContainer.SetRowSizes(-1, statusBufferHeight)
+	createGameContainer.SetRowSizes(-1, g.lobby.buttonBarHeight, statusBufferHeight)
+	joinGameContainer.SetRowSizes(-1, g.lobby.buttonBarHeight, statusBufferHeight)
+	listGamesContainer.SetRowSizes(-1, g.lobby.buttonBarHeight, statusBufferHeight)
 }
 
 func (g *Game) handleAutoRefresh() {
@@ -938,6 +946,28 @@ func (g *Game) Update() error {
 		}
 	}
 
+	var pressed bool
+	if cx == 0 && cy == 0 {
+		g.touchIDs = inpututil.AppendJustPressedTouchIDs(g.touchIDs[:0])
+		for _, id := range g.touchIDs {
+			game.enableTouchInput()
+			cx, cy = ebiten.TouchPosition(id)
+			if cx != 0 || cy != 0 {
+				pressed = true
+				break
+			}
+		}
+	} else {
+		pressed = ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
+	}
+	var skipUpdate bool
+	if pressed && g.keyboard.Visible() {
+		p := image.Point{X: cx, Y: cy}
+		if p.In(g.keyboard.Rect()) {
+			skipUpdate = true
+		}
+	}
+
 	if !g.loggedIn {
 		if len(g.keyboardInput) > 0 {
 			w := etk.Focused()
@@ -952,6 +982,9 @@ func (g *Game) Update() error {
 			}
 		}
 
+		if skipUpdate {
+			return nil
+		}
 		return etk.Update()
 	}
 
@@ -1002,6 +1035,9 @@ func (g *Game) Update() error {
 		}
 	}
 
+	if skipUpdate {
+		return nil
+	}
 	return etk.Update()
 }
 
@@ -1097,8 +1133,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	etk.Layout(g.screenW, g.screenH)
 
-	g.setBufferRects()
-
 	bufferWidth := text.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
 	if bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
@@ -1149,6 +1183,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.lobby.fullscreen = true
 		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
 	}
+
+	g.setBufferRects()
 
 	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
 	g.lobby.showKeyboardButton.SetRect(image.Rect(g.screenW-400, 0, g.screenW, int(2+game.lobby.entryH)))
