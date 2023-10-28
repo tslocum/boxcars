@@ -891,7 +891,8 @@ func (g *Game) Update() error {
 		drawScreen = true
 	}
 
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) || ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+	wheelX, wheelY := ebiten.Wheel()
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) || ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) || wheelX != 0 || wheelY != 0 {
 		drawScreen = true
 	}
 
