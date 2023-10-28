@@ -661,7 +661,8 @@ func (b *board) Draw(screen *ebiten.Image) {
 		img := drawLabel(label, opponentColor, b.gameState.Turn != b.gameState.PlayerNumber, opponentBorderColor)
 		bounds := img.Bounds()
 
-		x := b.x + int(((float64(b.innerW))/4)-(float64(bounds.Dx()/2))) - int(b.horizontalBorderSize)/2
+		innerCenter := b.x + (b.w / 4) - int(b.barWidth/4) + int(b.horizontalBorderSize/2)
+		x := innerCenter - int(float64(bounds.Dx()/2))
 		y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
 		{
 			op := &ebiten.DrawImageOptions{}
@@ -672,19 +673,19 @@ func (b *board) Draw(screen *ebiten.Image) {
 		if b.gameState.Turn == 0 {
 			if opponentRoll != 0 {
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 				screen.DrawImage(diceImage(opponentRoll), op)
 			}
 		} else if b.gameState.Turn != b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
 			{
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 				screen.DrawImage(diceImage(b.gameState.Roll1), op)
 			}
 
 			{
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(b.x+(b.innerW/4)-int(b.horizontalBorderSize)/2+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 				screen.DrawImage(diceImage(b.gameState.Roll2), op)
 			}
 		}
@@ -699,7 +700,8 @@ func (b *board) Draw(screen *ebiten.Image) {
 		img := drawLabel(label, playerColor, b.gameState.Turn == b.gameState.PlayerNumber, playerBorderColor)
 		bounds := img.Bounds()
 
-		x := b.x + int((((float64(b.innerW))/4)*3)-(float64(bounds.Dx()/2))) + int(b.horizontalBorderSize)/2
+		innerCenter := b.x + b.w/2 + b.w/4 + int(b.barWidth/4) - int(b.horizontalBorderSize/2)
+		x := innerCenter - int(float64(bounds.Dx()/2))
 		y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
 		{
 			op := &ebiten.DrawImageOptions{}
@@ -710,19 +712,19 @@ func (b *board) Draw(screen *ebiten.Image) {
 		if b.gameState.Turn == 0 {
 			if playerRoll != 0 {
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 				screen.DrawImage(diceImage(playerRoll), op)
 			}
 		} else if b.gameState.Turn == b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
 			{
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 				screen.DrawImage(diceImage(b.gameState.Roll1), op)
 			}
 
 			{
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(b.x+((b.innerW/4)*3)+int(b.horizontalBorderSize)/2+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 				screen.DrawImage(diceImage(b.gameState.Roll2), op)
 			}
 		}
