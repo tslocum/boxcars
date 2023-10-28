@@ -421,6 +421,7 @@ type Game struct {
 
 	lastRefresh time.Time
 
+	skipUpdate  bool
 	forceLayout bool
 }
 
@@ -965,7 +966,12 @@ func (g *Game) Update() error {
 		p := image.Point{X: cx, Y: cy}
 		if p.In(g.keyboard.Rect()) {
 			skipUpdate = true
+			g.skipUpdate = true
 		}
+	}
+	if g.skipUpdate && !skipUpdate {
+		skipUpdate = true
+		g.skipUpdate = false
 	}
 
 	if !g.loggedIn {
