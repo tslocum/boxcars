@@ -446,6 +446,9 @@ func NewGame() *Game {
 	etk.Style.TextColorDark = triangleA
 	etk.Style.InputBgColor = color.RGBA{40, 24, 9, 255}
 
+	etk.Style.ScrollAreaColor = color.RGBA{26, 15, 6, 255}
+	etk.Style.ScrollHandleColor = color.RGBA{180, 154, 108, 255}
+
 	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
 	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
 
@@ -1136,6 +1139,10 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	if s >= 1.25 {
 		lobbyStatusBufferHeight = int(50 * s)
 	}
+
+	statusBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	gameBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 
 	etk.Layout(g.screenW, g.screenH)
 
