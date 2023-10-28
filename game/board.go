@@ -196,8 +196,19 @@ func (b *board) recreateInputGrid() {
 }
 
 func (b *board) setKeyboardRect() {
-	heightOffset := 70
-	game.keyboard.SetRect(0, game.screenH/2, game.screenW, (game.screenH - game.screenH/2 - heightOffset*2))
+	s := ebiten.DeviceScaleFactor()
+	inputAndButtons := int((float64(56) + game.Board.verticalBorderSize*1.5) * s)
+	h := game.screenH - game.screenH/2 - inputAndButtons - int(b.horizontalBorderSize)
+	y := game.screenH / 2
+	if h < 450 {
+		h = 450
+		maxHeight := int(float64(game.screenH) * 0.75)
+		if h > maxHeight {
+			h = maxHeight
+		}
+		y = game.screenH - inputAndButtons - int(b.horizontalBorderSize) - h
+	}
+	game.keyboard.SetRect(0, y, game.screenW, h)
 }
 
 func (b *board) cancelLeaveGame() error {
@@ -826,11 +837,11 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.recreateInputGrid()
 
+	inputAndButtons := 46.0
 	if game.TouchInput {
-		b.uiGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), 112)
-	} else {
-		b.uiGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), 56)
+		inputAndButtons = 46.0 + 46.0*s + float64(b.horizontalBorderSize)
 	}
+	b.uiGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), int(inputAndButtons))
 
 	dialogWidth := int(400 * s)
 	dialogHeight := int(100 * s)

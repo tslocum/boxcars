@@ -335,8 +335,8 @@ func setViewBoard(view bool) {
 	}
 
 	if !game.loggedIn {
-		displayArea := 450
-		game.keyboard.SetRect(0, displayArea, game.screenW, game.screenH-displayArea)
+		displaySize := game.screenH / 2
+		game.keyboard.SetRect(0, displaySize, game.screenW, displaySize)
 	}
 
 	scheduleFrame()
@@ -496,16 +496,15 @@ func NewGame() *Game {
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
 		grid.SetRowPadding(20)
 		grid.SetColumnSizes(10, 200, -1, -1, 10)
-		grid.SetRowSizes(60, 50, 50, 75)
 		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
 		grid.AddChildAt(etk.NewBox(), 4, 0, 1, 1)
 		grid.AddChildAt(nameLabel, 1, 1, 2, 1)
 		grid.AddChildAt(g.connectUsername, 2, 1, 2, 1)
 		grid.AddChildAt(passwordLabel, 1, 2, 2, 1)
 		grid.AddChildAt(g.connectPassword, 2, 2, 2, 1)
-		grid.AddChildAt(connectButton, 2, 3, 1, 1)
-		grid.AddChildAt(g.connectKeyboardButton, 3, 3, 1, 1)
-		grid.AddChildAt(infoLabel, 1, 4, 3, 1)
+		grid.AddChildAt(infoLabel, 1, 3, 3, 1)
+		grid.AddChildAt(connectButton, 2, 4, 1, 1)
+		grid.AddChildAt(g.connectKeyboardButton, 3, 4, 1, 1)
 		grid.AddChildAt(footerLabel, 1, 5, 3, 1)
 		connectGrid = grid
 	}
@@ -1145,6 +1144,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	gameBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 
+	connectGrid.SetRowSizes(60, 50, 50, 100, int(56*s))
+
 	etk.Layout(g.screenW, g.screenH)
 
 	bufferWidth := text.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
@@ -1152,7 +1153,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
 
-	const inputBufferHeight = 56
 	if g.portraitView() { // Portrait view.
 		g.Board.Lock()
 
@@ -1162,11 +1162,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.Board.Unlock()
 
 		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
-		bufferPaddingY := int(g.Board.verticalBorderSize / 2)
-
 		g.Board.uiGrid.SetRect(image.Rect(bufferPaddingX, g.Board.h+bufferPaddingX, g.screenW-bufferPaddingX, g.screenH-bufferPaddingX))
 
-		g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPaddingY)*1.5)
 		g.lobby.fullscreen = true
 		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
 	} else { // Landscape view.
@@ -1189,15 +1186,13 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.Board.Unlock()
 
 		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
-		bufferPaddingY := int(g.Board.verticalBorderSize)
-
 		g.Board.uiGrid.SetRect(image.Rect(g.Board.w+bufferPaddingX, bufferPaddingX, g.screenW-bufferPaddingX, g.screenH-bufferPaddingX))
 
-		g.lobby.buttonBarHeight = inputBufferHeight + int(float64(bufferPaddingY)*1.5)
 		g.lobby.fullscreen = true
 		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
 	}
 
+	g.lobby.buttonBarHeight = int(56 * s)
 	g.setBufferRects()
 
 	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
