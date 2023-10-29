@@ -668,8 +668,8 @@ func NewGame() *Game {
 
 		createGameContainer = etk.NewGrid()
 		createGameContainer.AddChildAt(createGameGrid, 0, 0, 1, 1)
-		createGameContainer.AddChildAt(g.lobby.buttonsGrid, 0, 1, 1, 1)
-		createGameContainer.AddChildAt(statusBuffer, 0, 2, 1, 1)
+		createGameContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
+		createGameContainer.AddChildAt(g.lobby.buttonsGrid, 0, 2, 1, 1)
 
 		createGameFrame = etk.NewFrame()
 		createGameFrame.SetPositionChildren(true)
@@ -700,8 +700,8 @@ func NewGame() *Game {
 
 		joinGameContainer = etk.NewGrid()
 		joinGameContainer.AddChildAt(joinGameGrid, 0, 0, 1, 1)
-		joinGameContainer.AddChildAt(g.lobby.buttonsGrid, 0, 1, 1, 1)
-		joinGameContainer.AddChildAt(statusBuffer, 0, 2, 1, 1)
+		joinGameContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
+		joinGameContainer.AddChildAt(g.lobby.buttonsGrid, 0, 2, 1, 1)
 
 		joinGameFrame = etk.NewFrame()
 		joinGameFrame.SetPositionChildren(true)
@@ -718,8 +718,8 @@ func NewGame() *Game {
 
 		listGamesContainer = etk.NewGrid()
 		listGamesContainer.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
-		listGamesContainer.AddChildAt(g.lobby.buttonsGrid, 0, 1, 1, 1)
-		listGamesContainer.AddChildAt(statusBuffer, 0, 2, 1, 1)
+		listGamesContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
+		listGamesContainer.AddChildAt(g.lobby.buttonsGrid, 0, 2, 1, 1)
 
 		listGamesFrame.SetPositionChildren(true)
 		listGamesFrame.AddChild(listGamesContainer)
@@ -751,9 +751,9 @@ func (g *Game) setBufferRects() {
 		statusBufferHeight = int(50 * s)
 	}
 
-	createGameContainer.SetRowSizes(-1, g.lobby.buttonBarHeight, statusBufferHeight)
-	joinGameContainer.SetRowSizes(-1, g.lobby.buttonBarHeight, statusBufferHeight)
-	listGamesContainer.SetRowSizes(-1, g.lobby.buttonBarHeight, statusBufferHeight)
+	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
+	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
+	listGamesContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 }
 
 func (g *Game) handleAutoRefresh() {
