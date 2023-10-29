@@ -1,5 +1,7 @@
 package main
 
+//go:generate xgotext -default boxcars -in . -out game/locales
+
 import (
 	"bufio"
 	"log"

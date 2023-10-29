@@ -16,6 +16,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"github.com/leonelquinteros/gotext"
 	"github.com/llgcode/draw2d/draw2dimg"
 	"golang.org/x/image/font"
 )
@@ -109,18 +110,18 @@ func NewBoard() *board {
 	b.fontUpdated()
 
 	{
-		leaveGameLabel := etk.NewText("Leave match?")
+		leaveGameLabel := etk.NewText(gotext.Get("Leave match?"))
 		leaveGameLabel.SetHorizontal(messeji.AlignCenter)
 
 		b.leaveGameGrid = etk.NewGrid()
 		b.leaveGameGrid.SetBackground(color.RGBA{40, 24, 9, 255})
 		b.leaveGameGrid.AddChildAt(leaveGameLabel, 0, 0, 2, 1)
-		b.leaveGameGrid.AddChildAt(etk.NewButton("No", b.cancelLeaveGame), 0, 1, 1, 1)
-		b.leaveGameGrid.AddChildAt(etk.NewButton("Yes", b.confirmLeaveGame), 1, 1, 1, 1)
+		b.leaveGameGrid.AddChildAt(etk.NewButton(gotext.Get("No"), b.cancelLeaveGame), 0, 1, 1, 1)
+		b.leaveGameGrid.AddChildAt(etk.NewButton(gotext.Get("Yes"), b.confirmLeaveGame), 1, 1, 1, 1)
 		b.leaveGameGrid.SetVisible(false)
 	}
 
-	b.showKeyboardButton = etk.NewButton("Show Keyboard", b.toggleKeyboard)
+	b.showKeyboardButton = etk.NewButton(gotext.Get("Show Keyboard"), b.toggleKeyboard)
 	b.recreateInputGrid()
 
 	b.uiGrid.AddChildAt(statusBuffer, 0, 0, 1, 1)
@@ -134,22 +135,22 @@ func NewBoard() *board {
 
 	b.buttons = []*boardButton{
 		{
-			label:    "Roll",
+			label:    gotext.Get("Roll"),
 			selected: b.selectRoll,
 		}, {
-			label:    "Reset",
+			label:    gotext.Get("Reset"),
 			selected: b.selectReset,
 		}, {
-			label:    "OK",
+			label:    gotext.Get("OK"),
 			selected: b.selectOK,
 		}, {
-			label:    "Double",
+			label:    gotext.Get("Double"),
 			selected: b.selectDouble,
 		}, {
-			label:    "Resign",
+			label:    gotext.Get("Resign"),
 			selected: b.selectResign,
 		}, {
-			label:    "Accept",
+			label:    gotext.Get("Accept"),
 			selected: b.selectOK,
 		},
 	}
@@ -185,7 +186,7 @@ func (b *board) recreateInputGrid() {
 
 		b.inputGrid.AddChildAt(etk.NewBox(), 0, 1, 2, 1)
 
-		leaveGameButton := etk.NewButton("Leave Match", b.leaveGame)
+		leaveGameButton := etk.NewButton(gotext.Get("Leave Match"), b.leaveGame)
 		b.inputGrid.AddChildAt(leaveGameButton, 0, 2, 1, 1)
 		b.inputGrid.AddChildAt(b.showKeyboardButton, 1, 2, 1, 1)
 
@@ -229,11 +230,11 @@ func (b *board) leaveGame() error {
 func (b *board) toggleKeyboard() error {
 	if game.keyboard.Visible() {
 		game.keyboard.Hide()
-		b.showKeyboardButton.Label.SetText("Show Keyboard")
+		b.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	} else {
 		b.setKeyboardRect()
 		game.keyboard.Show()
-		b.showKeyboardButton.Label.SetText("Hide Keyboard")
+		b.showKeyboardButton.Label.SetText(gotext.Get("Hide Keyboard"))
 	}
 	return nil
 }

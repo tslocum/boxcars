@@ -15,6 +15,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"github.com/leonelquinteros/gotext"
 	"golang.org/x/image/font"
 )
 
@@ -33,6 +34,8 @@ type lobbyButton struct {
 	label string
 	f     func()
 }
+
+// TODO get button labels dynamically later as it needs to be after gotext loads
 
 var mainButtons = []*lobbyButton{
 	{"Refresh", func() {}},
@@ -113,7 +116,7 @@ func NewLobby() *lobby {
 		buttonsGrid: etk.NewGrid(),
 	}
 	l.fontUpdated()
-	l.showKeyboardButton = etk.NewButton("Show Keyboard", l.toggleKeyboard)
+	l.showKeyboardButton = etk.NewButton(gotext.Get("Show Keyboard"), l.toggleKeyboard)
 	l.frame = etk.NewFrame()
 	l.frame.AddChild(l.showKeyboardButton)
 	go l.handleRefreshTimer()
@@ -133,11 +136,11 @@ func (l *lobby) setKeyboardRect() {
 func (l *lobby) toggleKeyboard() error {
 	if game.keyboard.Visible() {
 		game.keyboard.Hide()
-		l.showKeyboardButton.Label.SetText("Show Keyboard")
+		l.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	} else {
 		l.setKeyboardRect()
 		game.keyboard.Show()
-		l.showKeyboardButton.Label.SetText("Hide Keyboard")
+		l.showKeyboardButton.Label.SetText(gotext.Get("Hide Keyboard"))
 	}
 	return nil
 }
@@ -260,7 +263,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				l.showJoinGame = true
 				game.setRoot(joinGameFrame)
 				etk.SetFocus(l.joinGamePassword)
-				l.joinGameLabel.SetText(fmt.Sprintf("Join match: %s", l.games[l.selected].Name))
+				l.joinGameLabel.SetText(gotext.Get("Join match: %s", l.games[l.selected].Name))
 				l.joinGamePassword.Field.SetText("")
 				l.joinGameID = l.games[l.selected].ID
 				l.bufferDirty = true
@@ -350,7 +353,7 @@ func (l *lobby) drawBuffer() {
 	cy += l.entryH
 
 	if len(l.games) == 0 {
-		drawEntry(cx+l.padding, cy+l.padding, "No matches available. Please create one.", "", "", false, false)
+		drawEntry(cx+l.padding, cy+l.padding, gotext.Get("No matches available. Please create one."), "", "", false, false)
 	} else {
 		i := 0
 		var status string
@@ -459,7 +462,7 @@ func (l *lobby) click(x, y int) {
 					l.showJoinGame = true
 					game.setRoot(joinGameFrame)
 					etk.SetFocus(l.joinGamePassword)
-					l.joinGameLabel.SetText(fmt.Sprintf("Join match: %s", entry.Name))
+					l.joinGameLabel.SetText(gotext.Get("Join match: %s", entry.Name))
 					l.joinGamePassword.Field.SetText("")
 					l.joinGameID = entry.ID
 					l.bufferDirty = true

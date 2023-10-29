@@ -29,6 +29,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"github.com/leonelquinteros/gotext"
 	"github.com/nfnt/resize"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -423,9 +424,9 @@ func setViewBoard(view bool) {
 	if viewBoard != view {
 		g := game
 		g.keyboard.Hide()
-		g.connectKeyboardButton.Label.SetText("Show Keyboard")
-		g.lobby.showKeyboardButton.Label.SetText("Show Keyboard")
-		g.Board.showKeyboardButton.Label.SetText("Show Keyboard")
+		g.connectKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
+		g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
+		g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	}
 
 	viewBoard = view
@@ -550,6 +551,9 @@ type Game struct {
 }
 
 func NewGame() *Game {
+	// TODO load from asset
+	gotext.Configure("/path/to/locales/root/dir", "en_US", "boxcars")
+
 	g := &Game{
 		runeBuffer: make([]rune, 24),
 
@@ -579,31 +583,31 @@ func NewGame() *Game {
 
 	{
 		headerLabel := etk.NewText("Welcome to bgammon.org")
-		nameLabel := etk.NewText("Username")
-		passwordLabel := etk.NewText("Password")
+		nameLabel := etk.NewText(gotext.Get("Username"))
+		passwordLabel := etk.NewText(gotext.Get("Password"))
 
-		connectButton := etk.NewButton("Connect", func() error {
+		connectButton := etk.NewButton(gotext.Get("Connect"), func() error {
 			g.Username = g.connectUsername.Text()
 			g.Password = g.connectPassword.Text()
 			g.Connect()
 			return nil
 		})
 
-		g.connectKeyboardButton = etk.NewButton("Show Keyboard", func() error {
+		g.connectKeyboardButton = etk.NewButton(gotext.Get("Show Keyboard"), func() error {
 			if g.keyboard.Visible() {
 				g.keyboard.Hide()
-				g.connectKeyboardButton.Label.SetText("Show Keyboard")
-				g.lobby.showKeyboardButton.Label.SetText("Show Keyboard")
-				g.Board.showKeyboardButton.Label.SetText("Show Keyboard")
+				g.connectKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
+				g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
+				g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 			} else {
 				g.enableTouchInput()
 				g.keyboard.Show()
-				g.connectKeyboardButton.Label.SetText("Hide Keyboard")
+				g.connectKeyboardButton.Label.SetText(gotext.Get("Hide Keyboard"))
 			}
 			return nil
 		})
 
-		infoLabel := etk.NewText("To log in as a guest, enter a username (if you want) and do not enter a password.")
+		infoLabel := etk.NewText(gotext.Get("To log in as a guest, enter a username (if you want) and do not enter a password."))
 
 		footerLabel := etk.NewText("Boxcars " + version)
 		footerLabel.SetHorizontal(messeji.AlignEnd)
@@ -635,10 +639,10 @@ func NewGame() *Game {
 	}
 
 	{
-		headerLabel := etk.NewText("Create match")
-		nameLabel := etk.NewText("Name")
-		pointsLabel := etk.NewText("Points")
-		passwordLabel := etk.NewText("Password")
+		headerLabel := etk.NewText(gotext.Get("Create match"))
+		nameLabel := etk.NewText(gotext.Get("Name"))
+		pointsLabel := etk.NewText(gotext.Get("Points"))
+		passwordLabel := etk.NewText(gotext.Get("Password"))
 
 		g.lobby.createGameName = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
@@ -680,9 +684,9 @@ func NewGame() *Game {
 	}
 
 	{
-		g.lobby.joinGameLabel = etk.NewText("Join match")
+		g.lobby.joinGameLabel = etk.NewText(gotext.Get("Join match"))
 
-		passwordLabel := etk.NewText("Password")
+		passwordLabel := etk.NewText(gotext.Get("Password"))
 
 		g.lobby.joinGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
@@ -817,13 +821,13 @@ func (g *Game) handleEvents() {
 				gameBuffer.SetText("")
 				gameLogged = false
 			} else {
-				lg(fmt.Sprintf("%s joined the match.", ev.Player))
+				lg(gotext.Get("%s joined the match.", ev.Player))
 				playSoundEffect(effectJoinLeave)
 			}
 		case *bgammon.EventFailedJoin:
-			l(fmt.Sprintf("*** Failed to join match: %s", ev.Reason))
+			l("*** " + gotext.Get("Failed to join match: %s", ev.Reason))
 		case *bgammon.EventFailedLeave:
-			l(fmt.Sprintf("*** Failed to leave match: %s", ev.Reason))
+			l("*** " + gotext.Get("Failed to leave match: %s", ev.Reason))
 			setViewBoard(false)
 		case *bgammon.EventLeft:
 			g.Board.Lock()
@@ -837,7 +841,7 @@ func (g *Game) handleEvents() {
 			if ev.Player == g.Client.Username {
 				setViewBoard(false)
 			} else {
-				lg(fmt.Sprintf("%s left the match.", ev.Player))
+				lg(gotext.Get("%s left the match.", ev.Player))
 				playSoundEffect(effectJoinLeave)
 			}
 		case *bgammon.EventBoard:
@@ -866,11 +870,11 @@ func (g *Game) handleEvents() {
 			g.Board.processState()
 			g.Board.Unlock()
 			scheduleFrame()
-			lg(fmt.Sprintf("%s rolled %s.", ev.Player, diceFormatted))
+			lg(gotext.Get("%s rolled %s.", ev.Player, diceFormatted))
 		case *bgammon.EventFailedRoll:
 			l(fmt.Sprintf("*** Failed to roll: %s", ev.Reason))
 		case *bgammon.EventMoved:
-			lg(fmt.Sprintf("%s moved %s.", ev.Player, bgammon.FormatMoves(ev.Moves)))
+			lg(gotext.Get("%s moved %s.", ev.Player, bgammon.FormatMoves(ev.Moves)))
 			playSoundEffect(effectMove)
 			if ev.Player == g.Client.Username {
 				continue
@@ -887,17 +891,18 @@ func (g *Game) handleEvents() {
 			if ev.From != 0 || ev.To != 0 {
 				extra = fmt.Sprintf(" from %s to %s", bgammon.FormatSpace(ev.From), bgammon.FormatSpace(ev.To))
 			}
-			l(fmt.Sprintf("*** Failed to move checker%s: %s", extra, ev.Reason))
-			l(fmt.Sprintf("*** Legal moves: %s", bgammon.FormatMoves(g.Board.gameState.Available)))
+			l("*** " + gotext.Get("Failed to move checker%s: %s", extra, ev.Reason))
+			l("*** " + gotext.Get("Legal moves: %s", bgammon.FormatMoves(g.Board.gameState.Available)))
 		case *bgammon.EventFailedOk:
 			g.Client.Out <- []byte("board") // Refresh game state.
-			l(fmt.Sprintf("*** Failed to submit moves: %s", ev.Reason))
+			l("*** " + gotext.Get("Failed to submit moves: %s", ev.Reason))
 		case *bgammon.EventWin:
-			lg(fmt.Sprintf("%s wins!", ev.Player))
+			lg(gotext.Get("%s wins!", ev.Player))
 		case *bgammon.EventPing:
 			g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
 		default:
-			l(fmt.Sprintf("*** Warning: Received unknown event: %+v", ev))
+			l("*** " + gotext.Get("Warning: Received unknown event: %+v", ev))
+			l("*** " + gotext.Get("You may need to upgrade your client.", ev))
 		}
 	}
 }
@@ -908,12 +913,12 @@ func (g *Game) Connect() {
 	}
 	g.loggedIn = true
 
-	l(fmt.Sprintf("*** Connecting..."))
+	l("*** " + gotext.Get("Connecting..."))
 
 	g.keyboard.Hide()
-	g.connectKeyboardButton.Label.SetText("Show Keyboard")
-	g.lobby.showKeyboardButton.Label.SetText("Show Keyboard")
-	g.Board.showKeyboardButton.Label.SetText("Show Keyboard")
+	g.connectKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
+	g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
+	g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 
 	g.setRoot(listGamesFrame)
 
