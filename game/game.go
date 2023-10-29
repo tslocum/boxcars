@@ -7,7 +7,9 @@ import (
 	"image"
 	"image/color"
 	_ "image/png"
+	"io"
 	"log"
+	"math/rand"
 	"os"
 	"path"
 	"regexp"
@@ -20,6 +22,9 @@ import (
 	"code.rocketnine.space/tslocum/kibodo"
 	"code.rocketnine.space/tslocum/messeji"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -35,8 +40,8 @@ const MaxDebug = 1
 
 var onlyNumbers = regexp.MustCompile(`[0-9]+`)
 
-//go:embed assets
-var assetsFS embed.FS
+//go:embed asset
+var assetFS embed.FS
 
 var debugExtra []byte
 
@@ -119,6 +124,18 @@ var (
 	listGamesFrame  *etk.Frame
 )
 
+const sampleRate = 44100
+
+var (
+	audioContext *audio.Context
+
+	SoundDie1, SoundDie2, SoundDie3                []byte
+	SoundDice1, SoundDice2, SoundDice3, SoundDice4 []byte
+	SoundMove1, SoundMove2, SoundMove3             []byte
+	SoundJoinLeave                                 []byte
+	SoundSay                                       []byte
+)
+
 func l(s string) {
 	m := time.Now().Format("15:04") + " " + s
 	if statusLogged {
@@ -182,10 +199,9 @@ func init() {
 	inputBuffer.Field.SetBackgroundColor(bufferBackgroundColor)
 	inputBuffer.Field.SetSuffix("")
 }
-
-func loadAssets(width int) {
-	imgCheckerLight = loadAsset("assets/checker_white.png", width)
-	imgCheckerDark = loadAsset("assets/checker_white.png", width)
+func loadImageAssets(width int) {
+	imgCheckerLight = loadAsset("asset/image/checker_white.png", width)
+	imgCheckerDark = loadAsset("asset/image/checker_white.png", width)
 	//imgCheckerDark = loadAsset("assets/checker_black.png", width)
 
 	resizeDice := func(img image.Image) *ebiten.Image {
@@ -198,7 +214,7 @@ func loadAssets(width int) {
 	}
 
 	const size = 184
-	imgDice = ebiten.NewImageFromImage(loadImage("assets/dice.png"))
+	imgDice = ebiten.NewImageFromImage(loadImage("asset/image/dice.png"))
 	imgDice1 = resizeDice(imgDice.SubImage(image.Rect(0, 0, size*1, size*1)))
 	imgDice2 = resizeDice(imgDice.SubImage(image.Rect(size*1, 0, size*2, size*1)))
 	imgDice3 = resizeDice(imgDice.SubImage(image.Rect(size*2, 0, size*3, size*1)))
@@ -206,9 +222,56 @@ func loadAssets(width int) {
 	imgDice5 = resizeDice(imgDice.SubImage(image.Rect(size*1, size*1, size*2, size*2)))
 	imgDice6 = resizeDice(imgDice.SubImage(image.Rect(size*2, size*1, size*3, size*2)))
 }
+func loadAudioAssets() {
+	audioContext = audio.NewContext(sampleRate)
+	p := "asset/audio/"
+
+	SoundDie1 = LoadBytes(p + "die1.ogg")
+	SoundDie2 = LoadBytes(p + "die2.ogg")
+	SoundDie3 = LoadBytes(p + "die3.ogg")
+
+	SoundDice1 = LoadBytes(p + "dice1.ogg")
+	SoundDice2 = LoadBytes(p + "dice2.ogg")
+	SoundDice3 = LoadBytes(p + "dice3.ogg")
+	SoundDice4 = LoadBytes(p + "dice4.ogg")
+
+	SoundMove1 = LoadBytes(p + "move1.ogg")
+	SoundMove2 = LoadBytes(p + "move2.ogg")
+	SoundMove3 = LoadBytes(p + "move3.ogg")
+
+	SoundJoinLeave = LoadBytes(p + "joinleave.ogg")
+	SoundSay = LoadBytes(p + "say.ogg")
+
+	dieSounds = [][]byte{
+		SoundDie1,
+		SoundDie2,
+		SoundDie3,
+	}
+	randomizeByteSlice(dieSounds)
+
+	diceSounds = [][]byte{
+		SoundDice1,
+		SoundDice2,
+		SoundDice3,
+		SoundDice4,
+	}
+	randomizeByteSlice(diceSounds)
+
+	moveSounds = [][]byte{
+		SoundMove1,
+		SoundMove2,
+		SoundMove3,
+	}
+	randomizeByteSlice(moveSounds)
+}
+
+func loadAssets(width int) {
+	loadImageAssets(width)
+	loadAudioAssets()
+}
 
 func loadImage(assetPath string) image.Image {
-	f, err := assetsFS.Open(assetPath)
+	f, err := assetFS.Open(assetPath)
 	if err != nil {
 		panic(err)
 	}
@@ -229,6 +292,65 @@ func loadAsset(assetPath string, width int) *ebiten.Image {
 		return ebiten.NewImageFromImage(imgResized)
 	}
 	return ebiten.NewImageFromImage(img)
+}
+
+func LoadBytes(p string) []byte {
+	b, err := assetFS.ReadFile(p)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
+func LoadWAV(context *audio.Context, p string) *audio.Player {
+	f, err := assetFS.Open(p)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	stream, err := wav.DecodeWithSampleRate(sampleRate, f)
+	if err != nil {
+		panic(err)
+	}
+
+	player, err := audio.NewPlayer(audioContext, io.NopCloser(stream))
+	if err != nil {
+		panic(err)
+	}
+
+	// Workaround to prevent delays when playing for the first time.
+	player.SetVolume(0)
+	player.Play()
+	player.Pause()
+	player.Rewind()
+	player.SetVolume(1)
+
+	return player
+}
+
+type oggStream struct {
+	*vorbis.Stream
+}
+
+func (s *oggStream) Close() error {
+	return nil
+}
+
+func LoadOGG(context *audio.Context, p string) *audio.Player {
+	b := LoadBytes(p)
+
+	stream, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(b))
+	if err != nil {
+		panic(err)
+	}
+
+	player, err := audio.NewPlayer(audioContext, &oggStream{Stream: stream})
+	if err != nil {
+		panic(err)
+	}
+
+	return player
 }
 
 func initializeFonts() {
@@ -393,6 +515,8 @@ type Game struct {
 
 	lobby *lobby
 
+	volume float64 // Volume range is 0-1.
+
 	runeBuffer []rune
 	userInput  string
 
@@ -434,6 +558,7 @@ func NewGame() *Game {
 		TouchInput: AutoEnableTouchInput,
 
 		debugImg: ebiten.NewImage(200, 200),
+		volume:   1,
 	}
 	game = g
 
@@ -671,6 +796,7 @@ func (g *Game) handleEvents() {
 			l(fmt.Sprintf("*** %s", ev.Message))
 		case *bgammon.EventSay:
 			l(fmt.Sprintf("<%s> %s", ev.Player, ev.Message))
+			playSoundEffect(effectSay)
 		case *bgammon.EventList:
 			g.lobby.setGameList(ev.Games)
 			if !viewBoard {
@@ -692,6 +818,7 @@ func (g *Game) handleEvents() {
 				gameLogged = false
 			} else {
 				lg(fmt.Sprintf("%s joined the match.", ev.Player))
+				playSoundEffect(effectJoinLeave)
 			}
 		case *bgammon.EventFailedJoin:
 			l(fmt.Sprintf("*** Failed to join match: %s", ev.Reason))
@@ -709,10 +836,9 @@ func (g *Game) handleEvents() {
 			g.Board.Unlock()
 			if ev.Player == g.Client.Username {
 				setViewBoard(false)
-			}
-
-			if ev.Player != g.Client.Username {
+			} else {
 				lg(fmt.Sprintf("%s left the match.", ev.Player))
+				playSoundEffect(effectJoinLeave)
 			}
 		case *bgammon.EventBoard:
 			g.Board.Lock()
@@ -732,8 +858,10 @@ func (g *Game) handleEvents() {
 				} else {
 					diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll2)
 				}
+				playSoundEffect(effectDie)
 			} else {
 				diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
+				playSoundEffect(effectDice)
 			}
 			g.Board.processState()
 			g.Board.Unlock()
@@ -743,6 +871,7 @@ func (g *Game) handleEvents() {
 			l(fmt.Sprintf("*** Failed to roll: %s", ev.Reason))
 		case *bgammon.EventMoved:
 			lg(fmt.Sprintf("%s moved %s.", ev.Player, bgammon.FormatMoves(ev.Moves)))
+			playSoundEffect(effectMove)
 			if ev.Player == g.Client.Username {
 				continue
 			}
@@ -1280,4 +1409,89 @@ func (g *Game) toggleProfiling() error {
 
 func (g *Game) Exit() {
 	os.Exit(0)
+}
+
+type SoundEffect int
+
+const (
+	effectJoinLeave SoundEffect = iota
+	effectSay
+	effectDie
+	effectDice
+	effectMove
+)
+
+var (
+	dieSounds      [][]byte
+	dieSoundPlays  int
+	diceSounds     [][]byte
+	diceSoundPlays int
+	moveSounds     [][]byte
+	moveSoundPlays int
+)
+
+func playSoundEffect(effect SoundEffect) {
+	if game.volume == 0 {
+		return
+	}
+
+	var b []byte
+	switch effect {
+	case effectSay:
+		b = SoundSay
+	case effectJoinLeave:
+		b = SoundJoinLeave
+	case effectDie:
+		b = dieSounds[dieSoundPlays]
+
+		dieSoundPlays++
+		if dieSoundPlays == len(dieSounds)-1 {
+			randomizeByteSlice(dieSounds)
+			dieSoundPlays = 0
+		}
+	case effectDice:
+		b = diceSounds[diceSoundPlays]
+
+		diceSoundPlays++
+		if diceSoundPlays == len(diceSounds)-1 {
+			randomizeByteSlice(diceSounds)
+			diceSoundPlays = 0
+		}
+	case effectMove:
+		b = moveSounds[moveSoundPlays]
+
+		moveSoundPlays++
+		if moveSoundPlays == len(moveSounds)-1 {
+			randomizeByteSlice(moveSounds)
+			moveSoundPlays = 0
+		}
+	default:
+		log.Panicf("unknown sound effect: %d", effect)
+		return
+	}
+
+	stream, err := vorbis.DecodeWithoutResampling(bytes.NewReader(b))
+	if err != nil {
+		panic(err)
+	}
+
+	player, err := audioContext.NewPlayer(&oggStream{stream})
+	if err != nil {
+		panic(err)
+	}
+
+	if effect == effectSay {
+		player.SetVolume(game.volume / 2)
+	} else {
+		player.SetVolume(game.volume)
+	}
+
+	player.Play()
+}
+
+func randomizeByteSlice(b [][]byte) {
+	for i := range b {
+		j := rand.Intn(i + 1)
+		b[i], b[j] = b[j], b[i]
+	}
 }

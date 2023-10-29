@@ -826,7 +826,7 @@ func (b *board) setRect(x, y, w, h int) {
 	b.innerW = int(float64(b.w) - (b.horizontalBorderSize * 2))
 	b.innerH = int(float64(b.h) - (b.verticalBorderSize * 2))
 
-	loadAssets(int(b.spaceWidth))
+	loadImageAssets(int(b.spaceWidth))
 
 	for i := 0; i < b.Sprites.num; i++ {
 		s := b.Sprites.sprites[i]
