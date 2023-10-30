@@ -7,160 +7,113 @@ msgstr ""
 "Language: \n"
 "X-Generator: xgotext\n"
 
-#: game/game.go:824
 msgid "%s joined the match."
 msgstr ""
 
-#: game/game.go:844
 msgid "%s left the match."
 msgstr ""
 
-#: game/game.go:877
 msgid "%s moved %s."
 msgstr ""
 
-#: game/game.go:873
 msgid "%s rolled %s."
 msgstr ""
 
-#: game/game.go:900
 msgid "%s wins!"
 msgstr ""
 
-#: game/board.go:153
 msgid "Accept"
 msgstr ""
 
-#: game/game.go:589
 msgid "Connect"
 msgstr ""
 
-#: game/game.go:916
 msgid "Connecting..."
 msgstr ""
 
-#: game/game.go:642
 msgid "Create match"
 msgstr ""
 
-#: game/board.go:147
 msgid "Double"
 msgstr ""
 
-#: game/game.go:828
 msgid "Failed to join match: %s"
 msgstr ""
 
-#: game/game.go:830
 msgid "Failed to leave match: %s"
 msgstr ""
 
-#: game/game.go:894
 msgid "Failed to move checker%s: %s"
 msgstr ""
 
-#: game/game.go:898
 msgid "Failed to submit moves: %s"
 msgstr ""
 
-#: game/board.go:237
-#: game/game.go:605
-#: game/lobby.go:143
 msgid "Hide Keyboard"
 msgstr ""
 
-#: game/game.go:687
 msgid "Join match"
 msgstr ""
 
-#: game/lobby.go:266
-#: game/lobby.go:465
 msgid "Join match: %s"
 msgstr ""
 
-#: game/board.go:189
 msgid "Leave Match"
 msgstr ""
 
-#: game/board.go:113
 msgid "Leave match?"
 msgstr ""
 
-#: game/game.go:895
 msgid "Legal moves: %s"
 msgstr ""
 
-#: game/game.go:643
 msgid "Name"
 msgstr ""
 
-#: game/lobby.go:356
-msgid "No matches available. Please create one."
-msgstr ""
-
-#: game/board.go:119
 msgid "No"
 msgstr ""
 
-#: game/board.go:144
+msgid "No matches available. Please create one."
+msgstr ""
+
 msgid "OK"
 msgstr ""
 
-#: game/game.go:587
-#: game/game.go:645
-#: game/game.go:689
 msgid "Password"
 msgstr ""
 
-#: game/game.go:644
 msgid "Points"
 msgstr ""
 
-#: game/board.go:141
 msgid "Reset"
 msgstr ""
 
-#: game/board.go:150
 msgid "Resign"
 msgstr ""
 
-#: game/board.go:138
 msgid "Roll"
 msgstr ""
 
-#: game/board.go:124
-#: game/board.go:233
-#: game/game.go:427
-#: game/game.go:428
-#: game/game.go:429
-#: game/game.go:596
-#: game/game.go:599
-#: game/game.go:600
-#: game/game.go:601
-#: game/game.go:919
-#: game/game.go:920
-#: game/game.go:921
-#: game/lobby.go:119
-#: game/lobby.go:139
+msgid "Server"
+msgstr ""
+
 msgid "Show Keyboard"
 msgstr ""
 
-#: game/game.go:610
 msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
 msgstr ""
 
-#: game/game.go:586
 msgid "Username"
 msgstr ""
 
-#: game/game.go:904
 msgid "Warning: Received unknown event: %+v"
 msgstr ""
 
-#: game/board.go:120
+msgid "Welcome to %s"
+msgstr ""
+
 msgid "Yes"
 msgstr ""
 
-#: game/game.go:905
 msgid "You may need to upgrade your client."
 msgstr ""

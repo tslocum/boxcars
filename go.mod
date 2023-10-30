@@ -12,7 +12,6 @@ require (
 	github.com/llgcode/draw2d v0.0.0-20231022063514-1acb54133d2a
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	golang.org/x/image v0.13.0
-	golang.org/x/text v0.13.0
 	nhooyr.io/websocket v1.8.10
 )
 
@@ -27,4 +26,5 @@ require (
 	golang.org/x/mobile v0.0.0-20231006135142-2b44d11868fe // indirect
 	golang.org/x/sync v0.4.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 )

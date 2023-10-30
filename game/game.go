@@ -35,7 +35,7 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
-const version = "v1.0.4"
+const version = "v1.0.5"
 
 const MaxDebug = 1
 
@@ -533,6 +533,7 @@ type Game struct {
 
 	connectUsername       *etk.Input
 	connectPassword       *etk.Input
+	connectServer         *etk.Input
 	connectKeyboardButton *etk.Button
 
 	pressedKeys []ebiten.Key
@@ -582,14 +583,12 @@ func NewGame() *Game {
 	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
 
 	{
-		headerLabel := etk.NewText("Welcome to bgammon.org")
+		headerLabel := etk.NewText(gotext.Get("Welcome to %s", "bgammon.org"))
 		nameLabel := etk.NewText(gotext.Get("Username"))
 		passwordLabel := etk.NewText(gotext.Get("Password"))
 
 		connectButton := etk.NewButton(gotext.Get("Connect"), func() error {
-			g.Username = g.connectUsername.Text()
-			g.Password = g.connectPassword.Text()
-			g.Connect()
+			g.selectConnect()
 			return nil
 		})
 
@@ -631,10 +630,23 @@ func NewGame() *Game {
 		grid.AddChildAt(g.connectUsername, 2, 1, 2, 1)
 		grid.AddChildAt(passwordLabel, 1, 2, 2, 1)
 		grid.AddChildAt(g.connectPassword, 2, 2, 2, 1)
-		grid.AddChildAt(infoLabel, 1, 3, 3, 1)
-		grid.AddChildAt(connectButton, 2, 4, 1, 1)
-		grid.AddChildAt(g.connectKeyboardButton, 3, 4, 1, 1)
-		grid.AddChildAt(footerLabel, 1, 5, 3, 1)
+		y := 3
+		if ShowServerSettings {
+			connectAddress := game.ServerAddress
+			if connectAddress == "" {
+				connectAddress = DefaultServerAddress
+			}
+			g.connectServer = etk.NewInput("", connectAddress, func(text string) (handled bool) {
+				return false
+			})
+			grid.AddChildAt(etk.NewText(gotext.Get("Server")), 1, y, 2, 1)
+			grid.AddChildAt(g.connectServer, 2, y, 2, 1)
+			y++
+		}
+		grid.AddChildAt(infoLabel, 1, y, 3, 1)
+		grid.AddChildAt(connectButton, 2, y+1, 1, 1)
+		grid.AddChildAt(g.connectKeyboardButton, 3, y+1, 1, 1)
+		grid.AddChildAt(footerLabel, 1, y+2, 3, 1)
 		connectGrid = grid
 	}
 
@@ -952,6 +964,16 @@ func (g *Game) Connect() {
 	go c.Connect()
 }
 
+func (g *Game) selectConnect() error {
+	g.Username = g.connectUsername.Text()
+	g.Password = g.connectPassword.Text()
+	if ShowServerSettings {
+		g.ServerAddress = g.connectServer.Text()
+	}
+	g.Connect()
+	return nil
+}
+
 func (g *Game) handleInput(keys []ebiten.Key) error {
 	if !g.loggedIn {
 		for _, key := range keys {
@@ -965,9 +987,7 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					etk.SetFocus(g.connectUsername)
 				}
 			case ebiten.KeyEnter, ebiten.KeyKPEnter:
-				g.Username = g.connectUsername.Text()
-				g.Password = g.connectPassword.Text()
-				g.Connect()
+				g.selectConnect()
 			}
 		}
 		return nil
@@ -1278,7 +1298,11 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	gameBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 
-	connectGrid.SetRowSizes(60, 50, 50, 100, int(56*s))
+	if ShowServerSettings {
+		connectGrid.SetRowSizes(60, 50, 50, 50, 100, int(56*s))
+	} else {
+		connectGrid.SetRowSizes(60, 50, 50, 100, int(56*s))
+	}
 
 	{
 		scrollBarWidth := int(32 * s)

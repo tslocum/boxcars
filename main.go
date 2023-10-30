@@ -1,6 +1,6 @@
 package main
 
-//go:generate xgotext -default boxcars -in . -out game/locales
+//go:generate xgotext -no-locations -default boxcars -in . -out game/locales
 
 import (
 	"bufio"
