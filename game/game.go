@@ -35,7 +35,7 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
-const version = "v1.0.5"
+const version = "v1.0.6"
 
 const MaxDebug = 1
 
@@ -201,23 +201,17 @@ func init() {
 	inputBuffer.Field.SetSuffix("")
 }
 
-var (
-	loadedCheckerWidth = -1
-	loadedDiceImages   bool
-)
+var loadedCheckerWidth = -1
 
 func loadImageAssets(width int) {
-	if width != loadedCheckerWidth {
-		imgCheckerLight = loadAsset("asset/image/checker_white.png", width)
-		imgCheckerDark = loadAsset("asset/image/checker_white.png", width)
-		//imgCheckerDark = loadAsset("assets/checker_black.png", width)
-		loadedCheckerWidth = width
-	}
-
-	if loadedDiceImages {
+	if width == loadedCheckerWidth {
 		return
 	}
-	loadedDiceImages = true
+	loadedCheckerWidth = width
+
+	imgCheckerLight = loadAsset("asset/image/checker_white.png", width)
+	imgCheckerDark = loadAsset("asset/image/checker_white.png", width)
+	//imgCheckerDark = loadAsset("assets/checker_black.png", width)
 
 	resizeDice := func(img image.Image) *ebiten.Image {
 		const maxSize = 70

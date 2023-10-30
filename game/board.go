@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/draw"
 	"log"
 	"strconv"
 	"sync"
@@ -36,6 +37,7 @@ type board struct {
 	innerW, innerH int
 
 	backgroundImage *ebiten.Image
+	baseImage       *image.RGBA
 
 	Sprites *Sprites
 
@@ -274,41 +276,49 @@ func (b *board) updateBackgroundImage() {
 	frameW := b.w - int((b.horizontalBorderSize-borderSize)*2)
 	innerW := float64(b.w) - b.horizontalBorderSize*2 // Outer board width (including frame)
 
-	// Table
-	b.backgroundImage = ebiten.NewImage(b.w, b.h)
+	if b.backgroundImage == nil {
+		b.backgroundImage = ebiten.NewImage(b.w, b.h)
+		b.baseImage = image.NewRGBA(image.Rect(0, 0, b.w, b.h))
+	} else {
+		bounds := b.backgroundImage.Bounds()
+		if bounds.Dx() != b.w || bounds.Dy() != b.h {
+			b.backgroundImage = ebiten.NewImage(b.w, b.h)
+			b.baseImage = image.NewRGBA(image.Rect(0, 0, b.w, b.h))
+		}
+	}
+
+	// Draw table.
 	b.backgroundImage.Fill(tableColor)
 
-	// Frame
-	img := ebiten.NewImage(frameW, b.h)
-	img.Fill(frameColor)
+	// Draw frame.
 	{
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64(b.horizontalBorderSize-borderSize), 0)
-		b.backgroundImage.DrawImage(img, op)
+		x, y := int(b.horizontalBorderSize-borderSize), 0
+		w, h := frameW, b.h
+		b.backgroundImage.SubImage(image.Rect(x, y, x+w, y+h)).(*ebiten.Image).Fill(frameColor)
 	}
 
-	// Face
-	img = ebiten.NewImage(int(innerW), b.h-int(b.verticalBorderSize*2))
-	img.Fill(faceColor)
+	// Draw face.
 	{
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64(b.horizontalBorderSize), float64(b.verticalBorderSize))
-		b.backgroundImage.DrawImage(img, op)
+		x, y := int(b.horizontalBorderSize), int(b.verticalBorderSize)
+		w, h := int(innerW), b.h-int(b.verticalBorderSize*2)
+		b.backgroundImage.SubImage(image.Rect(x, y, x+w, y+h)).(*ebiten.Image).Fill(faceColor)
 	}
 
-	// Bar
-	img = ebiten.NewImage(int(b.barWidth), b.h)
-	img.Fill(frameColor)
+	// Draw bar.
 	{
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64((b.w/2)-int(b.barWidth/2)), 0)
-		b.backgroundImage.DrawImage(img, op)
+		x, y := int((b.w/2)-int(b.barWidth/2)), 0
+		w, h := int(b.barWidth), b.h
+		b.backgroundImage.SubImage(image.Rect(x, y, x+w, y+h)).(*ebiten.Image).Fill(frameColor)
 	}
 
-	// Draw triangles
-	baseImg := image.NewRGBA(image.Rect(0, 0, b.w-int(b.horizontalBorderSize*2), b.h-int(b.verticalBorderSize*2)))
-	gc := draw2dimg.NewGraphicContext(baseImg)
+	// Draw triangles.
+	draw.Draw(b.baseImage, image.Rect(0, 0, b.w, b.h), image.NewUniform(color.RGBA{0, 0, 0, 0}), image.ZP, draw.Src)
+	gc := draw2dimg.NewGraphicContext(b.baseImage)
+	offsetX, offsetY := float64(b.horizontalBorderSize), float64(b.verticalBorderSize)
 	for i := 0; i < 2; i++ {
+		if i == 1 {
+			offsetY = -offsetY - 1
+		}
 		triangleTip := (float64(b.h) - (b.verticalBorderSize * 2)) / 2
 		if i == 0 {
 			triangleTip -= b.triangleOffset
@@ -332,26 +342,19 @@ func (b *board) updateBackgroundImage() {
 			if j >= 6 {
 				tx += b.barWidth
 			}
-			gc.MoveTo(float64(tx), float64(ty))
-			gc.LineTo(float64(tx+b.spaceWidth/2), triangleTip)
-			gc.LineTo(float64(tx+b.spaceWidth), float64(ty))
+			gc.MoveTo(offsetX+float64(tx), offsetY+float64(ty))
+			gc.LineTo(offsetX+float64(tx+b.spaceWidth/2), offsetY+triangleTip)
+			gc.LineTo(offsetX+float64(tx+b.spaceWidth), offsetY+float64(ty))
 			gc.Close()
 			gc.Fill()
 		}
 	}
-	img = ebiten.NewImageFromImage(baseImg)
-	{
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64(b.horizontalBorderSize), float64(b.verticalBorderSize))
-		b.backgroundImage.DrawImage(img, op)
-	}
 
-	// Border
-	borderImage := image.NewRGBA(image.Rect(0, 0, b.w, b.h))
-	gc = draw2dimg.NewGraphicContext(borderImage)
+	// Draw border.
+	borderStrokeSize := 2.0
 	gc.SetStrokeColor(borderColor)
 	// - Center
-	gc.SetLineWidth(2)
+	gc.SetLineWidth(borderStrokeSize)
 	gc.MoveTo(float64(frameW/2), float64(0))
 	gc.LineTo(float64(frameW/2), float64(b.h))
 	gc.Stroke()
@@ -360,7 +363,7 @@ func (b *board) updateBackgroundImage() {
 	gc.LineTo(float64(frameW), float64(b.h))
 	gc.Stroke()
 	// - Inside left
-	gc.SetLineWidth(1)
+	gc.SetLineWidth(borderStrokeSize / 2)
 	edge := float64((((innerW) - b.barWidth) / 2) + borderSize)
 	gc.MoveTo(float64(borderSize), float64(b.verticalBorderSize))
 	gc.LineTo(edge, float64(b.verticalBorderSize))
@@ -392,12 +395,7 @@ func (b *board) updateBackgroundImage() {
 		gc.LineTo(float64(b.w), float64(b.h))
 		gc.Stroke()
 	}
-	img = ebiten.NewImageFromImage(borderImage)
-	{
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(b.horizontalBorderSize-borderSize, 0)
-		b.backgroundImage.DrawImage(img, op)
-	}
+	b.backgroundImage.DrawImage(ebiten.NewImageFromImage(b.baseImage), nil)
 
 	// Draw space numbers.
 	for space, r := range b.spaceRects {

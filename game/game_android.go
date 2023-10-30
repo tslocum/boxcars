@@ -2,6 +2,11 @@
 
 package game
 
+import (
+	"log"
+	"os"
+)
+
 const (
 	DefaultServerAddress = "wss://ws.bgammon.org"
 	OptimizeDraws        = false
@@ -9,3 +14,7 @@ const (
 	ShowServerSettings   = true
 	APPNAME              = "boxcars-android"
 )
+
+func init() {
+	log.SetOutput(os.Stdout)
+}
