@@ -1190,10 +1190,10 @@ func (b *board) Update() {
 		handled = b.handleClick(cx, cy)
 	}
 
-	if b.dragging == nil && b.playerTurn() {
+	if b.dragging == nil {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
-		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && !handled && len(b.gameState.Available) > 0 {
+		if b.playerTurn() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && !handled && len(b.gameState.Available) > 0 {
 			s := b.spriteAt(cx, cy)
 			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
 				b.dragging = s
@@ -1205,7 +1205,7 @@ func (b *board) Update() {
 			game.enableTouchInput()
 			x, y := ebiten.TouchPosition(id)
 			handled := b.handleClick(x, y)
-			if !handled && len(b.gameState.Available) > 0 {
+			if !handled && b.playerTurn() && len(b.gameState.Available) > 0 {
 				b.dragX, b.dragY = x, y
 
 				s := b.spriteAt(x, y)
