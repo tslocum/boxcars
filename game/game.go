@@ -200,10 +200,24 @@ func init() {
 	inputBuffer.Field.SetBackgroundColor(bufferBackgroundColor)
 	inputBuffer.Field.SetSuffix("")
 }
+
+var (
+	loadedCheckerWidth = -1
+	loadedDiceImages   bool
+)
+
 func loadImageAssets(width int) {
-	imgCheckerLight = loadAsset("asset/image/checker_white.png", width)
-	imgCheckerDark = loadAsset("asset/image/checker_white.png", width)
-	//imgCheckerDark = loadAsset("assets/checker_black.png", width)
+	if width != loadedCheckerWidth {
+		imgCheckerLight = loadAsset("asset/image/checker_white.png", width)
+		imgCheckerDark = loadAsset("asset/image/checker_white.png", width)
+		//imgCheckerDark = loadAsset("assets/checker_black.png", width)
+		loadedCheckerWidth = width
+	}
+
+	if loadedDiceImages {
+		return
+	}
+	loadedDiceImages = true
 
 	resizeDice := func(img image.Image) *ebiten.Image {
 		const maxSize = 70
