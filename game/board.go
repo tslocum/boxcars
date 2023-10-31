@@ -76,6 +76,8 @@ type board struct {
 	uiGrid             *etk.Grid
 	frame              *etk.Frame
 
+	bearOffOverlay *etk.Button
+
 	leaveGameGrid         *etk.Grid
 	confirmLeaveGameFrame *etk.Frame
 
@@ -111,6 +113,11 @@ func NewBoard() *board {
 	}
 	b.fontUpdated()
 
+	b.bearOffOverlay = etk.NewButton(fmt.Sprintf("%s", gotext.Get("Drag here to bear off")), func() error {
+		return nil
+	})
+	b.bearOffOverlay.SetVisible(false)
+
 	{
 		leaveGameLabel := etk.NewText(gotext.Get("Leave match?"))
 		leaveGameLabel.SetHorizontal(messeji.AlignCenter)
@@ -133,6 +140,7 @@ func NewBoard() *board {
 	b.uiGrid.AddChildAt(b.inputGrid, 0, 4, 1, 1)
 
 	b.frame.AddChild(b.uiGrid)
+	b.frame.AddChild(b.bearOffOverlay)
 	b.frame.AddChild(b.leaveGameGrid)
 
 	b.buttons = []*boardButton{
@@ -458,82 +466,81 @@ func (b *board) drawButtons(screen *ebiten.Image) {
 	}
 }
 
+func (b *board) drawSprite(target *ebiten.Image, sprite *Sprite) {
+	x, y := float64(sprite.x), float64(sprite.y)
+	if !sprite.toStart.IsZero() {
+		progress := float64(time.Since(sprite.toStart)) / float64(sprite.toTime)
+		if x == float64(sprite.toX) && y == float64(sprite.toY) {
+			sprite.toStart = time.Time{}
+			sprite.x = sprite.toX
+			sprite.y = sprite.toY
+		} else {
+			if x < float64(sprite.toX) {
+				x += (float64(sprite.toX) - x) * progress
+				if x > float64(sprite.toX) {
+					x = float64(sprite.toX)
+				}
+			} else if x > float64(sprite.toX) {
+				x -= (x - float64(sprite.toX)) * progress
+				if x < float64(sprite.toX) {
+					x = float64(sprite.toX)
+				}
+			}
+
+			if y < float64(sprite.toY) {
+				y += (float64(sprite.toY) - y) * progress
+				if y > float64(sprite.toY) {
+					y = float64(sprite.toY)
+				}
+			} else if y > float64(sprite.toY) {
+				y -= (y - float64(sprite.toY)) * progress
+				if y < float64(sprite.toY) {
+					y = float64(sprite.toY)
+				}
+			}
+		}
+		// Schedule another frame
+		scheduleFrame()
+	}
+
+	// Draw shadow.
+	{
+		op := &ebiten.DrawImageOptions{}
+		op.Filter = ebiten.FilterLinear
+		op.GeoM.Translate(x, y)
+		op.ColorScale.Scale(0, 0, 0, 1)
+		target.DrawImage(imgCheckerLight, op)
+	}
+
+	// Draw checker.
+
+	checkerScale := 0.94
+
+	op := &ebiten.DrawImageOptions{}
+	op.Filter = ebiten.FilterLinear
+	op.GeoM.Translate(-b.spaceWidth/2, -b.spaceWidth/2)
+	op.GeoM.Scale(checkerScale, checkerScale)
+	op.GeoM.Translate((b.spaceWidth/2)+x, (b.spaceWidth/2)+y)
+
+	c := lightCheckerColor
+	if !sprite.colorWhite {
+		c = darkCheckerColor
+	}
+	op.ColorScale.Scale(0, 0, 0, 1)
+	r := float32(c.R) / 0xff
+	g := float32(c.G) / 0xff
+	bl := float32(c.B) / 0xff
+	op.ColorScale.SetR(r)
+	op.ColorScale.SetG(g)
+	op.ColorScale.SetB(bl)
+
+	target.DrawImage(imgCheckerLight, op)
+}
 func (b *board) Draw(screen *ebiten.Image) {
 	{
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(float64(b.x), float64(b.y))
 		screen.DrawImage(b.backgroundImage, op)
-	}
-
-	drawSprite := func(sprite *Sprite) {
-		x, y := float64(sprite.x), float64(sprite.y)
-		if !sprite.toStart.IsZero() {
-			progress := float64(time.Since(sprite.toStart)) / float64(sprite.toTime)
-			if x == float64(sprite.toX) && y == float64(sprite.toY) {
-				sprite.toStart = time.Time{}
-				sprite.x = sprite.toX
-				sprite.y = sprite.toY
-			} else {
-				if x < float64(sprite.toX) {
-					x += (float64(sprite.toX) - x) * progress
-					if x > float64(sprite.toX) {
-						x = float64(sprite.toX)
-					}
-				} else if x > float64(sprite.toX) {
-					x -= (x - float64(sprite.toX)) * progress
-					if x < float64(sprite.toX) {
-						x = float64(sprite.toX)
-					}
-				}
-
-				if y < float64(sprite.toY) {
-					y += (float64(sprite.toY) - y) * progress
-					if y > float64(sprite.toY) {
-						y = float64(sprite.toY)
-					}
-				} else if y > float64(sprite.toY) {
-					y -= (y - float64(sprite.toY)) * progress
-					if y < float64(sprite.toY) {
-						y = float64(sprite.toY)
-					}
-				}
-			}
-			// Schedule another frame
-			scheduleFrame()
-		}
-
-		// Draw shadow.
-		{
-			op := &ebiten.DrawImageOptions{}
-			op.Filter = ebiten.FilterLinear
-			op.GeoM.Translate(x, y)
-			op.ColorScale.Scale(0, 0, 0, 1)
-			screen.DrawImage(imgCheckerLight, op)
-		}
-
-		// Draw checker.
-
-		checkerScale := 0.94
-
-		op := &ebiten.DrawImageOptions{}
-		op.Filter = ebiten.FilterLinear
-		op.GeoM.Translate(-b.spaceWidth/2, -b.spaceWidth/2)
-		op.GeoM.Scale(checkerScale, checkerScale)
-		op.GeoM.Translate((b.spaceWidth/2)+x, (b.spaceWidth/2)+y)
-
-		c := lightCheckerColor
-		if !sprite.colorWhite {
-			c = darkCheckerColor
-		}
-		op.ColorScale.Scale(0, 0, 0, 1)
-		r := float32(c.R) / 0xff
-		g := float32(c.G) / 0xff
-		bl := float32(c.B) / 0xff
-		op.ColorScale.SetR(r)
-		op.ColorScale.SetG(g)
-		op.ColorScale.SetB(bl)
-
-		screen.DrawImage(imgCheckerLight, op)
 	}
 
 	for space := 0; space < bgammon.BoardSpaces; space++ {
@@ -544,7 +551,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 			}
 			numPieces++
 
-			drawSprite(sprite)
+			b.drawSprite(screen, sprite)
 
 			var overlayText string
 			if i > 5 {
@@ -729,17 +736,14 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	// Draw moving sprite
-	if b.moving != nil {
-		drawSprite(b.moving)
-	}
-
-	// Draw dragged sprite
-	if b.dragging != nil {
-		drawSprite(b.dragging)
-	}
-
 	b.drawButtons(screen)
+}
+
+func (b *board) drawDraggedChecker(screen *ebiten.Image) {
+	if b.dragging == nil {
+		return
+	}
+	b.drawSprite(screen, b.dragging)
 }
 
 func (b *board) updateButtonRects() {
@@ -1172,6 +1176,13 @@ func (b *board) handleClick(x int, y int) bool {
 	return false
 }
 
+func (b *board) startDrag(s *Sprite) {
+	b.dragging = s
+	if bgammon.CanBearOff(b.gameState.Board, b.gameState.PlayerNumber, true) && b.gameState.Board[bgammon.SpaceHomePlayer] == 0 {
+		b.bearOffOverlay.SetVisible(true)
+	}
+}
+
 func (b *board) Update() {
 	if b.Client == nil {
 		return
@@ -1196,7 +1207,7 @@ func (b *board) Update() {
 		if b.playerTurn() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && !handled && len(b.gameState.Available) > 0 {
 			s := b.spriteAt(cx, cy)
 			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
-				b.dragging = s
+				b.startDrag(s)
 			}
 		}
 
@@ -1210,7 +1221,7 @@ func (b *board) Update() {
 
 				s := b.spriteAt(x, y)
 				if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
-					b.dragging = s
+					b.startDrag(s)
 					b.dragTouchId = id
 				}
 			}
@@ -1233,10 +1244,12 @@ func (b *board) Update() {
 		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
 			dropped = b.dragging
 			b.dragging = nil
+			b.bearOffOverlay.SetVisible(false)
 		}
 	} else if inpututil.IsTouchJustReleased(b.dragTouchId) {
 		dropped = b.dragging
 		b.dragging = nil
+		b.bearOffOverlay.SetVisible(false)
 	}
 	if dropped != nil {
 		index := b.spaceAt(x, y)
