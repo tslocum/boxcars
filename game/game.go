@@ -35,7 +35,7 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
-const version = "v1.0.6"
+const version = "v1.0.7"
 
 const MaxDebug = 1
 
@@ -558,6 +558,8 @@ type Game struct {
 
 	skipUpdate  bool
 	forceLayout bool
+
+	scaleFactor float64
 }
 
 func NewGame() *Game {
@@ -571,8 +573,9 @@ func NewGame() *Game {
 
 		TouchInput: AutoEnableTouchInput,
 
-		debugImg: ebiten.NewImage(200, 200),
-		volume:   1,
+		debugImg:    ebiten.NewImage(200, 200),
+		volume:      1,
+		scaleFactor: 1,
 	}
 	game = g
 
@@ -1284,6 +1287,10 @@ func (g *Game) portraitView() bool {
 	return g.screenH-g.screenW >= 100
 }
 
+func (g *Game) scale(v int) int {
+	return int(float64(v) * g.scaleFactor)
+}
+
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	s := ebiten.DeviceScaleFactor()
 	outsideWidth, outsideHeight = int(float64(outsideWidth)*s), int(float64(outsideHeight)*s)
@@ -1299,6 +1306,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.forceLayout = false
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
+	g.scaleFactor = s
 	drawScreen = true
 
 	if s >= 1.25 {
@@ -1310,13 +1318,13 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 
 	if ShowServerSettings {
-		connectGrid.SetRowSizes(60, 50, 50, 50, 100, int(56*s))
+		connectGrid.SetRowSizes(60, 50, 50, 50, 100, g.scale(56))
 	} else {
-		connectGrid.SetRowSizes(60, 50, 50, 100, int(56*s))
+		connectGrid.SetRowSizes(60, 50, 50, 100, g.scale(56))
 	}
 
 	{
-		scrollBarWidth := int(32 * s)
+		scrollBarWidth := g.scale(32)
 		statusBuffer.SetScrollBarWidth(scrollBarWidth)
 		gameBuffer.SetScrollBarWidth(scrollBarWidth)
 		inputBuffer.Field.SetScrollBarWidth(scrollBarWidth)
@@ -1380,7 +1388,10 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
 	}
 
-	g.lobby.buttonBarHeight = int(56 * s)
+	g.lobby.buttonBarHeight = g.scale(56)
+	if g.TouchInput {
+		g.lobby.buttonBarHeight = g.scale(92)
+	}
 	g.setBufferRects()
 
 	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)

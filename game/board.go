@@ -200,15 +200,17 @@ func (b *board) recreateInputGrid() {
 		b.inputGrid.AddChildAt(leaveGameButton, 0, 2, 1, 1)
 		b.inputGrid.AddChildAt(b.showKeyboardButton, 1, 2, 1, 1)
 
-		b.inputGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1)
+		b.inputGrid.SetRowSizes(game.scale(46), int(b.horizontalBorderSize/2), -1)
 	} else {
 		b.inputGrid.AddChildAt(inputBuffer, 0, 0, 1, 1)
 	}
 }
 
 func (b *board) setKeyboardRect() {
-	s := ebiten.DeviceScaleFactor()
-	inputAndButtons := int((float64(56) + game.Board.verticalBorderSize*1.5) * s)
+	inputAndButtons := 46
+	if game.TouchInput {
+		inputAndButtons = game.scale(46*3) + int(b.horizontalBorderSize)
+	}
 	h := game.screenH - game.screenH/2 - inputAndButtons - int(b.horizontalBorderSize)
 	y := game.screenH / 2
 	if h < 450 {
@@ -842,9 +844,9 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.recreateInputGrid()
 
-	inputAndButtons := 46.0
+	inputAndButtons := 46
 	if game.TouchInput {
-		inputAndButtons = 46.0 + 46.0*s + float64(b.horizontalBorderSize)
+		inputAndButtons = game.scale(46*3) + int(b.horizontalBorderSize)
 	}
 	b.uiGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), int(inputAndButtons))
 
