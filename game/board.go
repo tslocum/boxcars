@@ -14,7 +14,6 @@ import (
 	"code.rocket9labs.com/tslocum/etk"
 	"code.rocketnine.space/tslocum/messeji"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/leonelquinteros/gotext"
@@ -88,12 +87,16 @@ type board struct {
 	*sync.Mutex
 }
 
+const (
+	baseBoardVerticalSize = 25
+)
+
 func NewBoard() *board {
 	b := &board{
 		barWidth:             100,
 		triangleOffset:       float64(50),
 		horizontalBorderSize: 20,
-		verticalBorderSize:   20,
+		verticalBorderSize:   float64(baseBoardVerticalSize),
 		overlapSize:          97,
 		Sprites: &Sprites{
 			sprites: make([]*Sprite, 30),
@@ -416,15 +419,19 @@ func (b *board) updateBackgroundImage() {
 		}
 
 		sp := strconv.Itoa(space)
+		boundSpace := sp
 		if space < 10 {
+			boundSpace = "." + sp
 			sp = " " + sp
 		}
-		x := r[0] + r[2]/2 + int(b.horizontalBorderSize/2) + 4
-		y := 2
+		x := r[0] + r[2]/2 + int(b.horizontalBorderSize/2)
+		y := 0
 		if b.bottomRow(space) {
-			y = b.h - int(b.verticalBorderSize) + 2
+			y = b.h - int(b.verticalBorderSize)
 		}
-		ebitenutil.DebugPrintAt(b.backgroundImage, sp, x, y)
+
+		bounds := etk.BoundString(b.fontFace, boundSpace)
+		text.Draw(b.backgroundImage, sp, b.fontFace, (x - bounds.Dx()/4), y+(int(b.verticalBorderSize)-b.lineHeight)/2+b.lineOffset, color.RGBA{128, 105, 71, 255})
 	}
 }
 
@@ -727,19 +734,19 @@ func (b *board) Draw(screen *ebiten.Image) {
 		if b.gameState.Turn == 0 {
 			if playerRoll != 0 {
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 				screen.DrawImage(diceImage(playerRoll), op)
 			}
 		} else if b.gameState.Turn == b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
 			{
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 				screen.DrawImage(diceImage(b.gameState.Roll1), op)
 			}
 
 			{
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 				screen.DrawImage(diceImage(b.gameState.Roll2), op)
 			}
 		}

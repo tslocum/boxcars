@@ -1319,6 +1319,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	if s >= 1.25 {
 		lobbyStatusBufferHeight = int(50 * s)
+		g.Board.verticalBorderSize = baseBoardVerticalSize * 1.35
 	}
 
 	statusBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
