@@ -203,16 +203,16 @@ func (b *board) recreateInputGrid() {
 		b.inputGrid.AddChildAt(leaveGameButton, 0, 2, 1, 1)
 		b.inputGrid.AddChildAt(b.showKeyboardButton, 1, 2, 1, 1)
 
-		b.inputGrid.SetRowSizes(game.scale(46), int(b.horizontalBorderSize/2), -1)
+		b.inputGrid.SetRowSizes(52, int(b.horizontalBorderSize/2), -1)
 	} else {
 		b.inputGrid.AddChildAt(inputBuffer, 0, 0, 1, 1)
 	}
 }
 
 func (b *board) setKeyboardRect() {
-	inputAndButtons := 46
+	inputAndButtons := 52
 	if game.TouchInput {
-		inputAndButtons = game.scale(46*3) + int(b.horizontalBorderSize)
+		inputAndButtons = 52 + int(b.horizontalBorderSize) + game.scale(56)
 	}
 	h := game.screenH - game.screenH/2 - inputAndButtons - int(b.horizontalBorderSize)
 	y := game.screenH / 2
@@ -411,6 +411,7 @@ func (b *board) updateBackgroundImage() {
 	b.backgroundImage.DrawImage(ebiten.NewImageFromImage(b.baseImage), nil)
 
 	// Draw space numbers.
+	spaceLabelColor := color.RGBA{121, 96, 60, 255}
 	for space, r := range b.spaceRects {
 		if space < 1 || space > 24 {
 			continue
@@ -419,19 +420,16 @@ func (b *board) updateBackgroundImage() {
 		}
 
 		sp := strconv.Itoa(space)
-		boundSpace := sp
-		if space < 10 {
-			boundSpace = "." + sp
-			sp = " " + sp
+		bounds := etk.BoundString(b.fontFace, sp)
+		x := r[0] + r[2]/2 + int(b.horizontalBorderSize) - bounds.Dx()/2 - 2
+		if space == 1 || space > 9 {
+			x -= 2
 		}
-		x := r[0] + r[2]/2 + int(b.horizontalBorderSize/2)
 		y := 0
 		if b.bottomRow(space) {
 			y = b.h - int(b.verticalBorderSize)
 		}
-
-		bounds := etk.BoundString(b.fontFace, boundSpace)
-		text.Draw(b.backgroundImage, sp, b.fontFace, (x - bounds.Dx()/4), y+(int(b.verticalBorderSize)-b.lineHeight)/2+b.lineOffset, color.RGBA{128, 105, 71, 255})
+		text.Draw(b.backgroundImage, sp, b.fontFace, x, y+(int(b.verticalBorderSize)-b.lineHeight)/2+b.lineOffset, spaceLabelColor)
 	}
 }
 
@@ -853,9 +851,9 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.recreateInputGrid()
 
-	inputAndButtons := 46
+	inputAndButtons := 52
 	if game.TouchInput {
-		inputAndButtons = game.scale(46*3) + int(b.horizontalBorderSize)
+		inputAndButtons = 52 + int(b.horizontalBorderSize) + game.scale(56)
 	}
 	b.uiGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), int(inputAndButtons))
 
