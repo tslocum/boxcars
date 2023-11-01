@@ -435,6 +435,9 @@ func (b *board) updateBackgroundImage() {
 
 func (b *board) drawButton(target *ebiten.Image, r image.Rectangle, label string) {
 	w, h := r.Dx(), r.Dy()
+	if w == 0 || h == 0 {
+		return
+	}
 
 	baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
 
@@ -768,23 +771,49 @@ func (b *board) updateButtonRects() {
 	btnResign := b.buttons[4]
 	btnAccept := b.buttons[5]
 
-	w := 200
-	h := 75
-	x, y := (b.w-w)/2, (b.h-h)/2
+	w := game.scale(200)
+	if w > b.innerW/4 {
+		w = b.innerW / 4
+	}
+	h := game.scale(75)
+	if h > b.innerH/10 {
+		h = b.innerH / 10
+	}
+	x, y := int(b.horizontalBorderSize)+(b.innerW-w)/2, int(b.verticalBorderSize)+(b.innerH-h)/2
 
-	const padding = 20
+	padding := game.scale(42)
+
+	if w >= b.innerW/8 {
+		btnReset.rect = image.Rect(x, y, x+w, y+h)
+		btnRoll.rect = image.Rect(x, y, x+w, y+h)
+		btnResign.rect = image.Rect(x, y+h+padding/2, x+w, y+h+padding/2+h)
+		btnOK.rect = image.Rect(x, y, x+w, y+h)
+		btnAccept.rect = image.Rect(x, y, x+w, y+h)
+
+		if b.gameState.MayDouble() && b.gameState.MayRoll() {
+			y -= h/2 + padding/2
+			btnDouble.rect = image.Rect(x, y+h+padding/2, x+w, y+h+padding/2+h)
+			btnRoll.rect = image.Rect(x, y, x+w, y+h)
+		} else if b.gameState.MayReset() && b.gameState.MayOK() {
+			y -= h/2 + padding/2
+			btnReset.rect = image.Rect(x, y+h+padding/2, x+w, y+h+padding/2+h)
+			btnOK.rect = image.Rect(x, y, x+w, y+h)
+		}
+		return
+	}
+
 	btnReset.rect = image.Rect(x, y, x+w, y+h)
 	btnRoll.rect = image.Rect(x, y, x+w, y+h)
-	btnResign.rect = image.Rect(b.w/2-padding/2-w, y, b.w/2-padding/2, y+h)
-	btnOK.rect = image.Rect(b.w/2+padding/2, y, b.w/2+padding/2+w, y+h)
-	btnAccept.rect = image.Rect(b.w/2+padding/2, y, b.w/2+padding/2+w, y+h)
+	btnResign.rect = image.Rect(x-w/2-padding/2, y, x+w/2-padding/2, y+h)
+	btnOK.rect = image.Rect(x, y, x+w, y+h)
+	btnAccept.rect = image.Rect(x+w/2+padding/2, y, x+w/2+w+padding/2, y+h)
 
 	if b.gameState.MayDouble() && b.gameState.MayRoll() {
-		btnDouble.rect = image.Rect(b.w/2-padding/2-w, y, b.w/2-padding/2, y+h)
-		btnRoll.rect = image.Rect(b.w/2+padding/2, y, b.w/2+padding/2+w, y+h)
+		btnDouble.rect = image.Rect(x-w/2-padding/2, y, x+w/2-padding/2, y+h)
+		btnRoll.rect = image.Rect(x+w/2+padding/2, y, x+w/2+w+padding/2, y+h)
 	} else if b.gameState.MayReset() && b.gameState.MayOK() {
-		btnReset.rect = image.Rect(b.w/2-padding/2-w, y, b.w/2-padding/2, y+h)
-		btnOK.rect = image.Rect(b.w/2+padding/2, y, b.w/2+padding/2+w, y+h)
+		btnReset.rect = image.Rect(x-w/2-padding/2, y, x+w/2-padding/2, y+h)
+		btnOK.rect = image.Rect(x+w/2+padding/2, y, x+w/2+w+padding/2, y+h)
 	}
 }
 
