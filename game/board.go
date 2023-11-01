@@ -655,7 +655,19 @@ func (b *board) Draw(screen *ebiten.Image) {
 		return img
 	}
 
-	const diceGap = 10
+	diceGap := 10.0
+	if game.screenW < 800 {
+		v := 10.0 * (float64(game.screenW) / 800)
+		if v < diceGap {
+			diceGap = v
+		}
+	}
+	if game.screenH < 800 {
+		v := 10.0 * (float64(game.screenH) / 800)
+		if v < diceGap {
+			diceGap = v
+		}
+	}
 
 	opponent := b.gameState.OpponentPlayer()
 	if opponent.Name != "" {
@@ -676,19 +688,19 @@ func (b *board) Draw(screen *ebiten.Image) {
 		if b.gameState.Turn == 0 {
 			if opponentRoll != 0 {
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 				screen.DrawImage(diceImage(opponentRoll), op)
 			}
 		} else if b.gameState.Turn != b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
 			{
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 				screen.DrawImage(diceImage(b.gameState.Roll1), op)
 			}
 
 			{
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 				screen.DrawImage(diceImage(b.gameState.Roll2), op)
 			}
 		}
@@ -721,13 +733,13 @@ func (b *board) Draw(screen *ebiten.Image) {
 		} else if b.gameState.Turn == b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
 			{
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter-diceSize-diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 				screen.DrawImage(diceImage(b.gameState.Roll1), op)
 			}
 
 			{
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter+diceGap), float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
+				op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-(float64(diceSize)*1.4))
 				screen.DrawImage(diceImage(b.gameState.Roll2), op)
 			}
 		}

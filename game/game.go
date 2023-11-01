@@ -217,11 +217,13 @@ func loadImageAssets(width int) {
 			panic("nil game")
 		}
 
-		maxSize := 70
-		if game.TouchInput {
-			maxSize = 108
+		maxSize := game.scale(100)
+		if maxSize > game.screenW/10 {
+			maxSize = game.screenW / 10
 		}
-		maxSize = game.scale(maxSize)
+		if maxSize > game.screenH/10 {
+			maxSize = game.screenH / 10
+		}
 
 		diceSize = game.scale(width)
 		if diceSize > maxSize {
