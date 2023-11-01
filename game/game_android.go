@@ -9,7 +9,8 @@ import (
 
 const (
 	DefaultServerAddress = "wss://ws.bgammon.org"
-	OptimizeDraws        = false
+	OptimizeDraw         = false
+	OptimizeSetRect      = false
 	AutoEnableTouchInput = true
 	ShowServerSettings   = true
 	APPNAME              = "boxcars-android"

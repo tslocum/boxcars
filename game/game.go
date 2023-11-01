@@ -28,7 +28,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/leonelquinteros/gotext"
 	"github.com/nfnt/resize"
 	"golang.org/x/image/font"
@@ -48,7 +47,7 @@ var debugExtra []byte
 
 var (
 	imgCheckerLight *ebiten.Image
-	imgCheckerDark  *ebiten.Image
+	//imgCheckerDark  *ebiten.Image
 
 	imgDice  *ebiten.Image
 	imgDice1 *ebiten.Image
@@ -188,7 +187,7 @@ func defaultFont() font.Face {
 func init() {
 	initializeFonts()
 
-	loadAssets(0)
+	loadAudioAssets()
 
 	statusBuffer.SetForegroundColor(bufferTextColor)
 	statusBuffer.SetBackgroundColor(bufferBackgroundColor)
@@ -210,12 +209,21 @@ func loadImageAssets(width int) {
 	loadedCheckerWidth = width
 
 	imgCheckerLight = loadAsset("asset/image/checker_white.png", width)
-	imgCheckerDark = loadAsset("asset/image/checker_white.png", width)
+	//imgCheckerDark = loadAsset("asset/image/checker_white.png", width)
 	//imgCheckerDark = loadAsset("assets/checker_black.png", width)
 
 	resizeDice := func(img image.Image) *ebiten.Image {
-		const maxSize = 70
-		diceSize = width
+		if game == nil {
+			panic("nil game")
+		}
+
+		maxSize := 70
+		if game.TouchInput {
+			maxSize = 108
+		}
+		maxSize = game.scale(maxSize)
+
+		diceSize = game.scale(width)
 		if diceSize > maxSize {
 			diceSize = maxSize
 		}
@@ -231,6 +239,7 @@ func loadImageAssets(width int) {
 	imgDice5 = resizeDice(imgDice.SubImage(image.Rect(size*1, size*1, size*2, size*2)))
 	imgDice6 = resizeDice(imgDice.SubImage(image.Rect(size*2, size*1, size*3, size*2)))
 }
+
 func loadAudioAssets() {
 	audioContext = audio.NewContext(sampleRate)
 	p := "asset/audio/"
@@ -272,11 +281,6 @@ func loadAudioAssets() {
 		SoundMove3,
 	}
 	randomizeByteSlice(moveSounds)
-}
-
-func loadAssets(width int) {
-	loadImageAssets(width)
-	loadAudioAssets()
 }
 
 func loadImage(assetPath string) image.Image {
@@ -323,7 +327,7 @@ func LoadWAV(context *audio.Context, p string) *audio.Player {
 		panic(err)
 	}
 
-	player, err := audio.NewPlayer(audioContext, io.NopCloser(stream))
+	player, err := audioContext.NewPlayer(io.NopCloser(stream))
 	if err != nil {
 		panic(err)
 	}
@@ -354,7 +358,7 @@ func LoadOGG(context *audio.Context, p string) *audio.Player {
 		panic(err)
 	}
 
-	player, err := audio.NewPlayer(audioContext, &oggStream{Stream: stream})
+	player, err := audioContext.NewPlayer(&oggStream{Stream: stream})
 	if err != nil {
 		panic(err)
 	}
@@ -475,7 +479,6 @@ func setViewBoard(view bool) {
 }
 
 type Sprite struct {
-	image      *ebiten.Image
 	w          int
 	h          int
 	x          int
@@ -497,10 +500,14 @@ var spinner = []byte(`-\|/`)
 
 var viewBoard bool // View board or lobby
 
-var drawScreen = true
+var (
+	drawScreen  bool
+	updatedGame bool
+)
 
 func scheduleFrame() {
 	drawScreen = true
+	updatedGame = false
 }
 
 type Game struct {
@@ -510,11 +517,10 @@ type Game struct {
 
 	spinnerIndex int
 
-	ServerAddress     string
-	Username          string
-	Password          string
-	loggedIn          bool
-	usernameConfirmed bool
+	ServerAddress string
+	Username      string
+	Password      string
+	loggedIn      bool
 
 	Watch bool
 	TV    bool
@@ -528,13 +534,11 @@ type Game struct {
 	volume float64 // Volume range is 0-1.
 
 	runeBuffer []rune
-	userInput  string
 
 	debugImg *ebiten.Image
 
 	keyboard      *kibodo.Keyboard
 	keyboardInput []*kibodo.Input
-	shownKeyboard bool
 
 	cpuProfile *os.File
 
@@ -578,6 +582,8 @@ func NewGame() *Game {
 		scaleFactor: 1,
 	}
 	game = g
+
+	loadImageAssets(0)
 
 	g.Board = NewBoard()
 	g.lobby = NewLobby()
@@ -761,6 +767,7 @@ func NewGame() *Game {
 
 	go g.handleAutoRefresh()
 
+	scheduleFrame()
 	return g
 }
 
@@ -772,12 +779,7 @@ func (g *Game) setRoot(w etk.Widget) {
 }
 
 func (g *Game) setBufferRects() {
-	s := ebiten.DeviceScaleFactor()
-
-	statusBufferHeight := 75
-	if s >= 1.25 {
-		statusBufferHeight = int(50 * s)
-	}
+	statusBufferHeight := g.scale(75)
 
 	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
@@ -1050,20 +1052,22 @@ func (g *Game) Update() error {
 		return nil
 	}
 
+	updatedGame = true
+
 	cx, cy := ebiten.CursorPosition()
 	if cx != g.cursorX || cy != g.cursorY {
 		g.cursorX, g.cursorY = cx, cy
-		drawScreen = true
+		scheduleFrame()
 	}
 
 	wheelX, wheelY := ebiten.Wheel()
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) || ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) || wheelX != 0 || wheelY != 0 {
-		drawScreen = true
+		scheduleFrame()
 	}
 
 	g.pressedKeys = inpututil.AppendPressedKeys(g.pressedKeys[:0])
 	if len(g.pressedKeys) > 0 {
-		drawScreen = true
+		scheduleFrame()
 	}
 
 	if !g.loaded {
@@ -1217,10 +1221,13 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	if OptimizeDraws && !drawScreen {
-		return
+	if OptimizeDraw {
+		if !drawScreen {
+			return
+		} else if updatedGame {
+			drawScreen = false
+		}
 	}
-	drawScreen = false
 
 	screen.Fill(tableColor)
 
@@ -1260,9 +1267,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			g.spinnerIndex = 0
 		}
 
-		scaleFactor := ebiten.DeviceScaleFactor()
-		if scaleFactor != 1.0 {
-			g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f\n", scaleFactor)))
+		if g.scaleFactor != 1.0 {
+			g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f\n", g.scaleFactor)))
 		}
 
 		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %c %0.0f", spinner[g.spinnerIndex], ebiten.ActualFPS())))
@@ -1307,7 +1313,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
 	g.scaleFactor = s
-	drawScreen = true
+	scheduleFrame()
 
 	if s >= 1.25 {
 		lobbyStatusBufferHeight = int(50 * s)
@@ -1332,7 +1338,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	etk.Layout(g.screenW, g.screenH)
 
-	bufferWidth := text.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
+	bufferWidth := etk.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
 	if bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}

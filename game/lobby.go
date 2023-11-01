@@ -32,30 +32,24 @@ const (
 
 type lobbyButton struct {
 	label string
-	f     func()
 }
 
 // TODO get button labels dynamically later as it needs to be after gotext loads
 
 var mainButtons = []*lobbyButton{
-	{"Refresh", func() {}},
-	{"Create", func() {}},
-	{"Join", func() {}},
+	{"Refresh"},
+	{"Create"},
+	{"Join"},
 }
 
 var createButtons = []*lobbyButton{
-	{"Cancel", func() {}},
-	{"Create", func() {}},
-}
-
-var cancelConfirmButtons = []*lobbyButton{
-	{"Cancel", func() {}},
-	{"Confirm", func() {}},
+	{"Cancel"},
+	{"Create"},
 }
 
 var cancelJoinButtons = []*lobbyButton{
-	{"Cancel", func() {}},
-	{"Join", func() {}},
+	{"Cancel"},
+	{"Join"},
 }
 
 type lobby struct {
@@ -86,14 +80,10 @@ type lobby struct {
 
 	refresh bool
 
-	runeBuffer []rune
-
-	showCreateGame         bool
-	createGameNamePrev     string
-	createGamePasswordPrev string
-	createGameName         *etk.Input
-	createGamePoints       *etk.Input
-	createGamePassword     *etk.Input
+	showCreateGame     bool
+	createGameName     *etk.Input
+	createGamePoints   *etk.Input
+	createGamePassword *etk.Input
 
 	showJoinGame     bool
 	joinGameID       int
@@ -385,14 +375,7 @@ func (l *lobby) draw(screen *ebiten.Image) {
 		return
 	}
 
-	var p bool
-
 	if l.bufferDirty {
-		if len(l.games) > 1 {
-			p = true
-			//debugGame.toggleProfiling()
-		}
-
 		l.drawBuffer()
 		l.bufferDirty = false
 	}
@@ -400,15 +383,10 @@ func (l *lobby) draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(l.x), float64(l.y))
 	screen.DrawImage(l.buffer, op)
-
-	if p {
-		//debugGame.toggleProfiling()
-		//os.Exit(0)
-	}
 }
 
 func (l *lobby) setRect(x, y, w, h int) {
-	if l.x == x && l.y == y && l.w == w && l.h == h {
+	if OptimizeSetRect && l.x == x && l.y == y && l.w == w && l.h == h {
 		return
 	}
 
@@ -416,8 +394,7 @@ func (l *lobby) setRect(x, y, w, h int) {
 		l.setKeyboardRect()
 	}
 
-	s := ebiten.DeviceScaleFactor()
-	if s >= 1.25 {
+	if game.scaleFactor >= 1.25 {
 		if l.fontFace != largeFont {
 			l.fontFace = largeFont
 			l.fontUpdated()

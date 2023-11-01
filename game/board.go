@@ -113,7 +113,7 @@ func NewBoard() *board {
 	}
 	b.fontUpdated()
 
-	b.bearOffOverlay = etk.NewButton(fmt.Sprintf("%s", gotext.Get("Drag here to bear off")), func() error {
+	b.bearOffOverlay = etk.NewButton(gotext.Get("Drag here to bear off"), func() error {
 		return nil
 	})
 	b.bearOffOverlay.SetVisible(false)
@@ -322,7 +322,7 @@ func (b *board) updateBackgroundImage() {
 	}
 
 	// Draw triangles.
-	draw.Draw(b.baseImage, image.Rect(0, 0, b.w, b.h), image.NewUniform(color.RGBA{0, 0, 0, 0}), image.ZP, draw.Src)
+	draw.Draw(b.baseImage, image.Rect(0, 0, b.w, b.h), image.NewUniform(color.RGBA{0, 0, 0, 0}), image.Point{}, draw.Src)
 	gc := draw2dimg.NewGraphicContext(b.baseImage)
 	offsetX, offsetY := float64(b.horizontalBorderSize), float64(b.verticalBorderSize)
 	for i := 0; i < 2; i++ {
@@ -447,7 +447,7 @@ func (b *board) drawButton(target *ebiten.Image, r image.Rectangle, label string
 	img.Fill(color.RGBA{225.0, 188, 125, 255})
 	img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
 
-	bounds := text.BoundString(b.fontFace, label)
+	bounds := etk.BoundString(b.fontFace, label)
 	text.Draw(img, label, b.fontFace, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
 
 	op := &ebiten.DrawImageOptions{}
@@ -574,7 +574,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 				labelColor = color.RGBA{0, 0, 0, 255}
 			}
 
-			bounds := text.BoundString(b.fontFace, overlayText)
+			bounds := etk.BoundString(b.fontFace, overlayText)
 			overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
 			text.Draw(overlayImage, overlayText, b.fontFace, 0, bounds.Dy(), labelColor)
 
@@ -612,11 +612,6 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	// Draw opponent name and dice
 
-	borderSize := b.horizontalBorderSize
-	if borderSize > b.barWidth/2 {
-		borderSize = b.barWidth / 2
-	}
-
 	playerColor := color.White
 	opponentColor := color.Black
 	playerBorderColor := lightCheckerColor
@@ -635,7 +630,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 	}
 
 	drawLabel := func(label string, labelColor color.Color, border bool, borderColor color.Color) *ebiten.Image {
-		bounds := text.BoundString(b.fontFace, label)
+		bounds := etk.BoundString(b.fontFace, label)
 
 		w := int(float64(bounds.Dx()) * 1.5)
 		h := int(float64(bounds.Dy()) * 2)
@@ -664,7 +659,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	opponent := b.gameState.OpponentPlayer()
 	if opponent.Name != "" {
-		label := fmt.Sprintf("%s", opponent.Name)
+		label := opponent.Name
 
 		img := drawLabel(label, opponentColor, b.gameState.Turn != b.gameState.PlayerNumber, opponentBorderColor)
 		bounds := img.Bounds()
@@ -703,7 +698,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	player := b.gameState.LocalPlayer()
 	if player.Name != "" {
-		label := fmt.Sprintf("%s", player.Name)
+		label := player.Name
 
 		img := drawLabel(label, playerColor, b.gameState.Turn == b.gameState.PlayerNumber, playerBorderColor)
 		bounds := img.Bounds()
@@ -777,12 +772,11 @@ func (b *board) updateButtonRects() {
 }
 
 func (b *board) setRect(x, y, w, h int) {
-	if b.x == x && b.y == y && b.w == w && b.h == h {
+	if OptimizeSetRect && b.x == x && b.y == y && b.w == w && b.h == h {
 		return
 	}
 
-	s := ebiten.DeviceScaleFactor()
-	if s >= 1.25 {
+	if game.scaleFactor >= 1.25 {
 		if b.fontFace != largeFont {
 			b.fontFace = largeFont
 			b.fontUpdated()
@@ -824,10 +818,6 @@ func (b *board) setRect(x, y, w, h int) {
 		b.spaceWidth = 1
 	}
 
-	borderSize := b.horizontalBorderSize
-	if borderSize > b.barWidth/2 {
-		borderSize = b.barWidth / 2
-	}
 	b.innerW = int(float64(b.w) - (b.horizontalBorderSize * 2))
 	b.innerH = int(float64(b.h) - (b.verticalBorderSize * 2))
 
@@ -850,9 +840,19 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 	b.uiGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), int(inputAndButtons))
 
-	dialogWidth := int(400 * s)
-	dialogHeight := int(100 * s)
-	b.leaveGameGrid.SetRect(image.Rect(game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2, game.screenW/2+dialogWidth/2, game.screenH/2+dialogHeight/2))
+	{
+		dialogWidth := game.scale(400)
+		if dialogWidth > game.screenW {
+			dialogWidth = game.screenW
+		}
+		dialogHeight := game.scale(100)
+		if dialogHeight > game.screenH {
+			dialogHeight = game.screenH
+		}
+
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
+		b.leaveGameGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+	}
 
 	if viewBoard && game.keyboard.Visible() {
 		b.setKeyboardRect()
@@ -984,7 +984,7 @@ func (b *board) bottomRow(space int) bool {
 
 // relX, relY
 func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
-	x, y, w, h = b.spaceRect(space)
+	x, y, _, h = b.spaceRect(space)
 
 	// Stack pieces
 	var o int

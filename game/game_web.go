@@ -4,7 +4,8 @@ package game
 
 const (
 	DefaultServerAddress = "wss://ws.bgammon.org"
-	OptimizeDraws        = true
+	OptimizeDraw         = true
+	OptimizeSetRect      = true
 	AutoEnableTouchInput = false
 	ShowServerSettings   = false
 	APPNAME              = "boxcars"
