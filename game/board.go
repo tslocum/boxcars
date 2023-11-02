@@ -73,6 +73,9 @@ type board struct {
 	opponentLabel *Label
 	playerLabel   *Label
 
+	timerLabel *etk.Text
+	clockLabel *etk.Text
+
 	inputGrid          *etk.Grid
 	showKeyboardButton *etk.Button
 	uiGrid             *etk.Grid
@@ -119,7 +122,6 @@ func NewBoard() *board {
 		fontFace:              mediumFont,
 		Mutex:                 &sync.Mutex{},
 	}
-	b.fontUpdated()
 
 	b.bearOffOverlay = etk.NewButton(gotext.Get("Drag here to bear off"), func() error {
 		return nil
@@ -141,17 +143,49 @@ func NewBoard() *board {
 	b.showKeyboardButton = etk.NewButton(gotext.Get("Show Keyboard"), b.toggleKeyboard)
 	b.recreateInputGrid()
 
-	b.uiGrid.AddChildAt(statusBuffer, 0, 0, 1, 1)
+	timerLabel := etk.NewText("0:00")
+	timerLabel.SetForegroundColor(triangleA)
+	timerLabel.SetScrollBarVisible(false)
+	timerLabel.SetSingleLine(true)
+	timerLabel.TextField.SetHorizontal(messeji.AlignCenter)
+	timerLabel.TextField.SetVertical(messeji.AlignCenter)
+	b.timerLabel = timerLabel
+
+	clockLabel := etk.NewText("12:00")
+	clockLabel.SetForegroundColor(triangleA)
+	clockLabel.SetScrollBarVisible(false)
+	clockLabel.SetSingleLine(true)
+	clockLabel.TextField.SetHorizontal(messeji.AlignCenter)
+	clockLabel.TextField.SetVertical(messeji.AlignCenter)
+	b.clockLabel = clockLabel
+
+	btn := etk.NewButton("Settings", func() error {
+		return nil
+	})
+	btn.Label.SetFont(smallFont)
+
+	mockUp := etk.NewGrid()
+	mockUp.AddChildAt(b.timerLabel, 0, 0, 1, 1)
+	mockUp.AddChildAt(b.clockLabel, 1, 0, 1, 1)
+	if !AutoEnableTouchInput {
+		mockUp.AddChildAt(btn, 2, 0, 1, 1)
+	}
+
+	b.uiGrid.AddChildAt(mockUp, 0, 0, 1, 1)
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 1, 1, 1)
-	b.uiGrid.AddChildAt(gameBuffer, 0, 2, 1, 1)
+	b.uiGrid.AddChildAt(statusBuffer, 0, 2, 1, 1)
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 3, 1, 1)
-	b.uiGrid.AddChildAt(b.inputGrid, 0, 4, 1, 1)
+	b.uiGrid.AddChildAt(gameBuffer, 0, 4, 1, 1)
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 5, 1, 1)
+	b.uiGrid.AddChildAt(b.inputGrid, 0, 6, 1, 1)
 
 	b.frame.AddChild(b.opponentLabel)
 	b.frame.AddChild(b.playerLabel)
 	b.frame.AddChild(b.uiGrid)
 	b.frame.AddChild(b.bearOffOverlay)
 	b.frame.AddChild(b.leaveGameGrid)
+
+	b.fontUpdated()
 
 	b.buttons = []*boardButton{
 		{
@@ -192,6 +226,9 @@ func (b *board) fontUpdated() {
 	statusBuffer.SetFont(b.fontFace)
 	gameBuffer.SetFont(b.fontFace)
 	inputBuffer.Field.SetFont(b.fontFace)
+
+	b.timerLabel.SetFont(b.fontFace)
+	b.clockLabel.SetFont(b.fontFace)
 }
 
 func (b *board) recreateInputGrid() {
@@ -206,8 +243,8 @@ func (b *board) recreateInputGrid() {
 
 		b.inputGrid.AddChildAt(etk.NewBox(), 0, 1, 2, 1)
 
-		leaveGameButton := etk.NewButton(gotext.Get("Leave Match"), b.leaveGame)
-		b.inputGrid.AddChildAt(leaveGameButton, 0, 2, 1, 1)
+		showMenuButton := etk.NewButton(gotext.Get("Menu"), b.showMenu)
+		b.inputGrid.AddChildAt(showMenuButton, 0, 2, 1, 1)
 		b.inputGrid.AddChildAt(b.showKeyboardButton, 1, 2, 1, 1)
 
 		b.inputGrid.SetRowSizes(52, int(b.horizontalBorderSize/2), -1)
@@ -238,6 +275,12 @@ func (b *board) confirmLeaveGame() error {
 
 func (b *board) leaveGame() error {
 	b.leaveGameGrid.SetVisible(true)
+	return nil
+}
+
+func (b *board) showMenu() error {
+	//b.menuGrid.SetVisible(true)
+	// TODO
 	return nil
 }
 
@@ -822,7 +865,11 @@ func (b *board) setRect(x, y, w, h int) {
 	if game.TouchInput {
 		inputAndButtons = 52 + int(b.horizontalBorderSize) + game.scale(56)
 	}
-	b.uiGrid.SetRowSizes(-1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), int(inputAndButtons))
+	matchStatus := 36
+	if game.scaleFactor >= 1.25 {
+		matchStatus = 44
+	}
+	b.uiGrid.SetRowSizes(matchStatus, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), int(inputAndButtons))
 
 	{
 		dialogWidth := game.scale(400)

@@ -771,9 +771,52 @@ func NewGame() *Game {
 	etk.SetFocus(g.connectUsername)
 
 	go g.handleAutoRefresh()
+	go g.handleUpdateTimeLabels()
 
 	scheduleFrame()
 	return g
+}
+
+func (g *Game) handleUpdateTimeLabels() {
+	lastTimerHour, lastTimerMinute := -1, -1
+	lastClockHour, lastClockMinute := -1, -1
+
+	t := time.NewTicker(3 * time.Second)
+	var now time.Time
+	var d time.Duration
+	var h, m int
+	for {
+		now = time.Now()
+
+		// Update match timer.
+		started := g.Board.gameState.Started
+		if started.IsZero() {
+			h, m = 0, 0
+		} else {
+			ended := g.Board.gameState.Ended
+			if ended.IsZero() {
+				d = now.Sub(started)
+			} else {
+				d = ended.Sub(started)
+			}
+			h, m = int(d.Hours()), int(d.Minutes())
+		}
+		if h != lastTimerHour || m != lastTimerMinute {
+			g.Board.timerLabel.SetText(fmt.Sprintf("%d:%02d", h, m))
+			lastTimerHour, lastTimerMinute = h, m
+			scheduleFrame()
+		}
+
+		// Update clock.
+		h, m = now.Hour(), now.Minute()
+		if h != lastClockHour || m != lastClockMinute {
+			g.Board.clockLabel.SetText(fmt.Sprintf("%d:%02d", h, m))
+			lastClockHour, lastClockMinute = h, m
+			scheduleFrame()
+		}
+
+		<-t.C
+	}
 }
 
 func (g *Game) setRoot(w etk.Widget) {
