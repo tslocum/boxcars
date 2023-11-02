@@ -458,6 +458,8 @@ func setViewBoard(view bool) {
 
 		game.Board.uiGrid.SetRect(game.Board.uiGrid.Rect())
 		game.Board.bearOffOverlay.SetRect(game.Board.bearOffOverlay.Rect())
+
+		game.Board.setKeyboardRect()
 	} else {
 		if !game.loggedIn {
 			game.setRoot(connectGrid)
@@ -470,10 +472,12 @@ func setViewBoard(view bool) {
 		}
 
 		game.Board.leaveGameGrid.SetVisible(false)
-	}
 
-	if !game.loggedIn {
-		game.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
+		if !game.loggedIn {
+			game.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
+		} else {
+			game.lobby.setKeyboardRect()
+		}
 	}
 
 	scheduleFrame()
@@ -1045,6 +1049,29 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 	return nil
 }
 
+func (g *Game) handleTouch(p image.Point) {
+	if p.X == 0 && p.Y == 0 {
+		return
+	}
+	w := etk.At(p)
+	if w == nil {
+		return
+	}
+	switch w.(type) {
+	case *etk.Input:
+		g.keyboard.Show()
+		var btn *etk.Button
+		if !g.loggedIn {
+			btn = g.connectKeyboardButton
+		} else if !viewBoard {
+			btn = g.lobby.showKeyboardButton
+		} else {
+			btn = g.Board.showKeyboardButton
+		}
+		btn.Label.SetText(gotext.Get("Hide Keyboard"))
+	}
+}
+
 // Update is called by Ebitengine only when user input occurs, or a frame is
 // explicitly scheduled.
 func (g *Game) Update() error {
@@ -1122,6 +1149,7 @@ func (g *Game) Update() error {
 	}
 
 	var pressed bool
+	var pressedTouch image.Point
 	if cx == 0 && cy == 0 {
 		g.touchIDs = inpututil.AppendJustPressedTouchIDs(g.touchIDs[:0])
 		for _, id := range g.touchIDs {
@@ -1129,6 +1157,7 @@ func (g *Game) Update() error {
 			cx, cy = ebiten.TouchPosition(id)
 			if cx != 0 || cy != 0 {
 				pressed = true
+				pressedTouch = image.Point{cx, cy}
 				break
 			}
 		}
@@ -1165,7 +1194,12 @@ func (g *Game) Update() error {
 		if skipUpdate {
 			return nil
 		}
-		return etk.Update()
+		err = etk.Update()
+		if err != nil {
+			return err
+		}
+		g.handleTouch(pressedTouch)
+		return nil
 	}
 
 	if !viewBoard {
@@ -1218,7 +1252,12 @@ func (g *Game) Update() error {
 	if skipUpdate {
 		return nil
 	}
-	return etk.Update()
+	err = etk.Update()
+	if err != nil {
+		return err
+	}
+	g.handleTouch(pressedTouch)
+	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
