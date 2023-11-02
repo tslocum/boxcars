@@ -1419,6 +1419,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	setViewBoard(viewBoard)
 
+	g.Board.updateOpponentLabel()
+	g.Board.updatePlayerLabel()
+
 	return outsideWidth, outsideHeight
 }
 

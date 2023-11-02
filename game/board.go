@@ -70,6 +70,9 @@ type board struct {
 
 	spaceHighlight *ebiten.Image
 
+	opponentLabel *Label
+	playerLabel   *Label
+
 	inputGrid          *etk.Grid
 	showKeyboardButton *etk.Button
 	uiGrid             *etk.Grid
@@ -108,6 +111,8 @@ func NewBoard() *board {
 			Game: bgammon.NewGame(),
 		},
 		spaceHighlight:        ebiten.NewImage(1, 1),
+		opponentLabel:         NewLabel(color.RGBA{255, 255, 255, 255}),
+		playerLabel:           NewLabel(color.RGBA{0, 0, 0, 255}),
 		uiGrid:                etk.NewGrid(),
 		frame:                 etk.NewFrame(),
 		confirmLeaveGameFrame: etk.NewFrame(),
@@ -142,6 +147,8 @@ func NewBoard() *board {
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 3, 1, 1)
 	b.uiGrid.AddChildAt(b.inputGrid, 0, 4, 1, 1)
 
+	b.frame.AddChild(b.opponentLabel)
+	b.frame.AddChild(b.playerLabel)
 	b.frame.AddChild(b.uiGrid)
 	b.frame.AddChild(b.bearOffOverlay)
 	b.frame.AddChild(b.leaveGameGrid)
@@ -618,49 +625,12 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	// Draw opponent name and dice
-
-	playerColor := color.White
-	opponentColor := color.Black
-	playerBorderColor := lightCheckerColor
-	opponentBorderColor := darkCheckerColor
-	if b.gameState.PlayerNumber == 1 {
-		playerColor = color.Black
-		opponentColor = color.White
-		playerBorderColor = darkCheckerColor
-		opponentBorderColor = lightCheckerColor
-	}
+	// Draw opponent dice
 
 	playerRoll := b.gameState.Roll1
 	opponentRoll := b.gameState.Roll2
 	if b.gameState.PlayerNumber == 2 {
 		playerRoll, opponentRoll = opponentRoll, playerRoll
-	}
-
-	drawLabel := func(label string, labelColor color.Color, border bool, borderColor color.Color) *ebiten.Image {
-		bounds := etk.BoundString(b.fontFace, label)
-
-		w := int(float64(bounds.Dx()) * 1.5)
-		h := int(float64(bounds.Dy()) * 2)
-
-		baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
-		// Draw border
-		if border {
-			gc := draw2dimg.NewGraphicContext(baseImg)
-			gc.SetLineWidth(5)
-			gc.SetStrokeColor(borderColor)
-			gc.MoveTo(float64(0), float64(0))
-			gc.LineTo(float64(w), 0)
-			gc.LineTo(float64(w), float64(h))
-			gc.LineTo(float64(0), float64(h))
-			gc.Close()
-			gc.Stroke()
-		}
-
-		img := ebiten.NewImageFromImage(baseImg)
-		text.Draw(img, label, b.fontFace, (w-bounds.Dx())/2, int(float64(h-(bounds.Max.Y/2))*0.75), labelColor)
-
-		return img
 	}
 
 	diceGap := 10.0
@@ -679,20 +649,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	opponent := b.gameState.OpponentPlayer()
 	if opponent.Name != "" {
-		label := opponent.Name
-
-		img := drawLabel(label, opponentColor, b.gameState.Turn != b.gameState.PlayerNumber, opponentBorderColor)
-		bounds := img.Bounds()
-
 		innerCenter := b.x + (b.w / 4) - int(b.barWidth/4) + int(b.horizontalBorderSize/2)
-		x := innerCenter - int(float64(bounds.Dx()/2))
-		y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
-		{
-			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(x), float64(y))
-			screen.DrawImage(img, op)
-		}
-
 		if b.gameState.Turn == 0 {
 			if opponentRoll != 0 {
 				op := &ebiten.DrawImageOptions{}
@@ -714,24 +671,11 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	// Draw player name and dice
+	// Draw player dice
 
 	player := b.gameState.LocalPlayer()
 	if player.Name != "" {
-		label := player.Name
-
-		img := drawLabel(label, playerColor, b.gameState.Turn == b.gameState.PlayerNumber, playerBorderColor)
-		bounds := img.Bounds()
-
 		innerCenter := b.x + b.w/2 + b.w/4 + int(b.barWidth/4) - int(b.horizontalBorderSize/2)
-		x := innerCenter - int(float64(bounds.Dx()/2))
-		y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
-		{
-			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(x), float64(y))
-			screen.DrawImage(img, op)
-		}
-
 		if b.gameState.Turn == 0 {
 			if playerRoll != 0 {
 				op := &ebiten.DrawImageOptions{}
@@ -900,9 +844,66 @@ func (b *board) setRect(x, y, w, h int) {
 		b.leaveGameGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 
+	b.updateOpponentLabel()
+	b.updatePlayerLabel()
+
 	if viewBoard && game.keyboard.Visible() {
 		b.setKeyboardRect()
 	}
+}
+
+func (b *board) updateOpponentLabel() {
+	player := b.gameState.OpponentPlayer()
+	label := b.opponentLabel
+
+	label.SetText(player.Name)
+
+	if player.Number == 1 {
+		label.activeColor = color.RGBA{0, 0, 0, 255}
+	} else {
+		label.activeColor = color.RGBA{255, 255, 255, 255}
+	}
+	label.active = b.gameState.Turn == player.Number
+	label.Text.TextField.SetForegroundColor(label.activeColor)
+
+	bounds := etk.BoundString(largeFont, player.Name)
+	padding := 13
+	innerCenter := b.x + (b.w / 4) - int(b.barWidth/4) + int(b.horizontalBorderSize/2)
+	x := innerCenter - int(float64(bounds.Dx()/2))
+	y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
+	r := image.Rect(x, y, x+bounds.Dx(), y+bounds.Dy())
+	if r.Eq(label.Rect()) && r.Dx() != 0 && r.Dy() != 0 {
+		label.updateBackground()
+		return
+	}
+	label.SetRect(r.Inset(-padding))
+}
+
+func (b *board) updatePlayerLabel() {
+	player := b.gameState.LocalPlayer()
+	label := b.playerLabel
+
+	label.SetText(player.Name)
+
+	if player.Number == 1 {
+		label.activeColor = color.RGBA{0, 0, 0, 255}
+	} else {
+		label.activeColor = color.RGBA{255, 255, 255, 255}
+	}
+	label.active = b.gameState.Turn == player.Number
+	label.Text.TextField.SetForegroundColor(label.activeColor)
+
+	bounds := etk.BoundString(largeFont, player.Name)
+	padding := 13
+	innerCenter := b.x + b.w/2 + b.w/4 + int(b.barWidth/4) - int(b.horizontalBorderSize/2)
+	x := innerCenter - int(float64(bounds.Dx()/2))
+	y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
+	r := image.Rect(x, y, x+bounds.Dx(), y+bounds.Dy())
+	if r.Eq(label.Rect()) && r.Dx() != 0 && r.Dy() != 0 {
+		label.updateBackground()
+		return
+	}
+	label.SetRect(r.Inset(-padding))
 }
 
 func (b *board) offsetPosition(x, y int) (int, int) {
@@ -1094,6 +1095,9 @@ func (b *board) processState() {
 	b.Sprites.num = len(b.Sprites.sprites)
 
 	b._positionCheckers()
+
+	b.updateOpponentLabel()
+	b.updatePlayerLabel()
 }
 
 // _movePiece returns after moving the piece.
@@ -1334,4 +1338,78 @@ func (b *board) Update() {
 		sprite.x = x - (sprite.w / 2)
 		sprite.y = y - (sprite.h / 2)
 	}
+}
+
+type Label struct {
+	*etk.Text
+	active      bool
+	activeColor color.RGBA
+	lastActive  bool
+	bg          *ebiten.Image
+}
+
+func (l *Label) updateBackground() {
+	bgColor := color.RGBA{0, 0, 0, 20}
+	borderSize := 2
+	if l.active {
+		bounds := l.bg.Bounds()
+		l.bg.Fill(l.activeColor)
+		l.bg.SubImage(image.Rect(0, 0, bounds.Dx(), bounds.Dy()).Inset(borderSize)).(*ebiten.Image).Fill(bgColor)
+	} else {
+		l.bg.Fill(bgColor)
+	}
+
+	l.lastActive = l.active
+}
+
+func (l *Label) SetRect(r image.Rectangle) {
+	if r.Dx() == 0 || r.Dy() == 0 {
+		l.bg = nil
+		l.Text.SetRect(r)
+		return
+	} else if l.bg != nil {
+		bounds := l.bg.Bounds()
+		if bounds.Dx() != r.Dx() || bounds.Dy() != r.Dy() {
+			l.bg = ebiten.NewImage(r.Dx(), r.Dy())
+		}
+	} else {
+		l.bg = ebiten.NewImage(r.Dx(), r.Dy())
+	}
+
+	l.updateBackground()
+
+	l.Text.SetRect(r)
+}
+
+func (l *Label) SetActive(active bool) {
+	l.active = active
+}
+
+func (l *Label) Draw(screen *ebiten.Image) error {
+	if l.TextField.Text() == "" {
+		return nil
+	}
+	if l.bg != nil {
+		if l.active != l.lastActive {
+			l.updateBackground()
+		}
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(l.Rect().Min.X), float64(l.Rect().Min.Y))
+		screen.DrawImage(l.bg, op)
+	}
+	return l.Text.Draw(screen)
+}
+
+func NewLabel(c color.RGBA) *Label {
+	l := &Label{
+		Text:        etk.NewText(""),
+		activeColor: c,
+	}
+	l.Text.SetFont(largeFont)
+	l.Text.SetForegroundColor(c)
+	l.Text.SetScrollBarVisible(false)
+	l.Text.SetSingleLine(true)
+	l.Text.SetHorizontal(messeji.AlignCenter)
+	l.Text.SetVertical(messeji.AlignCenter)
+	return l
 }
