@@ -34,7 +34,7 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
-const version = "v1.0.7"
+const version = "v1.0.8"
 
 const MaxDebug = 1
 

@@ -1343,11 +1343,27 @@ type Label struct {
 }
 
 func (l *Label) updateBackground() {
+	if l.TextField.Text() == "" {
+		l.bg = nil
+		return
+	}
+
+	r := l.Rect()
+	if l.bg != nil {
+		bounds := l.bg.Bounds()
+		if bounds.Dx() != r.Dx() || bounds.Dy() != r.Dy() {
+			l.bg = ebiten.NewImage(r.Dx(), r.Dy())
+		}
+	} else {
+		l.bg = ebiten.NewImage(r.Dx(), r.Dy())
+	}
+
 	bgColor := color.RGBA{0, 0, 0, 20}
 	borderSize := 2
 	if l.active {
-		bounds := l.bg.Bounds()
 		l.bg.Fill(l.activeColor)
+
+		bounds := l.bg.Bounds()
 		l.bg.SubImage(image.Rect(0, 0, bounds.Dx(), bounds.Dy()).Inset(borderSize)).(*ebiten.Image).Fill(bgColor)
 	} else {
 		l.bg.Fill(bgColor)
@@ -1361,36 +1377,35 @@ func (l *Label) SetRect(r image.Rectangle) {
 		l.bg = nil
 		l.Text.SetRect(r)
 		return
-	} else if l.bg != nil {
-		bounds := l.bg.Bounds()
-		if bounds.Dx() != r.Dx() || bounds.Dy() != r.Dy() {
-			l.bg = ebiten.NewImage(r.Dx(), r.Dy())
-		}
-	} else {
-		l.bg = ebiten.NewImage(r.Dx(), r.Dy())
 	}
 
-	l.updateBackground()
-
 	l.Text.SetRect(r)
+	l.updateBackground()
 }
 
 func (l *Label) SetActive(active bool) {
 	l.active = active
 }
 
+func (l *Label) SetText(t string) {
+	r := l.Rect()
+	if r.Empty() || l.TextField.Text() == t {
+		return
+	}
+	l.TextField.SetText(t)
+	l.updateBackground()
+}
+
 func (l *Label) Draw(screen *ebiten.Image) error {
-	if l.TextField.Text() == "" {
+	if l.bg == nil {
 		return nil
 	}
-	if l.bg != nil {
-		if l.active != l.lastActive {
-			l.updateBackground()
-		}
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64(l.Rect().Min.X), float64(l.Rect().Min.Y))
-		screen.DrawImage(l.bg, op)
+	if l.active != l.lastActive {
+		l.updateBackground()
 	}
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(l.Rect().Min.X), float64(l.Rect().Min.Y))
+	screen.DrawImage(l.bg, op)
 	return l.Text.Draw(screen)
 }
 
