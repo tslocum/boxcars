@@ -1295,7 +1295,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		log.Fatal(err)
 	}
 
-	g.Board.drawDraggedChecker(screen)
+	g.Board.drawDraggedCheckers(screen)
 
 	game.keyboard.Draw(screen)
 

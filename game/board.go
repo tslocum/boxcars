@@ -692,11 +692,13 @@ func (b *board) Draw(screen *ebiten.Image) {
 	b.drawButtons(screen)
 }
 
-func (b *board) drawDraggedChecker(screen *ebiten.Image) {
-	if b.dragging == nil {
-		return
+func (b *board) drawDraggedCheckers(screen *ebiten.Image) {
+	if b.moving != nil {
+		b.drawSprite(screen, b.moving)
 	}
-	b.drawSprite(screen, b.dragging)
+	if b.dragging != nil {
+		b.drawSprite(screen, b.dragging)
+	}
 }
 
 func (b *board) updateButtonRects() {
