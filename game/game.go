@@ -473,8 +473,7 @@ func setViewBoard(view bool) {
 	}
 
 	if !game.loggedIn {
-		displaySize := game.screenH / 2
-		game.keyboard.SetRect(0, displaySize, game.screenW, displaySize)
+		game.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
 	}
 
 	scheduleFrame()

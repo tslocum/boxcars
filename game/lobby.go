@@ -120,7 +120,7 @@ func (l *lobby) fontUpdated() {
 }
 
 func (l *lobby) setKeyboardRect() {
-	game.keyboard.SetRect(0, game.screenH/2, game.screenW, game.screenH/2)
+	game.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
 }
 
 func (l *lobby) toggleKeyboard() error {

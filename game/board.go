@@ -221,16 +221,8 @@ func (b *board) setKeyboardRect() {
 	if game.TouchInput {
 		inputAndButtons = 52 + int(b.horizontalBorderSize) + game.scale(56)
 	}
-	h := game.screenH - game.screenH/2 - inputAndButtons - int(b.horizontalBorderSize)
-	y := game.screenH / 2
-	if h < 450 {
-		h = 450
-		maxHeight := int(float64(game.screenH) * 0.75)
-		if h > maxHeight {
-			h = maxHeight
-		}
-		y = game.screenH - inputAndButtons - int(b.horizontalBorderSize) - h
-	}
+	h := game.screenH / 3
+	y := game.screenH - game.screenH/3 - inputAndButtons - int(b.horizontalBorderSize)
 	game.keyboard.SetRect(0, y, game.screenW, h)
 }
 
