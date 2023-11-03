@@ -810,7 +810,10 @@ func (g *Game) handleUpdateTimeLabels() {
 		}
 
 		// Update clock.
-		h, m = now.Hour(), now.Minute()
+		h, m = now.Hour()%12, now.Minute()
+		if h == 0 {
+			h = 12
+		}
 		if h != lastClockHour || m != lastClockMinute {
 			g.Board.clockLabel.SetText(fmt.Sprintf("%d:%02d", h, m))
 			lastClockHour, lastClockMinute = h, m
