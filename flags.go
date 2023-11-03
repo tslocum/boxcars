@@ -26,7 +26,7 @@ func parseFlags(g *game.Game) {
 	flag.Parse()
 
 	if touch {
-		g.TouchInput = true
+		g.EnableTouchInput()
 	}
 
 	if debug > 0 {

@@ -73,8 +73,13 @@ type board struct {
 	opponentLabel *Label
 	playerLabel   *Label
 
-	timerLabel *etk.Text
-	clockLabel *etk.Text
+	timerLabel     *etk.Text
+	clockLabel     *etk.Text
+	showMenuButton *etk.Button
+
+	menuGrid *etk.Grid
+
+	matchStatusGrid *etk.Grid
 
 	inputGrid          *etk.Grid
 	showKeyboardButton *etk.Button
@@ -116,6 +121,7 @@ func NewBoard() *board {
 		spaceHighlight:        ebiten.NewImage(1, 1),
 		opponentLabel:         NewLabel(color.RGBA{255, 255, 255, 255}),
 		playerLabel:           NewLabel(color.RGBA{0, 0, 0, 255}),
+		menuGrid:              etk.NewGrid(),
 		uiGrid:                etk.NewGrid(),
 		frame:                 etk.NewFrame(),
 		confirmLeaveGameFrame: etk.NewFrame(),
@@ -127,6 +133,15 @@ func NewBoard() *board {
 		return nil
 	})
 	b.bearOffOverlay.SetVisible(false)
+
+	{
+		b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.hideMenu), 0, 0, 1, 1)
+		b.menuGrid.AddChildAt(etk.NewBox(), 1, 0, 1, 1)
+		b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Settings"), b.showSettings), 2, 0, 1, 1)
+		b.menuGrid.AddChildAt(etk.NewBox(), 3, 0, 1, 1)
+		b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Leave"), b.leaveGame), 4, 0, 1, 1)
+		b.menuGrid.SetVisible(false)
+	}
 
 	{
 		leaveGameLabel := etk.NewText(gotext.Get("Leave match?"))
@@ -159,19 +174,17 @@ func NewBoard() *board {
 	clockLabel.TextField.SetVertical(messeji.AlignCenter)
 	b.clockLabel = clockLabel
 
-	btn := etk.NewButton("Settings", func() error {
-		return nil
-	})
-	btn.Label.SetFont(smallFont)
+	b.showMenuButton = etk.NewButton("Menu", b.showMenu)
+	b.showMenuButton.Label.SetFont(smallFont)
 
-	mockUp := etk.NewGrid()
-	mockUp.AddChildAt(b.timerLabel, 0, 0, 1, 1)
-	mockUp.AddChildAt(b.clockLabel, 1, 0, 1, 1)
+	b.matchStatusGrid = etk.NewGrid()
+	b.matchStatusGrid.AddChildAt(b.timerLabel, 0, 0, 1, 1)
+	b.matchStatusGrid.AddChildAt(b.clockLabel, 1, 0, 1, 1)
 	if !AutoEnableTouchInput {
-		mockUp.AddChildAt(btn, 2, 0, 1, 1)
+		b.matchStatusGrid.AddChildAt(b.showMenuButton, 2, 0, 1, 1)
 	}
 
-	b.uiGrid.AddChildAt(mockUp, 0, 0, 1, 1)
+	b.uiGrid.AddChildAt(b.matchStatusGrid, 0, 0, 1, 1)
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 1, 1, 1)
 	b.uiGrid.AddChildAt(statusBuffer, 0, 2, 1, 1)
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 3, 1, 1)
@@ -183,6 +196,7 @@ func NewBoard() *board {
 	b.frame.AddChild(b.playerLabel)
 	b.frame.AddChild(b.uiGrid)
 	b.frame.AddChild(b.bearOffOverlay)
+	b.frame.AddChild(b.menuGrid)
 	b.frame.AddChild(b.leaveGameGrid)
 
 	b.fontUpdated()
@@ -274,13 +288,25 @@ func (b *board) confirmLeaveGame() error {
 }
 
 func (b *board) leaveGame() error {
+	b.menuGrid.SetVisible(false)
 	b.leaveGameGrid.SetVisible(true)
 	return nil
 }
 
-func (b *board) showMenu() error {
-	//b.menuGrid.SetVisible(true)
+func (b *board) showSettings() error {
+	b.menuGrid.SetVisible(false)
+	//b.settingsGrid.SetVisible(true)
 	// TODO
+	return nil
+}
+
+func (b *board) hideMenu() error {
+	b.menuGrid.SetVisible(false)
+	return nil
+}
+
+func (b *board) showMenu() error {
+	b.menuGrid.SetVisible(true)
 	return nil
 }
 
@@ -872,6 +898,20 @@ func (b *board) setRect(x, y, w, h int) {
 	b.uiGrid.SetRowSizes(matchStatus, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), int(inputAndButtons))
 
 	{
+		dialogWidth := game.scale(620)
+		if dialogWidth > game.screenW {
+			dialogWidth = game.screenW
+		}
+		dialogHeight := game.scale(100)
+		if dialogHeight > game.screenH {
+			dialogHeight = game.screenH
+		}
+
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(b.verticalBorderSize)
+		b.menuGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+	}
+
+	{
 		dialogWidth := game.scale(400)
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
@@ -881,12 +921,14 @@ func (b *board) setRect(x, y, w, h int) {
 			dialogHeight = game.screenH
 		}
 
-		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(b.verticalBorderSize)
 		b.leaveGameGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 
 	b.updateOpponentLabel()
 	b.updatePlayerLabel()
+
+	b.menuGrid.SetColumnSizes(-1, game.scale(10), -1, game.scale(10), -1)
 
 	if viewBoard && game.keyboard.Visible() {
 		b.setKeyboardRect()
@@ -1306,7 +1348,7 @@ func (b *board) Update() {
 
 		b.touchIDs = inpututil.AppendJustPressedTouchIDs(b.touchIDs[:0])
 		for _, id := range b.touchIDs {
-			game.enableTouchInput()
+			game.EnableTouchInput()
 			x, y := ebiten.TouchPosition(id)
 			handled := b.handleClick(x, y)
 			if !handled && b.playerTurn() && len(b.gameState.Available) > 0 {

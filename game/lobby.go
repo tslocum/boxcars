@@ -523,7 +523,7 @@ func (l *lobby) update() {
 
 	l.touchIDs = inpututil.AppendJustPressedTouchIDs(l.touchIDs[:0])
 	for _, id := range l.touchIDs {
-		game.enableTouchInput()
+		game.EnableTouchInput()
 		x, y := ebiten.TouchPosition(id)
 		l.click(x, y)
 	}

@@ -471,6 +471,7 @@ func setViewBoard(view bool) {
 			game.setRoot(listGamesFrame)
 		}
 
+		game.Board.menuGrid.SetVisible(false)
 		game.Board.leaveGameGrid.SetVisible(false)
 
 		if !game.loggedIn {
@@ -622,7 +623,7 @@ func NewGame() *Game {
 				g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 				g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 			} else {
-				g.enableTouchInput()
+				g.EnableTouchInput()
 				g.keyboard.Show()
 				g.connectKeyboardButton.Label.SetText(gotext.Get("Hide Keyboard"))
 			}
@@ -1058,6 +1059,16 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 	for _, key := range keys {
 		switch key {
 		case ebiten.KeyEscape:
+			if viewBoard {
+				if g.Board.menuGrid.Visible() {
+					g.Board.menuGrid.SetVisible(false)
+				} else if g.Board.leaveGameGrid.Visible() {
+					g.Board.leaveGameGrid.SetVisible(false)
+				} else {
+					g.Board.menuGrid.SetVisible(true)
+				}
+				continue
+			}
 			setViewBoard(!viewBoard)
 		}
 	}
@@ -1196,7 +1207,7 @@ func (g *Game) Update() error {
 	if cx == 0 && cy == 0 {
 		g.touchIDs = inpututil.AppendJustPressedTouchIDs(g.touchIDs[:0])
 		for _, id := range g.touchIDs {
-			game.enableTouchInput()
+			game.EnableTouchInput()
 			cx, cy = ebiten.TouchPosition(id)
 			if cx != 0 || cy != 0 {
 				pressed = true
@@ -1522,7 +1533,7 @@ func acceptInput(text string) (handled bool) {
 	return true
 }
 
-func (g *Game) enableTouchInput() {
+func (g *Game) EnableTouchInput() {
 	if g.TouchInput {
 		return
 	}
@@ -1530,6 +1541,11 @@ func (g *Game) enableTouchInput() {
 
 	// Update layout.
 	g.forceLayout = true
+
+	b := g.Board
+	*b.matchStatusGrid = *etk.NewGrid()
+	b.matchStatusGrid.AddChildAt(b.timerLabel, 0, 0, 1, 1)
+	b.matchStatusGrid.AddChildAt(b.clockLabel, 1, 0, 1, 1)
 }
 
 func (g *Game) toggleProfiling() error {
