@@ -43,8 +43,9 @@ type board struct {
 	spaceRects   [][4]int
 	spaceSprites [][]*Sprite // Space contents
 
-	dragging *Sprite
-	moving   *Sprite // Moving automatically
+	dragging      *Sprite
+	draggingSpace int
+	moving        *Sprite // Moving automatically
 
 	dragTouchId ebiten.TouchID
 	touchIDs    []ebiten.TouchID
@@ -94,6 +95,9 @@ type board struct {
 	fontFace   font.Face
 	lineHeight int
 	lineOffset int
+
+	highlightAvailable bool
+	availableMoves     [][]int
 
 	*sync.Mutex
 }
@@ -666,8 +670,20 @@ func (b *board) Draw(screen *ebiten.Image) {
 	}
 
 	// Draw space hover overlay when dragging
-
 	if b.dragging != nil {
+		if b.highlightAvailable && b.draggingSpace != -1 {
+			for _, move := range b.gameState.Available {
+				if move[0] == b.draggingSpace {
+					x, y, _, _ := b.spaceRect(move[1])
+					x, y = b.offsetPosition(x, y)
+					op := &ebiten.DrawImageOptions{}
+					op.GeoM.Translate(float64(x), float64(y))
+					op.ColorScale.Scale(0.2, 0.2, 0.2, 0.2)
+					screen.DrawImage(b.spaceHighlight, op)
+				}
+			}
+		}
+
 		dx, dy := b.dragX, b.dragY
 
 		x, y := ebiten.CursorPosition()
@@ -1012,16 +1028,16 @@ func (b *board) _positionCheckers() {
 	}
 }
 
-func (b *board) spriteAt(x, y int) *Sprite {
+func (b *board) spriteAt(x, y int) (*Sprite, int) {
 	space := b.spaceAt(x, y)
 	if space == -1 {
-		return nil
+		return nil, -1
 	}
 	pieces := b.spaceSprites[space]
 	if len(pieces) == 0 {
-		return nil
+		return nil, -1
 	}
-	return pieces[len(pieces)-1]
+	return pieces[len(pieces)-1], space
 }
 
 func (b *board) spaceAt(x, y int) int {
@@ -1311,8 +1327,9 @@ func (b *board) handleClick(x int, y int) bool {
 	return false
 }
 
-func (b *board) startDrag(s *Sprite) {
+func (b *board) startDrag(s *Sprite, space int) {
 	b.dragging = s
+	b.draggingSpace = space
 	if bgammon.CanBearOff(b.gameState.Board, b.gameState.PlayerNumber, true) && b.gameState.Board[bgammon.SpaceHomePlayer] == 0 {
 		b.bearOffOverlay.SetVisible(true)
 	}
@@ -1340,9 +1357,9 @@ func (b *board) Update() {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
 		if b.playerTurn() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && !handled && len(b.gameState.Available) > 0 {
-			s := b.spriteAt(cx, cy)
+			s, space := b.spriteAt(cx, cy)
 			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
-				b.startDrag(s)
+				b.startDrag(s, space)
 			}
 		}
 
@@ -1354,9 +1371,9 @@ func (b *board) Update() {
 			if !handled && b.playerTurn() && len(b.gameState.Available) > 0 {
 				b.dragX, b.dragY = x, y
 
-				s := b.spriteAt(x, y)
+				s, space := b.spriteAt(x, y)
 				if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
-					b.startDrag(s)
+					b.startDrag(s, space)
 					b.dragTouchId = id
 				}
 			}
