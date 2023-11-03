@@ -80,6 +80,9 @@ type board struct {
 
 	menuGrid *etk.Grid
 
+	highlightCheckbox *etk.Checkbox
+	settingsGrid      *etk.Grid
+
 	matchStatusGrid *etk.Grid
 
 	inputGrid          *etk.Grid
@@ -126,6 +129,7 @@ func NewBoard() *board {
 		opponentLabel:         NewLabel(color.RGBA{255, 255, 255, 255}),
 		playerLabel:           NewLabel(color.RGBA{0, 0, 0, 255}),
 		menuGrid:              etk.NewGrid(),
+		settingsGrid:          etk.NewGrid(),
 		uiGrid:                etk.NewGrid(),
 		frame:                 etk.NewFrame(),
 		confirmLeaveGameFrame: etk.NewFrame(),
@@ -145,6 +149,33 @@ func NewBoard() *board {
 		b.menuGrid.AddChildAt(etk.NewBox(), 3, 0, 1, 1)
 		b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Leave"), b.leaveGame), 4, 0, 1, 1)
 		b.menuGrid.SetVisible(false)
+	}
+
+	{
+		settingsLabel := etk.NewText(gotext.Get("Settings"))
+		settingsLabel.SetHorizontal(messeji.AlignCenter)
+
+		b.highlightCheckbox = etk.NewCheckbox(b.toggleHighlightCheckbox)
+		b.highlightCheckbox.SetBorderColor(triangleA)
+		b.highlightCheckbox.SetCheckColor(triangleA)
+		b.highlightCheckbox.SetSelected(b.highlightAvailable)
+
+		highlightLabel := etk.NewText(gotext.Get("Highlight legal moves"))
+		highlightLabel.SetVertical(messeji.AlignCenter)
+
+		checkboxGrid := etk.NewGrid()
+		checkboxGrid.SetColumnSizes(-1, -1, -1, -1, -1)
+		checkboxGrid.AddChildAt(b.highlightCheckbox, 0, 0, 1, 1)
+		checkboxGrid.AddChildAt(highlightLabel, 1, 0, 4, 1)
+
+		b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
+		b.settingsGrid.SetColumnSizes(20, -1, -1, 20)
+		b.settingsGrid.SetRowSizes(72, 72, 20, -1)
+		b.settingsGrid.AddChildAt(settingsLabel, 1, 0, 2, 1)
+		b.settingsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
+		b.settingsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
+		b.settingsGrid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.hideMenu), 0, 3, 4, 1)
+		b.settingsGrid.SetVisible(false)
 	}
 
 	{
@@ -201,6 +232,7 @@ func NewBoard() *board {
 	b.frame.AddChild(b.uiGrid)
 	b.frame.AddChild(b.bearOffOverlay)
 	b.frame.AddChild(b.menuGrid)
+	b.frame.AddChild(b.settingsGrid)
 	b.frame.AddChild(b.leaveGameGrid)
 
 	b.fontUpdated()
@@ -299,13 +331,13 @@ func (b *board) leaveGame() error {
 
 func (b *board) showSettings() error {
 	b.menuGrid.SetVisible(false)
-	//b.settingsGrid.SetVisible(true)
-	// TODO
+	b.settingsGrid.SetVisible(true)
 	return nil
 }
 
 func (b *board) hideMenu() error {
 	b.menuGrid.SetVisible(false)
+	b.settingsGrid.SetVisible(false)
 	return nil
 }
 
@@ -344,6 +376,11 @@ func (b *board) selectDouble() {
 
 func (b *board) selectResign() {
 	b.Client.Out <- []byte("resign")
+}
+
+func (b *board) toggleHighlightCheckbox() error {
+	b.highlightAvailable = b.highlightCheckbox.Selected()
+	return nil
 }
 
 func (b *board) newSprite(white bool) *Sprite {
@@ -925,6 +962,20 @@ func (b *board) setRect(x, y, w, h int) {
 
 		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(b.verticalBorderSize)
 		b.menuGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+	}
+
+	{
+		dialogWidth := game.scale(620)
+		if dialogWidth > game.screenW {
+			dialogWidth = game.screenW
+		}
+		dialogHeight := 72 + 72 + 20 + game.scale(56)
+		if dialogHeight > game.screenH {
+			dialogHeight = game.screenH
+		}
+
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(b.verticalBorderSize)
+		b.settingsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 
 	{

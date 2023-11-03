@@ -1,5 +1,6 @@
 1.0.8:
-- Add menu
+- Add in-game menu
+- Add settings dialog
 - Allow highlighting available moves when moving a checker
 - Display match duration and current time when viewing board
 

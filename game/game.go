@@ -472,6 +472,7 @@ func setViewBoard(view bool) {
 		}
 
 		game.Board.menuGrid.SetVisible(false)
+		game.Board.settingsGrid.SetVisible(false)
 		game.Board.leaveGameGrid.SetVisible(false)
 
 		if !game.loggedIn {
@@ -1062,6 +1063,8 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 			if viewBoard {
 				if g.Board.menuGrid.Visible() {
 					g.Board.menuGrid.SetVisible(false)
+				} else if g.Board.settingsGrid.Visible() {
+					g.Board.settingsGrid.SetVisible(false)
 				} else if g.Board.leaveGameGrid.Visible() {
 					g.Board.leaveGameGrid.SetVisible(false)
 				} else {

@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231102214836-522663becc48
-	code.rocket9labs.com/tslocum/etk v0.0.0-20231102195906-c2c9a228d0aa
+	code.rocket9labs.com/tslocum/etk v0.0.0-20231103045149-354a405635ac
 	code.rocketnine.space/tslocum/kibodo v1.0.2-0.20231102011532-8d3f420207ad
 	code.rocketnine.space/tslocum/messeji v1.0.5-0.20231102191237-a6fd28a6b52d
 	github.com/hajimehoshi/ebiten/v2 v2.6.2
