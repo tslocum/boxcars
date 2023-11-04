@@ -595,7 +595,12 @@ func NewGame() *Game {
 	g.Board = NewBoard()
 	g.lobby = NewLobby()
 
-	g.keyboard.SetKeys(kibodo.KeysQWERTY)
+	if AutoEnableTouchInput {
+		g.keyboard.SetKeys(kibodo.KeysMobileQWERTY)
+		g.keyboard.SetExtendedKeys(kibodo.KeysMobileSymbols)
+	} else {
+		g.keyboard.SetKeys(kibodo.KeysQWERTY)
+	}
 
 	etk.Style.TextColorLight = triangleA
 	etk.Style.TextColorDark = triangleA
@@ -1544,6 +1549,9 @@ func (g *Game) EnableTouchInput() {
 		return
 	}
 	g.TouchInput = true
+
+	g.keyboard.SetKeys(kibodo.KeysMobileQWERTY)
+	g.keyboard.SetExtendedKeys(kibodo.KeysMobileSymbols)
 
 	// Update layout.
 	g.forceLayout = true
