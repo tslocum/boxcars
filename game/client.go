@@ -48,7 +48,7 @@ func (c *Client) Connect() {
 }
 
 func (c *Client) logIn() []byte {
-	loginInfo := c.Username
+	loginInfo := strings.ReplaceAll(c.Username, " ", "_")
 	if c.Username != "" && c.Password != "" {
 		loginInfo = fmt.Sprintf("%s %s", strings.ReplaceAll(c.Username, " ", "_"), strings.ReplaceAll(c.Password, " ", "_"))
 	}
