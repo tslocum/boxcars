@@ -306,7 +306,7 @@ func (b *board) recreateInputGrid() {
 func (b *board) setKeyboardRect() {
 	inputAndButtons := 52
 	if game.TouchInput {
-		inputAndButtons = 52 + int(b.horizontalBorderSize) + game.scale(56)
+		inputAndButtons = 52 + int(b.horizontalBorderSize) + game.scale(baseButtonHeight)
 	}
 	h := game.screenH / 3
 	y := game.screenH - game.screenH/3 - inputAndButtons - int(b.horizontalBorderSize)
@@ -831,17 +831,23 @@ func (b *board) updateButtonRects() {
 	btnResign := b.buttons[4]
 	btnAccept := b.buttons[5]
 
-	w := game.scale(200)
+	w := game.scale(250)
 	if w > b.innerW/4 {
 		w = b.innerW / 4
 	}
-	h := game.scale(75)
-	if h > b.innerH/10 {
-		h = b.innerH / 10
+	if w > b.innerH/4 {
+		w = b.innerH / 4
+	}
+	h := game.scale(125)
+	if h > b.innerW/8 {
+		h = b.innerW / 8
+	}
+	if h > b.innerH/8 {
+		h = b.innerH / 8
 	}
 	x, y := int(b.horizontalBorderSize)+(b.innerW-w)/2, int(b.verticalBorderSize)+(b.innerH-h)/2
 
-	padding := game.scale(42)
+	padding := 75
 
 	if w >= b.innerW/8 {
 		btnReset.rect = image.Rect(x, y, x+w, y+h)
@@ -942,7 +948,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	inputAndButtons := 52
 	if game.TouchInput {
-		inputAndButtons = 52 + int(b.horizontalBorderSize) + game.scale(56)
+		inputAndButtons = 52 + int(b.horizontalBorderSize) + game.scale(baseButtonHeight)
 	}
 	matchStatus := 36
 	if game.scaleFactor >= 1.25 {
@@ -969,7 +975,7 @@ func (b *board) setRect(x, y, w, h int) {
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := 72 + 72 + 20 + game.scale(56)
+		dialogHeight := 72 + 72 + 20 + game.scale(baseButtonHeight)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}

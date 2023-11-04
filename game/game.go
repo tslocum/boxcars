@@ -38,6 +38,8 @@ const version = "v1.0.8"
 
 const MaxDebug = 1
 
+const baseButtonHeight = 46
+
 var onlyNumbers = regexp.MustCompile(`[0-9]+`)
 
 //go:embed asset
@@ -1430,9 +1432,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 
 	if ShowServerSettings {
-		connectGrid.SetRowSizes(60, 50, 50, 50, 100, g.scale(56))
+		connectGrid.SetRowSizes(60, 50, 50, 50, 100, g.scale(baseButtonHeight))
 	} else {
-		connectGrid.SetRowSizes(60, 50, 50, 100, g.scale(56))
+		connectGrid.SetRowSizes(60, 50, 50, 100, g.scale(baseButtonHeight))
 	}
 
 	{
@@ -1500,7 +1502,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
 	}
 
-	g.lobby.buttonBarHeight = g.scale(56)
+	g.lobby.buttonBarHeight = g.scale(baseButtonHeight)
 	g.setBufferRects()
 
 	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
