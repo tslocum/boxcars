@@ -242,8 +242,8 @@ func NewBoard() *board {
 			label:    gotext.Get("Roll"),
 			selected: b.selectRoll,
 		}, {
-			label:    gotext.Get("Reset"),
-			selected: b.selectReset,
+			label:    gotext.Get("Undo"),
+			selected: b.selectUndo,
 		}, {
 			label:    gotext.Get("OK"),
 			selected: b.selectOK,
@@ -366,8 +366,22 @@ func (b *board) selectOK() {
 	b.Client.Out <- []byte("ok")
 }
 
-func (b *board) selectReset() {
-	b.Client.Out <- []byte("reset")
+func (b *board) selectUndo() {
+	go func() {
+		b.Lock()
+		defer b.Unlock()
+		if b.gameState.Turn != b.gameState.PlayerNumber {
+			return
+		}
+		l := len(b.gameState.Moves)
+		if l == 0 {
+			return
+		}
+		lastMove := b.gameState.Moves[l-1]
+		b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", lastMove[1], lastMove[0]))
+		b.movePiece(lastMove[1], lastMove[0])
+		b.gameState.Moves = b.gameState.Moves[:l-1]
+	}()
 }
 
 func (b *board) selectDouble() {
@@ -1412,7 +1426,7 @@ func (b *board) Update() {
 	if b.dragging == nil {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
-		if b.playerTurn() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) && !handled && len(b.gameState.Available) > 0 {
+		if !handled && b.playerTurn() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			s, space := b.spriteAt(cx, cy)
 			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
 				b.startDrag(s, space)
@@ -1424,7 +1438,7 @@ func (b *board) Update() {
 			game.EnableTouchInput()
 			x, y := ebiten.TouchPosition(id)
 			handled := b.handleClick(x, y)
-			if !handled && b.playerTurn() && len(b.gameState.Available) > 0 {
+			if !handled && b.playerTurn() {
 				b.dragX, b.dragY = x, y
 
 				s, space := b.spriteAt(x, y)
