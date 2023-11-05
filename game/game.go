@@ -747,9 +747,6 @@ func NewGame() *Game {
 
 		listGamesFrame.SetPositionChildren(true)
 		listGamesFrame.AddChild(listGamesContainer)
-		frame := etk.NewFrame()
-		frame.AddChild(g.lobby.showKeyboardButton)
-		listGamesFrame.AddChild(frame)
 	}
 
 	g.setRoot(connectGrid)
@@ -1482,7 +1479,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.setBufferRects()
 
 	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
-	g.lobby.showKeyboardButton.SetRect(image.Rect(g.screenW-400, 0, g.screenW, int(2+game.lobby.entryH)))
+	g.lobby.showKeyboardButton.SetRect(image.Rect(g.screenW-400, 0, g.screenW, int(76)))
 
 	if g.screenW > 200 {
 		statusBuffer.SetPadding(4)
