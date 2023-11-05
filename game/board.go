@@ -438,10 +438,7 @@ func (b *board) updateBackgroundImage() {
 	gc := draw2dimg.NewGraphicContext(b.baseImage)
 	offsetX, offsetY := float64(b.horizontalBorderSize), float64(b.verticalBorderSize)
 	for i := 0; i < 2; i++ {
-		if i == 1 {
-			offsetY = -offsetY - 1
-		}
-		triangleTip := (float64(b.h) - (b.verticalBorderSize * 2)) / 2
+		triangleTip := float64(b.innerH) / 2
 		if i == 0 {
 			triangleTip -= b.triangleOffset
 		} else {
@@ -460,7 +457,7 @@ func (b *board) updateBackgroundImage() {
 			}
 
 			tx := b.spaceWidth * float64(j)
-			ty := b.h * i
+			ty := b.innerH * i
 			if j >= 6 {
 				tx += b.barWidth
 			}
@@ -932,6 +929,8 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.innerW = int(float64(b.w) - (b.horizontalBorderSize * 2))
 	b.innerH = int(float64(b.h) - (b.verticalBorderSize * 2))
+
+	b.triangleOffset = (float64(b.innerH)+b.verticalBorderSize-b.spaceWidth*10)/2 + b.spaceWidth/12
 
 	loadImageAssets(int(b.spaceWidth))
 
