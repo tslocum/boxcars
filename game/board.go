@@ -273,9 +273,18 @@ func (b *board) fontUpdated() {
 	b.lineHeight = m.Height.Round()
 	b.lineOffset = m.Ascent.Round()
 
-	statusBuffer.SetFont(b.fontFace)
-	gameBuffer.SetFont(b.fontFace)
-	inputBuffer.Field.SetFont(b.fontFace)
+	bufferFont := b.fontFace
+	if game.scaleFactor <= 1 {
+		switch b.fontFace {
+		case largeFont:
+			bufferFont = mediumFont
+		case mediumFont:
+			bufferFont = smallFont
+		}
+	}
+	statusBuffer.SetFont(bufferFont)
+	gameBuffer.SetFont(bufferFont)
+	inputBuffer.Field.SetFont(bufferFont)
 
 	b.timerLabel.SetFont(b.fontFace)
 	b.clockLabel.SetFont(b.fontFace)

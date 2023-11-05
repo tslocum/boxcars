@@ -74,7 +74,7 @@ var (
 
 const maxStatusWidthRatio = 0.5
 
-const bufferCharacterWidth = 54
+const bufferCharacterWidth = 40
 
 const (
 	minWidth  = 320
@@ -160,30 +160,6 @@ func lg(s string) {
 	_, _ = gameBuffer.Write([]byte(m))
 	gameLogged = true
 	scheduleFrame()
-}
-
-var defaultFontFace font.Face
-
-func defaultFont() font.Face {
-	if defaultFontFace != nil {
-		return defaultFontFace
-	}
-
-	tt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	const dpi = 72
-	defaultFontFace, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    16,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	return defaultFontFace
 }
 
 func init() {
@@ -1446,7 +1422,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	etk.Layout(g.screenW, g.screenH)
 
-	bufferWidth := etk.BoundString(defaultFont(), strings.Repeat("A", bufferCharacterWidth)).Dx()
+	bufferWidth := etk.BoundString(g.Board.fontFace, strings.Repeat("A", bufferCharacterWidth)).Dx()
 	if bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
