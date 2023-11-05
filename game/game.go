@@ -1086,6 +1086,18 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 			}
 		}
 	}
+
+	if !viewBoard && (g.lobby.showCreateGame || g.lobby.showJoinGame) {
+		for _, key := range keys {
+			if key == ebiten.KeyEnter || key == ebiten.KeyKPEnter {
+				if g.lobby.showCreateGame {
+					g.lobby.confirmCreateGame()
+				} else {
+					g.lobby.confirmJoinGame()
+				}
+			}
+		}
+	}
 	return nil
 }
 

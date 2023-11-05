@@ -173,6 +173,22 @@ func (l *lobby) getButtons() []*lobbyButton {
 	return mainButtons
 }
 
+func (l *lobby) confirmCreateGame() {
+	typeAndPassword := "public"
+	if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
+		typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
+	}
+	points, err := strconv.Atoi(game.lobby.createGamePoints.Text())
+	if err != nil {
+		points = 1
+	}
+	l.c.Out <- []byte(fmt.Sprintf("c %s %d %s", typeAndPassword, points, game.lobby.createGameName.Text()))
+}
+
+func (l *lobby) confirmJoinGame() {
+	l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
+}
+
 func (l *lobby) selectButton(buttonIndex int) func() error {
 	return func() error {
 		if l.showCreateGame {
@@ -185,15 +201,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				l.rebuildButtonsGrid()
 				game.setRoot(listGamesFrame)
 			case lobbyButtonCreateConfirm:
-				typeAndPassword := "public"
-				if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
-					typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
-				}
-				points, err := strconv.Atoi(game.lobby.createGamePoints.Text())
-				if err != nil {
-					points = 1
-				}
-				l.c.Out <- []byte(fmt.Sprintf("c %s %d %s", typeAndPassword, points, game.lobby.createGameName.Text()))
+				l.confirmCreateGame()
 			}
 			return nil
 		} else if l.showJoinGame {
@@ -207,7 +215,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 					game.setRoot(listGamesFrame)
 				}
 			} else {
-				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
+				l.confirmJoinGame()
 			}
 			return nil
 		}
@@ -459,24 +467,7 @@ func (l *lobby) click(x, y int) {
 }
 
 func (l *lobby) update() {
-	if l.showCreateGame || l.showJoinGame {
-		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-			if l.showCreateGame {
-				typeAndPassword := "public"
-				if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
-					typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
-				}
-				points, err := strconv.Atoi(game.lobby.createGamePoints.Text())
-				if err != nil {
-					points = 1
-				}
-				l.c.Out <- []byte(fmt.Sprintf("c %s %d %s", typeAndPassword, points, game.lobby.createGameName.Text()))
-			} else {
-				l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
-			}
-			return
-		}
-	} else {
+	if !l.showCreateGame && !l.showJoinGame {
 		scrollLength := 3
 
 		if _, y := ebiten.Wheel(); y != 0 {
