@@ -55,19 +55,25 @@ msgstr ""
 msgid "Hide Keyboard"
 msgstr ""
 
+msgid "Highlight legal moves"
+msgstr ""
+
 msgid "Join match"
 msgstr ""
 
 msgid "Join match: %s"
 msgstr ""
 
-msgid "Leave Match"
+msgid "Leave"
 msgstr ""
 
 msgid "Leave match?"
 msgstr ""
 
 msgid "Legal moves: %s"
+msgstr ""
+
+msgid "Menu"
 msgstr ""
 
 msgid "Name"
@@ -88,10 +94,10 @@ msgstr ""
 msgid "Points"
 msgstr ""
 
-msgid "Reset"
+msgid "Resign"
 msgstr ""
 
-msgid "Resign"
+msgid "Return"
 msgstr ""
 
 msgid "Roll"
@@ -100,10 +106,16 @@ msgstr ""
 msgid "Server"
 msgstr ""
 
+msgid "Settings"
+msgstr ""
+
 msgid "Show Keyboard"
 msgstr ""
 
 msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
+msgstr ""
+
+msgid "Undo"
 msgstr ""
 
 msgid "Username"
