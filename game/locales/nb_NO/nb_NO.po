@@ -1,0 +1,176 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2023-11-03 10:42+0000\n"
+"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
+"Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/bgammon/"
+"boxcars/nb_NO/>\n"
+"Language: nb_NO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.2-dev\n"
+
+#: game/game.go:824
+msgid "%s joined the match."
+msgstr "%s tok del i spillet."
+
+#: game/game.go:844
+msgid "%s left the match."
+msgstr "%s forlot spillet."
+
+#: game/game.go:877
+msgid "%s moved %s."
+msgstr "%s flyttet %s."
+
+#: game/game.go:873
+msgid "%s rolled %s."
+msgstr "%s rullet %s."
+
+#: game/game.go:900
+msgid "%s wins!"
+msgstr "%s vant."
+
+#: game/board.go:153
+msgid "Accept"
+msgstr "Godta"
+
+#: game/game.go:589
+msgid "Connect"
+msgstr "Koble til"
+
+#: game/game.go:916
+msgid "Connecting..."
+msgstr "Kobler til …"
+
+#: game/game.go:642
+msgid "Create match"
+msgstr "Opprett spill"
+
+#: game/board.go:147
+msgid "Double"
+msgstr "Dobling"
+
+#: game/game.go:828
+#, fuzzy
+msgid "Failed to join match: %s"
+msgstr "Klarte ikke å ta del i spill: %s"
+
+#: game/game.go:830
+#, fuzzy
+msgid "Failed to leave match: %s"
+msgstr "Klarte ikke å forlate spill: %s"
+
+#: game/game.go:894
+#, fuzzy
+msgid "Failed to move checker%s: %s"
+msgstr "Klarte ikke å flytte brikke%s: %s"
+
+#: game/game.go:898
+#, fuzzy
+msgid "Failed to submit moves: %s"
+msgstr "Klarte ikke å sende inn trekk: %s"
+
+#: game/board.go:237
+#: game/game.go:605
+#: game/lobby.go:143
+msgid "Hide Keyboard"
+msgstr "Skjul tastatur"
+
+#: game/game.go:687
+msgid "Join match"
+msgstr "Ta del i spill"
+
+#: game/lobby.go:266
+#: game/lobby.go:465
+msgid "Join match: %s"
+msgstr "Ta del i spill: %s"
+
+#: game/board.go:189
+msgid "Leave Match"
+msgstr "Forlat spillet"
+
+#: game/board.go:113
+msgid "Leave match?"
+msgstr "Forlat spillet?"
+
+#: game/game.go:895
+msgid "Legal moves: %s"
+msgstr "Lovlige trekk: %s"
+
+#: game/game.go:643
+msgid "Name"
+msgstr "Navn"
+
+#: game/lobby.go:356
+msgid "No matches available. Please create one."
+msgstr "Ingen spill tilgjengelig. Opprett ett."
+
+#: game/board.go:119
+msgid "No"
+msgstr "Nei"
+
+#: game/board.go:144
+msgid "OK"
+msgstr "OK"
+
+#: game/game.go:587
+#: game/game.go:645
+#: game/game.go:689
+msgid "Password"
+msgstr "Passord"
+
+#: game/game.go:644
+msgid "Points"
+msgstr "Poeng"
+
+#: game/board.go:141
+msgid "Reset"
+msgstr "Tilbakestill"
+
+#: game/board.go:150
+msgid "Resign"
+msgstr "Gi opp"
+
+#: game/board.go:138
+msgid "Roll"
+msgstr "Kast terninger"
+
+#: game/board.go:124
+#: game/board.go:233
+#: game/game.go:427
+#: game/game.go:428
+#: game/game.go:429
+#: game/game.go:596
+#: game/game.go:599
+#: game/game.go:600
+#: game/game.go:601
+#: game/game.go:919
+#: game/game.go:920
+#: game/game.go:921
+#: game/lobby.go:119
+#: game/lobby.go:139
+msgid "Show Keyboard"
+msgstr "Vis tastatur"
+
+#: game/game.go:610
+#, fuzzy
+msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
+msgstr "Kun angi brukernavn (uten passord) hvis du vil logge inn som gjest."
+
+#: game/game.go:586
+msgid "Username"
+msgstr "Brukernavn"
+
+#: game/game.go:904
+msgid "Warning: Received unknown event: %+v"
+msgstr "Advarsel: Mottok ukjent begivenhet: %s+v"
+
+#: game/board.go:120
+msgid "Yes"
+msgstr "Ja"
+
+#: game/game.go:905
+#, fuzzy
+msgid "You may need to upgrade your client."
+msgstr "Det kan hende du må installere en nyere versjon av programmet."

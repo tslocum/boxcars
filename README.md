@@ -1,6 +1,6 @@
 # boxcars - Graphical client for [bgammon.org](https://bgammon.org)
+[![Translate](https://hosted.weblate.org/widgets/meditation-assistant/-/svg-badge.svg)](https://hosted.weblate.org/projects/bgammon/boxcars/)
 [![Donate via LiberaPay](https://img.shields.io/liberapay/receives/rocket9labs.com.svg?logo=liberapay)](https://liberapay.com/rocket9labs.com)
-[![Donate via Patreon](https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F5252223)](https://www.patreon.com/rocketnine)
 
 ## Play
 
@@ -29,6 +29,10 @@ Run the following command:
 `go install code.rocket9labs.com/tslocum/boxcars@latest`
 
 Run `~/go/bin/boxcars` to play.
+
+## Translate
+
+Translation is handled [online](https://hosted.weblate.org/projects/bgammon/boxcars/).
 
 ## Support
 
