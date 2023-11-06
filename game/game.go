@@ -1665,3 +1665,9 @@ func randomizeByteSlice(b [][]byte) {
 		b[i], b[j] = b[j], b[i]
 	}
 }
+
+// Short description.
+var _ = gotext.Get("Play backgammon online via bgammon.org")
+
+// Long description.
+var _ = gotext.Get("Boxcars is a client for playing backgammon via bgammon.org, a free and open source backgammon service.")

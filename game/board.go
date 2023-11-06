@@ -21,12 +21,6 @@ import (
 	"golang.org/x/image/font"
 )
 
-type boardButton struct {
-	label    string
-	selected func()
-	rect     image.Rectangle
-}
-
 type board struct {
 	x, y int
 	w, h int
@@ -67,9 +61,15 @@ type board struct {
 
 	dragX, dragY int
 
-	buttons []*boardButton
-
 	spaceHighlight *ebiten.Image
+
+	buttonsGrid             *etk.Grid
+	buttonsOnlyRollGrid     *etk.Grid
+	buttonsOnlyUndoGrid     *etk.Grid
+	buttonsOnlyOKGrid       *etk.Grid
+	buttonsDoubleRollGrid   *etk.Grid
+	buttonsResignAcceptGrid *etk.Grid
+	buttonsUndoOKGrid       *etk.Grid
 
 	opponentLabel *Label
 	playerLabel   *Label
@@ -125,22 +125,31 @@ func NewBoard() *board {
 		gameState: &bgammon.GameState{
 			Game: bgammon.NewGame(),
 		},
-		spaceHighlight:        ebiten.NewImage(1, 1),
-		opponentLabel:         NewLabel(color.RGBA{255, 255, 255, 255}),
-		playerLabel:           NewLabel(color.RGBA{0, 0, 0, 255}),
-		menuGrid:              etk.NewGrid(),
-		settingsGrid:          etk.NewGrid(),
-		uiGrid:                etk.NewGrid(),
-		frame:                 etk.NewFrame(),
-		confirmLeaveGameFrame: etk.NewFrame(),
-		fontFace:              mediumFont,
-		Mutex:                 &sync.Mutex{},
+		spaceHighlight:          ebiten.NewImage(1, 1),
+		opponentLabel:           NewLabel(color.RGBA{255, 255, 255, 255}),
+		playerLabel:             NewLabel(color.RGBA{0, 0, 0, 255}),
+		buttonsGrid:             etk.NewGrid(),
+		buttonsOnlyRollGrid:     etk.NewGrid(),
+		buttonsOnlyUndoGrid:     etk.NewGrid(),
+		buttonsOnlyOKGrid:       etk.NewGrid(),
+		buttonsDoubleRollGrid:   etk.NewGrid(),
+		buttonsResignAcceptGrid: etk.NewGrid(),
+		buttonsUndoOKGrid:       etk.NewGrid(),
+		menuGrid:                etk.NewGrid(),
+		settingsGrid:            etk.NewGrid(),
+		uiGrid:                  etk.NewGrid(),
+		frame:                   etk.NewFrame(),
+		confirmLeaveGameFrame:   etk.NewFrame(),
+		fontFace:                mediumFont,
+		Mutex:                   &sync.Mutex{},
 	}
 
 	b.bearOffOverlay = etk.NewButton(gotext.Get("Drag here to bear off"), func() error {
 		return nil
 	})
 	b.bearOffOverlay.SetVisible(false)
+
+	b.recreateButtonGrid()
 
 	{
 		b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.hideMenu), 0, 0, 1, 1)
@@ -227,37 +236,29 @@ func NewBoard() *board {
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 5, 1, 1)
 	b.uiGrid.AddChildAt(b.inputGrid, 0, 6, 1, 1)
 
-	b.frame.AddChild(b.opponentLabel)
-	b.frame.AddChild(b.playerLabel)
-	b.frame.AddChild(b.uiGrid)
-	b.frame.AddChild(b.bearOffOverlay)
-	b.frame.AddChild(b.menuGrid)
-	b.frame.AddChild(b.settingsGrid)
-	b.frame.AddChild(b.leaveGameGrid)
+	b.frame.SetPositionChildren(true)
+
+	{
+		f := etk.NewFrame()
+		f.AddChild(b.opponentLabel)
+		f.AddChild(b.opponentLabel)
+		f.AddChild(b.playerLabel)
+		f.AddChild(b.uiGrid)
+		f.AddChild(b.bearOffOverlay)
+		b.frame.AddChild(f)
+	}
+
+	b.frame.AddChild(b.buttonsGrid)
+
+	{
+		f := etk.NewFrame()
+		f.AddChild(b.menuGrid)
+		f.AddChild(b.settingsGrid)
+		f.AddChild(b.leaveGameGrid)
+		b.frame.AddChild(f)
+	}
 
 	b.fontUpdated()
-
-	b.buttons = []*boardButton{
-		{
-			label:    gotext.Get("Roll"),
-			selected: b.selectRoll,
-		}, {
-			label:    gotext.Get("Undo"),
-			selected: b.selectUndo,
-		}, {
-			label:    gotext.Get("OK"),
-			selected: b.selectOK,
-		}, {
-			label:    gotext.Get("Double"),
-			selected: b.selectDouble,
-		}, {
-			label:    gotext.Get("Resign"),
-			selected: b.selectResign,
-		}, {
-			label:    gotext.Get("Accept"),
-			selected: b.selectOK,
-		},
-	}
 
 	for i := range b.Sprites.sprites {
 		b.Sprites.sprites[i] = b.newSprite(false)
@@ -310,6 +311,93 @@ func (b *board) recreateInputGrid() {
 	} else {
 		b.inputGrid.AddChildAt(inputBuffer, 0, 0, 1, 1)
 	}
+}
+
+func (b *board) showButtonGrid(buttonGrid *etk.Grid) {
+	b.buttonsOnlyRollGrid.SetVisible(false)
+	b.buttonsOnlyUndoGrid.SetVisible(false)
+	b.buttonsOnlyOKGrid.SetVisible(false)
+	b.buttonsDoubleRollGrid.SetVisible(false)
+	b.buttonsResignAcceptGrid.SetVisible(false)
+	b.buttonsUndoOKGrid.SetVisible(false)
+	if buttonGrid == nil {
+		b.buttonsGrid.SetVisible(false)
+		return
+	}
+
+	grid := etk.NewGrid()
+	grid.SetColumnSizes(b.w, -1)
+	grid.SetRowSizes(b.h, -1)
+	grid.AddChildAt(buttonGrid, 0, 0, 1, 1)
+
+	buttonGrid.SetVisible(true)
+
+	*b.buttonsGrid = *grid
+}
+
+func (b *board) recreateButtonGrid() {
+	buttonGrid := func(reverse bool, widgets ...etk.Widget) *etk.Grid {
+		w := game.scale(250)
+		if w > b.innerW/4 {
+			w = b.innerW / 4
+		}
+		if w > b.innerH/4 {
+			w = b.innerH / 4
+		}
+		h := game.scale(125)
+		if h > b.innerW/8 {
+			h = b.innerW / 8
+		}
+		if h > b.innerH/8 {
+			h = b.innerH / 8
+		}
+		padding := int(b.barWidth - b.horizontalBorderSize*2)
+		if padding < 0 {
+			padding = 0
+		}
+
+		grid := etk.NewGrid()
+		grid.SetColumnSizes(-1, w, -1, padding, -1, w, -1, w, -1)
+		grid.SetRowSizes(-1, h+75, h, -1)
+		x := 1
+		for i, w := range widgets {
+			if !reverse && len(widgets) == 1 {
+				x += 2
+				i++
+			}
+			if i == 1 {
+				x += 2
+			}
+			grid.AddChildAt(w, x, 2, 1, 1)
+			x += 2
+			if reverse && len(widgets) == 1 {
+				x += 4
+			}
+		}
+		grid.AddChildAt(etk.NewBox(), x-1, 2, 1, 1)
+		grid.AddChildAt(etk.NewBox(), x-1, 3, 1, 1)
+		return grid
+	}
+
+	button := func(label string, onSelected func() error) *etk.Button {
+		btn := etk.NewButton(label, onSelected)
+		btn.Label.SetFont(largeFont)
+		return btn
+	}
+
+	doubleButton := button(gotext.Get("Double"), b.selectDouble)
+	rollButton := button(gotext.Get("Roll"), b.selectRoll)
+	undoButton := button(gotext.Get("Undo"), b.selectUndo)
+	okButton := button(gotext.Get("OK"), b.selectOK)
+	resignButton := button(gotext.Get("Resign"), b.selectResign)
+	acceptButton := button(gotext.Get("Accept"), b.selectOK)
+
+	*b.buttonsOnlyRollGrid = *buttonGrid(false, rollButton)
+	*b.buttonsOnlyUndoGrid = *buttonGrid(true, undoButton)
+	*b.buttonsOnlyOKGrid = *buttonGrid(false, okButton)
+	*b.buttonsDoubleRollGrid = *buttonGrid(false, doubleButton, rollButton)
+	*b.buttonsResignAcceptGrid = *buttonGrid(false, resignButton, acceptButton)
+	*b.buttonsUndoOKGrid = *buttonGrid(false, undoButton, okButton)
 }
 
 func (b *board) setKeyboardRect() {
@@ -367,15 +455,17 @@ func (b *board) toggleKeyboard() error {
 	return nil
 }
 
-func (b *board) selectRoll() {
+func (b *board) selectRoll() error {
 	b.Client.Out <- []byte("roll")
+	return nil
 }
 
-func (b *board) selectOK() {
+func (b *board) selectOK() error {
 	b.Client.Out <- []byte("ok")
+	return nil
 }
 
-func (b *board) selectUndo() {
+func (b *board) selectUndo() error {
 	go func() {
 		b.Lock()
 		defer b.Unlock()
@@ -391,14 +481,17 @@ func (b *board) selectUndo() {
 		b.movePiece(lastMove[1], lastMove[0])
 		b.gameState.Moves = b.gameState.Moves[:l-1]
 	}()
+	return nil
 }
 
-func (b *board) selectDouble() {
+func (b *board) selectDouble() error {
 	b.Client.Out <- []byte("double")
+	return nil
 }
 
-func (b *board) selectResign() {
+func (b *board) selectResign() error {
 	b.Client.Out <- []byte("resign")
+	return nil
 }
 
 func (b *board) toggleHighlightCheckbox() error {
@@ -590,19 +683,6 @@ func (b *board) drawButton(target *ebiten.Image, r image.Rectangle, label string
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(r.Min.X), float64(r.Min.Y))
 	target.DrawImage(img, op)
-}
-
-func (b *board) drawButtons(screen *ebiten.Image) {
-	for i, btn := range b.buttons {
-		if (i == 0 && b.gameState.MayRoll()) ||
-			(i == 1 && b.gameState.MayReset()) ||
-			(i == 2 && b.gameState.MayOK()) ||
-			(i == 3 && b.gameState.MayDouble()) ||
-			(i == 4 && b.gameState.MayResign()) ||
-			(i == 5 && (b.gameState.MayOK() && b.gameState.MayResign())) {
-			b.drawButton(screen, btn.rect, btn.label)
-		}
-	}
 }
 
 func (b *board) drawSprite(target *ebiten.Image, sprite *Sprite) {
@@ -830,8 +910,6 @@ func (b *board) Draw(screen *ebiten.Image) {
 			}
 		}
 	}
-
-	b.drawButtons(screen)
 }
 
 func (b *board) drawDraggedCheckers(screen *ebiten.Image) {
@@ -843,68 +921,9 @@ func (b *board) drawDraggedCheckers(screen *ebiten.Image) {
 	}
 }
 
-func (b *board) updateButtonRects() {
-	btnRoll := b.buttons[0]
-	btnReset := b.buttons[1]
-	btnOK := b.buttons[2]
-	btnDouble := b.buttons[3]
-	btnResign := b.buttons[4]
-	btnAccept := b.buttons[5]
-
-	w := game.scale(250)
-	if w > b.innerW/4 {
-		w = b.innerW / 4
-	}
-	if w > b.innerH/4 {
-		w = b.innerH / 4
-	}
-	h := game.scale(125)
-	if h > b.innerW/8 {
-		h = b.innerW / 8
-	}
-	if h > b.innerH/8 {
-		h = b.innerH / 8
-	}
-	x, y := int(b.horizontalBorderSize)+(b.innerW-w)/2, int(b.verticalBorderSize)+(b.innerH-h)/2
-
-	padding := 75
-
-	if w >= b.innerW/8 {
-		btnReset.rect = image.Rect(x, y, x+w, y+h)
-		btnRoll.rect = image.Rect(x, y, x+w, y+h)
-		btnResign.rect = image.Rect(x, y+h+padding/2, x+w, y+h+padding/2+h)
-		btnOK.rect = image.Rect(x, y, x+w, y+h)
-		btnAccept.rect = image.Rect(x, y, x+w, y+h)
-
-		if b.gameState.MayDouble() && b.gameState.MayRoll() {
-			y -= h/2 + padding/2
-			btnDouble.rect = image.Rect(x, y+h+padding/2, x+w, y+h+padding/2+h)
-			btnRoll.rect = image.Rect(x, y, x+w, y+h)
-		} else if b.gameState.MayReset() && b.gameState.MayOK() {
-			y -= h/2 + padding/2
-			btnReset.rect = image.Rect(x, y+h+padding/2, x+w, y+h+padding/2+h)
-			btnOK.rect = image.Rect(x, y, x+w, y+h)
-		}
-		return
-	}
-
-	btnReset.rect = image.Rect(x, y, x+w, y+h)
-	btnRoll.rect = image.Rect(x, y, x+w, y+h)
-	btnResign.rect = image.Rect(x-w/2-padding/2, y, x+w/2-padding/2, y+h)
-	btnOK.rect = image.Rect(x, y, x+w, y+h)
-	btnAccept.rect = image.Rect(x+w/2+padding/2, y, x+w/2+w+padding/2, y+h)
-
-	if b.gameState.MayDouble() && b.gameState.MayRoll() {
-		btnDouble.rect = image.Rect(x-w/2-padding/2, y, x+w/2-padding/2, y+h)
-		btnRoll.rect = image.Rect(x+w/2+padding/2, y, x+w/2+w+padding/2, y+h)
-	} else if b.gameState.MayReset() && b.gameState.MayOK() {
-		btnReset.rect = image.Rect(x-w/2-padding/2, y, x+w/2-padding/2, y+h)
-		btnOK.rect = image.Rect(x+w/2+padding/2, y, x+w/2+w+padding/2, y+h)
-	}
-}
-
 func (b *board) setRect(x, y, w, h int) {
 	if OptimizeSetRect && b.x == x && b.y == y && b.w == w && b.h == h {
+		b.recreateButtonGrid()
 		return
 	}
 
@@ -924,7 +943,6 @@ func (b *board) setRect(x, y, w, h int) {
 	if b.w > b.h {
 		b.w = b.h
 	}
-	b.updateButtonRects()
 
 	b.triangleOffset = (float64(b.h) - (b.verticalBorderSize * 2)) / 15
 
@@ -964,9 +982,8 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.setSpaceRects()
 	b.updateBackgroundImage()
-	b.processState()
-
 	b.recreateInputGrid()
+	b.processState()
 
 	inputAndButtons := 52
 	if game.TouchInput {
@@ -1022,6 +1039,8 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.updateOpponentLabel()
 	b.updatePlayerLabel()
+
+	b.recreateButtonGrid()
 
 	b.menuGrid.SetColumnSizes(-1, game.scale(10), -1, game.scale(10), -1)
 
@@ -1246,8 +1265,27 @@ func (b *board) processState() {
 		b.setSpaceRects()
 		b.updateBackgroundImage()
 	}
-	b.updateButtonRects()
 	b.lastPlayerNumber = b.gameState.PlayerNumber
+
+	var showGrid *etk.Grid
+	if b.gameState.MayRoll() {
+		if b.gameState.MayDouble() {
+			showGrid = b.buttonsDoubleRollGrid
+		} else {
+			showGrid = b.buttonsOnlyRollGrid
+		}
+	} else if b.gameState.MayOK() {
+		if b.gameState.MayResign() {
+			showGrid = b.buttonsResignAcceptGrid
+		} else if len(b.gameState.Moves) != 0 {
+			showGrid = b.buttonsUndoOKGrid
+		} else {
+			showGrid = b.buttonsOnlyOKGrid
+		}
+	} else if b.gameState.Winner == 0 && b.gameState.Turn != 0 && b.gameState.Turn == b.gameState.PlayerNumber && len(b.gameState.Moves) != 0 {
+		showGrid = b.buttonsOnlyUndoGrid
+	}
+	b.showButtonGrid(showGrid)
 
 	b.Sprites = &Sprites{}
 	b.spaceSprites = make([][]*Sprite, bgammon.BoardSpaces)
@@ -1387,25 +1425,6 @@ func (b *board) playerTurn() bool {
 	return b.playingGame() && (b.gameState.MayRoll() || b.gameState.Turn == b.gameState.PlayerNumber)
 }
 
-func (b *board) handleClick(x int, y int) bool {
-	p := image.Point{x, y}
-	for i := len(b.buttons) - 1; i >= 0; i-- {
-		btn := b.buttons[i]
-		if (i == 0 && b.gameState.MayRoll()) ||
-			(i == 1 && b.gameState.MayReset()) ||
-			(i == 2 && b.gameState.MayOK()) ||
-			(i == 3 && b.gameState.MayDouble()) ||
-			(i == 4 && b.gameState.MayResign()) ||
-			(i == 5 && (b.gameState.MayOK() && b.gameState.MayResign())) {
-			if p.In(btn.rect) {
-				btn.selected()
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func (b *board) startDrag(s *Sprite, space int) {
 	b.dragging = s
 	b.draggingSpace = space
@@ -1428,10 +1447,6 @@ func (b *board) Update() {
 		}
 	}
 
-	if b.dragging == nil && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		handled = b.handleClick(cx, cy)
-	}
-
 	if b.dragging == nil {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 
@@ -1446,8 +1461,7 @@ func (b *board) Update() {
 		for _, id := range b.touchIDs {
 			game.EnableTouchInput()
 			x, y := ebiten.TouchPosition(id)
-			handled := b.handleClick(x, y)
-			if !handled && b.playerTurn() {
+			if b.playerTurn() {
 				b.dragX, b.dragY = x, y
 
 				s, space := b.spriteAt(x, y)

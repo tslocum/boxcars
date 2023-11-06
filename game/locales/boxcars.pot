@@ -25,6 +25,9 @@ msgstr ""
 msgid "Accept"
 msgstr ""
 
+msgid "Boxcars is a client for playing backgammon via bgammon.org, a free and open source backgammon service."
+msgstr ""
+
 msgid "Connect"
 msgstr ""
 
@@ -89,6 +92,9 @@ msgid "OK"
 msgstr ""
 
 msgid "Password"
+msgstr ""
+
+msgid "Play backgammon online via bgammon.org"
 msgstr ""
 
 msgid "Points"

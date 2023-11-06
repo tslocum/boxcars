@@ -4,8 +4,8 @@ code.rocket9labs.com/tslocum/etk v0.0.0-20231103045149-354a405635ac h1:2eCpRxkdj
 code.rocket9labs.com/tslocum/etk v0.0.0-20231103045149-354a405635ac/go.mod h1:/NKTqYGNoES3oQNXbxn665TgcSPrVLc7qBZwz18HlYo=
 code.rocketnine.space/tslocum/kibodo v1.0.2 h1:0RfvVz+IUku8MFx9wvDb+p8byns5gAjQLUo4ZenWP44=
 code.rocketnine.space/tslocum/kibodo v1.0.2/go.mod h1:mAYs1JKFnWlRFzo9BtteAlwjKdk1MIKgEyhQaPdeQDI=
-code.rocketnine.space/tslocum/messeji v1.0.5-0.20231102191237-a6fd28a6b52d h1:+/yDwjXqp7aKxDEYAKmWJfGNO7uOeo0nraj4aL8zUfQ=
-code.rocketnine.space/tslocum/messeji v1.0.5-0.20231102191237-a6fd28a6b52d/go.mod h1:xszLyTZtpyjCVaGmznizLSAlnvraPOSoanlzUBeqGco=
+code.rocketnine.space/tslocum/messeji v1.0.5 h1:aIQ6dYgIzqyv2AFtVHVNNTNZEum+2m8wTBBK/0Vev8g=
+code.rocketnine.space/tslocum/messeji v1.0.5/go.mod h1:xszLyTZtpyjCVaGmznizLSAlnvraPOSoanlzUBeqGco=
 github.com/ebitengine/oto/v3 v3.1.0 h1:9tChG6rizyeR2w3vsygTTTVVJ9QMMyu00m2yBOCch6U=
 github.com/ebitengine/oto/v3 v3.1.0/go.mod h1:IK1QTnlfZK2GIB6ziyECm433hAdTaPpOsGMLhEyEGTg=
 github.com/ebitengine/purego v0.5.0 h1:JrMGKfRIAM4/QVKaesIIT7m/UVjTj5GYhRSQYwfVdpo=
