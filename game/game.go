@@ -454,6 +454,8 @@ func setViewBoard(view bool) {
 		game.Board.menuGrid.SetVisible(false)
 		game.Board.settingsGrid.SetVisible(false)
 		game.Board.leaveGameGrid.SetVisible(false)
+
+		statusBuffer.SetRect(statusBuffer.Rect())
 	}
 
 	scheduleFrame()

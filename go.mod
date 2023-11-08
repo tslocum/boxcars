@@ -6,7 +6,7 @@ require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231103194829-7e7aed577632
 	code.rocket9labs.com/tslocum/etk v0.0.0-20231108221136-e826b3e7fc6b
 	code.rocketnine.space/tslocum/kibodo v1.0.2
-	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231108013522-08fa5fbe2882
+	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231108225635-7a691903039e
 	github.com/hajimehoshi/ebiten/v2 v2.6.2
 	github.com/leonelquinteros/gotext v1.5.2
 	github.com/llgcode/draw2d v0.0.0-20231022063514-1acb54133d2a
