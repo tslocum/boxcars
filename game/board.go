@@ -108,6 +108,8 @@ type board struct {
 	highlightAvailable bool
 	availableMoves     [][]int
 
+	widget *BoardWidget
+
 	*sync.Mutex
 }
 
@@ -149,6 +151,7 @@ func NewBoard() *board {
 		chatGrid:                etk.NewGrid(),
 		floatChatGrid:           etk.NewGrid(),
 		floatInputGrid:          etk.NewGrid(),
+		widget:                  NewBoardWidget(),
 		fontFace:                mediumFont,
 		Mutex:                   &sync.Mutex{},
 	}
@@ -248,6 +251,7 @@ func NewBoard() *board {
 
 	{
 		f := etk.NewFrame()
+		f.AddChild(b.widget)
 		f.AddChild(b.opponentLabel)
 		f.AddChild(b.opponentLabel)
 		f.AddChild(b.playerLabel)
@@ -1456,55 +1460,9 @@ func (b *board) startDrag(s *Sprite, space int) {
 	}
 }
 
-func (b *board) Update() {
-	if b.Client == nil {
-		return
-	}
-
-	var handled bool
-	cx, cy := ebiten.CursorPosition()
-	if (cx != 0 || cy != 0) && game.keyboard.Visible() {
-		p := image.Point{X: cx, Y: cy}
-		if p.In(game.keyboard.Rect()) {
-			return
-		}
-	}
-
+func (b *board) finishDrag(x int, y int) {
 	if b.dragging == nil {
-		// TODO allow grabbing multiple pieces by grabbing further down the stack
-
-		if !handled && b.playerTurn() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			s, space := b.spriteAt(cx, cy)
-			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
-				b.startDrag(s, space)
-			}
-		}
-
-		b.touchIDs = inpututil.AppendJustPressedTouchIDs(b.touchIDs[:0])
-		for _, id := range b.touchIDs {
-			game.EnableTouchInput()
-			x, y := ebiten.TouchPosition(id)
-			if b.playerTurn() {
-				b.dragX, b.dragY = x, y
-
-				s, space := b.spriteAt(x, y)
-				if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
-					b.startDrag(s, space)
-					b.dragTouchId = id
-				}
-			}
-		}
-	}
-
-	x, y := ebiten.CursorPosition()
-	if b.dragTouchId != -1 {
-		x, y = ebiten.TouchPosition(b.dragTouchId)
-
-		if x != 0 || y != 0 { // 0,0 is returned when the touch is released
-			b.dragX, b.dragY = x, y
-		} else {
-			x, y = b.dragX, b.dragY
-		}
+		return
 	}
 
 	var dropped *Sprite
@@ -1520,6 +1478,13 @@ func (b *board) Update() {
 		b.bearOffOverlay.SetVisible(false)
 	}
 	if dropped != nil {
+		if x == 0 && y == 0 {
+			x, y = ebiten.CursorPosition()
+			if x == 0 && y == 0 {
+				x, y = b.dragX, b.dragY
+			}
+		}
+
 		index := b.spaceAt(x, y)
 		// Bear off by dragging outside the board.
 		if index == -1 {
@@ -1548,12 +1513,10 @@ func (b *board) Update() {
 			scheduleFrame()
 		}
 	}
+}
 
-	if b.dragging != nil {
-		sprite := b.dragging
-		sprite.x = x - (sprite.w / 2)
-		sprite.y = y - (sprite.h / 2)
-	}
+func (b *board) Update() {
+	b.finishDrag(0, 0)
 }
 
 type Label struct {
@@ -1643,4 +1606,76 @@ func NewLabel(c color.RGBA) *Label {
 	l.Text.SetHorizontal(messeji.AlignCenter)
 	l.Text.SetVertical(messeji.AlignCenter)
 	return l
+}
+
+type BoardWidget struct {
+	*etk.Box
+}
+
+func NewBoardWidget() *BoardWidget {
+	return &BoardWidget{
+		Box: etk.NewBox(),
+	}
+}
+
+func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
+	b := game.Board
+
+	if b.Client == nil {
+		return true, nil
+	}
+
+	cx, cy := ebiten.CursorPosition()
+	if cx != 0 || cy != 0 {
+		p := image.Point{X: cx, Y: cy}
+		if game.keyboard.Visible() && p.In(game.keyboard.Rect()) {
+			return false, nil
+		}
+	}
+
+	if b.dragging == nil {
+		// TODO allow grabbing multiple pieces by grabbing further down the stack
+
+		if !handled && b.playerTurn() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			s, space := b.spriteAt(cx, cy)
+			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
+				b.startDrag(s, space)
+			}
+		}
+
+		b.touchIDs = inpututil.AppendJustPressedTouchIDs(b.touchIDs[:0])
+		for _, id := range b.touchIDs {
+			game.EnableTouchInput()
+			x, y := ebiten.TouchPosition(id)
+			if b.playerTurn() {
+				b.dragX, b.dragY = x, y
+
+				s, space := b.spriteAt(x, y)
+				if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
+					b.startDrag(s, space)
+					b.dragTouchId = id
+				}
+			}
+		}
+	}
+
+	x, y := ebiten.CursorPosition()
+	if b.dragTouchId != -1 {
+		x, y = ebiten.TouchPosition(b.dragTouchId)
+
+		if x != 0 || y != 0 { // 0,0 is returned when the touch is released
+			b.dragX, b.dragY = x, y
+		} else {
+			x, y = b.dragX, b.dragY
+		}
+	}
+
+	b.finishDrag(x, y)
+
+	if b.dragging != nil {
+		sprite := b.dragging
+		sprite.x = x - (sprite.w / 2)
+		sprite.y = y - (sprite.h / 2)
+	}
+	return true, nil
 }

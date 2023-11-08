@@ -1522,6 +1522,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.Board.updateOpponentLabel()
 	g.Board.updatePlayerLabel()
 
+	g.Board.widget.SetRect(image.Rect(0, 0, g.screenW, g.screenH))
+
 	g.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
 
 	return outsideWidth, outsideHeight
