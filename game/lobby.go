@@ -122,16 +122,11 @@ func (l *lobby) fontUpdated() {
 	l.lineOffset = m.Ascent.Round()
 }
 
-func (l *lobby) setKeyboardRect() {
-	game.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
-}
-
 func (l *lobby) toggleKeyboard() error {
 	if game.keyboard.Visible() {
 		game.keyboard.Hide()
 		l.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	} else {
-		l.setKeyboardRect()
 		game.keyboard.Show()
 		l.showKeyboardButton.Label.SetText(gotext.Get("Hide Keyboard"))
 	}
@@ -402,10 +397,6 @@ func (l *lobby) draw(screen *ebiten.Image) {
 func (l *lobby) setRect(x, y, w, h int) {
 	if OptimizeSetRect && l.x == x && l.y == y && l.w == w && l.h == h {
 		return
-	}
-
-	if game.loggedIn && !viewBoard && game.keyboard.Visible() {
-		l.setKeyboardRect()
 	}
 
 	if game.scaleFactor >= 1.25 {

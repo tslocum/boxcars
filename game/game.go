@@ -39,7 +39,7 @@ const version = "v1.0.9"
 
 const MaxDebug = 1
 
-const baseButtonHeight = 46
+const baseButtonHeight = 56
 
 var onlyNumbers = regexp.MustCompile(`[0-9]+`)
 
@@ -63,7 +63,6 @@ var (
 	smallFont  font.Face
 	mediumFont font.Face
 	largeFont  font.Face
-	monoFont   font.Face
 
 	gameFont font.Face
 
@@ -86,13 +85,8 @@ const (
 
 const (
 	smallFontSize  = 20
-	monoFontSize   = 10
 	mediumFontSize = 24
 	largeFontSize  = 36
-)
-
-const (
-	monoLineHeight = 14
 )
 
 var (
@@ -101,9 +95,10 @@ var (
 )
 
 var (
-	statusBuffer = etk.NewText("")
-	gameBuffer   = etk.NewText("")
-	inputBuffer  = etk.NewInput("", "", acceptInput)
+	statusBuffer      = etk.NewText("")
+	floatStatusBuffer = etk.NewText("")
+	gameBuffer        = etk.NewText("")
+	inputBuffer       = etk.NewInput("", "", acceptInput)
 
 	statusLogged bool
 	gameLogged   bool
@@ -145,10 +140,12 @@ func l(s string) {
 	m := time.Now().Format("15:04") + " " + s
 	if statusLogged {
 		_, _ = statusBuffer.Write([]byte("\n" + m))
+		_, _ = floatStatusBuffer.Write([]byte("\n" + m))
 		scheduleFrame()
 		return
 	}
 	_, _ = statusBuffer.Write([]byte(m))
+	_, _ = floatStatusBuffer.Write([]byte(m))
 	statusLogged = true
 	scheduleFrame()
 }
@@ -170,8 +167,24 @@ func init() {
 
 	loadAudioAssets()
 
+	etk.Style.TextFont = largeFont
+	etk.Style.TextFontMutex = fontMutex
+
+	etk.Style.TextColorLight = triangleA
+	etk.Style.TextColorDark = triangleA
+	etk.Style.InputBgColor = color.RGBA{40, 24, 9, 255}
+
+	etk.Style.ScrollAreaColor = color.RGBA{26, 15, 6, 255}
+	etk.Style.ScrollHandleColor = color.RGBA{180, 154, 108, 255}
+
+	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
+	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
+
 	statusBuffer.SetForegroundColor(bufferTextColor)
 	statusBuffer.SetBackgroundColor(bufferBackgroundColor)
+
+	floatStatusBuffer.SetForegroundColor(bufferTextColor)
+	floatStatusBuffer.SetBackgroundColor(bufferBackgroundColor)
 
 	gameBuffer.SetForegroundColor(bufferTextColor)
 	gameBuffer.SetBackgroundColor(bufferBackgroundColor)
@@ -380,19 +393,6 @@ func initializeFonts() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	tt, err = opentype.Parse(fonts.PressStart2P_ttf)
-	if err != nil {
-		log.Fatal(err)
-	}
-	monoFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    monoFontSize,
-		DPI:     dpi,
-		Hinting: font.HintingNone,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func diceImage(roll int) *ebiten.Image {
@@ -419,6 +419,7 @@ func setViewBoard(view bool) {
 	if viewBoard != view {
 		g := game
 		g.keyboard.Hide()
+		g.Board.floatChatGrid.SetVisible(false)
 		g.connectKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 		g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 		g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
@@ -439,8 +440,6 @@ func setViewBoard(view bool) {
 
 		game.Board.uiGrid.SetRect(game.Board.uiGrid.Rect())
 		game.Board.bearOffOverlay.SetRect(game.Board.bearOffOverlay.Rect())
-
-		game.Board.setKeyboardRect()
 	} else {
 		if !game.loggedIn {
 			game.setRoot(connectGrid)
@@ -455,12 +454,6 @@ func setViewBoard(view bool) {
 		game.Board.menuGrid.SetVisible(false)
 		game.Board.settingsGrid.SetVisible(false)
 		game.Board.leaveGameGrid.SetVisible(false)
-
-		if !game.loggedIn {
-			game.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
-		} else {
-			game.lobby.setKeyboardRect()
-		}
 	}
 
 	scheduleFrame()
@@ -530,8 +523,6 @@ type Game struct {
 
 	cpuProfile *os.File
 
-	loaded bool
-
 	connectUsername       *etk.Input
 	connectPassword       *etk.Input
 	connectServer         *etk.Input
@@ -552,6 +543,8 @@ type Game struct {
 	forceLayout bool
 
 	scaleFactor float64
+
+	loaded bool
 }
 
 func NewGame() *Game {
@@ -582,19 +575,6 @@ func NewGame() *Game {
 	} else {
 		g.keyboard.SetKeys(kibodo.KeysQWERTY)
 	}
-
-	etk.Style.TextFont = mediumFont
-	etk.Style.TextFontMutex = fontMutex
-
-	etk.Style.TextColorLight = triangleA
-	etk.Style.TextColorDark = triangleA
-	etk.Style.InputBgColor = color.RGBA{40, 24, 9, 255}
-
-	etk.Style.ScrollAreaColor = color.RGBA{26, 15, 6, 255}
-	etk.Style.ScrollHandleColor = color.RGBA{180, 154, 108, 255}
-
-	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
-	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
 
 	{
 		headerLabel := etk.NewText(gotext.Get("Welcome to %s", "bgammon.org"))
@@ -1159,6 +1139,24 @@ func (g *Game) Update() error {
 	if !g.loaded {
 		g.loaded = true
 
+		var updateButtons func(w etk.Widget)
+		updateButtons = func(w etk.Widget) {
+			for _, c := range w.Children() {
+				updateButtons(c)
+			}
+
+			btn, ok := w.(*etk.Button)
+			if ok && btn != g.Board.showMenuButton {
+				btn.Label.SetFont(largeFont, fontMutex)
+			}
+		}
+		updateButtons(connectGrid)
+		updateButtons(game.lobby.buttonsGrid)
+		updateButtons(game.Board.menuGrid)
+		updateButtons(game.Board.leaveGameGrid)
+		updateButtons(game.Board.bearOffOverlay)
+		updateButtons(game.Board.floatChatGrid)
+
 		// Auto-connect
 		if g.Username != "" || g.Password != "" {
 			g.Connect()
@@ -1339,12 +1337,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	statusBuffer.Draw(screen)
 	if !viewBoard { // Lobby
 		g.lobby.draw(screen)
 	} else { // Game board
-		gameBuffer.Draw(screen)
-		inputBuffer.Draw(screen)
 		g.Board.Draw(screen)
 	}
 
@@ -1419,18 +1414,20 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	}
 
 	statusBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	floatStatusBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	gameBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 
 	if ShowServerSettings {
-		connectGrid.SetRowSizes(60, 50, 50, 50, 100, g.scale(baseButtonHeight))
+		connectGrid.SetRowSizes(60, 50, 50, 50, 108, g.scale(baseButtonHeight))
 	} else {
-		connectGrid.SetRowSizes(60, 50, 50, 100, g.scale(baseButtonHeight))
+		connectGrid.SetRowSizes(60, 50, 50, 108, g.scale(baseButtonHeight))
 	}
 
 	{
 		scrollBarWidth := g.scale(32)
 		statusBuffer.SetScrollBarWidth(scrollBarWidth)
+		floatStatusBuffer.SetScrollBarWidth(scrollBarWidth)
 		gameBuffer.SetScrollBarWidth(scrollBarWidth)
 		inputBuffer.Field.SetScrollBarWidth(scrollBarWidth)
 	}
@@ -1503,14 +1500,17 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	if g.screenW > 200 {
 		statusBuffer.SetPadding(4)
+		floatStatusBuffer.SetPadding(4)
 		gameBuffer.SetPadding(4)
 		inputBuffer.Field.SetPadding(4)
 	} else if g.screenW > 100 {
 		statusBuffer.SetPadding(2)
+		floatStatusBuffer.SetPadding(2)
 		gameBuffer.SetPadding(2)
 		inputBuffer.Field.SetPadding(2)
 	} else {
 		statusBuffer.SetPadding(0)
+		floatStatusBuffer.SetPadding(0)
 		gameBuffer.SetPadding(0)
 		inputBuffer.Field.SetPadding(0)
 	}
@@ -1519,6 +1519,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.Board.updateOpponentLabel()
 	g.Board.updatePlayerLabel()
+
+	g.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
 
 	return outsideWidth, outsideHeight
 }
@@ -1555,6 +1557,8 @@ func (g *Game) EnableTouchInput() {
 	*b.matchStatusGrid = *etk.NewGrid()
 	b.matchStatusGrid.AddChildAt(b.timerLabel, 0, 0, 1, 1)
 	b.matchStatusGrid.AddChildAt(b.clockLabel, 1, 0, 1, 1)
+
+	b.fontUpdated()
 }
 
 func (g *Game) toggleProfiling() error {

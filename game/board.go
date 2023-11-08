@@ -90,10 +90,16 @@ type board struct {
 	uiGrid             *etk.Grid
 	frame              *etk.Frame
 
+	lastKeyboardToggle time.Time
+
 	bearOffOverlay *etk.Button
 
 	leaveGameGrid         *etk.Grid
 	confirmLeaveGameFrame *etk.Frame
+
+	chatGrid       *etk.Grid
+	floatInputGrid *etk.Grid
+	floatChatGrid  *etk.Grid
 
 	fontFace   font.Face
 	lineHeight int
@@ -140,6 +146,9 @@ func NewBoard() *board {
 		uiGrid:                  etk.NewGrid(),
 		frame:                   etk.NewFrame(),
 		confirmLeaveGameFrame:   etk.NewFrame(),
+		chatGrid:                etk.NewGrid(),
+		floatChatGrid:           etk.NewGrid(),
+		floatInputGrid:          etk.NewGrid(),
 		fontFace:                mediumFont,
 		Mutex:                   &sync.Mutex{},
 	}
@@ -219,7 +228,6 @@ func NewBoard() *board {
 	b.clockLabel = clockLabel
 
 	b.showMenuButton = etk.NewButton("Menu", b.showMenu)
-	b.showMenuButton.Label.SetFont(smallFont, fontMutex)
 
 	b.matchStatusGrid = etk.NewGrid()
 	b.matchStatusGrid.AddChildAt(b.timerLabel, 0, 0, 1, 1)
@@ -249,6 +257,26 @@ func NewBoard() *board {
 	}
 
 	b.frame.AddChild(b.buttonsGrid)
+
+	{
+		b.chatGrid.SetBackground(tableColor)
+		b.chatGrid.AddChildAt(floatStatusBuffer, 0, 0, 1, 1)
+		b.chatGrid.AddChildAt(etk.NewBox(), 0, 1, 1, 1)
+		b.chatGrid.AddChildAt(b.floatInputGrid, 0, 2, 1, 1)
+		b.chatGrid.AddChildAt(etk.NewBox(), 0, 3, 1, 1)
+
+		padding := etk.NewBox()
+		padding.SetBackground(tableColor)
+
+		g := b.floatChatGrid
+		g.SetRowSizes(-1, -1, -1)
+		g.AddChildAt(b.chatGrid, 0, 1, 1, 1)
+		g.AddChildAt(padding, 0, 2, 1, 1)
+		g.SetVisible(false)
+		b.frame.AddChild(g)
+	}
+
+	b.frame.AddChild(b.floatChatGrid)
 
 	{
 		f := etk.NewFrame()
@@ -286,8 +314,17 @@ func (b *board) fontUpdated() {
 		}
 	}
 	statusBuffer.SetFont(bufferFont, fontMutex)
+	floatStatusBuffer.SetFont(bufferFont, fontMutex)
 	gameBuffer.SetFont(bufferFont, fontMutex)
 	inputBuffer.Field.SetFont(bufferFont, fontMutex)
+
+	if game.TouchInput {
+		b.showMenuButton.Label.SetFont(largeFont, fontMutex)
+	} else {
+		b.showMenuButton.Label.SetFont(smallFont, fontMutex)
+	}
+
+	b.showKeyboardButton.Label.SetFont(largeFont, fontMutex)
 
 	b.timerLabel.SetFont(b.fontFace, fontMutex)
 	b.clockLabel.SetFont(b.fontFace, fontMutex)
@@ -299,19 +336,25 @@ func (b *board) recreateInputGrid() {
 	} else {
 		*b.inputGrid = *etk.NewGrid()
 	}
+	*b.floatInputGrid = *etk.NewGrid()
 
 	if game.TouchInput {
 		b.inputGrid.AddChildAt(inputBuffer, 0, 0, 2, 1)
+		b.floatInputGrid.AddChildAt(inputBuffer, 0, 0, 2, 1)
 
 		b.inputGrid.AddChildAt(etk.NewBox(), 0, 1, 2, 1)
+		b.floatInputGrid.AddChildAt(etk.NewBox(), 0, 1, 2, 1)
 
-		showMenuButton := etk.NewButton(gotext.Get("Menu"), b.showMenu)
-		b.inputGrid.AddChildAt(showMenuButton, 0, 2, 1, 1)
+		b.inputGrid.AddChildAt(b.showMenuButton, 0, 2, 1, 1)
+		b.floatInputGrid.AddChildAt(b.showMenuButton, 0, 2, 1, 1)
 		b.inputGrid.AddChildAt(b.showKeyboardButton, 1, 2, 1, 1)
+		b.floatInputGrid.AddChildAt(b.showKeyboardButton, 1, 2, 1, 1)
 
 		b.inputGrid.SetRowSizes(52, int(b.horizontalBorderSize/2), -1)
+		b.floatInputGrid.SetRowSizes(52, int(b.horizontalBorderSize/2), -1)
 	} else {
 		b.inputGrid.AddChildAt(inputBuffer, 0, 0, 1, 1)
+		b.floatInputGrid.AddChildAt(inputBuffer, 0, 0, 1, 1)
 	}
 }
 
@@ -402,16 +445,6 @@ func (b *board) recreateButtonGrid() {
 	*b.buttonsUndoOKGrid = *buttonGrid(false, undoButton, okButton)
 }
 
-func (b *board) setKeyboardRect() {
-	inputAndButtons := 52
-	if game.TouchInput {
-		inputAndButtons = 52 + int(b.horizontalBorderSize) + game.scale(baseButtonHeight)
-	}
-	h := game.screenH / 3
-	y := game.screenH - game.screenH/3 - inputAndButtons - int(b.horizontalBorderSize)
-	game.keyboard.SetRect(0, y, game.screenW, h)
-}
-
 func (b *board) cancelLeaveGame() error {
 	b.leaveGameGrid.SetVisible(false)
 	return nil
@@ -446,11 +479,20 @@ func (b *board) showMenu() error {
 }
 
 func (b *board) toggleKeyboard() error {
+	t := time.Now()
+	if !b.lastKeyboardToggle.IsZero() && t.Sub(b.lastKeyboardToggle) < 200*time.Millisecond {
+		return nil
+	}
+	b.lastKeyboardToggle = t
+
 	if game.keyboard.Visible() {
 		game.keyboard.Hide()
+		b.floatChatGrid.SetVisible(false)
+		b.uiGrid.SetRect(b.uiGrid.Rect())
 		b.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	} else {
-		b.setKeyboardRect()
+		b.floatChatGrid.SetVisible(true)
+		b.floatChatGrid.SetRect(b.floatChatGrid.Rect())
 		game.keyboard.Show()
 		b.showKeyboardButton.Label.SetText(gotext.Get("Hide Keyboard"))
 	}
@@ -658,39 +700,6 @@ func (b *board) updateBackgroundImage() {
 		}
 		text.Draw(b.backgroundImage, sp, b.fontFace, x, y+(int(b.verticalBorderSize)-b.lineHeight)/2+b.lineOffset, spaceLabelColor)
 	}
-}
-
-func (b *board) drawButton(target *ebiten.Image, r image.Rectangle, label string) {
-	w, h := r.Dx(), r.Dy()
-	if w == 0 || h == 0 {
-		return
-	}
-
-	baseImg := image.NewRGBA(image.Rect(0, 0, w, h))
-
-	gc := draw2dimg.NewGraphicContext(baseImg)
-	gc.SetLineWidth(5)
-	gc.SetStrokeColor(color.Black)
-	gc.MoveTo(0, 0)
-	gc.LineTo(float64(w), 0)
-	gc.LineTo(float64(w), float64(h))
-	gc.LineTo(0, float64(h))
-	gc.Close()
-	gc.Stroke()
-
-	img := ebiten.NewImage(w, h)
-	img.Fill(color.RGBA{225.0, 188, 125, 255})
-	img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
-
-	fontMutex.Lock()
-	defer fontMutex.Unlock()
-
-	bounds := etk.BoundString(b.fontFace, label)
-	text.Draw(img, label, b.fontFace, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
-
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(r.Min.X), float64(r.Min.Y))
-	target.DrawImage(img, op)
 }
 
 func (b *board) drawSprite(target *ebiten.Image, sprite *Sprite) {
@@ -1054,9 +1063,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.menuGrid.SetColumnSizes(-1, game.scale(10), -1, game.scale(10), -1)
 
-	if viewBoard && game.keyboard.Visible() {
-		b.setKeyboardRect()
-	}
+	b.chatGrid.SetRowSizes(-1, int(b.horizontalBorderSize)/2, inputAndButtons, int(b.horizontalBorderSize)/2)
 }
 
 func (b *board) updateOpponentLabel() {
