@@ -4,14 +4,14 @@ go 1.17
 
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231103194829-7e7aed577632
-	code.rocket9labs.com/tslocum/etk v0.0.0-20231103045149-354a405635ac
+	code.rocket9labs.com/tslocum/etk v0.0.0-20231108013751-c8545de5b36f
 	code.rocketnine.space/tslocum/kibodo v1.0.2
-	code.rocketnine.space/tslocum/messeji v1.0.5
+	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231108013522-08fa5fbe2882
 	github.com/hajimehoshi/ebiten/v2 v2.6.2
 	github.com/leonelquinteros/gotext v1.5.2
 	github.com/llgcode/draw2d v0.0.0-20231022063514-1acb54133d2a
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	golang.org/x/image v0.13.0
+	golang.org/x/image v0.14.0
 	nhooyr.io/websocket v1.8.10
 )
 

@@ -114,6 +114,9 @@ func NewLobby() *lobby {
 }
 
 func (l *lobby) fontUpdated() {
+	fontMutex.Lock()
+	defer fontMutex.Unlock()
+
 	m := l.fontFace.Metrics()
 	l.lineHeight = m.Height.Round()
 	l.lineOffset = m.Ascent.Round()
@@ -323,6 +326,9 @@ func (l *lobby) drawBuffer() {
 				img.Set(l.w-(int(l.padding)*2)-1, by, highlightBorderColor)
 			}
 		}
+
+		fontMutex.Lock()
+		defer fontMutex.Unlock()
 
 		text.Draw(img, colA, l.fontFace, 4, l.lineOffset, labelColor)
 		text.Draw(img, colB, l.fontFace, 250, l.lineOffset, labelColor)

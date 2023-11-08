@@ -219,7 +219,7 @@ func NewBoard() *board {
 	b.clockLabel = clockLabel
 
 	b.showMenuButton = etk.NewButton("Menu", b.showMenu)
-	b.showMenuButton.Label.SetFont(smallFont)
+	b.showMenuButton.Label.SetFont(smallFont, fontMutex)
 
 	b.matchStatusGrid = etk.NewGrid()
 	b.matchStatusGrid.AddChildAt(b.timerLabel, 0, 0, 1, 1)
@@ -270,9 +270,11 @@ func NewBoard() *board {
 }
 
 func (b *board) fontUpdated() {
+	fontMutex.Lock()
 	m := b.fontFace.Metrics()
 	b.lineHeight = m.Height.Round()
 	b.lineOffset = m.Ascent.Round()
+	fontMutex.Unlock()
 
 	bufferFont := b.fontFace
 	if game.scaleFactor <= 1 {
@@ -283,12 +285,12 @@ func (b *board) fontUpdated() {
 			bufferFont = smallFont
 		}
 	}
-	statusBuffer.SetFont(bufferFont)
-	gameBuffer.SetFont(bufferFont)
-	inputBuffer.Field.SetFont(bufferFont)
+	statusBuffer.SetFont(bufferFont, fontMutex)
+	gameBuffer.SetFont(bufferFont, fontMutex)
+	inputBuffer.Field.SetFont(bufferFont, fontMutex)
 
-	b.timerLabel.SetFont(b.fontFace)
-	b.clockLabel.SetFont(b.fontFace)
+	b.timerLabel.SetFont(b.fontFace, fontMutex)
+	b.clockLabel.SetFont(b.fontFace, fontMutex)
 }
 
 func (b *board) recreateInputGrid() {
@@ -381,7 +383,7 @@ func (b *board) recreateButtonGrid() {
 
 	button := func(label string, onSelected func() error) *etk.Button {
 		btn := etk.NewButton(label, onSelected)
-		btn.Label.SetFont(largeFont)
+		btn.Label.SetFont(largeFont, fontMutex)
 		return btn
 	}
 
@@ -633,6 +635,9 @@ func (b *board) updateBackgroundImage() {
 	b.backgroundImage.DrawImage(ebiten.NewImageFromImage(b.baseImage), nil)
 
 	// Draw space numbers.
+	fontMutex.Lock()
+	defer fontMutex.Unlock()
+
 	spaceLabelColor := color.RGBA{121, 96, 60, 255}
 	for space, r := range b.spaceRects {
 		if space < 1 || space > 24 {
@@ -676,6 +681,9 @@ func (b *board) drawButton(target *ebiten.Image, r image.Rectangle, label string
 	img := ebiten.NewImage(w, h)
 	img.Fill(color.RGBA{225.0, 188, 125, 255})
 	img.DrawImage(ebiten.NewImageFromImage(baseImg), nil)
+
+	fontMutex.Lock()
+	defer fontMutex.Unlock()
 
 	bounds := etk.BoundString(b.fontFace, label)
 	text.Draw(img, label, b.fontFace, (w-bounds.Dx())/2, (h+(bounds.Dy()/2))/2, color.Black)
@@ -762,6 +770,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		screen.DrawImage(b.backgroundImage, op)
 	}
 
+	fontMutex.Lock()
 	for space := 0; space < bgammon.BoardSpaces; space++ {
 		var numPieces int
 		for i, sprite := range b.spaceSprites[space] {
@@ -805,6 +814,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 			screen.DrawImage(overlayImage, op)
 		}
 	}
+	fontMutex.Unlock()
 
 	// Draw space hover overlay when dragging
 	if b.dragging != nil {
@@ -1063,7 +1073,10 @@ func (b *board) updateOpponentLabel() {
 	label.active = b.gameState.Turn == player.Number
 	label.Text.TextField.SetForegroundColor(label.activeColor)
 
+	fontMutex.Lock()
 	bounds := etk.BoundString(largeFont, player.Name)
+	fontMutex.Unlock()
+
 	padding := 13
 	innerCenter := b.x + (b.w / 4) - int(b.barWidth/4) + int(b.horizontalBorderSize/2)
 	x := innerCenter - int(float64(bounds.Dx()/2))
@@ -1090,7 +1103,10 @@ func (b *board) updatePlayerLabel() {
 	label.active = b.gameState.Turn == player.Number
 	label.Text.TextField.SetForegroundColor(label.activeColor)
 
+	fontMutex.Lock()
 	bounds := etk.BoundString(largeFont, player.Name)
+	defer fontMutex.Unlock()
+
 	padding := 13
 	innerCenter := b.x + b.w/2 + b.w/4 + int(b.barWidth/4) - int(b.horizontalBorderSize/2)
 	x := innerCenter - int(float64(bounds.Dx()/2))
@@ -1613,7 +1629,7 @@ func NewLabel(c color.RGBA) *Label {
 		Text:        etk.NewText(""),
 		activeColor: c,
 	}
-	l.Text.SetFont(largeFont)
+	l.Text.SetFont(largeFont, fontMutex)
 	l.Text.SetForegroundColor(c)
 	l.Text.SetScrollBarVisible(false)
 	l.Text.SetSingleLine(true)

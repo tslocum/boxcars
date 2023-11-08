@@ -15,6 +15,7 @@ import (
 	"regexp"
 	"runtime/pprof"
 	"strings"
+	"sync"
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
@@ -65,6 +66,8 @@ var (
 	monoFont   font.Face
 
 	gameFont font.Face
+
+	fontMutex = &sync.Mutex{}
 )
 
 var (
@@ -579,6 +582,9 @@ func NewGame() *Game {
 	} else {
 		g.keyboard.SetKeys(kibodo.KeysQWERTY)
 	}
+
+	etk.Style.TextFont = mediumFont
+	etk.Style.TextFontMutex = fontMutex
 
 	etk.Style.TextColorLight = triangleA
 	etk.Style.TextColorDark = triangleA
@@ -1431,7 +1437,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	etk.Layout(g.screenW, g.screenH)
 
+	fontMutex.Lock()
 	bufferWidth := etk.BoundString(g.Board.fontFace, strings.Repeat("A", bufferCharacterWidth)).Dx()
+	fontMutex.Unlock()
 	if bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
