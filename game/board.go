@@ -110,6 +110,8 @@ type board struct {
 
 	widget *BoardWidget
 
+	repositionLock *sync.Mutex
+
 	*sync.Mutex
 }
 
@@ -153,6 +155,7 @@ func NewBoard() *board {
 		floatInputGrid:          etk.NewGrid(),
 		widget:                  NewBoardWidget(),
 		fontFace:                mediumFont,
+		repositionLock:          &sync.Mutex{},
 		Mutex:                   &sync.Mutex{},
 	}
 
@@ -777,6 +780,9 @@ func (b *board) drawSprite(target *ebiten.Image, sprite *Sprite) {
 	target.DrawImage(imgCheckerLight, op)
 }
 func (b *board) Draw(screen *ebiten.Image) {
+	b.repositionLock.Lock()
+	defer b.repositionLock.Unlock()
+
 	{
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(float64(b.x), float64(b.y))
@@ -1288,6 +1294,9 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 }
 
 func (b *board) processState() {
+	b.repositionLock.Lock()
+	defer b.repositionLock.Unlock()
+
 	if b.lastPlayerNumber != b.gameState.PlayerNumber {
 		b.setSpaceRects()
 		b.updateBackgroundImage()
