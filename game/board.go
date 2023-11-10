@@ -1015,7 +1015,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	inputAndButtons := 52
 	if game.TouchInput {
-		inputAndButtons = 52 + int(b.horizontalBorderSize) + game.scale(baseButtonHeight)
+		inputAndButtons = 52 + int(b.horizontalBorderSize)/2 + game.scale(baseButtonHeight)
 	}
 	matchStatus := 36
 	if game.scaleFactor >= 1.25 {
