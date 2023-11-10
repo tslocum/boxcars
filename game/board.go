@@ -270,7 +270,6 @@ func NewBoard() *board {
 		b.chatGrid.AddChildAt(floatStatusBuffer, 0, 0, 1, 1)
 		b.chatGrid.AddChildAt(etk.NewBox(), 0, 1, 1, 1)
 		b.chatGrid.AddChildAt(b.floatInputGrid, 0, 2, 1, 1)
-		b.chatGrid.AddChildAt(etk.NewBox(), 0, 3, 1, 1)
 
 		padding := etk.NewBox()
 		padding.SetBackground(tableColor)
@@ -1073,7 +1072,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.menuGrid.SetColumnSizes(-1, game.scale(10), -1, game.scale(10), -1)
 
-	b.chatGrid.SetRowSizes(-1, int(b.horizontalBorderSize)/2, inputAndButtons, int(b.horizontalBorderSize)/2)
+	b.chatGrid.SetRowSizes(-1, int(b.horizontalBorderSize)/2, inputAndButtons)
 }
 
 func (b *board) updateOpponentLabel() {

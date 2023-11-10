@@ -1447,8 +1447,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 		g.Board.Unlock()
 
-		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
-		g.Board.uiGrid.SetRect(image.Rect(bufferPaddingX, g.Board.h+bufferPaddingX, g.screenW-bufferPaddingX, g.screenH-bufferPaddingX))
+		g.Board.uiGrid.SetRect(image.Rect(0, g.Board.h, g.screenW, g.screenH))
 
 		w := g.screenW / 2
 		h := (g.screenH - g.Board.h) / 2
