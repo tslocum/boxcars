@@ -36,21 +36,9 @@ type lobbyButton struct {
 
 // TODO get button labels dynamically later as it needs to be after gotext loads
 
-var mainButtons = []*lobbyButton{
-	{"Refresh"},
-	{"Create"},
-	{"Join"},
-}
-
-var createButtons = []*lobbyButton{
-	{"Cancel"},
-	{"Create"},
-}
-
-var cancelJoinButtons = []*lobbyButton{
-	{"Cancel"},
-	{"Join"},
-}
+var mainButtons []*lobbyButton
+var createButtons []*lobbyButton
+var cancelJoinButtons []*lobbyButton
 
 type lobby struct {
 	x, y int
@@ -100,6 +88,22 @@ type lobby struct {
 }
 
 func NewLobby() *lobby {
+	mainButtons = []*lobbyButton{
+		{gotext.Get("Refresh")},
+		{gotext.Get("Create")},
+		{gotext.Get("Join")},
+	}
+
+	createButtons = []*lobbyButton{
+		{gotext.Get("Cancel")},
+		{gotext.Get("Create")},
+	}
+
+	cancelJoinButtons = []*lobbyButton{
+		{gotext.Get("Cancel")},
+		{gotext.Get("Join")},
+	}
+
 	l := &lobby{
 		refresh:     true,
 		fontFace:    mediumFont,
@@ -348,7 +352,7 @@ func (l *lobby) drawBuffer() {
 	}
 
 	cx, cy := 0.0, 0.0 // Cursor
-	drawEntry(cx+l.padding, cy+l.padding-titleOffset, "Status", "Points", "Name", false, true)
+	drawEntry(cx+l.padding, cy+l.padding-titleOffset, gotext.Get("Status"), gotext.Get("Points"), gotext.Get("Name"), false, true)
 	cy += l.entryH
 
 	if len(l.games) == 0 {
@@ -359,12 +363,12 @@ func (l *lobby) drawBuffer() {
 		for _, entry := range l.games {
 			if i >= l.offset {
 				if entry.Players == 2 {
-					status = "Full"
+					status = gotext.Get("Full")
 				} else {
 					if !entry.Password {
-						status = "Open"
+						status = gotext.Get("Open")
 					} else {
-						status = "Private"
+						status = gotext.Get("Private")
 					}
 				}
 
