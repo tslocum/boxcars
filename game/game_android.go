@@ -8,6 +8,8 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	"golang.org/x/text/language"
 )
 
 const (
@@ -22,7 +24,7 @@ const (
 func init() {
 	log.SetOutput(os.Stdout)
 
-	// Android timezone issue workaround.
+	// Detect timezone.
 	out, err := exec.Command("/system/bin/getprop", "persist.sys.timezone").Output()
 	if err != nil {
 		return
@@ -32,4 +34,19 @@ func init() {
 		return
 	}
 	time.Local = tz
+
+	// Detect locale.
+	out, err = exec.Command("/system/bin/getprop", "persist.sys.locale").Output()
+	if err != nil {
+		return
+	}
+	tag, err := language.Parse(strings.TrimSpace(string(out)))
+	if err != nil {
+		return
+	}
+	LoadLocales(&tag)
+}
+
+func DefaultLocale() string {
+	return ""
 }

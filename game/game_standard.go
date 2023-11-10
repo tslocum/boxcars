@@ -10,3 +10,7 @@ const (
 	ShowServerSettings   = false
 	APPNAME              = "boxcars"
 )
+
+func DefaultLocale() string {
+	return ""
+}

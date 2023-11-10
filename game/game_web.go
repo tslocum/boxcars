@@ -2,6 +2,10 @@
 
 package game
 
+import (
+	"syscall/js"
+)
+
 const (
 	DefaultServerAddress = "wss://ws.bgammon.org"
 	OptimizeDraw         = true
@@ -10,3 +14,7 @@ const (
 	ShowServerSettings   = false
 	APPNAME              = "boxcars"
 )
+
+func DefaultLocale() string {
+	return js.Global().Get("navigator").Get("language").String()
+}
