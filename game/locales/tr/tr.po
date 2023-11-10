@@ -1,0 +1,122 @@
+msgid ""
+msgstr ""
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: xgotext\n"
+
+msgid "%s joined the match."
+msgstr ""
+
+msgid "%s left the match."
+msgstr ""
+
+msgid "%s moved %s."
+msgstr ""
+
+msgid "%s rolled %s."
+msgstr ""
+
+msgid "%s wins!"
+msgstr ""
+
+msgid "Accept"
+msgstr ""
+
+msgid "Connect"
+msgstr ""
+
+msgid "Connecting..."
+msgstr ""
+
+msgid "Create match"
+msgstr ""
+
+msgid "Double"
+msgstr ""
+
+msgid "Drag here to bear off"
+msgstr ""
+
+msgid "Failed to join match: %s"
+msgstr ""
+
+msgid "Failed to leave match: %s"
+msgstr ""
+
+msgid "Failed to move checker%s: %s"
+msgstr ""
+
+msgid "Failed to submit moves: %s"
+msgstr ""
+
+msgid "Hide Keyboard"
+msgstr ""
+
+msgid "Join match"
+msgstr ""
+
+msgid "Join match: %s"
+msgstr ""
+
+msgid "Leave Match"
+msgstr ""
+
+msgid "Leave match?"
+msgstr ""
+
+msgid "Legal moves: %s"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "No matches available. Please create one."
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Points"
+msgstr ""
+
+msgid "Reset"
+msgstr ""
+
+msgid "Resign"
+msgstr ""
+
+msgid "Roll"
+msgstr ""
+
+msgid "Server"
+msgstr ""
+
+msgid "Show Keyboard"
+msgstr ""
+
+msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "Warning: Received unknown event: %+v"
+msgstr ""
+
+msgid "Welcome to %s"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "You may need to upgrade your client."
+msgstr ""

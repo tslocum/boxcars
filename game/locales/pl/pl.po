@@ -1,0 +1,129 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2023-11-09 23:36+0000\n"
+"Last-Translator: Eryk Michalak <gnu.ewm@protonmail.com>\n"
+"Language-Team: Polish <https://hosted.weblate.org/projects/bgammon/boxcars/"
+"pl/>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 5.2-dev\n"
+
+msgid "%s joined the match."
+msgstr "%s dołączył/a do meczu."
+
+msgid "%s left the match."
+msgstr "%s opuścił/a mecz."
+
+msgid "%s moved %s."
+msgstr "%s poruszył/a %s."
+
+msgid "%s rolled %s."
+msgstr "%s wyrzucił/a %s."
+
+msgid "%s wins!"
+msgstr "%s wygrywa!"
+
+msgid "Accept"
+msgstr "Akceptuj"
+
+msgid "Connect"
+msgstr "Połącz"
+
+msgid "Connecting..."
+msgstr "Łączenie..."
+
+msgid "Create match"
+msgstr "Stwórz mecz"
+
+msgid "Double"
+msgstr "Dubluj"
+
+msgid "Drag here to bear off"
+msgstr "Przeciągnij tutaj, aby wystartować"
+
+msgid "Failed to join match: %s"
+msgstr "Nie udało się dołączyć do meczu: %s"
+
+msgid "Failed to leave match: %s"
+msgstr "Nie udało się opuścić meczu: %s"
+
+msgid "Failed to move checker%s: %s"
+msgstr "Nie udało się poruszyć szachownicy%s: %s"
+
+msgid "Failed to submit moves: %s"
+msgstr "Nie udało się przesłać ruchów: %s"
+
+msgid "Hide Keyboard"
+msgstr "Ukryj klawiaturę"
+
+msgid "Join match"
+msgstr "Dołącz do meczu"
+
+msgid "Join match: %s"
+msgstr "Dołącz do meczu: %s"
+
+msgid "Leave Match"
+msgstr ""
+
+msgid "Leave match?"
+msgstr "Czy na pewno opuścić mecz?"
+
+msgid "Legal moves: %s"
+msgstr "Dozwolone ruchy: %s"
+
+msgid "Name"
+msgstr "Nazwa"
+
+msgid "No"
+msgstr "Nie"
+
+msgid "No matches available. Please create one."
+msgstr "Brak dostępnych meczów. Utwórz mecz."
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Password"
+msgstr "Hasło"
+
+msgid "Points"
+msgstr "Punkty"
+
+msgid "Reset"
+msgstr ""
+
+msgid "Resign"
+msgstr "Rezygnuj"
+
+msgid "Roll"
+msgstr "Rzuć kostką"
+
+msgid "Server"
+msgstr "Serwer"
+
+msgid "Show Keyboard"
+msgstr "Pokaż klawiaturę"
+
+msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
+msgstr ""
+"Aby zalogować się jako gość, wprowadź nazwę użytkownika (jeśli chcesz) i nie "
+"wprowadzaj hasła."
+
+msgid "Username"
+msgstr "Nazwa użytkownika"
+
+msgid "Warning: Received unknown event: %+v"
+msgstr "Ostrzeżenie: Otrzymano nieznane zdarzenie: %+v"
+
+msgid "Welcome to %s"
+msgstr "Witamy w %s"
+
+msgid "Yes"
+msgstr "Tak"
+
+msgid "You may need to upgrade your client."
+msgstr "Konieczna może być aktualizacja twojego klienta."
