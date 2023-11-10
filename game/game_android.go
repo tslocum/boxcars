@@ -44,7 +44,7 @@ func init() {
 	if err != nil {
 		return
 	}
-	LoadLocales(&tag)
+	LoadLocale(&tag)
 }
 
 func DefaultLocale() string {

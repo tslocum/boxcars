@@ -41,7 +41,7 @@ func parseFlags() *game.Game {
 		}
 		forceLanguage = &tag
 	}
-	game.LoadLocales(forceLanguage)
+	game.LoadLocale(forceLanguage)
 
 	g := game.NewGame()
 	g.Username = username

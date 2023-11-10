@@ -33,7 +33,7 @@ func main() {
 	go func() {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
-			g.Client.Out <- append(scanner.Bytes())
+			g.Client.Out <- append(scanner.Bytes(), '\n')
 		}
 	}()
 

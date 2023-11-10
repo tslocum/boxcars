@@ -138,7 +138,7 @@ var (
 )
 
 func l(s string) {
-	m := time.Now().Format("15:04") + " " + s
+	m := time.Now().Format("3:04") + " " + s
 	if statusLogged {
 		_, _ = statusBuffer.Write([]byte("\n" + m))
 		_, _ = floatStatusBuffer.Write([]byte("\n" + m))
@@ -152,7 +152,7 @@ func l(s string) {
 }
 
 func lg(s string) {
-	m := time.Now().Format("15:04") + " " + s
+	m := time.Now().Format("3:04") + " " + s
 	if gameLogged {
 		_, _ = gameBuffer.Write([]byte("\n" + m))
 		scheduleFrame()
@@ -1679,7 +1679,7 @@ func randomizeByteSlice(b [][]byte) {
 	}
 }
 
-func LoadLocales(forceLanguage *language.Tag) error {
+func LoadLocale(forceLanguage *language.Tag) error {
 	entries, err := assetFS.ReadDir("locales")
 	if err != nil {
 		return err

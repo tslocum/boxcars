@@ -16,7 +16,7 @@ func parseFlags() *game.Game {
 			forceLanguage = &tag
 		}
 	}
-	game.LoadLocales(forceLanguage)
+	game.LoadLocale(forceLanguage)
 
 	return game.NewGame()
 }
