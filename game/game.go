@@ -33,6 +33,7 @@ import (
 	"github.com/nfnt/resize"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
+	"golang.org/x/text/language"
 )
 
 const version = "v1.1.0"
@@ -43,7 +44,7 @@ const baseButtonHeight = 56
 
 var onlyNumbers = regexp.MustCompile(`[0-9]+`)
 
-//go:embed asset
+//go:embed asset locales
 var assetFS embed.FS
 
 var debugExtra []byte
@@ -76,7 +77,7 @@ var (
 
 const maxStatusWidthRatio = 0.5
 
-const bufferCharacterWidth = 40
+const bufferCharacterWidth = 28
 
 const (
 	minWidth  = 320
@@ -163,6 +164,8 @@ func lg(s string) {
 }
 
 func init() {
+	gotext.SetDomain("boxcars")
+
 	initializeFonts()
 
 	loadAudioAssets()
@@ -550,9 +553,6 @@ type Game struct {
 }
 
 func NewGame() *Game {
-	// TODO load from asset
-	gotext.Configure("/path/to/locales/root/dir", "en_US", "boxcars")
-
 	g := &Game{
 		runeBuffer: make([]rune, 24),
 
@@ -686,9 +686,7 @@ func NewGame() *Game {
 		createGameFrame = etk.NewFrame()
 		createGameFrame.SetPositionChildren(true)
 		createGameFrame.AddChild(createGameContainer)
-		frame := etk.NewFrame()
-		frame.AddChild(g.lobby.showKeyboardButton)
-		createGameFrame.AddChild(frame)
+		createGameFrame.AddChild(etk.NewFrame(g.lobby.showKeyboardButton))
 	}
 
 	{
@@ -718,9 +716,7 @@ func NewGame() *Game {
 		joinGameFrame = etk.NewFrame()
 		joinGameFrame.SetPositionChildren(true)
 		joinGameFrame.AddChild(joinGameContainer)
-		frame := etk.NewFrame()
-		frame.AddChild(g.lobby.showKeyboardButton)
-		joinGameFrame.AddChild(frame)
+		joinGameFrame.AddChild(etk.NewFrame(g.lobby.showKeyboardButton))
 	}
 
 	{
@@ -1680,6 +1676,53 @@ func randomizeByteSlice(b [][]byte) {
 		j := rand.Intn(i + 1)
 		b[i], b[j] = b[j], b[i]
 	}
+}
+
+func LoadLocales(forceLanguage *language.Tag) error {
+	entries, err := assetFS.ReadDir("locales")
+	if err != nil {
+		return err
+	}
+
+	var available = []language.Tag{
+		language.MustParse("en_US"),
+	}
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		available = append(available, language.MustParse(entry.Name()))
+	}
+
+	var preferred = []language.Tag{}
+	if forceLanguage != nil {
+		preferred = append(preferred, *forceLanguage)
+	} else {
+		systemLocale := os.Getenv("LANG")
+		if systemLocale != "" {
+			tag, err := language.Parse(systemLocale)
+			if err == nil {
+				preferred = append(preferred, tag)
+			}
+		}
+	}
+
+	useLanguage, _, _ := language.NewMatcher(available).Match(preferred...)
+	useLanguageCode := useLanguage.String()
+	if useLanguageCode == "" || strings.HasPrefix(useLanguageCode, "en") {
+		return nil
+	}
+
+	b, err := assetFS.ReadFile(fmt.Sprintf("locales/%s/%s.po", strings.ReplaceAll(useLanguageCode, "-", "_"), strings.ReplaceAll(useLanguageCode, "-", "_")))
+	if err != nil {
+		return nil
+	}
+
+	po := gotext.NewPo()
+	po.Parse(b)
+
+	gotext.GetStorage().AddTranslator("boxcars", po)
+	return nil
 }
 
 // Short description.
