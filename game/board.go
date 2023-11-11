@@ -233,7 +233,7 @@ func NewBoard() *board {
 	clockLabel.TextField.SetVertical(messeji.AlignCenter)
 	b.clockLabel = clockLabel
 
-	b.showMenuButton = etk.NewButton("Menu", b.showMenu)
+	b.showMenuButton = etk.NewButton("Menu", b.toggleMenu)
 
 	b.matchStatusGrid = etk.NewGrid()
 	b.matchStatusGrid.AddChildAt(b.timerLabel, 0, 0, 1, 1)
@@ -479,8 +479,14 @@ func (b *board) hideMenu() error {
 	return nil
 }
 
-func (b *board) showMenu() error {
-	b.menuGrid.SetVisible(true)
+func (b *board) toggleMenu() error {
+	if b.menuGrid.Visible() {
+		b.menuGrid.SetVisible(false)
+		b.settingsGrid.SetVisible(false)
+	} else {
+		b.menuGrid.SetVisible(true)
+	}
+
 	return nil
 }
 
