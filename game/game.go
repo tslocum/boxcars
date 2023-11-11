@@ -38,7 +38,7 @@ import (
 
 const version = "v1.1.0"
 
-const MaxDebug = 1
+const MaxDebug = 2
 
 const baseButtonHeight = 56
 
@@ -1181,6 +1181,7 @@ func (g *Game) Update() error {
 			Debug = 0
 		}
 		g.Board.debug = Debug
+		etk.SetDebug(Debug == 2)
 	}
 
 	// Handle physical keyboard.
