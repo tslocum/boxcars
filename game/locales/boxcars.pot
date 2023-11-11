@@ -142,6 +142,9 @@ msgstr ""
 msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
 msgstr ""
 
+msgid "Type %s to offer a rematch."
+msgstr ""
+
 msgid "Undo"
 msgstr ""
 

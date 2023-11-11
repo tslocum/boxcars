@@ -942,7 +942,12 @@ func (g *Game) handleEvents() {
 			g.Client.Out <- []byte("board") // Refresh game state.
 			l("*** " + gotext.Get("Failed to submit moves: %s", ev.Reason))
 		case *bgammon.EventWin:
+			g.Board.Lock()
 			lg(gotext.Get("%s wins!", ev.Player))
+			if g.Board.gameState.Player1.Points >= g.Board.gameState.Points || g.Board.gameState.Player2.Points >= g.Board.gameState.Points {
+				lg(gotext.Get("Type %s to offer a rematch.", "/rematch"))
+			}
+			g.Board.Unlock()
 		case *bgammon.EventPing:
 			g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
 		default:
