@@ -25,10 +25,21 @@ msgstr ""
 msgid "Accept"
 msgstr ""
 
+msgid ""
+"Boxcars is a client for playing backgammon via bgammon.org, a free and open "
+"source backgammon service."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
 msgid "Connect"
 msgstr ""
 
 msgid "Connecting..."
+msgstr ""
+
+msgid "Create"
 msgstr ""
 
 msgid "Create match"
@@ -52,7 +63,16 @@ msgstr ""
 msgid "Failed to submit moves: %s"
 msgstr ""
 
+msgid "Full"
+msgstr ""
+
 msgid "Hide Keyboard"
+msgstr ""
+
+msgid "Highlight legal moves"
+msgstr ""
+
+msgid "Join"
 msgstr ""
 
 msgid "Join match"
@@ -61,7 +81,7 @@ msgstr ""
 msgid "Join match: %s"
 msgstr ""
 
-msgid "Leave Match"
+msgid "Leave"
 msgstr ""
 
 msgid "Leave match?"
@@ -82,16 +102,28 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
+msgid "Open"
+msgstr ""
+
 msgid "Password"
+msgstr ""
+
+msgid "Play backgammon online via bgammon.org"
 msgstr ""
 
 msgid "Points"
 msgstr ""
 
-msgid "Reset"
+msgid "Private"
+msgstr ""
+
+msgid "Refresh"
 msgstr ""
 
 msgid "Resign"
+msgstr ""
+
+msgid "Return"
 msgstr ""
 
 msgid "Roll"
@@ -100,10 +132,24 @@ msgstr ""
 msgid "Server"
 msgstr ""
 
+msgid "Settings"
+msgstr ""
+
 msgid "Show Keyboard"
 msgstr ""
 
-msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
+msgid "Status"
+msgstr ""
+
+msgid ""
+"To log in as a guest, enter a username (if you want) and do not enter a "
+"password."
+msgstr ""
+
+msgid "Type %s to offer a rematch."
+msgstr ""
+
+msgid "Undo"
 msgstr ""
 
 msgid "Username"

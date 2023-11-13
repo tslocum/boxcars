@@ -11,166 +11,175 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 5.2-dev\n"
 
-#: game/game.go:824
 msgid "%s joined the match."
 msgstr "%s tok del i spillet."
 
-#: game/game.go:844
 msgid "%s left the match."
 msgstr "%s forlot spillet."
 
-#: game/game.go:877
 msgid "%s moved %s."
 msgstr "%s flyttet %s."
 
-#: game/game.go:873
 msgid "%s rolled %s."
 msgstr "%s rullet %s."
 
-#: game/game.go:900
 msgid "%s wins!"
 msgstr "%s vant."
 
-#: game/board.go:153
 msgid "Accept"
 msgstr "Godta"
 
-#: game/game.go:589
+msgid ""
+"Boxcars is a client for playing backgammon via bgammon.org, a free and open "
+"source backgammon service."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
 msgid "Connect"
 msgstr "Koble til"
 
-#: game/game.go:916
 msgid "Connecting..."
 msgstr "Kobler til …"
 
-#: game/game.go:642
+#, fuzzy
+#| msgid "Create match"
+msgid "Create"
+msgstr "Opprett spill"
+
 msgid "Create match"
 msgstr "Opprett spill"
 
-#: game/board.go:147
 msgid "Double"
 msgstr "Dobling"
 
-#: game/game.go:828
+msgid "Drag here to bear off"
+msgstr ""
+
 #, fuzzy
 msgid "Failed to join match: %s"
 msgstr "Klarte ikke å ta del i spill: %s"
 
-#: game/game.go:830
 #, fuzzy
 msgid "Failed to leave match: %s"
 msgstr "Klarte ikke å forlate spill: %s"
 
-#: game/game.go:894
 #, fuzzy
 msgid "Failed to move checker%s: %s"
 msgstr "Klarte ikke å flytte brikke%s: %s"
 
-#: game/game.go:898
 #, fuzzy
 msgid "Failed to submit moves: %s"
 msgstr "Klarte ikke å sende inn trekk: %s"
 
-#: game/board.go:237
-#: game/game.go:605
-#: game/lobby.go:143
+msgid "Full"
+msgstr ""
+
 msgid "Hide Keyboard"
 msgstr "Skjul tastatur"
 
-#: game/game.go:687
+msgid "Highlight legal moves"
+msgstr ""
+
+msgid "Join"
+msgstr ""
+
 msgid "Join match"
 msgstr "Ta del i spill"
 
-#: game/lobby.go:266
-#: game/lobby.go:465
 msgid "Join match: %s"
 msgstr "Ta del i spill: %s"
 
-#: game/board.go:189
-msgid "Leave Match"
+#, fuzzy
+#| msgid "Leave Match"
+msgid "Leave"
 msgstr "Forlat spillet"
 
-#: game/board.go:113
 msgid "Leave match?"
 msgstr "Forlat spillet?"
 
-#: game/game.go:895
 msgid "Legal moves: %s"
 msgstr "Lovlige trekk: %s"
 
-#: game/game.go:643
 msgid "Name"
 msgstr "Navn"
 
-#: game/lobby.go:356
-msgid "No matches available. Please create one."
-msgstr "Ingen spill tilgjengelig. Opprett ett."
-
-#: game/board.go:119
 msgid "No"
 msgstr "Nei"
 
-#: game/board.go:144
+msgid "No matches available. Please create one."
+msgstr "Ingen spill tilgjengelig. Opprett ett."
+
 msgid "OK"
 msgstr "OK"
 
-#: game/game.go:587
-#: game/game.go:645
-#: game/game.go:689
+msgid "Open"
+msgstr ""
+
 msgid "Password"
 msgstr "Passord"
 
-#: game/game.go:644
+msgid "Play backgammon online via bgammon.org"
+msgstr ""
+
 msgid "Points"
 msgstr "Poeng"
 
-#: game/board.go:141
-msgid "Reset"
-msgstr "Tilbakestill"
+msgid "Private"
+msgstr ""
 
-#: game/board.go:150
+msgid "Refresh"
+msgstr ""
+
 msgid "Resign"
 msgstr "Gi opp"
 
-#: game/board.go:138
+msgid "Return"
+msgstr ""
+
 msgid "Roll"
 msgstr "Kast terninger"
 
-#: game/board.go:124
-#: game/board.go:233
-#: game/game.go:427
-#: game/game.go:428
-#: game/game.go:429
-#: game/game.go:596
-#: game/game.go:599
-#: game/game.go:600
-#: game/game.go:601
-#: game/game.go:919
-#: game/game.go:920
-#: game/game.go:921
-#: game/lobby.go:119
-#: game/lobby.go:139
+msgid "Server"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
 msgid "Show Keyboard"
 msgstr "Vis tastatur"
 
-#: game/game.go:610
+msgid "Status"
+msgstr ""
+
 #, fuzzy
-msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
+msgid ""
+"To log in as a guest, enter a username (if you want) and do not enter a "
+"password."
 msgstr "Kun angi brukernavn (uten passord) hvis du vil logge inn som gjest."
 
-#: game/game.go:586
+msgid "Type %s to offer a rematch."
+msgstr ""
+
+msgid "Undo"
+msgstr ""
+
 msgid "Username"
 msgstr "Brukernavn"
 
-#: game/game.go:904
 msgid "Warning: Received unknown event: %+v"
 msgstr "Advarsel: Mottok ukjent begivenhet: %s+v"
 
-#: game/board.go:120
+msgid "Welcome to %s"
+msgstr ""
+
 msgid "Yes"
 msgstr "Ja"
 
-#: game/game.go:905
 #, fuzzy
 msgid "You may need to upgrade your client."
 msgstr "Det kan hende du må installere en nyere versjon av programmet."
+
+#~ msgid "Reset"
+#~ msgstr "Tilbakestill"

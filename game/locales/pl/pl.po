@@ -30,11 +30,24 @@ msgstr "%s wygrywa!"
 msgid "Accept"
 msgstr "Akceptuj"
 
+msgid ""
+"Boxcars is a client for playing backgammon via bgammon.org, a free and open "
+"source backgammon service."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
 msgid "Connect"
 msgstr "Połącz"
 
 msgid "Connecting..."
 msgstr "Łączenie..."
+
+#, fuzzy
+#| msgid "Create match"
+msgid "Create"
+msgstr "Stwórz mecz"
 
 msgid "Create match"
 msgstr "Stwórz mecz"
@@ -57,8 +70,17 @@ msgstr "Nie udało się poruszyć szachownicy%s: %s"
 msgid "Failed to submit moves: %s"
 msgstr "Nie udało się przesłać ruchów: %s"
 
+msgid "Full"
+msgstr ""
+
 msgid "Hide Keyboard"
 msgstr "Ukryj klawiaturę"
+
+msgid "Highlight legal moves"
+msgstr ""
+
+msgid "Join"
+msgstr ""
 
 msgid "Join match"
 msgstr "Dołącz do meczu"
@@ -66,7 +88,7 @@ msgstr "Dołącz do meczu"
 msgid "Join match: %s"
 msgstr "Dołącz do meczu: %s"
 
-msgid "Leave Match"
+msgid "Leave"
 msgstr ""
 
 msgid "Leave match?"
@@ -87,17 +109,29 @@ msgstr "Brak dostępnych meczów. Utwórz mecz."
 msgid "OK"
 msgstr "OK"
 
+msgid "Open"
+msgstr ""
+
 msgid "Password"
 msgstr "Hasło"
+
+msgid "Play backgammon online via bgammon.org"
+msgstr ""
 
 msgid "Points"
 msgstr "Punkty"
 
-msgid "Reset"
+msgid "Private"
+msgstr ""
+
+msgid "Refresh"
 msgstr ""
 
 msgid "Resign"
 msgstr "Rezygnuj"
+
+msgid "Return"
+msgstr ""
 
 msgid "Roll"
 msgstr "Rzuć kostką"
@@ -105,8 +139,14 @@ msgstr "Rzuć kostką"
 msgid "Server"
 msgstr "Serwer"
 
+msgid "Settings"
+msgstr ""
+
 msgid "Show Keyboard"
 msgstr "Pokaż klawiaturę"
+
+msgid "Status"
+msgstr ""
 
 msgid ""
 "To log in as a guest, enter a username (if you want) and do not enter a "
@@ -114,6 +154,12 @@ msgid ""
 msgstr ""
 "Aby zalogować się jako gość, wprowadź nazwę użytkownika (jeśli chcesz) i nie "
 "wprowadzaj hasła."
+
+msgid "Type %s to offer a rematch."
+msgstr ""
+
+msgid "Undo"
+msgstr ""
 
 msgid "Username"
 msgstr "Nazwa użytkownika"
