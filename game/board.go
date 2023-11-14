@@ -74,14 +74,18 @@ type board struct {
 	opponentLabel *Label
 	playerLabel   *Label
 
+	opponentPipCount *etk.Text
+	playerPipCount   *etk.Text
+
 	timerLabel     *etk.Text
 	clockLabel     *etk.Text
 	showMenuButton *etk.Button
 
 	menuGrid *etk.Grid
 
-	highlightCheckbox *etk.Checkbox
-	settingsGrid      *etk.Grid
+	showPipCountCheckbox *etk.Checkbox
+	highlightCheckbox    *etk.Checkbox
+	settingsGrid         *etk.Grid
 
 	matchStatusGrid *etk.Grid
 
@@ -105,8 +109,10 @@ type board struct {
 	lineHeight int
 	lineOffset int
 
+	showPipCount       bool
 	highlightAvailable bool
-	availableMoves     [][]int
+
+	availableMoves [][]int
 
 	widget *BoardWidget
 
@@ -138,6 +144,8 @@ func NewBoard() *board {
 		spaceHighlight:          ebiten.NewImage(1, 1),
 		opponentLabel:           NewLabel(color.RGBA{255, 255, 255, 255}),
 		playerLabel:             NewLabel(color.RGBA{0, 0, 0, 255}),
+		opponentPipCount:        etk.NewText("0"),
+		playerPipCount:          etk.NewText("0"),
 		buttonsGrid:             etk.NewGrid(),
 		buttonsOnlyRollGrid:     etk.NewGrid(),
 		buttonsOnlyUndoGrid:     etk.NewGrid(),
@@ -159,6 +167,17 @@ func NewBoard() *board {
 		Mutex:                   &sync.Mutex{},
 	}
 
+	centerText := func(t *etk.Text) {
+		t.SetVertical(messeji.AlignCenter)
+		t.SetScrollBarVisible(false)
+	}
+
+	centerText(b.opponentPipCount)
+	centerText(b.playerPipCount)
+
+	b.opponentPipCount.SetHorizontal(messeji.AlignEnd)
+	b.playerPipCount.SetHorizontal(messeji.AlignStart)
+
 	b.bearOffOverlay = etk.NewButton(gotext.Get("Drag here to bear off"), func() error {
 		return nil
 	})
@@ -179,22 +198,44 @@ func NewBoard() *board {
 		settingsLabel := etk.NewText(gotext.Get("Settings"))
 		settingsLabel.SetHorizontal(messeji.AlignCenter)
 
+		b.showPipCountCheckbox = etk.NewCheckbox(b.togglePipCountCheckbox)
+		b.showPipCountCheckbox.SetBorderColor(triangleA)
+		b.showPipCountCheckbox.SetCheckColor(triangleA)
+		b.showPipCountCheckbox.SetSelected(b.showPipCount)
+
+		pipCountLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Show pip count")),
+			onSelected: func() {
+				b.showPipCountCheckbox.SetSelected(!b.showPipCountCheckbox.Selected())
+				b.togglePipCountCheckbox()
+			},
+		}
+		pipCountLabel.SetVertical(messeji.AlignCenter)
+
 		b.highlightCheckbox = etk.NewCheckbox(b.toggleHighlightCheckbox)
 		b.highlightCheckbox.SetBorderColor(triangleA)
 		b.highlightCheckbox.SetCheckColor(triangleA)
 		b.highlightCheckbox.SetSelected(b.highlightAvailable)
 
-		highlightLabel := etk.NewText(gotext.Get("Highlight legal moves"))
+		highlightLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Highlight legal moves")),
+			onSelected: func() {
+				b.highlightCheckbox.SetSelected(!b.highlightCheckbox.Selected())
+				b.toggleHighlightCheckbox()
+			},
+		}
 		highlightLabel.SetVertical(messeji.AlignCenter)
 
 		checkboxGrid := etk.NewGrid()
-		checkboxGrid.SetColumnSizes(-1, -1, -1, -1, -1)
-		checkboxGrid.AddChildAt(b.highlightCheckbox, 0, 0, 1, 1)
-		checkboxGrid.AddChildAt(highlightLabel, 1, 0, 4, 1)
+		checkboxGrid.SetRowSizes(-1, 20, -1)
+		checkboxGrid.AddChildAt(b.showPipCountCheckbox, 0, 0, 1, 1)
+		checkboxGrid.AddChildAt(pipCountLabel, 1, 0, 4, 1)
+		checkboxGrid.AddChildAt(b.highlightCheckbox, 0, 2, 1, 1)
+		checkboxGrid.AddChildAt(highlightLabel, 1, 2, 4, 1)
 
 		b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
 		b.settingsGrid.SetColumnSizes(20, -1, -1, 20)
-		b.settingsGrid.SetRowSizes(72, 72, 20, -1)
+		b.settingsGrid.SetRowSizes(72, 72+20+72, 20, -1)
 		b.settingsGrid.AddChildAt(settingsLabel, 1, 0, 2, 1)
 		b.settingsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
 		b.settingsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
@@ -255,9 +296,11 @@ func NewBoard() *board {
 	{
 		f := etk.NewFrame()
 		f.AddChild(b.widget)
+		f.AddChild(b.opponentPipCount)
 		f.AddChild(b.opponentLabel)
 		f.AddChild(b.opponentLabel)
 		f.AddChild(b.playerLabel)
+		f.AddChild(b.playerPipCount)
 		f.AddChild(b.uiGrid)
 		f.AddChild(b.bearOffOverlay)
 		b.frame.AddChild(f)
@@ -334,6 +377,9 @@ func (b *board) fontUpdated() {
 
 	b.timerLabel.SetFont(b.fontFace, fontMutex)
 	b.clockLabel.SetFont(b.fontFace, fontMutex)
+
+	b.opponentPipCount.SetFont(bufferFont, fontMutex)
+	b.playerPipCount.SetFont(bufferFont, fontMutex)
 }
 
 func (b *board) recreateInputGrid() {
@@ -547,6 +593,13 @@ func (b *board) selectDouble() error {
 
 func (b *board) selectResign() error {
 	b.Client.Out <- []byte("resign")
+	return nil
+}
+
+func (b *board) togglePipCountCheckbox() error {
+	b.showPipCount = b.showPipCountCheckbox.Selected()
+	b.updatePlayerLabel()
+	b.updateOpponentLabel()
 	return nil
 }
 
@@ -1048,7 +1101,7 @@ func (b *board) setRect(x, y, w, h int) {
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := 72 + 72 + 20 + game.scale(baseButtonHeight)
+		dialogHeight := 72 + 72 + 20 + 72 + 20 + game.scale(baseButtonHeight)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
@@ -1079,13 +1132,34 @@ func (b *board) setRect(x, y, w, h int) {
 	b.menuGrid.SetColumnSizes(-1, game.scale(10), -1, game.scale(10), -1)
 
 	b.chatGrid.SetRowSizes(-1, int(b.horizontalBorderSize)/2, inputAndButtons)
+
+	var padding int
+	if b.w >= 600 {
+		padding = 20
+	} else if b.w >= 400 {
+		padding = 12
+	} else if b.w >= 300 {
+		padding = 10
+	} else if b.w >= 200 {
+		padding = 7
+	} else if b.w >= 100 {
+		padding = 5
+	}
+	b.opponentPipCount.SetPadding(padding / 2)
+	b.playerPipCount.SetPadding(padding)
 }
 
 func (b *board) updateOpponentLabel() {
 	player := b.gameState.OpponentPlayer()
 	label := b.opponentLabel
 
-	label.SetText(player.Name)
+	var text string
+	if b.gameState.Points > 1 && len(player.Name) > 0 {
+		text = fmt.Sprintf("%s  %d", player.Name, player.Points)
+	} else {
+		text = player.Name
+	}
+	label.SetText(text)
 
 	if player.Number == 1 {
 		label.activeColor = color.RGBA{0, 0, 0, 255}
@@ -1096,7 +1170,7 @@ func (b *board) updateOpponentLabel() {
 	label.Text.TextField.SetForegroundColor(label.activeColor)
 
 	fontMutex.Lock()
-	bounds := etk.BoundString(largeFont, player.Name)
+	bounds := etk.BoundString(largeFont, text)
 	fontMutex.Unlock()
 
 	padding := 13
@@ -1109,13 +1183,28 @@ func (b *board) updateOpponentLabel() {
 		return
 	}
 	label.SetRect(r.Inset(-padding))
+
+	if b.showPipCount {
+		b.opponentPipCount.SetVisible(true)
+		b.opponentPipCount.SetText(strconv.Itoa(b.gameState.Pips(player.Number)))
+		b.opponentPipCount.SetForegroundColor(label.activeColor)
+		b.opponentPipCount.SetRect(image.Rect(x+bounds.Dx(), y-bounds.Dy(), b.w/2-int(b.barWidth)/2, y+bounds.Dy()*2))
+	} else {
+		b.opponentPipCount.SetVisible(false)
+	}
 }
 
 func (b *board) updatePlayerLabel() {
 	player := b.gameState.LocalPlayer()
 	label := b.playerLabel
 
-	label.SetText(player.Name)
+	var text string
+	if b.gameState.Points > 1 && len(player.Name) > 0 {
+		text = fmt.Sprintf("%s  %d", player.Name, player.Points)
+	} else {
+		text = player.Name
+	}
+	label.SetText(text)
 
 	if player.Number == 1 {
 		label.activeColor = color.RGBA{0, 0, 0, 255}
@@ -1126,7 +1215,7 @@ func (b *board) updatePlayerLabel() {
 	label.Text.TextField.SetForegroundColor(label.activeColor)
 
 	fontMutex.Lock()
-	bounds := etk.BoundString(largeFont, player.Name)
+	bounds := etk.BoundString(largeFont, text)
 	defer fontMutex.Unlock()
 
 	padding := 13
@@ -1139,6 +1228,15 @@ func (b *board) updatePlayerLabel() {
 		return
 	}
 	label.SetRect(r.Inset(-padding))
+
+	if b.showPipCount {
+		b.playerPipCount.SetVisible(true)
+		b.playerPipCount.SetText(strconv.Itoa(b.gameState.Pips(player.Number)))
+		b.playerPipCount.SetForegroundColor(label.activeColor)
+		b.playerPipCount.SetRect(image.Rect(b.innerW/2+int(b.barWidth)/2+int(b.horizontalBorderSize), y-bounds.Dy(), x, y+bounds.Dy()*2))
+	} else {
+		b.playerPipCount.SetVisible(false)
+	}
 }
 
 func (b *board) offsetPosition(x, y int) (int, int) {

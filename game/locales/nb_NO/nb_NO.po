@@ -44,7 +44,6 @@ msgid "Connecting..."
 msgstr "Kobler til …"
 
 #, fuzzy
-#| msgid "Create match"
 msgid "Create"
 msgstr "Opprett spill"
 
@@ -92,7 +91,6 @@ msgid "Join match: %s"
 msgstr "Ta del i spill: %s"
 
 #, fuzzy
-#| msgid "Leave Match"
 msgid "Leave"
 msgstr "Forlat spillet"
 
@@ -183,3 +181,6 @@ msgstr "Det kan hende du må installere en nyere versjon av programmet."
 
 #~ msgid "Reset"
 #~ msgstr "Tilbakestill"
+
+#~ msgid "Leave Match"
+#~ msgstr "Forlat spillet"

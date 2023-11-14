@@ -45,7 +45,6 @@ msgid "Connecting..."
 msgstr "Łączenie..."
 
 #, fuzzy
-#| msgid "Create match"
 msgid "Create"
 msgstr "Stwórz mecz"
 

@@ -36,7 +36,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.1"
+const version = "v1.1.2"
 
 const MaxDebug = 2
 
@@ -1730,6 +1730,18 @@ func LoadLocale(forceLanguage *language.Tag) error {
 
 	gotext.GetStorage().AddTranslator("boxcars", po)
 	return nil
+}
+
+type ClickableText struct {
+	*etk.Text
+	onSelected func()
+}
+
+func (t *ClickableText) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
+	if clicked {
+		t.onSelected()
+	}
+	return true, nil
 }
 
 // Short description.
