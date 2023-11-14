@@ -1,4 +1,5 @@
 1.1.2:
+- Support moving checkers by clicking instead of dragging
 - Show match score during matches worth more than 1 point
 - Optionally show pip count
 

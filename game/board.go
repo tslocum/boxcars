@@ -39,6 +39,8 @@ type board struct {
 
 	dragging      *Sprite
 	draggingSpace int
+	draggingClick bool // Drag started with mouse click
+	lastDragClick time.Time
 	moving        *Sprite // Moving automatically
 
 	dragTouchId ebiten.TouchID
@@ -111,8 +113,6 @@ type board struct {
 
 	showPipCount       bool
 	highlightAvailable bool
-
-	availableMoves [][]int
 
 	widget *BoardWidget
 
@@ -295,7 +295,6 @@ func NewBoard() *board {
 
 	{
 		f := etk.NewFrame()
-		f.AddChild(b.widget)
 		f.AddChild(b.opponentPipCount)
 		f.AddChild(b.opponentLabel)
 		f.AddChild(b.opponentLabel)
@@ -327,6 +326,8 @@ func NewBoard() *board {
 
 	b.frame.AddChild(b.floatChatGrid)
 
+	b.frame.AddChild(b.widget)
+
 	{
 		f := etk.NewFrame()
 		f.AddChild(b.menuGrid)
@@ -338,7 +339,7 @@ func NewBoard() *board {
 	b.fontUpdated()
 
 	for i := range b.Sprites.sprites {
-		b.Sprites.sprites[i] = b.newSprite(false)
+		b.Sprites.sprites[i] = b.newSprite(i >= 15)
 	}
 
 	b.dragTouchId = -1
@@ -1106,7 +1107,7 @@ func (b *board) setRect(x, y, w, h int) {
 			dialogHeight = game.screenH
 		}
 
-		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(b.verticalBorderSize)
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
 		b.settingsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 
@@ -1426,9 +1427,11 @@ func (b *board) processState() {
 	}
 	b.showButtonGrid(showGrid)
 
-	b.Sprites = &Sprites{}
-	b.spaceSprites = make([][]*Sprite, bgammon.BoardSpaces)
+	var nextWhite int
+	var nextBlack int
+
 	for space := 0; space < bgammon.BoardSpaces; space++ {
+		b.spaceSprites[space] = b.spaceSprites[space][:0]
 		spaceValue := b.gameState.Board[space]
 
 		white := spaceValue < 0
@@ -1438,16 +1441,34 @@ func (b *board) processState() {
 			abs *= -1
 		}
 		for i := 0; i < abs; i++ {
-			s := b.newSprite(white)
+			var s *Sprite
+			if !white {
+				for i := range b.Sprites.sprites[nextBlack:] {
+					if !b.Sprites.sprites[nextBlack+i].colorWhite {
+						s = b.Sprites.sprites[nextBlack+i]
+						nextBlack = nextBlack + 1 + i
+						break
+					}
+				}
+			} else {
+				for i := range b.Sprites.sprites[nextWhite:] {
+					if b.Sprites.sprites[nextWhite+i].colorWhite {
+						s = b.Sprites.sprites[nextWhite+i]
+						nextWhite = nextWhite + 1 + i
+						break
+					}
+				}
+			}
+			if s == nil {
+				panic("no checker sprite available")
+			}
+
 			if i >= abs {
-				s.colorWhite = b.gameState.PlayerNumber == 2
 				s.premove = true
 			}
 			b.spaceSprites[space] = append(b.spaceSprites[space], s)
-			b.Sprites.sprites = append(b.Sprites.sprites, s)
 		}
 	}
-	b.Sprites.num = len(b.Sprites.sprites)
 
 	b._positionCheckers()
 
@@ -1564,9 +1585,11 @@ func (b *board) playerTurn() bool {
 	return b.playingGame() && (b.gameState.MayRoll() || b.gameState.Turn == b.gameState.PlayerNumber)
 }
 
-func (b *board) startDrag(s *Sprite, space int) {
+func (b *board) startDrag(s *Sprite, space int, click bool) {
 	b.dragging = s
 	b.draggingSpace = space
+	b.draggingClick = click
+	b.lastDragClick = time.Now()
 	if bgammon.CanBearOff(b.gameState.Board, b.gameState.PlayerNumber, true) && b.gameState.Board[bgammon.SpaceHomePlayer] == 0 {
 		b.bearOffOverlay.SetVisible(true)
 	}
@@ -1578,16 +1601,30 @@ func (b *board) finishDrag(x int, y int) {
 	}
 
 	var dropped *Sprite
-	if b.dragTouchId == -1 {
-		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
+	if b.draggingClick {
+		if b.dragTouchId == -1 {
+			if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && time.Since(b.lastDragClick) >= 50*time.Millisecond {
+				dropped = b.dragging
+				b.dragging = nil
+				b.bearOffOverlay.SetVisible(false)
+			}
+		} else if inpututil.IsTouchJustReleased(b.dragTouchId) {
 			dropped = b.dragging
 			b.dragging = nil
 			b.bearOffOverlay.SetVisible(false)
 		}
-	} else if inpututil.IsTouchJustReleased(b.dragTouchId) {
-		dropped = b.dragging
-		b.dragging = nil
-		b.bearOffOverlay.SetVisible(false)
+	} else {
+		if b.dragTouchId == -1 {
+			if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
+				dropped = b.dragging
+				b.dragging = nil
+				b.bearOffOverlay.SetVisible(false)
+			}
+		} else if inpututil.IsTouchJustReleased(b.dragTouchId) {
+			dropped = b.dragging
+			b.dragging = nil
+			b.bearOffOverlay.SetVisible(false)
+		}
 	}
 	if dropped != nil {
 		if x == 0 && y == 0 {
@@ -1602,6 +1639,15 @@ func (b *board) finishDrag(x int, y int) {
 		if index == -1 {
 			index = bgammon.SpaceHomePlayer
 		}
+
+		if !b.draggingClick && index == b.draggingSpace && b.dragTouchId == -1 && !b.lastDragClick.IsZero() && time.Since(b.lastDragClick) < 500*time.Millisecond {
+			b.startDrag(dropped, index, true)
+			b.processState()
+			scheduleFrame()
+			b.lastDragClick = time.Now()
+			return
+		}
+
 		var processed bool
 		if index >= 0 && b.Client != nil {
 		ADDPREMOVE:
@@ -1624,6 +1670,7 @@ func (b *board) finishDrag(x int, y int) {
 			b.processState()
 			scheduleFrame()
 		}
+		b.lastDragClick = time.Now()
 	}
 }
 
@@ -1734,7 +1781,7 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 	b := game.Board
 
 	if b.Client == nil {
-		return true, nil
+		return false, nil
 	}
 
 	cx, cy := ebiten.CursorPosition()
@@ -1751,7 +1798,8 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		if !handled && b.playerTurn() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			s, space := b.spriteAt(cx, cy)
 			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
-				b.startDrag(s, space)
+				b.startDrag(s, space, false)
+				handled = true
 			}
 		}
 
@@ -1764,8 +1812,9 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 
 				s, space := b.spriteAt(x, y)
 				if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
-					b.startDrag(s, space)
+					b.startDrag(s, space, false)
 					b.dragTouchId = id
+					handled = true
 				}
 			}
 		}
@@ -1789,5 +1838,5 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		sprite.x = x - (sprite.w / 2)
 		sprite.y = y - (sprite.h / 2)
 	}
-	return true, nil
+	return handled, nil
 }
