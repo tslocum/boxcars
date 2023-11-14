@@ -305,6 +305,8 @@ func NewBoard() *board {
 		b.frame.AddChild(f)
 	}
 
+	b.frame.AddChild(b.widget)
+
 	b.frame.AddChild(b.buttonsGrid)
 
 	{
@@ -1676,6 +1678,14 @@ func (b *board) finishDrag(x int, y int) {
 
 func (b *board) Update() {
 	b.finishDrag(0, 0)
+	if b.dragging != nil && b.draggingClick {
+		x, y := ebiten.CursorPosition()
+		if x != 0 || y != 0 {
+			sprite := b.dragging
+			sprite.x = x - (sprite.w / 2)
+			sprite.y = y - (sprite.h / 2)
+		}
+	}
 }
 
 type Label struct {
