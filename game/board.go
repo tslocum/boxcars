@@ -161,6 +161,8 @@ func NewBoard() *board {
 		chatGrid:                etk.NewGrid(),
 		floatChatGrid:           etk.NewGrid(),
 		floatInputGrid:          etk.NewGrid(),
+		showPipCount:            true,
+		highlightAvailable:      true,
 		widget:                  NewBoardWidget(),
 		fontFace:                mediumFont,
 		repositionLock:          &sync.Mutex{},
