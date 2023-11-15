@@ -330,8 +330,6 @@ func NewBoard() *board {
 
 	b.frame.AddChild(b.floatChatGrid)
 
-	b.frame.AddChild(b.widget)
-
 	{
 		f := etk.NewFrame()
 		f.AddChild(b.menuGrid)
