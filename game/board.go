@@ -901,12 +901,32 @@ func (b *board) Draw(screen *ebiten.Image) {
 		if b.highlightAvailable && b.draggingSpace != -1 {
 			for _, move := range b.gameState.Available {
 				if move[0] == b.draggingSpace {
-					x, y, _, _ := b.spaceRect(move[1])
-					x, y = b.offsetPosition(x, y)
-					op := &ebiten.DrawImageOptions{}
-					op.GeoM.Translate(float64(x), float64(y))
-					op.ColorScale.Scale(0.2, 0.2, 0.2, 0.2)
-					screen.DrawImage(b.spaceHighlight, op)
+					var availableMoves func(in *bgammon.Game, from int, to int) []int
+					availableMoves = func(in *bgammon.Game, from int, to int) []int {
+						gc := in.Copy()
+						ok, _ := gc.AddMoves([][]int{{from, to}}, true)
+						if !ok {
+							log.Panicf("failed to add move %+v to game %+v", move, in)
+						}
+
+						moves := []int{to}
+						var found = make(map[int]bool)
+						found[to] = true
+						for _, m := range gc.LegalMoves(true) {
+							if m[0] == to && !found[m[1]] {
+								moves = append(moves, availableMoves(gc, m[0], m[1])...)
+							}
+						}
+						return moves
+					}
+					for _, m := range availableMoves(b.gameState.Game, move[0], move[1]) {
+						x, y, _, _ := b.spaceRect(m)
+						x, y = b.offsetPosition(x, y)
+						op := &ebiten.DrawImageOptions{}
+						op.GeoM.Translate(float64(x), float64(y))
+						op.ColorScale.Scale(0.2, 0.2, 0.2, 0.2)
+						screen.DrawImage(b.spaceHighlight, op)
+					}
 				}
 			}
 		}
