@@ -1806,6 +1806,8 @@ func NewBoardWidget() *BoardWidget {
 
 func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
 	b := game.Board
+	b.Lock()
+	defer b.Unlock()
 
 	if b.Client == nil {
 		return false, nil

@@ -419,8 +419,10 @@ func diceImage(roll int) *ebiten.Image {
 }
 
 func setViewBoard(view bool) {
-	if viewBoard != view {
-		g := game
+	viewBoard = view
+
+	g := game
+	if g.keyboard.Visible() || g.Board.floatChatGrid.Visible() {
 		g.keyboard.Hide()
 		g.Board.floatChatGrid.SetVisible(false)
 		g.connectKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
@@ -428,7 +430,6 @@ func setViewBoard(view bool) {
 		g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	}
 
-	viewBoard = view
 	if viewBoard {
 		// Exit dialogs.
 		game.lobby.showJoinGame = false
@@ -1520,7 +1521,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		inputBuffer.Field.SetPadding(0)
 	}
 
-	setViewBoard(viewBoard)
+	old := viewBoard
+	viewBoard = !old
+	setViewBoard(old)
 
 	g.Board.updateOpponentLabel()
 	g.Board.updatePlayerLabel()
