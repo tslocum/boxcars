@@ -1837,13 +1837,11 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		return false, nil
 	}
 
-	cx, cy := ebiten.CursorPosition()
-	if cx != 0 || cy != 0 {
-		p := image.Point{X: cx, Y: cy}
-		if game.keyboard.Visible() && p.In(game.keyboard.Rect()) {
-			return false, nil
-		}
+	if game.keyboard.Visible() && cursor.In(game.keyboard.Rect()) {
+		return false, nil
 	}
+
+	cx, cy := cursor.X, cursor.Y
 
 	if b.dragging == nil {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
@@ -1873,7 +1871,7 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		}
 	}
 
-	x, y := ebiten.CursorPosition()
+	x, y := cx, cy
 	if b.dragTouchId != -1 {
 		x, y = ebiten.TouchPosition(b.dragTouchId)
 
