@@ -1430,22 +1430,24 @@ func (b *board) processState() {
 	b.lastPlayerNumber = b.gameState.PlayerNumber
 
 	var showGrid *etk.Grid
-	if b.gameState.MayRoll() {
-		if b.gameState.MayDouble() {
-			showGrid = b.buttonsDoubleRollGrid
-		} else {
-			showGrid = b.buttonsOnlyRollGrid
+	if !b.gameState.Spectating {
+		if b.gameState.MayRoll() {
+			if b.gameState.MayDouble() {
+				showGrid = b.buttonsDoubleRollGrid
+			} else {
+				showGrid = b.buttonsOnlyRollGrid
+			}
+		} else if b.gameState.MayOK() {
+			if b.gameState.MayResign() {
+				showGrid = b.buttonsResignAcceptGrid
+			} else if len(b.gameState.Moves) != 0 {
+				showGrid = b.buttonsUndoOKGrid
+			} else {
+				showGrid = b.buttonsOnlyOKGrid
+			}
+		} else if b.gameState.Winner == 0 && b.gameState.Turn != 0 && b.gameState.Turn == b.gameState.PlayerNumber && len(b.gameState.Moves) != 0 {
+			showGrid = b.buttonsOnlyUndoGrid
 		}
-	} else if b.gameState.MayOK() {
-		if b.gameState.MayResign() {
-			showGrid = b.buttonsResignAcceptGrid
-		} else if len(b.gameState.Moves) != 0 {
-			showGrid = b.buttonsUndoOKGrid
-		} else {
-			showGrid = b.buttonsOnlyOKGrid
-		}
-	} else if b.gameState.Winner == 0 && b.gameState.Turn != 0 && b.gameState.Turn == b.gameState.PlayerNumber && len(b.gameState.Moves) != 0 {
-		showGrid = b.buttonsOnlyUndoGrid
 	}
 	b.showButtonGrid(showGrid)
 
@@ -1593,14 +1595,9 @@ func (b *board) movePiece(from int, to int) {
 	}
 }
 
-// WatchingGame returns whether the active game is being watched.
-func (b *board) watchingGame() bool {
-	return !b.playingGame() && false // TODO
-}
-
 // PlayingGame returns whether the active game is being played.
 func (b *board) playingGame() bool {
-	return b.gameState.Player1.Name != "" || b.gameState.Player2.Name != ""
+	return (b.gameState.Player1.Name != "" || b.gameState.Player2.Name != "") && !b.gameState.Spectating
 }
 
 func (b *board) playerTurn() bool {

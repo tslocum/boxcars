@@ -36,7 +36,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.2p2"
+const version = "v1.1.2p3"
 
 const MaxDebug = 2
 
@@ -952,7 +952,7 @@ func (g *Game) handleEvents() {
 			g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
 		default:
 			l("*** " + gotext.Get("Warning: Received unknown event: %+v", ev))
-			l("*** " + gotext.Get("You may need to upgrade your client.", ev))
+			l("*** " + gotext.Get("You may need to upgrade your client."))
 		}
 	}
 }
