@@ -921,7 +921,6 @@ func (g *Game) handleEvents() {
 			l(fmt.Sprintf("*** Failed to roll: %s", ev.Reason))
 		case *bgammon.EventMoved:
 			lg(gotext.Get("%s moved %s.", ev.Player, bgammon.FormatMoves(ev.Moves)))
-			playSoundEffect(effectMove)
 			if ev.Player == g.Client.Username {
 				continue
 			}

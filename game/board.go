@@ -1531,6 +1531,8 @@ func (b *board) processState() {
 
 // _movePiece returns after moving the piece.
 func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bool) {
+	playSoundEffect(effectMove)
+
 	moveTime := (650 * time.Millisecond) / time.Duration(speed)
 	pauseTime := 250 * time.Millisecond
 
