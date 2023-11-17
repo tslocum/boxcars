@@ -36,7 +36,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.2p3"
+const version = "v1.1.2p4"
 
 const MaxDebug = 2
 
@@ -488,12 +488,12 @@ var spinner = []byte(`-\|/`)
 var viewBoard bool // View board or lobby
 
 var (
-	drawScreen  bool
+	drawScreen  int
 	updatedGame bool
 )
 
 func scheduleFrame() {
-	drawScreen = true
+	drawScreen = 2
 	updatedGame = false
 }
 
@@ -1325,10 +1325,10 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	if OptimizeDraw {
-		if !drawScreen {
+		if drawScreen <= 0 {
 			return
 		} else if updatedGame {
-			drawScreen = false
+			drawScreen -= 1
 		}
 	}
 

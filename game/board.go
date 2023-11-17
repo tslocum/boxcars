@@ -841,16 +841,12 @@ func (b *board) drawSprite(target *ebiten.Image, sprite *Sprite) {
 	target.DrawImage(imgCheckerLight, op)
 }
 func (b *board) Draw(screen *ebiten.Image) {
-	b.repositionLock.Lock()
-	defer b.repositionLock.Unlock()
-
 	{
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(float64(b.x), float64(b.y))
 		screen.DrawImage(b.backgroundImage, op)
 	}
 
-	fontMutex.Lock()
 	for space := 0; space < bgammon.BoardSpaces; space++ {
 		var numPieces int
 		for i, sprite := range b.spaceSprites[space] {
@@ -880,9 +876,11 @@ func (b *board) Draw(screen *ebiten.Image) {
 				labelColor = color.RGBA{0, 0, 0, 255}
 			}
 
+			fontMutex.Lock()
 			bounds := etk.BoundString(b.fontFace, overlayText)
 			overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
 			text.Draw(overlayImage, overlayText, b.fontFace, 0, bounds.Dy(), labelColor)
+			fontMutex.Unlock()
 
 			x, y, w, h := b.stackSpaceRect(space, numPieces-1)
 			x += (w / 2) - (bounds.Dx() / 2)
@@ -894,10 +892,10 @@ func (b *board) Draw(screen *ebiten.Image) {
 			screen.DrawImage(overlayImage, op)
 		}
 	}
-	fontMutex.Unlock()
 
 	// Draw space hover overlay when dragging
 	if b.dragging != nil {
+		b.Lock()
 		if b.highlightAvailable && b.draggingSpace != -1 {
 			for _, move := range b.gameState.Available {
 				if move[0] == b.draggingSpace {
@@ -930,6 +928,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 				}
 			}
 		}
+		b.Unlock()
 
 		dx, dy := b.dragX, b.dragY
 
@@ -1182,7 +1181,9 @@ func (b *board) updateOpponentLabel() {
 	} else {
 		text = player.Name
 	}
-	label.SetText(text)
+	if label.Text.Text() != text {
+		label.SetText(text)
+	}
 
 	if player.Number == 1 {
 		label.activeColor = color.RGBA{0, 0, 0, 255}
@@ -1205,13 +1206,26 @@ func (b *board) updateOpponentLabel() {
 		label.updateBackground()
 		return
 	}
-	label.SetRect(r.Inset(-padding))
+	{
+		newRect := r.Inset(-padding)
+		if !label.Rect().Eq(newRect) {
+			label.SetRect(newRect)
+		}
+	}
+	{
+		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy(), b.w/2-int(b.barWidth)/2, y+bounds.Dy()*2)
+		if !b.opponentPipCount.Rect().Eq(newRect) {
+			b.opponentPipCount.SetRect(newRect)
+		}
+	}
 
 	if b.showPipCount {
 		b.opponentPipCount.SetVisible(true)
-		b.opponentPipCount.SetText(strconv.Itoa(b.gameState.Pips(player.Number)))
-		b.opponentPipCount.SetForegroundColor(label.activeColor)
-		b.opponentPipCount.SetRect(image.Rect(x+bounds.Dx(), y-bounds.Dy(), b.w/2-int(b.barWidth)/2, y+bounds.Dy()*2))
+		pipCount := strconv.Itoa(b.gameState.Pips(player.Number))
+		if b.opponentPipCount.Text() != pipCount {
+			b.opponentPipCount.SetForegroundColor(label.activeColor)
+			b.opponentPipCount.SetText(pipCount)
+		}
 	} else {
 		b.opponentPipCount.SetVisible(false)
 	}
@@ -1227,7 +1241,9 @@ func (b *board) updatePlayerLabel() {
 	} else {
 		text = player.Name
 	}
-	label.SetText(text)
+	if label.Text.Text() != text {
+		label.SetText(text)
+	}
 
 	if player.Number == 1 {
 		label.activeColor = color.RGBA{0, 0, 0, 255}
@@ -1250,13 +1266,26 @@ func (b *board) updatePlayerLabel() {
 		label.updateBackground()
 		return
 	}
-	label.SetRect(r.Inset(-padding))
+	{
+		newRect := r.Inset(-padding)
+		if !label.Rect().Eq(newRect) {
+			label.SetRect(newRect)
+		}
+	}
+	{
+		newRect := image.Rect(b.innerW/2+int(b.barWidth)/2+int(b.horizontalBorderSize), y-bounds.Dy(), x, y+bounds.Dy()*2)
+		if !b.playerPipCount.Rect().Eq(newRect) {
+			b.playerPipCount.SetRect(newRect)
+		}
+	}
 
 	if b.showPipCount {
 		b.playerPipCount.SetVisible(true)
-		b.playerPipCount.SetText(strconv.Itoa(b.gameState.Pips(player.Number)))
-		b.playerPipCount.SetForegroundColor(label.activeColor)
-		b.playerPipCount.SetRect(image.Rect(b.innerW/2+int(b.barWidth)/2+int(b.horizontalBorderSize), y-bounds.Dy(), x, y+bounds.Dy()*2))
+		pipCount := strconv.Itoa(b.gameState.Pips(player.Number))
+		if b.playerPipCount.Text() != pipCount {
+			b.playerPipCount.SetForegroundColor(label.activeColor)
+			b.playerPipCount.SetText(pipCount)
+		}
 	} else {
 		b.playerPipCount.SetVisible(false)
 	}
@@ -1526,24 +1555,11 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	sprite.toTime = moveTime
 	sprite.toStart = time.Now()
 
-	t := time.NewTimer(moveTime)
-	mt := time.NewTicker(time.Second / 144)
-DRAWMOVE:
-	for {
-		select {
-		case <-t.C:
-			mt.Stop()
-			break DRAWMOVE
-		case <-mt.C:
-			scheduleFrame()
-		}
-
-	}
+	time.Sleep(moveTime)
 
 	sprite.x = x
 	sprite.y = y
 	sprite.toStart = time.Time{}
-	scheduleFrame()
 
 	/*homeSpace := b.ClientWebSocket.Board.PlayerHomeSpace()
 	if b.gameState.Turn != b.gameState.Player {
@@ -1614,6 +1630,7 @@ func (b *board) startDrag(s *Sprite, space int, click bool) {
 	}
 }
 
+// finishDrag calls processState. It does not need to be locked.
 func (b *board) finishDrag(x int, y int) {
 	if b.dragging == nil {
 		return
@@ -1702,6 +1719,10 @@ func (b *board) Update() {
 			sprite.x = x - (sprite.w / 2)
 			sprite.y = y - (sprite.h / 2)
 		}
+	}
+
+	if b.moving != nil || b.dragging != nil {
+		scheduleFrame()
 	}
 }
 
@@ -1805,11 +1826,12 @@ func NewBoardWidget() *BoardWidget {
 }
 
 func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
-	b := game.Board
-	b.Lock()
-	defer b.Unlock()
+	if !pressed && !clicked && game.Board.dragging == nil {
+		return false, nil
+	}
 
-	if b.Client == nil {
+	b := game.Board
+	if b.Client == nil || !b.playerTurn() {
 		return false, nil
 	}
 
