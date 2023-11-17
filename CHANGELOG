@@ -1,6 +1,7 @@
 1.1.3:
 - Support spectating matches
 - Highlight available moves using both dice
+- Optimize drawing user interface
 
 1.1.2:
 - Support moving checkers by clicking instead of dragging

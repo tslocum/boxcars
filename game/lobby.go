@@ -362,14 +362,12 @@ func (l *lobby) drawBuffer() {
 		var status string
 		for _, entry := range l.games {
 			if i >= l.offset {
-				if entry.Players == 2 {
-					status = gotext.Get("Full")
+				if entry.Password {
+					status = gotext.Get("Private")
+				} else if entry.Players == 2 {
+					status = gotext.Get("Started")
 				} else {
-					if !entry.Password {
-						status = gotext.Get("Open")
-					} else {
-						status = gotext.Get("Private")
-					}
+					status = gotext.Get("Public")
 				}
 
 				drawEntry(cx+l.padding, cy+l.padding, status, strconv.Itoa(entry.Points), entry.Name, i == l.selected, false)

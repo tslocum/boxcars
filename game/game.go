@@ -36,7 +36,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.2p4"
+const version = "v1.1.3"
 
 const MaxDebug = 2
 
@@ -1110,6 +1110,9 @@ func (g *Game) handleTouch(p image.Point) {
 			btn = g.lobby.showKeyboardButton
 		} else {
 			btn = g.Board.showKeyboardButton
+			g.Board.lastKeyboardToggle = time.Now()
+			g.Board.floatChatGrid.SetVisible(true)
+			g.Board.floatChatGrid.SetRect(g.Board.floatChatGrid.Rect())
 		}
 		btn.Label.SetText(gotext.Get("Hide Keyboard"))
 	}
