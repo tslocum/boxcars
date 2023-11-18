@@ -944,7 +944,7 @@ func (g *Game) handleEvents() {
 		case *bgammon.EventWin:
 			g.Board.Lock()
 			lg(gotext.Get("%s wins!", ev.Player))
-			if g.Board.gameState.Player1.Points >= g.Board.gameState.Points || g.Board.gameState.Player2.Points >= g.Board.gameState.Points {
+			if (g.Board.gameState.Player1.Points >= g.Board.gameState.Points || g.Board.gameState.Player2.Points >= g.Board.gameState.Points) && !g.Board.gameState.Spectating {
 				lg(gotext.Get("Type %s to offer a rematch.", "/rematch"))
 			}
 			g.Board.Unlock()

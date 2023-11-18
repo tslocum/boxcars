@@ -61,9 +61,6 @@ msgstr ""
 msgid "Failed to submit moves: %s"
 msgstr ""
 
-msgid "Full"
-msgstr ""
-
 msgid "Hide Keyboard"
 msgstr ""
 
@@ -100,9 +97,6 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-msgid "Open"
-msgstr ""
-
 msgid "Password"
 msgstr ""
 
@@ -113,6 +107,9 @@ msgid "Points"
 msgstr ""
 
 msgid "Private"
+msgstr ""
+
+msgid "Public"
 msgstr ""
 
 msgid "Refresh"
@@ -134,6 +131,12 @@ msgid "Settings"
 msgstr ""
 
 msgid "Show Keyboard"
+msgstr ""
+
+msgid "Show pip count"
+msgstr ""
+
+msgid "Started"
 msgstr ""
 
 msgid "Status"
