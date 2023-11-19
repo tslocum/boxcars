@@ -700,8 +700,8 @@ func (b *board) updateBackgroundImage() {
 	gc.SetStrokeColor(borderColor)
 	// Center.
 	gc.SetLineWidth(borderStrokeSize)
-	gc.MoveTo(float64(frameW-int(b.spaceWidth))/2, float64(0))
-	gc.LineTo(float64((frameW-int(b.spaceWidth))/2), float64(b.h))
+	gc.MoveTo(float64(frameW-int(b.spaceWidth))/2-1, float64(0))
+	gc.LineTo(float64(frameW-int(b.spaceWidth))/2-1, float64(b.h))
 	gc.Stroke()
 	// Outside right.
 	gc.MoveTo(float64(frameW), float64(0))
@@ -945,7 +945,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 						gc := in.Copy()
 						ok, _ := gc.AddMoves([][]int{{from, to}}, true)
 						if !ok {
-							log.Panicf("failed to add move %+v to game %+v", move, in)
+							return nil
 						}
 
 						moves := []int{to}
@@ -1400,8 +1400,8 @@ func (b *board) setSpaceRects() {
 		var add int
 		if space == bgammon.SpaceBarPlayer || space == bgammon.SpaceBarOpponent {
 			hspace = 6
+			add = 1
 			w = int(b.barWidth)
-			add = int(b.barWidth)/2 - int(b.spaceWidth)/2
 		} else if space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent {
 			hspace = 13
 			add = int(b.horizontalBorderSize)
@@ -1890,7 +1890,7 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 
 		if !handled && b.playerTurn() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			s, space := b.spriteAt(cx, cy)
-			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
+			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomePlayer && space != bgammon.SpaceHomeOpponent {
 				b.startDrag(s, space, false)
 				handled = true
 			}
@@ -1904,7 +1904,7 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 				b.dragX, b.dragY = x, y
 
 				s, space := b.spriteAt(x, y)
-				if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) {
+				if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomePlayer && space != bgammon.SpaceHomeOpponent {
 					b.startDrag(s, space, false)
 					b.dragTouchId = id
 					handled = true
