@@ -443,7 +443,6 @@ func setViewBoard(view bool) {
 		etk.SetFocus(inputBuffer)
 
 		game.Board.uiGrid.SetRect(game.Board.uiGrid.Rect())
-		game.Board.bearOffOverlay.SetRect(game.Board.bearOffOverlay.Rect())
 	} else {
 		if !game.loggedIn {
 			game.setRoot(connectGrid)
@@ -1162,7 +1161,6 @@ func (g *Game) Update() error {
 		updateButtons(game.lobby.buttonsGrid)
 		updateButtons(game.Board.menuGrid)
 		updateButtons(game.Board.leaveGameGrid)
-		updateButtons(game.Board.bearOffOverlay)
 		updateButtons(game.Board.floatChatGrid)
 
 		// Auto-connect
@@ -1460,12 +1458,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 		g.Board.uiGrid.SetRect(image.Rect(0, g.Board.h, g.screenW, g.screenH))
 
-		w := g.screenW / 2
-		h := (g.screenH - g.Board.h) / 2
-		x := w / 2
-		y := g.Board.h + h/2
-		g.Board.bearOffOverlay.SetRect(image.Rect(x, y, x+w, y+h))
-
 		g.lobby.fullscreen = true
 		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
 	} else { // Landscape view.
@@ -1489,12 +1481,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
 		g.Board.uiGrid.SetRect(image.Rect(g.Board.w+bufferPaddingX, bufferPaddingX, g.screenW-bufferPaddingX, g.screenH-bufferPaddingX))
-
-		w := (g.screenW - bufferPaddingX - g.Board.w) / 2
-		h := (g.screenH) / 4
-		x := g.Board.w + bufferPaddingX + w/2
-		y := g.screenH/2 - h/2
-		g.Board.bearOffOverlay.SetRect(image.Rect(x, y, x+w, y+h))
 
 		g.lobby.fullscreen = true
 		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)

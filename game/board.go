@@ -98,8 +98,6 @@ type board struct {
 
 	lastKeyboardToggle time.Time
 
-	bearOffOverlay *etk.Button
-
 	leaveGameGrid         *etk.Grid
 	confirmLeaveGameFrame *etk.Frame
 
@@ -179,11 +177,6 @@ func NewBoard() *board {
 
 	b.opponentPipCount.SetHorizontal(messeji.AlignEnd)
 	b.playerPipCount.SetHorizontal(messeji.AlignStart)
-
-	b.bearOffOverlay = etk.NewButton(gotext.Get("Drag here to bear off"), func() error {
-		return nil
-	})
-	b.bearOffOverlay.SetVisible(false)
 
 	b.recreateButtonGrid()
 
@@ -303,7 +296,6 @@ func NewBoard() *board {
 		f.AddChild(b.playerLabel)
 		f.AddChild(b.playerPipCount)
 		f.AddChild(b.uiGrid)
-		f.AddChild(b.bearOffOverlay)
 		b.frame.AddChild(f)
 	}
 
@@ -426,8 +418,8 @@ func (b *board) showButtonGrid(buttonGrid *etk.Grid) {
 	}
 
 	grid := etk.NewGrid()
-	grid.SetColumnSizes(b.w, -1)
-	grid.SetRowSizes(b.h, -1)
+	grid.SetColumnSizes(int(b.horizontalBorderSize)*2+b.innerW, -1)
+	grid.SetRowSizes(int(b.verticalBorderSize)*2+b.innerH, -1)
 	grid.AddChildAt(buttonGrid, 0, 0, 1, 1)
 
 	buttonGrid.SetVisible(true)
@@ -624,7 +616,6 @@ func (b *board) updateBackgroundImage() {
 		borderSize = b.barWidth / 2
 	}
 	frameW := b.w - int((b.horizontalBorderSize-borderSize)*2)
-	innerW := float64(b.w) - b.horizontalBorderSize*2 // Outer board width (including frame)
 
 	if b.backgroundImage == nil {
 		b.backgroundImage = ebiten.NewImage(b.w, b.h)
@@ -650,13 +641,20 @@ func (b *board) updateBackgroundImage() {
 	// Draw face.
 	{
 		x, y := int(b.horizontalBorderSize), int(b.verticalBorderSize)
-		w, h := int(innerW), b.h-int(b.verticalBorderSize*2)
+		w, h := int(b.w)+int(b.horizontalBorderSize), b.h-int(b.verticalBorderSize*2)
 		b.backgroundImage.SubImage(image.Rect(x, y, x+w, y+h)).(*ebiten.Image).Fill(faceColor)
+	}
+
+	// Draw right edge of frame.
+	{
+		x, y := int(b.horizontalBorderSize)+b.innerW, int(b.verticalBorderSize)
+		w, h := int(b.horizontalBorderSize), b.h
+		b.backgroundImage.SubImage(image.Rect(x, y, x+w, y+h)).(*ebiten.Image).Fill(frameColor)
 	}
 
 	// Draw bar.
 	{
-		x, y := int((b.w/2)-int(b.barWidth/2)), 0
+		x, y := int((b.w/2)-int(b.spaceWidth/2)-int(b.barWidth/2)), 0
 		w, h := int(b.barWidth), b.h
 		b.backgroundImage.SubImage(image.Rect(x, y, x+w, y+h)).(*ebiten.Image).Fill(frameColor)
 	}
@@ -700,18 +698,18 @@ func (b *board) updateBackgroundImage() {
 	// Draw border.
 	borderStrokeSize := 2.0
 	gc.SetStrokeColor(borderColor)
-	// - Center
+	// Center.
 	gc.SetLineWidth(borderStrokeSize)
-	gc.MoveTo(float64(frameW/2), float64(0))
-	gc.LineTo(float64(frameW/2), float64(b.h))
+	gc.MoveTo(float64(frameW-int(b.spaceWidth))/2, float64(0))
+	gc.LineTo(float64((frameW-int(b.spaceWidth))/2), float64(b.h))
 	gc.Stroke()
-	// - Outside right
+	// Outside right.
 	gc.MoveTo(float64(frameW), float64(0))
 	gc.LineTo(float64(frameW), float64(b.h))
 	gc.Stroke()
-	// - Inside left
+	// Inside left.
 	gc.SetLineWidth(borderStrokeSize / 2)
-	edge := float64((((innerW) - b.barWidth) / 2) + borderSize)
+	edge := float64(((float64(b.innerW) + 1 - b.barWidth) / 2) + borderSize)
 	gc.MoveTo(float64(borderSize), float64(b.verticalBorderSize))
 	gc.LineTo(edge, float64(b.verticalBorderSize))
 	gc.LineTo(edge, float64(b.h-int(b.verticalBorderSize)))
@@ -719,9 +717,9 @@ func (b *board) updateBackgroundImage() {
 	gc.LineTo(float64(borderSize), float64(b.verticalBorderSize))
 	gc.Close()
 	gc.Stroke()
-	// - Inside right
-	edgeStart := float64((innerW / 2) + (b.barWidth / 2) + borderSize)
-	edgeEnd := float64(innerW + borderSize)
+	// Inside right.
+	edgeStart := float64(float64(b.innerW/2) - 1 + (b.barWidth / 2) + borderSize)
+	edgeEnd := float64(float64(b.innerW) + borderSize)
 	gc.MoveTo(float64(edgeStart), float64(b.verticalBorderSize))
 	gc.LineTo(edgeEnd, float64(b.verticalBorderSize))
 	gc.LineTo(edgeEnd, float64(b.h-int(b.verticalBorderSize)))
@@ -729,15 +727,50 @@ func (b *board) updateBackgroundImage() {
 	gc.LineTo(float64(edgeStart), float64(b.verticalBorderSize))
 	gc.Close()
 	gc.Stroke()
+	// Home spaces.
+	{
+		edgeStart := b.horizontalBorderSize + float64(b.innerW) + b.horizontalBorderSize
+		edgeEnd := edgeStart + b.spaceWidth
+		gc.MoveTo(float64(edgeStart), float64(b.verticalBorderSize))
+		gc.LineTo(edgeEnd, float64(b.verticalBorderSize))
+		gc.LineTo(edgeEnd, float64(b.h-int(b.verticalBorderSize)))
+		gc.LineTo(float64(edgeStart), float64(b.h-int(b.verticalBorderSize)))
+		gc.LineTo(float64(edgeStart), float64(b.verticalBorderSize))
+		gc.Close()
+		gc.Stroke()
+	}
+	// Home space divider.
+	extraSpace := b.h - int(b.verticalBorderSize)*2 - int(b.overlapSize*10) - 4
+	if extraSpace > 0 {
+		edgeStart := b.horizontalBorderSize + float64(b.innerW) + b.horizontalBorderSize
+		edgeEnd := edgeStart + b.spaceWidth
+		divStart := float64(b.h/2 - (extraSpace / 2))
+		divEnd := float64(b.h/2 + (extraSpace / 2))
+
+		gc.MoveTo(float64(edgeStart)-1, divStart)
+		gc.LineTo(edgeEnd, divStart)
+		gc.LineTo(edgeEnd, divEnd)
+		gc.LineTo(edgeStart-1, divEnd)
+		gc.Close()
+		gc.SetFillColor(frameColor)
+		gc.Fill()
+
+		gc.MoveTo(float64(edgeStart), divStart)
+		gc.LineTo(edgeEnd, divStart)
+		gc.Stroke()
+		gc.MoveTo(float64(edgeStart), divEnd)
+		gc.LineTo(edgeEnd, divEnd)
+		gc.Stroke()
+	}
 	if !b.fullHeight {
-		// - Outside left
+		// Outside left.
 		gc.SetLineWidth(1)
 		gc.MoveTo(float64(0), float64(0))
 		gc.LineTo(float64(0), float64(b.h))
-		// Top
+		// Top.
 		gc.MoveTo(0, float64(0))
 		gc.LineTo(float64(b.w), float64(0))
-		// Bottom
+		// Bottom.
 		gc.MoveTo(0, float64(b.h))
 		gc.LineTo(float64(b.w), float64(b.h))
 		gc.Stroke()
@@ -840,6 +873,14 @@ func (b *board) drawSprite(target *ebiten.Image, sprite *Sprite) {
 
 	target.DrawImage(imgCheckerLight, op)
 }
+
+func (b *board) innerBoardCenter(right bool) int {
+	if right {
+		return b.x + int(b.horizontalBorderSize) + b.innerW - (b.innerW / 4) + int(b.barWidth/4)
+	}
+	return b.x + int(b.horizontalBorderSize) + (b.innerW / 4) - int(b.horizontalBorderSize*1.5)
+}
+
 func (b *board) Draw(screen *ebiten.Image) {
 	{
 		op := &ebiten.DrawImageOptions{}
@@ -885,7 +926,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 			x, y, w, h := b.stackSpaceRect(space, numPieces-1)
 			x += (w / 2) - (bounds.Dx() / 2)
 			y += (h / 2) - (bounds.Dy() / 2)
-			x, y = b.offsetPosition(x, y)
+			x, y = b.offsetPosition(space, x, y)
 
 			op := &ebiten.DrawImageOptions{}
 			op.GeoM.Translate(float64(x), float64(y))
@@ -919,7 +960,10 @@ func (b *board) Draw(screen *ebiten.Image) {
 					}
 					for _, m := range availableMoves(b.gameState.Game, move[0], move[1]) {
 						x, y, _, _ := b.spaceRect(m)
-						x, y = b.offsetPosition(x, y)
+						x, y = b.offsetPosition(m, x, y)
+						if b.bottomRow(m) {
+							y += b.h/2 - int(b.overlapSize*5) - int(b.verticalBorderSize) - 4
+						}
 						op := &ebiten.DrawImageOptions{}
 						op.GeoM.Translate(float64(x), float64(y))
 						op.ColorScale.Scale(0.2, 0.2, 0.2, 0.2)
@@ -940,7 +984,10 @@ func (b *board) Draw(screen *ebiten.Image) {
 		space := b.spaceAt(dx, dy)
 		if space > 0 && space < 25 {
 			x, y, _, _ := b.spaceRect(space)
-			x, y = b.offsetPosition(x, y)
+			x, y = b.offsetPosition(space, x, y)
+			if b.bottomRow(space) {
+				y += b.h/2 - int(b.overlapSize*5) - int(b.verticalBorderSize) - 4
+			}
 			op := &ebiten.DrawImageOptions{}
 			op.GeoM.Translate(float64(x), float64(y))
 			op.ColorScale.Scale(0.1, 0.1, 0.1, 0.1)
@@ -972,7 +1019,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	opponent := b.gameState.OpponentPlayer()
 	if opponent.Name != "" {
-		innerCenter := b.x + (b.w / 4) - int(b.barWidth/4) + int(b.horizontalBorderSize/2)
+		innerCenter := b.innerBoardCenter(false)
 		if b.gameState.Turn == 0 {
 			if opponentRoll != 0 {
 				op := &ebiten.DrawImageOptions{}
@@ -998,7 +1045,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	player := b.gameState.LocalPlayer()
 	if player.Name != "" {
-		innerCenter := b.x + b.w/2 + b.w/4 + int(b.barWidth/4) - int(b.horizontalBorderSize/2)
+		innerCenter := b.innerBoardCenter(true)
 		if b.gameState.Turn == 0 {
 			if playerRoll != 0 {
 				op := &ebiten.DrawImageOptions{}
@@ -1049,13 +1096,15 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 
 	b.x, b.y, b.w, b.h = x, y, w, h
-	if b.w > b.h {
-		b.w = b.h
+	maxWidth := int(float64(b.h) * 1.2)
+	if b.w > maxWidth {
+		b.w = maxWidth
 	}
 
 	b.triangleOffset = (float64(b.h) - (b.verticalBorderSize * 2)) / 15
 
-	b.spaceWidth = (float64(b.w) - (b.horizontalBorderSize * 2)) / 13
+	const horizontalSpaces = 14
+	b.spaceWidth = (float64(b.w) - (b.horizontalBorderSize * 2)) / horizontalSpaces
 	b.barWidth = b.spaceWidth
 
 	b.overlapSize = (((float64(b.h) - (b.verticalBorderSize * 2)) - (b.triangleOffset * 2)) / 2) / 5
@@ -1063,13 +1112,8 @@ func (b *board) setRect(x, y, w, h int) {
 		b.overlapSize = b.spaceWidth * 0.94
 	}
 
-	extraSpace := float64(b.w) - (b.spaceWidth * 12)
-	largeBarWidth := float64(b.spaceWidth) * 1.25
-	if extraSpace >= largeBarWidth {
-		b.barWidth = largeBarWidth
-		b.spaceWidth = ((float64(b.w) - (b.horizontalBorderSize * 2)) - b.barWidth) / 12
-	}
-
+	b.barWidth = float64(b.spaceWidth) + b.horizontalBorderSize
+	b.spaceWidth = ((float64(b.w) - (b.horizontalBorderSize * 2)) - b.barWidth) / (horizontalSpaces - 1)
 	if b.barWidth < 1 {
 		b.barWidth = 1
 	}
@@ -1077,7 +1121,7 @@ func (b *board) setRect(x, y, w, h int) {
 		b.spaceWidth = 1
 	}
 
-	b.innerW = int(float64(b.w) - (b.horizontalBorderSize * 2))
+	b.innerW = int(float64(b.w) - (b.horizontalBorderSize * 2) - b.spaceWidth)
 	b.innerH = int(float64(b.h) - (b.verticalBorderSize * 2))
 
 	b.triangleOffset = (float64(b.innerH)+b.verticalBorderSize-b.spaceWidth*10)/2 + b.spaceWidth/12
@@ -1198,10 +1242,11 @@ func (b *board) updateOpponentLabel() {
 	fontMutex.Unlock()
 
 	padding := 13
-	innerCenter := b.x + (b.w / 4) - int(b.barWidth/4) + int(b.horizontalBorderSize/2)
+	innerCenter := b.innerBoardCenter(false)
 	x := innerCenter - int(float64(bounds.Dx()/2))
 	y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
 	r := image.Rect(x, y, x+bounds.Dx(), y+bounds.Dy())
+
 	if r.Eq(label.Rect()) && r.Dx() != 0 && r.Dy() != 0 {
 		label.updateBackground()
 		return
@@ -1213,7 +1258,7 @@ func (b *board) updateOpponentLabel() {
 		}
 	}
 	{
-		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy(), b.w/2-int(b.barWidth)/2, y+bounds.Dy()*2)
+		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy(), b.innerW/2-int(b.barWidth)/2, y+bounds.Dy()*2)
 		if !b.opponentPipCount.Rect().Eq(newRect) {
 			b.opponentPipCount.SetRect(newRect)
 		}
@@ -1258,7 +1303,7 @@ func (b *board) updatePlayerLabel() {
 	defer fontMutex.Unlock()
 
 	padding := 13
-	innerCenter := b.x + b.w/2 + b.w/4 + int(b.barWidth/4) - int(b.horizontalBorderSize/2)
+	innerCenter := b.innerBoardCenter(true)
 	x := innerCenter - int(float64(bounds.Dx()/2))
 	y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
 	r := image.Rect(x, y, x+bounds.Dx(), y+bounds.Dy())
@@ -1291,7 +1336,10 @@ func (b *board) updatePlayerLabel() {
 	}
 }
 
-func (b *board) offsetPosition(x, y int) (int, int) {
+func (b *board) offsetPosition(space, x, y int) (int, int) {
+	if space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent {
+		x += 1
+	}
 	return b.x + x + int(b.horizontalBorderSize), b.y + y + int(b.verticalBorderSize)
 }
 
@@ -1307,7 +1355,7 @@ func (b *board) _positionCheckers() {
 			}
 
 			x, y, w, _ := b.stackSpaceRect(space, i)
-			s.x, s.y = b.offsetPosition(x, y)
+			s.x, s.y = b.offsetPosition(space, x, y)
 			// Center piece in space
 			s.x += (w - s.w) / 2
 		}
@@ -1329,7 +1377,7 @@ func (b *board) spriteAt(x, y int) (*Sprite, int) {
 func (b *board) spaceAt(x, y int) int {
 	for i := 0; i < bgammon.BoardSpaces; i++ {
 		sx, sy, sw, sh := b.spaceRect(i)
-		sx, sy = b.offsetPosition(sx, sy)
+		sx, sy = b.offsetPosition(i, sx, sy)
 		if x >= sx && x <= sx+sw && y >= sy && y <= sy+sh {
 			return i
 		}
@@ -1350,14 +1398,13 @@ func (b *board) setSpaceRects() {
 
 		var hspace int // horizontal space
 		var add int
-		if space == bgammon.SpaceBarPlayer {
+		if space == bgammon.SpaceBarPlayer || space == bgammon.SpaceBarOpponent {
 			hspace = 6
 			w = int(b.barWidth)
 			add = int(b.barWidth)/2 - int(b.spaceWidth)/2
-		} else if space == bgammon.SpaceBarOpponent {
-			hspace = 6
-			w = int(b.barWidth)
-			add = int(b.barWidth)/2 - int(b.spaceWidth)/2
+		} else if space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent {
+			hspace = 13
+			add = int(b.horizontalBorderSize)
 		} else if space <= 6 {
 			hspace = space - 1
 		} else if space <= 12 {
@@ -1375,7 +1422,7 @@ func (b *board) setSpaceRects() {
 		h = int((float64(b.h) - (b.verticalBorderSize * 2)) / 2)
 
 		if space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent {
-			x = -int(b.spaceWidth * 2)
+			x += int(b.horizontalBorderSize)
 		}
 
 		b.spaceRects[space] = [4]int{x, y, w, h}
@@ -1390,9 +1437,10 @@ func (b *board) setSpaceRects() {
 	}
 
 	r := b.spaceRects[1]
+	highlightHeight := int(b.overlapSize*5) + 4
 	bounds := b.spaceHighlight.Bounds()
-	if bounds.Dx() != r[2] || bounds.Dy() != r[3] {
-		b.spaceHighlight = ebiten.NewImage(r[2], r[3])
+	if bounds.Dx() != r[2] || bounds.Dy() != highlightHeight {
+		b.spaceHighlight = ebiten.NewImage(r[2], highlightHeight)
 		b.spaceHighlight.Fill(color.RGBA{255, 255, 255, 51})
 	}
 }
@@ -1407,11 +1455,12 @@ func (b *board) bottomRow(space int) bool {
 	bottomStart := 1
 	bottomEnd := 12
 	bottomBar := bgammon.SpaceBarPlayer
+	bottomHome := bgammon.SpaceHomePlayer
 	if b.gameState.PlayerNumber == 2 {
 		bottomStart = 1
 		bottomEnd = 12
 	}
-	return space == bottomBar || (space >= bottomStart && space <= bottomEnd)
+	return space == bottomBar || space == bottomHome || (space >= bottomStart && space <= bottomEnd)
 }
 
 // relX, relY
@@ -1441,7 +1490,7 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 	}
 
 	w, h = int(b.spaceWidth), int(b.spaceWidth)
-	if space == 0 || space == 25 {
+	if space == bgammon.SpaceBarPlayer || space == bgammon.SpaceBarOpponent {
 		w = int(b.barWidth)
 	}
 
@@ -1548,7 +1597,7 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	}
 
 	x, y, w, _ := b.stackSpaceRect(space, stack)
-	x, y = b.offsetPosition(x, y)
+	x, y = b.offsetPosition(space, x, y)
 	// Center piece in space
 	x += (w - int(b.spaceWidth)) / 2
 
@@ -1627,9 +1676,6 @@ func (b *board) startDrag(s *Sprite, space int, click bool) {
 	b.draggingSpace = space
 	b.draggingClick = click
 	b.lastDragClick = time.Now()
-	if bgammon.CanBearOff(b.gameState.Board, b.gameState.PlayerNumber, true) && b.gameState.Board[bgammon.SpaceHomePlayer] == 0 {
-		b.bearOffOverlay.SetVisible(true)
-	}
 }
 
 // finishDrag calls processState. It does not need to be locked.
@@ -1644,24 +1690,20 @@ func (b *board) finishDrag(x int, y int) {
 			if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && time.Since(b.lastDragClick) >= 50*time.Millisecond {
 				dropped = b.dragging
 				b.dragging = nil
-				b.bearOffOverlay.SetVisible(false)
 			}
 		} else if inpututil.IsTouchJustReleased(b.dragTouchId) {
 			dropped = b.dragging
 			b.dragging = nil
-			b.bearOffOverlay.SetVisible(false)
 		}
 	} else {
 		if b.dragTouchId == -1 {
 			if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
 				dropped = b.dragging
 				b.dragging = nil
-				b.bearOffOverlay.SetVisible(false)
 			}
 		} else if inpututil.IsTouchJustReleased(b.dragTouchId) {
 			dropped = b.dragging
 			b.dragging = nil
-			b.bearOffOverlay.SetVisible(false)
 		}
 	}
 	if dropped != nil {
