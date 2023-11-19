@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-11-09 23:36+0000\n"
-"Last-Translator: Nathan <bonnemainsnathan@gmail.com>\n"
+"PO-Revision-Date: 2023-11-19 17:53+0000\n"
+"Last-Translator: ButterflyOfFire <boffire@users.noreply.hosted.weblate.org>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/bgammon/boxcars/"
 "fr/>\n"
 "Language: fr\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.2-dev\n"
+"X-Generator: Weblate 5.2\n"
 
 msgid "%s joined the match."
 msgstr "%s a rejoint la partie."
@@ -33,9 +33,11 @@ msgid ""
 "Boxcars is a client for playing backgammon via bgammon.org, a free and open "
 "source backgammon service."
 msgstr ""
+"Boxcars est un client pour jouer à backgammon via bgammon.org, un service "
+"backgammon libre et ouvert."
 
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
 msgid "Connect"
 msgstr "Connexion"
@@ -43,7 +45,6 @@ msgstr "Connexion"
 msgid "Connecting..."
 msgstr "Connexion…"
 
-#, fuzzy
 msgid "Create"
 msgstr "Créer une partie"
 
@@ -69,7 +70,7 @@ msgid "Failed to submit moves: %s"
 msgstr "Impossible d'envoyer le mouvement : %s"
 
 msgid "Full"
-msgstr ""
+msgstr "Plein"
 
 msgid "Hide Keyboard"
 msgstr "Masquer le clavier"
@@ -87,7 +88,7 @@ msgid "Join match: %s"
 msgstr "Rejoindre la partie : %s"
 
 msgid "Leave"
-msgstr ""
+msgstr "Quitter"
 
 msgid "Leave match?"
 msgstr "Quitter la partie ?"
@@ -108,7 +109,7 @@ msgid "OK"
 msgstr "OK"
 
 msgid "Open"
-msgstr ""
+msgstr "Ouvrir"
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -120,10 +121,10 @@ msgid "Points"
 msgstr "Points"
 
 msgid "Private"
-msgstr ""
+msgstr "Privée"
 
 msgid "Refresh"
-msgstr ""
+msgstr "Actualiser"
 
 msgid "Resign"
 msgstr "Capituler"
@@ -138,13 +139,13 @@ msgid "Server"
 msgstr "Serveur"
 
 msgid "Settings"
-msgstr ""
+msgstr "Réglages"
 
 msgid "Show Keyboard"
 msgstr "Afficher le clavier"
 
 msgid "Status"
-msgstr ""
+msgstr "État"
 
 msgid ""
 "To log in as a guest, enter a username (if you want) and do not enter a "
@@ -157,7 +158,7 @@ msgid "Type %s to offer a rematch."
 msgstr ""
 
 msgid "Undo"
-msgstr ""
+msgstr "Annuler"
 
 msgid "Username"
 msgstr "Nom d'utilisateur"
