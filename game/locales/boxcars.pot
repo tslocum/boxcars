@@ -46,9 +46,6 @@ msgstr ""
 msgid "Double"
 msgstr ""
 
-msgid "Drag here to bear off"
-msgstr ""
-
 msgid "Failed to join match: %s"
 msgstr ""
 

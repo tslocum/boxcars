@@ -43,8 +43,7 @@ type board struct {
 	lastDragClick time.Time
 	moving        *Sprite // Moving automatically
 
-	dragTouchId ebiten.TouchID
-	touchIDs    []ebiten.TouchID
+	touchIDs []ebiten.TouchID
 
 	spaceWidth           float64
 	barWidth             float64
@@ -338,8 +337,6 @@ func NewBoard() *board {
 	for i := range b.Sprites.sprites {
 		b.Sprites.sprites[i] = b.newSprite(i >= 15)
 	}
-
-	b.dragTouchId = -1
 
 	return b
 }
@@ -812,7 +809,14 @@ func (b *board) updateBackgroundImage() {
 
 func (b *board) drawSprite(target *ebiten.Image, sprite *Sprite) {
 	x, y := float64(sprite.x), float64(sprite.y)
-	if !sprite.toStart.IsZero() {
+	if sprite == b.dragging {
+		cx, cy := ebiten.CursorPosition()
+		if cx != 0 || cy != 0 {
+			x, y = float64(cx-sprite.w/2), float64(cy-sprite.h/2)
+		} else {
+			x, y = float64(b.dragX), float64(b.dragY)
+		}
+	} else if !sprite.toStart.IsZero() {
 		progress := float64(time.Since(sprite.toStart)) / float64(sprite.toTime)
 		if x == float64(sprite.toX) && y == float64(sprite.toY) {
 			sprite.toStart = time.Time{}
@@ -986,6 +990,8 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	playerRoll := b.gameState.Roll1
 	opponentRoll := b.gameState.Roll2
+	roll1 := b.gameState.Roll1
+	roll2 := b.gameState.Roll2
 	if b.gameState.PlayerNumber == 2 {
 		playerRoll, opponentRoll = opponentRoll, playerRoll
 	}
@@ -1013,17 +1019,17 @@ func (b *board) Draw(screen *ebiten.Image) {
 				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 				screen.DrawImage(diceImage(opponentRoll), op)
 			}
-		} else if b.gameState.Turn != b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
+		} else if b.gameState.Turn != b.gameState.PlayerNumber && roll1 != 0 {
 			{
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-				screen.DrawImage(diceImage(b.gameState.Roll1), op)
+				screen.DrawImage(diceImage(roll1), op)
 			}
 
 			{
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-				screen.DrawImage(diceImage(b.gameState.Roll2), op)
+				screen.DrawImage(diceImage(roll2), op)
 			}
 		}
 	}
@@ -1039,17 +1045,17 @@ func (b *board) Draw(screen *ebiten.Image) {
 				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 				screen.DrawImage(diceImage(playerRoll), op)
 			}
-		} else if b.gameState.Turn == b.gameState.PlayerNumber && b.gameState.Roll1 != 0 {
+		} else if b.gameState.Turn == b.gameState.PlayerNumber && roll1 != 0 {
 			{
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-				screen.DrawImage(diceImage(b.gameState.Roll1), op)
+				screen.DrawImage(diceImage(roll1), op)
 			}
 
 			{
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-				screen.DrawImage(diceImage(b.gameState.Roll2), op)
+				screen.DrawImage(diceImage(roll2), op)
 			}
 		}
 	}
@@ -1386,7 +1392,7 @@ func (b *board) spaceAt(x, y int) int {
 	for i := 0; i < bgammon.BoardSpaces; i++ {
 		sx, sy, sw, sh := b.spaceRect(i)
 		sx, sy = b.offsetPosition(i, sx, sy)
-		if x >= sx && x <= sx+sw && y >= sy && y <= sy+sh {
+		if x >= sx && x < sx+sw && y >= sy && y < sy+sh {
 			return i
 		}
 	}
@@ -1687,32 +1693,21 @@ func (b *board) startDrag(s *Sprite, space int, click bool) {
 }
 
 // finishDrag calls processState. It does not need to be locked.
-func (b *board) finishDrag(x int, y int) {
+func (b *board) finishDrag(x int, y int, click bool) {
 	if b.dragging == nil {
+		return
+	} else if b.draggingClick && !click {
 		return
 	}
 
+	if x != 0 || y != 0 { // 0,0 is returned when the touch is released
+		b.dragX, b.dragY = x, y
+	}
+
 	var dropped *Sprite
-	if b.draggingClick {
-		if b.dragTouchId == -1 {
-			if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && time.Since(b.lastDragClick) >= 50*time.Millisecond {
-				dropped = b.dragging
-				b.dragging = nil
-			}
-		} else if inpututil.IsTouchJustReleased(b.dragTouchId) {
-			dropped = b.dragging
-			b.dragging = nil
-		}
-	} else {
-		if b.dragTouchId == -1 {
-			if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
-				dropped = b.dragging
-				b.dragging = nil
-			}
-		} else if inpututil.IsTouchJustReleased(b.dragTouchId) {
-			dropped = b.dragging
-			b.dragging = nil
-		}
+	if ((b.draggingClick && click) || (!b.draggingClick && len(ebiten.AppendTouchIDs(b.touchIDs[:0])) == 0 && !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft))) && time.Since(b.lastDragClick) >= 50*time.Millisecond {
+		dropped = b.dragging
+		b.dragging = nil
 	}
 	if dropped != nil {
 		if x == 0 && y == 0 {
@@ -1728,8 +1723,20 @@ func (b *board) finishDrag(x int, y int) {
 			index = bgammon.SpaceHomePlayer
 		}
 
-		if !b.draggingClick && index == b.draggingSpace && b.dragTouchId == -1 && !b.lastDragClick.IsZero() && time.Since(b.lastDragClick) < 500*time.Millisecond {
+		if !b.draggingClick && index == b.draggingSpace && !b.lastDragClick.IsZero() && time.Since(b.lastDragClick) < 500*time.Millisecond {
 			b.startDrag(dropped, index, true)
+			if game.TouchInput {
+				r := b.spaceRects[index]
+				offset := int(b.spaceWidth) + int(b.overlapSize)*4
+				if !b.bottomRow(index) {
+					b.dragX, b.dragY = int(b.horizontalBorderSize)+r[0], r[1]+offset
+				} else {
+					b.dragX, b.dragY = int(b.horizontalBorderSize)+r[0], r[1]+r[3]-offset
+				}
+				if index == bgammon.SpaceBarPlayer || index == bgammon.SpaceBarOpponent {
+					b.dragX += int(b.horizontalBorderSize / 2)
+				}
+			}
 			b.processState()
 			scheduleFrame()
 			b.lastDragClick = time.Now()
@@ -1764,7 +1771,7 @@ func (b *board) finishDrag(x int, y int) {
 }
 
 func (b *board) Update() {
-	b.finishDrag(0, 0)
+	b.finishDrag(0, 0, inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft))
 	if b.dragging != nil && b.draggingClick {
 		x, y := ebiten.CursorPosition()
 		if x != 0 || y != 0 {
@@ -1896,44 +1903,17 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 
 	if b.dragging == nil {
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
-
-		if !handled && b.playerTurn() && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		if !handled && b.playerTurn() && clicked && (b.lastDragClick.IsZero() || time.Since(b.lastDragClick) >= 50*time.Millisecond) {
 			s, space := b.spriteAt(cx, cy)
 			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomePlayer && space != bgammon.SpaceHomeOpponent {
 				b.startDrag(s, space, false)
 				handled = true
 			}
 		}
-
-		b.touchIDs = inpututil.AppendJustPressedTouchIDs(b.touchIDs[:0])
-		for _, id := range b.touchIDs {
-			game.EnableTouchInput()
-			x, y := ebiten.TouchPosition(id)
-			if b.playerTurn() {
-				b.dragX, b.dragY = x, y
-
-				s, space := b.spriteAt(x, y)
-				if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomePlayer && space != bgammon.SpaceHomeOpponent {
-					b.startDrag(s, space, false)
-					b.dragTouchId = id
-					handled = true
-				}
-			}
-		}
 	}
 
 	x, y := cx, cy
-	if b.dragTouchId != -1 {
-		x, y = ebiten.TouchPosition(b.dragTouchId)
-
-		if x != 0 || y != 0 { // 0,0 is returned when the touch is released
-			b.dragX, b.dragY = x, y
-		} else {
-			x, y = b.dragX, b.dragY
-		}
-	}
-
-	b.finishDrag(x, y)
+	b.finishDrag(x, y, clicked)
 
 	if b.dragging != nil {
 		sprite := b.dragging

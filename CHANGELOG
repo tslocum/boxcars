@@ -1,6 +1,7 @@
 1.1.4:
 - Display player "off" spaces
 - Allow bearing off by moving checkers to the "off" spaces
+- Support moving checkers on Android devices by tapping instead of dragging
 
 1.1.3:
 - Support spectating matches
