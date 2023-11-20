@@ -280,7 +280,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 
 func (l *lobby) rebuildButtonsGrid() {
 	r := l.buttonsGrid.Rect()
-	*l.buttonsGrid = *etk.NewGrid()
+	l.buttonsGrid.Empty()
 
 	for i, btn := range l.getButtons() {
 		l.buttonsGrid.AddChildAt(etk.NewButton(btn.label, l.selectButton(i)), i, 0, 1, 1)

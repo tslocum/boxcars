@@ -117,6 +117,7 @@ type board struct {
 	widget *BoardWidget
 
 	repositionLock *sync.Mutex
+	stateLock      *sync.Mutex
 
 	*sync.Mutex
 }
@@ -166,6 +167,7 @@ func NewBoard() *board {
 		widget:                  NewBoardWidget(),
 		fontFace:                mediumFont,
 		repositionLock:          &sync.Mutex{},
+		stateLock:               &sync.Mutex{},
 		Mutex:                   &sync.Mutex{},
 	}
 
@@ -381,9 +383,9 @@ func (b *board) recreateInputGrid() {
 	if b.inputGrid == nil {
 		b.inputGrid = etk.NewGrid()
 	} else {
-		*b.inputGrid = *etk.NewGrid()
+		b.inputGrid.Empty()
 	}
-	*b.floatInputGrid = *etk.NewGrid()
+	b.floatInputGrid.Empty()
 
 	if game.TouchInput {
 		b.inputGrid.AddChildAt(inputBuffer, 0, 0, 2, 1)
@@ -417,18 +419,18 @@ func (b *board) showButtonGrid(buttonGrid *etk.Grid) {
 		return
 	}
 
-	grid := etk.NewGrid()
+	grid := b.buttonsGrid
 	grid.SetColumnSizes(int(b.horizontalBorderSize)*2+b.innerW, -1)
 	grid.SetRowSizes(int(b.verticalBorderSize)*2+b.innerH, -1)
+	grid.Empty()
 	grid.AddChildAt(buttonGrid, 0, 0, 1, 1)
 
 	buttonGrid.SetVisible(true)
-
-	*b.buttonsGrid = *grid
+	b.buttonsGrid.SetVisible(true)
 }
 
 func (b *board) recreateButtonGrid() {
-	buttonGrid := func(reverse bool, widgets ...etk.Widget) *etk.Grid {
+	buttonGrid := func(grid *etk.Grid, reverse bool, widgets ...etk.Widget) *etk.Grid {
 		w := game.scale(250)
 		if w > b.innerW/4 {
 			w = b.innerW / 4
@@ -448,7 +450,11 @@ func (b *board) recreateButtonGrid() {
 			padding = 0
 		}
 
-		grid := etk.NewGrid()
+		if grid == nil {
+			grid = etk.NewGrid()
+		} else {
+			grid.Empty()
+		}
 		grid.SetColumnSizes(-1, w, -1, padding, -1, w, -1, w, -1)
 		grid.SetRowSizes(-1, h+75, h, -1)
 		x := 1
@@ -484,12 +490,12 @@ func (b *board) recreateButtonGrid() {
 	resignButton := button(gotext.Get("Resign"), b.selectResign)
 	acceptButton := button(gotext.Get("Accept"), b.selectOK)
 
-	*b.buttonsOnlyRollGrid = *buttonGrid(false, rollButton)
-	*b.buttonsOnlyUndoGrid = *buttonGrid(true, undoButton)
-	*b.buttonsOnlyOKGrid = *buttonGrid(false, okButton)
-	*b.buttonsDoubleRollGrid = *buttonGrid(false, doubleButton, rollButton)
-	*b.buttonsResignAcceptGrid = *buttonGrid(false, resignButton, acceptButton)
-	*b.buttonsUndoOKGrid = *buttonGrid(false, undoButton, okButton)
+	b.buttonsOnlyRollGrid = buttonGrid(b.buttonsOnlyRollGrid, false, rollButton)
+	b.buttonsOnlyUndoGrid = buttonGrid(b.buttonsOnlyUndoGrid, true, undoButton)
+	b.buttonsOnlyOKGrid = buttonGrid(b.buttonsOnlyOKGrid, false, okButton)
+	b.buttonsDoubleRollGrid = buttonGrid(b.buttonsDoubleRollGrid, false, doubleButton, rollButton)
+	b.buttonsResignAcceptGrid = buttonGrid(b.buttonsResignAcceptGrid, false, resignButton, acceptButton)
+	b.buttonsUndoOKGrid = buttonGrid(b.buttonsUndoOKGrid, false, undoButton, okButton)
 }
 
 func (b *board) cancelLeaveGame() error {
@@ -945,14 +951,23 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 	}
 
+	b.stateLock.Lock()
+	playerRoll := b.gameState.Roll1
+	opponentRoll := b.gameState.Roll2
+	roll1 := b.gameState.Roll1
+	roll2 := b.gameState.Roll2
+	if b.gameState.PlayerNumber == 2 {
+		playerRoll, opponentRoll = opponentRoll, playerRoll
+	}
+	var highlightSpaces []int
+	dragging := b.dragging
+	if b.dragging != nil && b.highlightAvailable && b.draggingSpace != -1 {
+		highlightSpaces = b.allAvailableMoves()
+	}
+	b.stateLock.Unlock()
+
 	// Draw space hover overlay when dragging
-	if b.dragging != nil {
-		b.Lock()
-		var highlightSpaces []int
-		if b.highlightAvailable && b.draggingSpace != -1 {
-			highlightSpaces = b.allAvailableMoves()
-		}
-		b.Unlock()
+	if dragging != nil {
 		for _, m := range highlightSpaces {
 			x, y, _, _ := b.spaceRect(m)
 			x, y = b.offsetPosition(m, x, y)
@@ -987,14 +1002,6 @@ func (b *board) Draw(screen *ebiten.Image) {
 	}
 
 	// Draw opponent dice
-
-	playerRoll := b.gameState.Roll1
-	opponentRoll := b.gameState.Roll2
-	roll1 := b.gameState.Roll1
-	roll2 := b.gameState.Roll2
-	if b.gameState.PlayerNumber == 2 {
-		playerRoll, opponentRoll = opponentRoll, playerRoll
-	}
 
 	diceGap := 10.0
 	if game.screenW < 800 {
@@ -1512,8 +1519,8 @@ func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
 }
 
 func (b *board) processState() {
-	b.repositionLock.Lock()
-	defer b.repositionLock.Unlock()
+	b.stateLock.Lock()
+	defer b.stateLock.Unlock()
 
 	if b.lastPlayerNumber != b.gameState.PlayerNumber {
 		b.setSpaceRects()

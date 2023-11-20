@@ -495,13 +495,17 @@ var spinner = []byte(`-\|/`)
 var viewBoard bool // View board or lobby
 
 var (
-	drawScreen  int
-	updatedGame bool
+	drawScreen     int
+	updatedGame    bool
+	gameUpdateLock = &sync.Mutex{}
 )
 
 func scheduleFrame() {
-	drawScreen = 2
+	gameUpdateLock.Lock()
+	defer gameUpdateLock.Unlock()
+
 	updatedGame = false
+	drawScreen = 2
 }
 
 type Game struct {
@@ -558,6 +562,8 @@ type Game struct {
 	scaleFactor float64
 
 	loaded bool
+
+	*sync.Mutex
 }
 
 func NewGame() *Game {
@@ -577,6 +583,8 @@ func NewGame() *Game {
 		debugImg:    ebiten.NewImage(200, 200),
 		volume:      1,
 		scaleFactor: 1,
+
+		Mutex: &sync.Mutex{},
 	}
 	game = g
 
@@ -834,140 +842,152 @@ func (g *Game) handleAutoRefresh() {
 	}
 }
 
+func (g *Game) handleEvent(e interface{}) {
+	switch ev := e.(type) {
+	case *bgammon.EventWelcome:
+		g.Client.Username = ev.PlayerName
+
+		areIs := "are"
+		if ev.Clients == 1 {
+			areIs = "is"
+		}
+		clientsPlural := "s"
+		if ev.Clients == 1 {
+			clientsPlural = ""
+		}
+		matchesPlural := "es"
+		if ev.Games == 1 {
+			matchesPlural = ""
+		}
+		l(fmt.Sprintf("*** Welcome, %s. There %s %d client%s playing %d match%s.", ev.PlayerName, areIs, ev.Clients, clientsPlural, ev.Games, matchesPlural))
+	case *bgammon.EventHelp:
+		l(fmt.Sprintf("*** Help: %s", ev.Message))
+	case *bgammon.EventNotice:
+		l(fmt.Sprintf("*** %s", ev.Message))
+	case *bgammon.EventSay:
+		l(fmt.Sprintf("<%s> %s", ev.Player, ev.Message))
+		playSoundEffect(effectSay)
+	case *bgammon.EventList:
+		g.lobby.setGameList(ev.Games)
+		if !viewBoard {
+			scheduleFrame()
+		}
+	case *bgammon.EventJoined:
+		g.Board.Lock()
+		if ev.PlayerNumber == 1 {
+			g.Board.gameState.Player1.Name = ev.Player
+		} else if ev.PlayerNumber == 2 {
+			g.Board.gameState.Player2.Name = ev.Player
+		}
+		g.Board.processState()
+		g.Board.Unlock()
+		setViewBoard(true)
+
+		if ev.Player == g.Client.Username {
+			gameBuffer.SetText("")
+			gameLogged = false
+		} else {
+			lg(gotext.Get("%s joined the match.", ev.Player))
+			playSoundEffect(effectJoinLeave)
+		}
+	case *bgammon.EventFailedJoin:
+		l("*** " + gotext.Get("Failed to join match: %s", ev.Reason))
+	case *bgammon.EventFailedLeave:
+		l("*** " + gotext.Get("Failed to leave match: %s", ev.Reason))
+		setViewBoard(false)
+	case *bgammon.EventLeft:
+		g.Board.Lock()
+		if g.Board.gameState.Player1.Name == ev.Player {
+			g.Board.gameState.Player1.Name = ""
+		} else if g.Board.gameState.Player2.Name == ev.Player {
+			g.Board.gameState.Player2.Name = ""
+		}
+		g.Board.processState()
+		g.Board.Unlock()
+		if ev.Player == g.Client.Username {
+			setViewBoard(false)
+		} else {
+			lg(gotext.Get("%s left the match.", ev.Player))
+			playSoundEffect(effectJoinLeave)
+		}
+	case *bgammon.EventBoard:
+		g.Board.Lock()
+		g.Board.stateLock.Lock()
+		*g.Board.gameState = ev.GameState
+		*g.Board.gameState.Game = *ev.GameState.Game
+		g.Board.stateLock.Unlock()
+		g.Board.processState()
+		g.Board.Unlock()
+		setViewBoard(true)
+	case *bgammon.EventRolled:
+		g.Board.Lock()
+		g.Board.stateLock.Lock()
+		g.Board.gameState.Roll1 = ev.Roll1
+		g.Board.gameState.Roll2 = ev.Roll2
+		var diceFormatted string
+		if g.Board.gameState.Turn == 0 {
+			if g.Board.gameState.Player1.Name == ev.Player {
+				diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll1)
+			} else {
+				diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll2)
+			}
+			playSoundEffect(effectDie)
+		} else {
+			diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
+			playSoundEffect(effectDice)
+		}
+		g.Board.stateLock.Unlock()
+		g.Board.processState()
+		g.Board.Unlock()
+		scheduleFrame()
+		lg(gotext.Get("%s rolled %s.", ev.Player, diceFormatted))
+	case *bgammon.EventFailedRoll:
+		l(fmt.Sprintf("*** Failed to roll: %s", ev.Reason))
+	case *bgammon.EventMoved:
+		lg(gotext.Get("%s moved %s.", ev.Player, bgammon.FormatMoves(ev.Moves)))
+		if ev.Player == g.Client.Username {
+			return
+		}
+		g.Board.Lock()
+		g.Unlock()
+		for _, move := range ev.Moves {
+			playSoundEffect(effectMove)
+			g.Board.movePiece(move[0], move[1])
+		}
+		g.Lock()
+		g.Board.Unlock()
+	case *bgammon.EventFailedMove:
+		g.Client.Out <- []byte("board") // Refresh game state.
+
+		var extra string
+		if ev.From != 0 || ev.To != 0 {
+			extra = fmt.Sprintf(" from %s to %s", bgammon.FormatSpace(ev.From), bgammon.FormatSpace(ev.To))
+		}
+		l("*** " + gotext.Get("Failed to move checker%s: %s", extra, ev.Reason))
+		l("*** " + gotext.Get("Legal moves: %s", bgammon.FormatMoves(g.Board.gameState.Available)))
+	case *bgammon.EventFailedOk:
+		g.Client.Out <- []byte("board") // Refresh game state.
+		l("*** " + gotext.Get("Failed to submit moves: %s", ev.Reason))
+	case *bgammon.EventWin:
+		g.Board.Lock()
+		lg(gotext.Get("%s wins!", ev.Player))
+		if (g.Board.gameState.Player1.Points >= g.Board.gameState.Points || g.Board.gameState.Player2.Points >= g.Board.gameState.Points) && !g.Board.gameState.Spectating {
+			lg(gotext.Get("Type %s to offer a rematch.", "/rematch"))
+		}
+		g.Board.Unlock()
+	case *bgammon.EventPing:
+		g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
+	default:
+		l("*** " + gotext.Get("Warning: Received unknown event: %+v", ev))
+		l("*** " + gotext.Get("You may need to upgrade your client."))
+	}
+}
+
 func (g *Game) handleEvents() {
 	for e := range g.Client.Events {
-		switch ev := e.(type) {
-		case *bgammon.EventWelcome:
-			g.Client.Username = ev.PlayerName
-
-			areIs := "are"
-			if ev.Clients == 1 {
-				areIs = "is"
-			}
-			clientsPlural := "s"
-			if ev.Clients == 1 {
-				clientsPlural = ""
-			}
-			matchesPlural := "es"
-			if ev.Games == 1 {
-				matchesPlural = ""
-			}
-			l(fmt.Sprintf("*** Welcome, %s. There %s %d client%s playing %d match%s.", ev.PlayerName, areIs, ev.Clients, clientsPlural, ev.Games, matchesPlural))
-		case *bgammon.EventHelp:
-			l(fmt.Sprintf("*** Help: %s", ev.Message))
-		case *bgammon.EventNotice:
-			l(fmt.Sprintf("*** %s", ev.Message))
-		case *bgammon.EventSay:
-			l(fmt.Sprintf("<%s> %s", ev.Player, ev.Message))
-			playSoundEffect(effectSay)
-		case *bgammon.EventList:
-			g.lobby.setGameList(ev.Games)
-			if !viewBoard {
-				scheduleFrame()
-			}
-		case *bgammon.EventJoined:
-			g.Board.Lock()
-			if ev.PlayerNumber == 1 {
-				g.Board.gameState.Player1.Name = ev.Player
-			} else if ev.PlayerNumber == 2 {
-				g.Board.gameState.Player2.Name = ev.Player
-			}
-			g.Board.processState()
-			g.Board.Unlock()
-			setViewBoard(true)
-
-			if ev.Player == g.Client.Username {
-				gameBuffer.SetText("")
-				gameLogged = false
-			} else {
-				lg(gotext.Get("%s joined the match.", ev.Player))
-				playSoundEffect(effectJoinLeave)
-			}
-		case *bgammon.EventFailedJoin:
-			l("*** " + gotext.Get("Failed to join match: %s", ev.Reason))
-		case *bgammon.EventFailedLeave:
-			l("*** " + gotext.Get("Failed to leave match: %s", ev.Reason))
-			setViewBoard(false)
-		case *bgammon.EventLeft:
-			g.Board.Lock()
-			if g.Board.gameState.Player1.Name == ev.Player {
-				g.Board.gameState.Player1.Name = ""
-			} else if g.Board.gameState.Player2.Name == ev.Player {
-				g.Board.gameState.Player2.Name = ""
-			}
-			g.Board.processState()
-			g.Board.Unlock()
-			if ev.Player == g.Client.Username {
-				setViewBoard(false)
-			} else {
-				lg(gotext.Get("%s left the match.", ev.Player))
-				playSoundEffect(effectJoinLeave)
-			}
-		case *bgammon.EventBoard:
-			g.Board.Lock()
-			*g.Board.gameState = ev.GameState
-			*g.Board.gameState.Game = *ev.GameState.Game
-			g.Board.processState()
-			g.Board.Unlock()
-			setViewBoard(true)
-		case *bgammon.EventRolled:
-			g.Board.Lock()
-			g.Board.gameState.Roll1 = ev.Roll1
-			g.Board.gameState.Roll2 = ev.Roll2
-			var diceFormatted string
-			if g.Board.gameState.Turn == 0 {
-				if g.Board.gameState.Player1.Name == ev.Player {
-					diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll1)
-				} else {
-					diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll2)
-				}
-				playSoundEffect(effectDie)
-			} else {
-				diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
-				playSoundEffect(effectDice)
-			}
-			g.Board.processState()
-			g.Board.Unlock()
-			scheduleFrame()
-			lg(gotext.Get("%s rolled %s.", ev.Player, diceFormatted))
-		case *bgammon.EventFailedRoll:
-			l(fmt.Sprintf("*** Failed to roll: %s", ev.Reason))
-		case *bgammon.EventMoved:
-			lg(gotext.Get("%s moved %s.", ev.Player, bgammon.FormatMoves(ev.Moves)))
-			if ev.Player == g.Client.Username {
-				continue
-			}
-			g.Board.Lock()
-			for _, move := range ev.Moves {
-				playSoundEffect(effectMove)
-				g.Board.movePiece(move[0], move[1])
-			}
-			g.Board.Unlock()
-		case *bgammon.EventFailedMove:
-			g.Client.Out <- []byte("board") // Refresh game state.
-
-			var extra string
-			if ev.From != 0 || ev.To != 0 {
-				extra = fmt.Sprintf(" from %s to %s", bgammon.FormatSpace(ev.From), bgammon.FormatSpace(ev.To))
-			}
-			l("*** " + gotext.Get("Failed to move checker%s: %s", extra, ev.Reason))
-			l("*** " + gotext.Get("Legal moves: %s", bgammon.FormatMoves(g.Board.gameState.Available)))
-		case *bgammon.EventFailedOk:
-			g.Client.Out <- []byte("board") // Refresh game state.
-			l("*** " + gotext.Get("Failed to submit moves: %s", ev.Reason))
-		case *bgammon.EventWin:
-			g.Board.Lock()
-			lg(gotext.Get("%s wins!", ev.Player))
-			if (g.Board.gameState.Player1.Points >= g.Board.gameState.Points || g.Board.gameState.Player2.Points >= g.Board.gameState.Points) && !g.Board.gameState.Spectating {
-				lg(gotext.Get("Type %s to offer a rematch.", "/rematch"))
-			}
-			g.Board.Unlock()
-		case *bgammon.EventPing:
-			g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
-		default:
-			l("*** " + gotext.Get("Warning: Received unknown event: %+v", ev))
-			l("*** " + gotext.Get("You may need to upgrade your client."))
-		}
+		g.Lock()
+		g.handleEvent(e)
+		g.Unlock()
 	}
 }
 
@@ -1140,7 +1160,12 @@ func (g *Game) Update() error {
 		return nil
 	}
 
+	g.Lock()
+	defer g.Unlock()
+
+	gameUpdateLock.Lock()
 	updatedGame = true
+	gameUpdateLock.Unlock()
 
 	cx, cy := ebiten.CursorPosition()
 	if cx != g.cursorX || cy != g.cursorY {
@@ -1339,12 +1364,18 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	g.Lock()
+	defer g.Unlock()
+
 	if OptimizeDraw {
+		gameUpdateLock.Lock()
 		if drawScreen <= 0 {
+			gameUpdateLock.Unlock()
 			return
 		} else if updatedGame {
 			drawScreen -= 1
 		}
+		gameUpdateLock.Unlock()
 	}
 
 	screen.Fill(tableColor)
@@ -1413,6 +1444,9 @@ func (g *Game) scale(v int) int {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+	g.Lock()
+	defer g.Unlock()
+
 	s := ebiten.DeviceScaleFactor()
 	outsideWidth, outsideHeight = int(float64(outsideWidth)*s), int(float64(outsideHeight)*s)
 	if outsideWidth < minWidth {
@@ -1567,7 +1601,7 @@ func (g *Game) EnableTouchInput() {
 	g.forceLayout = true
 
 	b := g.Board
-	*b.matchStatusGrid = *etk.NewGrid()
+	b.matchStatusGrid.Empty()
 	b.matchStatusGrid.AddChildAt(b.timerLabel, 0, 0, 1, 1)
 	b.matchStatusGrid.AddChildAt(b.clockLabel, 1, 0, 1, 1)
 
