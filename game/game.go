@@ -419,6 +419,10 @@ func diceImage(roll int) *ebiten.Image {
 }
 
 func setViewBoard(view bool) {
+	var refreshLobby bool
+	if !view && viewBoard != view {
+		refreshLobby = true
+	}
 	viewBoard = view
 
 	g := game
@@ -459,6 +463,10 @@ func setViewBoard(view bool) {
 		game.Board.leaveGameGrid.SetVisible(false)
 
 		statusBuffer.SetRect(statusBuffer.Rect())
+	}
+
+	if refreshLobby && game.Client != nil {
+		game.Client.Out <- []byte("list")
 	}
 
 	scheduleFrame()
