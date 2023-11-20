@@ -63,6 +63,9 @@ type board struct {
 
 	dragX, dragY int
 
+	availableCache       []int
+	updateAvailableCache bool
+
 	spaceHighlight *ebiten.Image
 
 	buttonsGrid             *etk.Grid
@@ -937,42 +940,22 @@ func (b *board) Draw(screen *ebiten.Image) {
 	// Draw space hover overlay when dragging
 	if b.dragging != nil {
 		b.Lock()
+		var highlightSpaces []int
 		if b.highlightAvailable && b.draggingSpace != -1 {
-			for _, move := range b.gameState.Available {
-				if move[0] == b.draggingSpace {
-					var availableMoves func(in *bgammon.Game, from int, to int) []int
-					availableMoves = func(in *bgammon.Game, from int, to int) []int {
-						gc := in.Copy()
-						ok, _ := gc.AddMoves([][]int{{from, to}}, true)
-						if !ok {
-							return nil
-						}
-
-						moves := []int{to}
-						var found = make(map[int]bool)
-						found[to] = true
-						for _, m := range gc.LegalMoves(true) {
-							if m[0] == to && !found[m[1]] {
-								moves = append(moves, availableMoves(gc, m[0], m[1])...)
-							}
-						}
-						return moves
-					}
-					for _, m := range availableMoves(b.gameState.Game, move[0], move[1]) {
-						x, y, _, _ := b.spaceRect(m)
-						x, y = b.offsetPosition(m, x, y)
-						if b.bottomRow(m) {
-							y += b.h/2 - int(b.overlapSize*5) - int(b.verticalBorderSize) - 4
-						}
-						op := &ebiten.DrawImageOptions{}
-						op.GeoM.Translate(float64(x), float64(y))
-						op.ColorScale.Scale(0.2, 0.2, 0.2, 0.2)
-						screen.DrawImage(b.spaceHighlight, op)
-					}
-				}
-			}
+			highlightSpaces = b.allAvailableMoves()
 		}
 		b.Unlock()
+		for _, m := range highlightSpaces {
+			x, y, _, _ := b.spaceRect(m)
+			x, y = b.offsetPosition(m, x, y)
+			if b.bottomRow(m) {
+				y += b.h/2 - int(b.overlapSize*5) - int(b.verticalBorderSize) - 4
+			}
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(x), float64(y))
+			op.ColorScale.Scale(0.2, 0.2, 0.2, 0.2)
+			screen.DrawImage(b.spaceHighlight, op)
+		}
 
 		dx, dy := b.dragX, b.dragY
 
@@ -982,7 +965,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 
 		space := b.spaceAt(dx, dy)
-		if space > 0 && space < 25 {
+		if space >= 0 && space <= 25 {
 			x, y, _, _ := b.spaceRect(space)
 			x, y = b.offsetPosition(space, x, y)
 			if b.bottomRow(space) {
@@ -1213,6 +1196,27 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 	b.opponentPipCount.SetPadding(padding / 2)
 	b.playerPipCount.SetPadding(padding)
+}
+
+func (b *board) allAvailableMoves() []int {
+	if !b.updateAvailableCache {
+		return b.availableCache
+	}
+	var all []int
+	found := make(map[int]bool)
+	for _, move := range b.gameState.Available {
+		if move[0] == b.draggingSpace {
+			for _, m := range allMoves(b.gameState.Game, move[0], move[1]) {
+				if !found[m] {
+					all = append(all, m)
+					found[m] = true
+				}
+			}
+		}
+	}
+	b.availableCache = all
+	b.updateAvailableCache = false
+	return b.availableCache
 }
 
 func (b *board) updateOpponentLabel() {
@@ -1506,6 +1510,8 @@ func (b *board) processState() {
 		b.updateBackgroundImage()
 	}
 	b.lastPlayerNumber = b.gameState.PlayerNumber
+
+	b.updateAvailableCache = true
 
 	var showGrid *etk.Grid
 	if !b.gameState.Spectating {
@@ -1932,4 +1938,27 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		sprite.y = y - (sprite.h / 2)
 	}
 	return handled, nil
+}
+
+func allMoves(in *bgammon.Game, from int, to int) []int {
+	gc := in.Copy()
+	ok, _ := gc.AddMoves([][]int{{from, to}}, true)
+	if !ok {
+		return nil
+	}
+
+	moves := []int{to}
+	var found = make(map[int]bool)
+	found[to] = true
+	for _, m := range gc.LegalMoves(true) {
+		if m[0] == to && !found[m[1]] {
+			for _, move := range allMoves(gc, m[0], m[1]) {
+				if !found[move] {
+					moves = append(moves, move)
+					found[move] = true
+				}
+			}
+		}
+	}
+	return moves
 }
