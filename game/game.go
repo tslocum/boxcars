@@ -933,6 +933,7 @@ func (g *Game) handleEvents() {
 			}
 			g.Board.Lock()
 			for _, move := range ev.Moves {
+				playSoundEffect(effectMove)
 				g.Board.movePiece(move[0], move[1])
 			}
 			g.Board.Unlock()

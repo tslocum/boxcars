@@ -572,12 +572,16 @@ func (b *board) selectUndo() error {
 		if b.gameState.Turn != b.gameState.PlayerNumber {
 			return
 		}
+
 		l := len(b.gameState.Moves)
 		if l == 0 {
 			return
 		}
+
 		lastMove := b.gameState.Moves[l-1]
 		b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", lastMove[1], lastMove[0]))
+
+		playSoundEffect(effectMove)
 		b.movePiece(lastMove[1], lastMove[0])
 		b.gameState.Moves = b.gameState.Moves[:l-1]
 	}()
@@ -1586,8 +1590,6 @@ func (b *board) processState() {
 
 // _movePiece returns after moving the piece.
 func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bool) {
-	playSoundEffect(effectMove)
-
 	moveTime := (650 * time.Millisecond) / time.Duration(speed)
 	pauseTime := 250 * time.Millisecond
 
@@ -1741,6 +1743,7 @@ func (b *board) finishDrag(x int, y int) {
 				for _, piece := range pieces {
 					if piece == dropped {
 						if space != index {
+							playSoundEffect(effectMove)
 							b.gameState.AddLocalMove([]int{space, index})
 							b.processState()
 							scheduleFrame()
