@@ -561,6 +561,12 @@ type Game struct {
 }
 
 func NewGame() *Game {
+	ebiten.SetVsyncEnabled(true)
+	ebiten.SetScreenClearedEveryFrame(false)
+	ebiten.SetTPS(144)
+	ebiten.SetRunnableOnUnfocused(true)
+	ebiten.SetWindowClosingHandled(true)
+
 	g := &Game{
 		runeBuffer: make([]rune, 24),
 
