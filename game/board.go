@@ -140,7 +140,7 @@ func NewBoard() *board {
 		spaceSprites: make([][]*Sprite, bgammon.BoardSpaces),
 		spaceRects:   make([][4]int, bgammon.BoardSpaces),
 		gameState: &bgammon.GameState{
-			Game: bgammon.NewGame(),
+			Game: bgammon.NewGame(false),
 		},
 		spaceHighlight:          ebiten.NewImage(1, 1),
 		opponentLabel:           NewLabel(color.RGBA{255, 255, 255, 255}),
@@ -245,6 +245,7 @@ func NewBoard() *board {
 	{
 		leaveGameLabel := etk.NewText(gotext.Get("Leave match?"))
 		leaveGameLabel.SetHorizontal(messeji.AlignCenter)
+		leaveGameLabel.SetVertical(messeji.AlignCenter)
 
 		b.leaveGameGrid = etk.NewGrid()
 		b.leaveGameGrid.SetBackground(color.RGBA{40, 24, 9, 255})
@@ -568,26 +569,29 @@ func (b *board) selectOK() error {
 	return nil
 }
 
+func (b *board) _selectUndo() {
+	b.Lock()
+	defer b.Unlock()
+
+	if b.gameState.Turn != b.gameState.PlayerNumber {
+		return
+	}
+
+	l := len(b.gameState.Moves)
+	if l == 0 {
+		return
+	}
+
+	lastMove := b.gameState.Moves[l-1]
+	b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", lastMove[1], lastMove[0]))
+
+	playSoundEffect(effectMove)
+	b.movePiece(lastMove[1], lastMove[0])
+	b.gameState.Moves = b.gameState.Moves[:l-1]
+}
+
 func (b *board) selectUndo() error {
-	go func() {
-		b.Lock()
-		defer b.Unlock()
-		if b.gameState.Turn != b.gameState.PlayerNumber {
-			return
-		}
-
-		l := len(b.gameState.Moves)
-		if l == 0 {
-			return
-		}
-
-		lastMove := b.gameState.Moves[l-1]
-		b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", lastMove[1], lastMove[0]))
-
-		playSoundEffect(effectMove)
-		b.movePiece(lastMove[1], lastMove[0])
-		b.gameState.Moves = b.gameState.Moves[:l-1]
-	}()
+	go b._selectUndo()
 	return nil
 }
 
@@ -1912,7 +1916,7 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 		if !handled && b.playerTurn() && clicked && (b.lastDragClick.IsZero() || time.Since(b.lastDragClick) >= 50*time.Millisecond) {
 			s, space := b.spriteAt(cx, cy)
-			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomePlayer && space != bgammon.SpaceHomeOpponent {
+			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomeOpponent && (space != bgammon.SpaceHomePlayer || !game.Board.gameState.Acey || !game.Board.gameState.Player1.Entered) {
 				b.startDrag(s, space, false)
 				handled = true
 			}

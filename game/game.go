@@ -65,8 +65,6 @@ var (
 	mediumFont font.Face
 	largeFont  font.Face
 
-	gameFont font.Face
-
 	fontMutex = &sync.Mutex{}
 )
 
@@ -78,6 +76,8 @@ var (
 const maxStatusWidthRatio = 0.5
 
 const bufferCharacterWidth = 28
+
+const fieldHeight = 50
 
 const (
 	minWidth  = 320
@@ -633,10 +633,12 @@ func NewGame() *Game {
 		g.connectUsername = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
+		centerInput(g.connectUsername)
 
 		g.connectPassword = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
+		centerInput(g.connectPassword)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
@@ -657,6 +659,7 @@ func NewGame() *Game {
 			g.connectServer = etk.NewInput("", connectAddress, func(text string) (handled bool) {
 				return false
 			})
+			centerInput(g.connectServer)
 			grid.AddChildAt(etk.NewText(gotext.Get("Server")), 1, y, 2, 1)
 			grid.AddChildAt(g.connectServer, 2, y, 2, 1)
 			y++
@@ -677,20 +680,23 @@ func NewGame() *Game {
 		g.lobby.createGameName = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
+		centerInput(g.lobby.createGameName)
 
 		g.lobby.createGamePoints = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
+		centerInput(g.lobby.createGamePoints)
 
 		g.lobby.createGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
+		centerInput(g.lobby.createGamePassword)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
 		grid.SetRowPadding(20)
 		grid.SetColumnSizes(10, 200, -1, 10)
-		grid.SetRowSizes(60, 50, 50, 50)
+		grid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight)
 		grid.AddChildAt(headerLabel, 0, 0, 3, 1)
 		grid.AddChildAt(etk.NewBox(), 3, 0, 1, 1)
 		grid.AddChildAt(nameLabel, 1, 1, 1, 1)
@@ -720,12 +726,13 @@ func NewGame() *Game {
 		g.lobby.joinGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
 		})
+		centerInput(g.lobby.joinGamePassword)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
 		grid.SetRowPadding(20)
 		grid.SetColumnSizes(10, 200, -1, 10)
-		grid.SetRowSizes(60, 50, 50)
+		grid.SetRowSizes(60, fieldHeight, fieldHeight)
 		grid.AddChildAt(g.lobby.joinGameLabel, 0, 0, 3, 1)
 		grid.AddChildAt(etk.NewBox(), 3, 0, 1, 1)
 		grid.AddChildAt(passwordLabel, 1, 1, 1, 1)
@@ -985,7 +992,9 @@ func (g *Game) handleEvent(e interface{}) {
 
 func (g *Game) handleEvents() {
 	for e := range g.Client.Events {
+		g.Board.Lock()
 		g.Lock()
+		g.Board.Unlock()
 		g.handleEvent(e)
 		g.Unlock()
 	}
@@ -1475,9 +1484,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 
 	if ShowServerSettings {
-		connectGrid.SetRowSizes(60, 50, 50, 50, 108, g.scale(baseButtonHeight))
+		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, 108, g.scale(baseButtonHeight))
 	} else {
-		connectGrid.SetRowSizes(60, 50, 50, 108, g.scale(baseButtonHeight))
+		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, 108, g.scale(baseButtonHeight))
 	}
 
 	{
@@ -1782,6 +1791,10 @@ func (t *ClickableText) HandleMouse(cursor image.Point, pressed bool, clicked bo
 		t.onSelected()
 	}
 	return true, nil
+}
+
+func centerInput(input *etk.Input) {
+	input.Field.SetVertical(messeji.AlignCenter)
 }
 
 // Short description.
