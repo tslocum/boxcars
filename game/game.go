@@ -36,7 +36,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.4"
+const version = "v1.1.4p1"
 
 const MaxDebug = 2
 
@@ -1550,22 +1550,18 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
 	g.lobby.showKeyboardButton.SetRect(image.Rect(g.screenW-400, 0, g.screenW, int(76)))
 
-	if g.screenW > 200 {
-		statusBuffer.SetPadding(4)
-		floatStatusBuffer.SetPadding(4)
-		gameBuffer.SetPadding(4)
-		inputBuffer.Field.SetPadding(4)
-	} else if g.screenW > 100 {
-		statusBuffer.SetPadding(2)
-		floatStatusBuffer.SetPadding(2)
-		gameBuffer.SetPadding(2)
-		inputBuffer.Field.SetPadding(2)
+	padding := 0
+	if bufferWidth > 200 {
+		padding = 8
+	} else if bufferWidth > 100 {
+		padding = 4
 	} else {
-		statusBuffer.SetPadding(0)
-		floatStatusBuffer.SetPadding(0)
-		gameBuffer.SetPadding(0)
-		inputBuffer.Field.SetPadding(0)
+		padding = 2
 	}
+	statusBuffer.SetPadding(padding)
+	floatStatusBuffer.SetPadding(padding)
+	gameBuffer.SetPadding(padding)
+	inputBuffer.Field.SetPadding(padding)
 
 	old := viewBoard
 	viewBoard = !old
