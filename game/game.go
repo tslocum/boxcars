@@ -425,6 +425,15 @@ func setViewBoard(view bool) {
 	}
 	viewBoard = view
 
+	switch {
+	case game.needLayoutConnect && !game.loggedIn:
+		game.layoutConnect()
+	case game.needLayoutLobby && game.loggedIn && !viewBoard:
+		game.layoutLobby()
+	case game.needLayoutBoard && game.loggedIn && viewBoard:
+		game.layoutBoard()
+	}
+
 	g := game
 	if g.keyboard.Visible() || g.Board.floatChatGrid.Visible() {
 		g.keyboard.Hide()
@@ -560,6 +569,12 @@ type Game struct {
 	forceLayout bool
 
 	scaleFactor float64
+
+	bufferWidth int
+
+	needLayoutConnect bool
+	needLayoutLobby   bool
+	needLayoutBoard   bool
 
 	loaded bool
 
@@ -1176,6 +1191,15 @@ func (g *Game) Update() error {
 	updatedGame = true
 	gameUpdateLock.Unlock()
 
+	switch {
+	case g.needLayoutConnect && !g.loggedIn:
+		g.layoutConnect()
+	case g.needLayoutLobby && g.loggedIn && !viewBoard:
+		g.layoutLobby()
+	case g.needLayoutBoard && g.loggedIn && viewBoard:
+		g.layoutBoard()
+	}
+
 	cx, cy := ebiten.CursorPosition()
 	if cx != g.cursorX || cy != g.cursorY {
 		g.cursorX, g.cursorY = cx, cy
@@ -1376,6 +1400,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.Lock()
 	defer g.Unlock()
 
+	switch {
+	case g.needLayoutConnect && !g.loggedIn:
+		g.layoutConnect()
+	case g.needLayoutLobby && g.loggedIn && !viewBoard:
+		g.layoutLobby()
+	case g.needLayoutBoard && g.loggedIn && viewBoard:
+		g.layoutBoard()
+	}
+
 	if OptimizeDraw {
 		gameUpdateLock.Lock()
 		if drawScreen <= 0 {
@@ -1452,6 +1485,84 @@ func (g *Game) scale(v int) int {
 	return int(float64(v) * g.scaleFactor)
 }
 
+func (g *Game) layoutConnect() {
+	g.needLayoutConnect = false
+
+	if ShowServerSettings {
+		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, 108, g.scale(baseButtonHeight))
+	} else {
+		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, 108, g.scale(baseButtonHeight))
+	}
+}
+
+func (g *Game) layoutLobby() {
+	g.needLayoutLobby = false
+
+	if g.portraitView() { // Portrait view.
+		g.lobby.fullscreen = true
+		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
+	} else { // Landscape view.
+		g.lobby.fullscreen = true
+		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
+	}
+
+	g.lobby.buttonBarHeight = g.scale(baseButtonHeight)
+	g.setBufferRects()
+
+	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
+	g.lobby.showKeyboardButton.SetRect(image.Rect(g.screenW-400, 0, g.screenW, int(76)))
+}
+
+func (g *Game) layoutBoard() {
+	g.needLayoutBoard = false
+
+	if g.portraitView() { // Portrait view.
+		g.Board.Lock()
+
+		g.Board.fullHeight = false
+		g.Board.setRect(0, 0, g.screenW, g.screenW)
+
+		g.Board.Unlock()
+
+		g.Board.uiGrid.SetRect(image.Rect(0, g.Board.h, g.screenW, g.screenH))
+	} else { // Landscape view.
+		g.Board.Lock()
+
+		g.Board.fullHeight = true
+		g.Board.setRect(0, 0, g.screenW-g.bufferWidth, g.screenH)
+
+		availableWidth := g.screenW - (g.Board.innerW + int(g.Board.horizontalBorderSize*2))
+		if availableWidth > g.bufferWidth {
+			g.bufferWidth = availableWidth
+			g.Board.setRect(0, 0, g.screenW-g.bufferWidth, g.screenH)
+		}
+
+		if g.Board.h > g.Board.w {
+			g.Board.fullHeight = false
+			g.Board.setRect(0, 0, g.Board.w, g.Board.w)
+		}
+
+		g.Board.Unlock()
+
+		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
+		g.Board.uiGrid.SetRect(image.Rect(g.Board.w+bufferPaddingX, bufferPaddingX, g.screenW-bufferPaddingX, g.screenH-bufferPaddingX))
+	}
+
+	g.setBufferRects()
+
+	g.Board.widget.SetRect(image.Rect(0, 0, g.screenW, g.screenH))
+}
+
+func (g *Game) bufferPadding() int {
+	if g.bufferWidth > 200 {
+		return 8
+	} else if g.bufferWidth > 100 {
+		return 4
+	} else {
+		return 2
+	}
+}
+
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.Lock()
 	defer g.Unlock()
@@ -1483,12 +1594,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	gameBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 
-	if ShowServerSettings {
-		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, 108, g.scale(baseButtonHeight))
-	} else {
-		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, 108, g.scale(baseButtonHeight))
-	}
-
 	{
 		scrollBarWidth := g.scale(32)
 		statusBuffer.SetScrollBarWidth(scrollBarWidth)
@@ -1497,67 +1602,27 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		inputBuffer.Field.SetScrollBarWidth(scrollBarWidth)
 	}
 
+	fontMutex.Lock()
+	g.bufferWidth = etk.BoundString(g.Board.fontFace, strings.Repeat("A", bufferCharacterWidth)).Dx()
+	fontMutex.Unlock()
+	if g.bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
+		g.bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
+	}
+
 	etk.Layout(g.screenW, g.screenH)
 
-	fontMutex.Lock()
-	bufferWidth := etk.BoundString(g.Board.fontFace, strings.Repeat("A", bufferCharacterWidth)).Dx()
-	fontMutex.Unlock()
-	if bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
-		bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
-	}
-
-	if g.portraitView() { // Portrait view.
-		g.Board.Lock()
-
-		g.Board.fullHeight = false
-		g.Board.setRect(0, 0, g.screenW, g.screenW)
-
-		g.Board.Unlock()
-
-		g.Board.uiGrid.SetRect(image.Rect(0, g.Board.h, g.screenW, g.screenH))
-
-		g.lobby.fullscreen = true
-		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
-	} else { // Landscape view.
-		g.Board.Lock()
-
-		g.Board.fullHeight = true
-		g.Board.setRect(0, 0, g.screenW-bufferWidth, g.screenH)
-
-		availableWidth := g.screenW - (g.Board.innerW + int(g.Board.horizontalBorderSize*2))
-		if availableWidth > bufferWidth {
-			bufferWidth = availableWidth
-			g.Board.setRect(0, 0, g.screenW-bufferWidth, g.screenH)
-		}
-
-		if g.Board.h > g.Board.w {
-			g.Board.fullHeight = false
-			g.Board.setRect(0, 0, g.Board.w, g.Board.w)
-		}
-
-		g.Board.Unlock()
-
-		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
-		g.Board.uiGrid.SetRect(image.Rect(g.Board.w+bufferPaddingX, bufferPaddingX, g.screenW-bufferPaddingX, g.screenH-bufferPaddingX))
-
-		g.lobby.fullscreen = true
-		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
-	}
-
-	g.lobby.buttonBarHeight = g.scale(baseButtonHeight)
-	g.setBufferRects()
-
-	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
-	g.lobby.showKeyboardButton.SetRect(image.Rect(g.screenW-400, 0, g.screenW, int(76)))
-
-	padding := 0
-	if bufferWidth > 200 {
-		padding = 8
-	} else if bufferWidth > 100 {
-		padding = 4
+	g.needLayoutConnect = true
+	g.needLayoutLobby = true
+	g.needLayoutBoard = true
+	if !g.loggedIn {
+		g.layoutConnect()
+	} else if !viewBoard {
+		g.layoutLobby()
 	} else {
-		padding = 2
+		g.layoutBoard()
 	}
+
+	padding := g.bufferPadding()
 	statusBuffer.SetPadding(padding)
 	floatStatusBuffer.SetPadding(padding)
 	gameBuffer.SetPadding(padding)
@@ -1569,8 +1634,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.Board.updateOpponentLabel()
 	g.Board.updatePlayerLabel()
-
-	g.Board.widget.SetRect(image.Rect(0, 0, g.screenW, g.screenH))
 
 	g.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
 

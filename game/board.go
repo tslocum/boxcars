@@ -1283,7 +1283,7 @@ func (b *board) updateOpponentLabel() {
 		}
 	}
 	{
-		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy(), b.innerW/2-int(b.barWidth)/2, y+bounds.Dy()*2)
+		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy(), b.innerW/2-int(b.barWidth)/2+int(b.horizontalBorderSize), y+bounds.Dy()*2)
 		if !b.opponentPipCount.Rect().Eq(newRect) {
 			b.opponentPipCount.SetRect(newRect)
 		}

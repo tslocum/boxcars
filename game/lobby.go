@@ -367,7 +367,7 @@ func (l *lobby) drawBuffer() {
 				} else if entry.Players == 2 {
 					status = gotext.Get("Started")
 				} else {
-					status = gotext.Get("Public")
+					status = gotext.Get("Available")
 				}
 
 				drawEntry(cx+l.padding, cy+l.padding, status, strconv.Itoa(entry.Points), entry.Name, i == l.selected, false)
