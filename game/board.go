@@ -182,6 +182,9 @@ func NewBoard() *board {
 	b.opponentPipCount.SetHorizontal(messeji.AlignEnd)
 	b.playerPipCount.SetHorizontal(messeji.AlignStart)
 
+	b.opponentPipCount.SetForegroundColor(color.RGBA{255, 255, 255, 255})
+	b.playerPipCount.SetForegroundColor(color.RGBA{0, 0, 0, 255})
+
 	b.recreateButtonGrid()
 
 	{
@@ -1234,7 +1237,7 @@ func (b *board) updateOpponentLabel() {
 
 	var text string
 	if b.gameState.Points > 1 && len(player.Name) > 0 {
-		text = fmt.Sprintf("%s  %d", player.Name, player.Points)
+		text = fmt.Sprintf("%s (%d)", player.Name, player.Points)
 	} else {
 		text = player.Name
 	}
@@ -1242,11 +1245,6 @@ func (b *board) updateOpponentLabel() {
 		label.SetText(text)
 	}
 
-	if player.Number == 1 {
-		label.activeColor = color.RGBA{0, 0, 0, 255}
-	} else {
-		label.activeColor = color.RGBA{255, 255, 255, 255}
-	}
 	label.active = b.gameState.Turn == player.Number
 	label.Text.TextField.SetForegroundColor(label.activeColor)
 
@@ -1281,7 +1279,6 @@ func (b *board) updateOpponentLabel() {
 		b.opponentPipCount.SetVisible(true)
 		pipCount := strconv.Itoa(b.gameState.Pips(player.Number))
 		if b.opponentPipCount.Text() != pipCount {
-			b.opponentPipCount.SetForegroundColor(label.activeColor)
 			b.opponentPipCount.SetText(pipCount)
 		}
 	} else {
@@ -1295,7 +1292,7 @@ func (b *board) updatePlayerLabel() {
 
 	var text string
 	if b.gameState.Points > 1 && len(player.Name) > 0 {
-		text = fmt.Sprintf("%s  %d", player.Name, player.Points)
+		text = fmt.Sprintf("%s (%d)", player.Name, player.Points)
 	} else {
 		text = player.Name
 	}
@@ -1303,11 +1300,6 @@ func (b *board) updatePlayerLabel() {
 		label.SetText(text)
 	}
 
-	if player.Number == 1 {
-		label.activeColor = color.RGBA{0, 0, 0, 255}
-	} else {
-		label.activeColor = color.RGBA{255, 255, 255, 255}
-	}
 	label.active = b.gameState.Turn == player.Number
 	label.Text.TextField.SetForegroundColor(label.activeColor)
 
@@ -1341,7 +1333,6 @@ func (b *board) updatePlayerLabel() {
 		b.playerPipCount.SetVisible(true)
 		pipCount := strconv.Itoa(b.gameState.Pips(player.Number))
 		if b.playerPipCount.Text() != pipCount {
-			b.playerPipCount.SetForegroundColor(label.activeColor)
 			b.playerPipCount.SetText(pipCount)
 		}
 	} else {
@@ -1793,6 +1784,20 @@ type Label struct {
 	bg          *ebiten.Image
 }
 
+func NewLabel(c color.RGBA) *Label {
+	l := &Label{
+		Text:        etk.NewText(""),
+		activeColor: c,
+	}
+	l.Text.SetFont(largeFont, fontMutex)
+	l.Text.SetForegroundColor(c)
+	l.Text.SetScrollBarVisible(false)
+	l.Text.SetSingleLine(true)
+	l.Text.SetHorizontal(messeji.AlignCenter)
+	l.Text.SetVertical(messeji.AlignCenter)
+	return l
+}
+
 func (l *Label) updateBackground() {
 	if l.TextField.Text() == "" {
 		l.bg = nil
@@ -1858,20 +1863,6 @@ func (l *Label) Draw(screen *ebiten.Image) error {
 	op.GeoM.Translate(float64(l.Rect().Min.X), float64(l.Rect().Min.Y))
 	screen.DrawImage(l.bg, op)
 	return l.Text.Draw(screen)
-}
-
-func NewLabel(c color.RGBA) *Label {
-	l := &Label{
-		Text:        etk.NewText(""),
-		activeColor: c,
-	}
-	l.Text.SetFont(largeFont, fontMutex)
-	l.Text.SetForegroundColor(c)
-	l.Text.SetScrollBarVisible(false)
-	l.Text.SetSingleLine(true)
-	l.Text.SetHorizontal(messeji.AlignCenter)
-	l.Text.SetVertical(messeji.AlignCenter)
-	return l
 }
 
 type BoardWidget struct {
