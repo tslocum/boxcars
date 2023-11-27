@@ -1087,18 +1087,6 @@ func (b *board) setRect(x, y, w, h int) {
 		return
 	}
 
-	if game.scaleFactor >= 1.25 {
-		if b.fontFace != largeFont {
-			b.fontFace = largeFont
-			b.fontUpdated()
-		}
-	} else {
-		if b.fontFace != mediumFont {
-			b.fontFace = mediumFont
-			b.fontUpdated()
-		}
-	}
-
 	b.x, b.y, b.w, b.h = x, y, w, h
 	maxWidth := int(float64(b.h) * 1.2)
 	if b.w > maxWidth {

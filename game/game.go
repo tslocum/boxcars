@@ -1592,9 +1592,19 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.scaleFactor = s
 	scheduleFrame()
 
+	b := g.Board
 	if s >= 1.25 {
 		lobbyStatusBufferHeight = int(50 * s)
 		g.Board.verticalBorderSize = baseBoardVerticalSize * 1.5
+		if b.fontFace != largeFont {
+			b.fontFace = largeFont
+			b.fontUpdated()
+		}
+	} else {
+		if b.fontFace != mediumFont {
+			b.fontFace = mediumFont
+			b.fontUpdated()
+		}
 	}
 
 	statusBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
