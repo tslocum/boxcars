@@ -576,6 +576,10 @@ type Game struct {
 	needLayoutLobby   bool
 	needLayoutBoard   bool
 
+	loadedConnect bool
+	loadedLobby   bool
+	loadedBoard   bool
+
 	loaded bool
 
 	*sync.Mutex
@@ -778,6 +782,10 @@ func NewGame() *Game {
 		listGamesFrame.SetPositionChildren(true)
 		listGamesFrame.AddChild(listGamesContainer)
 	}
+
+	g.needLayoutConnect = true
+	g.needLayoutLobby = true
+	g.needLayoutBoard = true
 
 	g.setRoot(connectGrid)
 	etk.SetFocus(g.connectUsername)
@@ -1219,23 +1227,6 @@ func (g *Game) Update() error {
 	if !g.loaded {
 		g.loaded = true
 
-		var updateButtons func(w etk.Widget)
-		updateButtons = func(w etk.Widget) {
-			for _, c := range w.Children() {
-				updateButtons(c)
-			}
-
-			btn, ok := w.(*etk.Button)
-			if ok && btn != g.Board.showMenuButton {
-				btn.Label.SetFont(largeFont, fontMutex)
-			}
-		}
-		updateButtons(connectGrid)
-		updateButtons(game.lobby.buttonsGrid)
-		updateButtons(game.Board.menuGrid)
-		updateButtons(game.Board.leaveGameGrid)
-		updateButtons(game.Board.floatChatGrid)
-
 		// Auto-connect
 		if g.Username != "" || g.Password != "" {
 			g.Connect()
@@ -1493,6 +1484,11 @@ func (g *Game) layoutConnect() {
 	} else {
 		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, 108, g.scale(baseButtonHeight))
 	}
+
+	if !g.loadedConnect {
+		updateAllButtons(connectGrid)
+		g.loadedConnect = true
+	}
 }
 
 func (g *Game) layoutLobby() {
@@ -1511,6 +1507,11 @@ func (g *Game) layoutLobby() {
 
 	g.lobby.showKeyboardButton.SetVisible(g.TouchInput)
 	g.lobby.showKeyboardButton.SetRect(image.Rect(g.screenW-400, 0, g.screenW, int(76)))
+
+	if !g.loadedLobby {
+		updateAllButtons(game.lobby.buttonsGrid)
+		g.loadedLobby = true
+	}
 }
 
 func (g *Game) layoutBoard() {
@@ -1551,6 +1552,13 @@ func (g *Game) layoutBoard() {
 	g.setBufferRects()
 
 	g.Board.widget.SetRect(image.Rect(0, 0, g.screenW, g.screenH))
+
+	if !g.loadedBoard {
+		updateAllButtons(game.Board.menuGrid)
+		updateAllButtons(game.Board.leaveGameGrid)
+		updateAllButtons(game.Board.floatChatGrid)
+		g.loadedBoard = true
+	}
 }
 
 func (g *Game) bufferPadding() int {
@@ -1854,6 +1862,17 @@ func (t *ClickableText) HandleMouse(cursor image.Point, pressed bool, clicked bo
 
 func centerInput(input *etk.Input) {
 	input.Field.SetVertical(messeji.AlignCenter)
+}
+
+func updateAllButtons(w etk.Widget) {
+	for _, c := range w.Children() {
+		updateAllButtons(c)
+	}
+
+	btn, ok := w.(*etk.Button)
+	if ok && btn != game.Board.showMenuButton {
+		btn.Label.SetFont(largeFont, fontMutex)
+	}
 }
 
 // Short description.
