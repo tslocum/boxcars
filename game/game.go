@@ -796,7 +796,7 @@ func (g *Game) handleUpdateTimeLabels() {
 			} else {
 				d = ended.Sub(started)
 			}
-			h, m = int(d.Hours()), int(d.Minutes())
+			h, m = int(d.Hours()), int(d.Minutes())%60
 		}
 		if h != lastTimerHour || m != lastTimerMinute {
 			g.Board.timerLabel.SetText(fmt.Sprintf("%d:%02d", h, m))
