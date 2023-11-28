@@ -3,7 +3,7 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231125035505-5bacfe6b287b
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231127231228-3c37ea592733
 	code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454
 	code.rocketnine.space/tslocum/kibodo v1.0.2
 	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231125191211-6c28130f61d0
