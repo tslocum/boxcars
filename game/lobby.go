@@ -157,6 +157,9 @@ func (l *lobby) handleRefreshTimer() {
 }
 
 func (l *lobby) clampOffset() {
+	if int(l.entryH) == 0 {
+		return
+	}
 	maxOffset := 0
 	visibleItems := (l.h / int(l.entryH)) - 2
 	if visibleItems < len(l.games) && len(l.games) > 0 {

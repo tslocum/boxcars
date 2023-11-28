@@ -66,6 +66,7 @@ type board struct {
 	updateAvailableCache bool
 
 	spaceHighlight *ebiten.Image
+	foundMoves     map[int]bool
 
 	buttonsGrid             *etk.Grid
 	buttonsOnlyRollGrid     *etk.Grid
@@ -145,6 +146,7 @@ func NewBoard() *board {
 			Game: bgammon.NewGame(false),
 		},
 		spaceHighlight:          ebiten.NewImage(1, 1),
+		foundMoves:              make(map[int]bool),
 		opponentLabel:           NewLabel(color.RGBA{255, 255, 255, 255}),
 		playerLabel:             NewLabel(color.RGBA{0, 0, 0, 255}),
 		opponentPipCount:        etk.NewText("0"),
@@ -1245,11 +1247,17 @@ func (b *board) allAvailableMoves() []int {
 		return b.availableCache
 	}
 	var all []int
-	found := make(map[int]bool)
 	for _, move := range b.gameState.Available {
-		if move[0] == b.draggingSpace && !found[move[1]] {
-			all = append(all, allMoves(b.gameState.Game, move[0], move[1], found)...)
-			found[move[0]] = true
+		if move[0] == b.draggingSpace {
+		FOUNDMOVES:
+			for _, m := range allMoves(b.gameState.Game, move[0], move[1], b.foundMoves) {
+				for _, foundMove := range all {
+					if m == foundMove {
+						continue FOUNDMOVES
+					}
+				}
+				all = append(all, m)
+			}
 		}
 	}
 	b.availableCache = all
@@ -1985,9 +1993,11 @@ func allMoves(in *bgammon.Game, from int, to int, found map[int]bool) []int {
 	}
 
 	moves := []int{to}
-	found[to] = true
+	for key := range found {
+		delete(found, key)
+	}
 	for _, m := range gc.LegalMoves(true) {
-		if m[0] == to && !found[m[1]] {
+		if m[0] == to {
 			for _, move := range allMoves(gc, m[0], m[1], found) {
 				if !found[move] {
 					moves = append(moves, move)
