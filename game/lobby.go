@@ -156,6 +156,19 @@ func (l *lobby) handleRefreshTimer() {
 	}
 }
 
+func (l *lobby) clampOffset() {
+	maxOffset := 0
+	visibleItems := (l.h / int(l.entryH)) - 2
+	if visibleItems < len(l.games) && len(l.games) > 0 {
+		maxOffset = len(l.games) - 1
+	}
+	if l.offset < 0 {
+		l.offset = 0
+	} else if l.offset > maxOffset {
+		l.offset = maxOffset
+	}
+}
+
 func (l *lobby) setGameList(games []bgammon.GameListing) {
 	l.games = games
 	l.loaded = true
@@ -470,9 +483,11 @@ func (l *lobby) click(x, y int) {
 			}
 		}
 
-		l.lastClick = time.Now()
-		l.selected = newSelection
-		l.bufferDirty = true
+		if newSelection >= 0 && newSelection < len(l.games) {
+			l.lastClick = time.Now()
+			l.selected = newSelection
+			l.bufferDirty = true
+		}
 	}
 }
 
@@ -488,7 +503,6 @@ func (l *lobby) update() {
 				scroll = 1
 			}
 			l.offset -= scroll * scrollLength
-			l.bufferDirty = true
 		}
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
@@ -502,18 +516,23 @@ func (l *lobby) update() {
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyPageDown) {
 			l.offset += scrollLength * 4
-			l.bufferDirty = true
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeyPageUp) {
 			l.offset -= scrollLength * 4
-			l.bufferDirty = true
 		}
 
 		if l.selected < 0 {
 			l.selected = 0
+			l.bufferDirty = true
+		} else if l.selected > len(l.games)-1 {
+			l.selected = len(l.games) - 1
+			l.bufferDirty = true
 		}
-		if l.offset < 0 {
-			l.offset = 0
+
+		lastOffset := l.offset
+		l.clampOffset()
+		if l.offset != lastOffset {
+			l.bufferDirty = true
 		}
 	}
 

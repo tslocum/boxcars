@@ -1522,10 +1522,10 @@ func (g *Game) layoutLobby() {
 
 	if g.portraitView() { // Portrait view.
 		g.lobby.fullscreen = true
-		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
+		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
 	} else { // Landscape view.
 		g.lobby.fullscreen = true
-		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight)
+		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
 	}
 
 	g.lobby.buttonBarHeight = g.scale(baseButtonHeight)
