@@ -726,7 +726,7 @@ func (b *board) updateBackgroundImage() {
 	gc.Stroke()
 	// Inside left.
 	gc.SetLineWidth(borderStrokeSize / 2)
-	edge := float64(((float64(b.innerW) + 1 - b.barWidth) / 2) + borderSize)
+	edge := float64(((float64(b.innerW) + 2 - b.barWidth) / 2) + borderSize)
 	gc.MoveTo(float64(borderSize), float64(b.verticalBorderSize))
 	gc.LineTo(edge, float64(b.verticalBorderSize))
 	gc.LineTo(edge, float64(b.h-int(b.verticalBorderSize)))
@@ -735,13 +735,13 @@ func (b *board) updateBackgroundImage() {
 	gc.Close()
 	gc.Stroke()
 	// Inside right.
-	edgeStart := float64(float64(b.innerW/2) - 1 + (b.barWidth / 2) + borderSize)
-	edgeEnd := float64(float64(b.innerW) + borderSize)
-	gc.MoveTo(float64(edgeStart), float64(b.verticalBorderSize))
-	gc.LineTo(edgeEnd, float64(b.verticalBorderSize))
-	gc.LineTo(edgeEnd, float64(b.h-int(b.verticalBorderSize)))
-	gc.LineTo(float64(edgeStart), float64(b.h-int(b.verticalBorderSize)))
-	gc.LineTo(float64(edgeStart), float64(b.verticalBorderSize))
+	leftEdge := float64((b.innerW-int(b.barWidth))/2) + borderSize + b.barWidth
+	edge = leftEdge + float64((b.innerW-int(b.barWidth))/2)
+	gc.MoveTo(leftEdge, float64(b.verticalBorderSize))
+	gc.LineTo(edge, float64(b.verticalBorderSize))
+	gc.LineTo(edge, float64(b.h-int(b.verticalBorderSize)))
+	gc.LineTo(leftEdge, float64(b.h-int(b.verticalBorderSize)))
+	gc.LineTo(leftEdge, float64(b.verticalBorderSize))
 	gc.Close()
 	gc.Stroke()
 	// Home spaces.
