@@ -443,6 +443,8 @@ func setViewBoard(view bool) {
 		g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	}
 
+	game.Board.selectRollGrid.SetVisible(false)
+
 	if viewBoard {
 		// Exit dialogs.
 		game.lobby.showJoinGame = false

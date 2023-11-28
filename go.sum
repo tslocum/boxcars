@@ -1,11 +1,11 @@
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231127231228-3c37ea592733 h1:zA/h33dsmpannq+0nTEpSa5DP0DXPlz8zzqZz4gywEo=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231127231228-3c37ea592733/go.mod h1:+dgD9v8BlzZjzpIB+/g0lgog90YUoPzEZsp1iAchl30=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231128033914-b081b604e191 h1:9xJkORfv11+dRvNRofH3FiQTZnnaQNHmYejHkaOGXXk=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231128033914-b081b604e191/go.mod h1:+dgD9v8BlzZjzpIB+/g0lgog90YUoPzEZsp1iAchl30=
 code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454 h1:R+KAg2+ORkMT/bcljmlno1nr21OBOxo6hY0Qa2qOk+Y=
 code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454/go.mod h1:bDrMbdTIhIy9egS6ISZat3Cw1dusd/Raeiq8vKHo9b4=
 code.rocketnine.space/tslocum/kibodo v1.0.2 h1:0RfvVz+IUku8MFx9wvDb+p8byns5gAjQLUo4ZenWP44=
 code.rocketnine.space/tslocum/kibodo v1.0.2/go.mod h1:mAYs1JKFnWlRFzo9BtteAlwjKdk1MIKgEyhQaPdeQDI=
-code.rocketnine.space/tslocum/messeji v1.0.6-0.20231125191211-6c28130f61d0 h1:hWNMgBd5I1d42j7tpNekx3xpWQpJODUnPZ3eAGRq9EA=
-code.rocketnine.space/tslocum/messeji v1.0.6-0.20231125191211-6c28130f61d0/go.mod h1:yLsZtW6XgrQPpqBpQfJJkueurBUUYNnkPr68cS1MtJc=
+code.rocketnine.space/tslocum/messeji v1.0.6-0.20231128010227-689683b75174 h1:jxE3JcaE4ovMWaZHLA6MvYgkmdkdbEEUv943Bp+MoxU=
+code.rocketnine.space/tslocum/messeji v1.0.6-0.20231128010227-689683b75174/go.mod h1:yLsZtW6XgrQPpqBpQfJJkueurBUUYNnkPr68cS1MtJc=
 github.com/ebitengine/oto/v3 v3.1.0 h1:9tChG6rizyeR2w3vsygTTTVVJ9QMMyu00m2yBOCch6U=
 github.com/ebitengine/oto/v3 v3.1.0/go.mod h1:IK1QTnlfZK2GIB6ziyECm433hAdTaPpOsGMLhEyEGTg=
 github.com/ebitengine/purego v0.5.1 h1:hNunhThpOf1vzKl49v6YxIsXLhl92vbBEv1/2Ez3ZrY=

@@ -75,6 +75,8 @@ type board struct {
 	buttonsResignAcceptGrid *etk.Grid
 	buttonsUndoOKGrid       *etk.Grid
 
+	selectRollGrid *etk.Grid
+
 	opponentLabel *Label
 	playerLabel   *Label
 
@@ -154,6 +156,7 @@ func NewBoard() *board {
 		buttonsDoubleRollGrid:   etk.NewGrid(),
 		buttonsResignAcceptGrid: etk.NewGrid(),
 		buttonsUndoOKGrid:       etk.NewGrid(),
+		selectRollGrid:          etk.NewGrid(),
 		menuGrid:                etk.NewGrid(),
 		settingsGrid:            etk.NewGrid(),
 		uiGrid:                  etk.NewGrid(),
@@ -309,7 +312,22 @@ func NewBoard() *board {
 
 	b.frame.AddChild(b.widget)
 
+	{
+		const padding = 10
+		b.selectRollGrid.SetBackground(frameColor)
+		b.selectRollGrid.SetColumnPadding(padding)
+		b.selectRollGrid.SetRowPadding(padding)
+		b.selectRollGrid.AddChildAt(NewDieButton(1, b.selectRollFunc(1)), 0, 0, 1, 1)
+		b.selectRollGrid.AddChildAt(NewDieButton(2, b.selectRollFunc(2)), 1, 0, 1, 1)
+		b.selectRollGrid.AddChildAt(NewDieButton(3, b.selectRollFunc(3)), 2, 0, 1, 1)
+		b.selectRollGrid.AddChildAt(NewDieButton(4, b.selectRollFunc(4)), 0, 1, 1, 1)
+		b.selectRollGrid.AddChildAt(NewDieButton(5, b.selectRollFunc(5)), 1, 1, 1, 1)
+		b.selectRollGrid.AddChildAt(NewDieButton(6, b.selectRollFunc(6)), 2, 1, 1, 1)
+	}
+
 	b.frame.AddChild(b.buttonsGrid)
+
+	b.frame.AddChild(etk.NewFrame(b.selectRollGrid))
 
 	{
 		b.chatGrid.SetBackground(tableColor)
@@ -567,7 +585,18 @@ func (b *board) selectRoll() error {
 	return nil
 }
 
+func (b *board) selectRollFunc(value int) func() error {
+	return func() error {
+		b.Client.Out <- []byte(fmt.Sprintf("ok %d", value))
+		return nil
+	}
+}
+
 func (b *board) selectOK() error {
+	if b.gameState.MayChooseRoll() {
+		b.selectRollGrid.SetVisible(true)
+		return nil
+	}
 	b.Client.Out <- []byte("ok")
 	return nil
 }
@@ -1169,6 +1198,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
 		b.settingsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+		b.selectRollGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 
 	{
@@ -1871,6 +1901,36 @@ func (l *Label) Draw(screen *ebiten.Image) error {
 	op.GeoM.Translate(float64(l.Rect().Min.X), float64(l.Rect().Min.Y))
 	screen.DrawImage(l.bg, op)
 	return l.Text.Draw(screen)
+}
+
+type DieButton struct {
+	*etk.Button
+	Value int
+}
+
+func NewDieButton(value int, onSelected func() error) *DieButton {
+	return &DieButton{
+		Button: etk.NewButton(" ", onSelected),
+		Value:  value,
+	}
+}
+
+func (b *DieButton) Draw(screen *ebiten.Image) error {
+	dieFace := diceImage(b.Value)
+	if dieFace == nil {
+		return nil
+	}
+
+	err := b.Button.Draw(screen)
+	if err != nil {
+		return err
+	}
+
+	r := b.Rect()
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(r.Min.X+(r.Dx()-int(game.Board.spaceWidth))/2), float64(r.Min.Y+(r.Dy()-int(game.Board.spaceWidth))/2))
+	screen.DrawImage(dieFace, op)
+	return nil
 }
 
 type BoardWidget struct {
