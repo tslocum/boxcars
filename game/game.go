@@ -36,7 +36,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.4p1"
+const version = "v1.1.5"
 
 const MaxDebug = 2
 

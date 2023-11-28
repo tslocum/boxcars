@@ -1247,13 +1247,9 @@ func (b *board) allAvailableMoves() []int {
 	var all []int
 	found := make(map[int]bool)
 	for _, move := range b.gameState.Available {
-		if move[0] == b.draggingSpace {
-			for _, m := range allMoves(b.gameState.Game, move[0], move[1]) {
-				if !found[m] {
-					all = append(all, m)
-					found[m] = true
-				}
-			}
+		if move[0] == b.draggingSpace && !found[move[1]] {
+			all = append(all, allMoves(b.gameState.Game, move[0], move[1], found)...)
+			found[move[0]] = true
 		}
 	}
 	b.availableCache = all
@@ -1981,7 +1977,7 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 	return handled, nil
 }
 
-func allMoves(in *bgammon.Game, from int, to int) []int {
+func allMoves(in *bgammon.Game, from int, to int, found map[int]bool) []int {
 	gc := in.Copy()
 	ok, _ := gc.AddMoves([][]int{{from, to}}, true)
 	if !ok {
@@ -1989,11 +1985,10 @@ func allMoves(in *bgammon.Game, from int, to int) []int {
 	}
 
 	moves := []int{to}
-	var found = make(map[int]bool)
 	found[to] = true
 	for _, m := range gc.LegalMoves(true) {
 		if m[0] == to && !found[m[1]] {
-			for _, move := range allMoves(gc, m[0], m[1]) {
+			for _, move := range allMoves(gc, m[0], m[1], found) {
 				if !found[move] {
 					moves = append(moves, move)
 					found[move] = true

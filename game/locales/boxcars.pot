@@ -25,6 +25,9 @@ msgstr ""
 msgid "Accept"
 msgstr ""
 
+msgid "Acey-deucey"
+msgstr ""
+
 msgid "Available"
 msgstr ""
 
@@ -149,6 +152,9 @@ msgid "Undo"
 msgstr ""
 
 msgid "Username"
+msgstr ""
+
+msgid "Variant"
 msgstr ""
 
 msgid "Warning: Received unknown event: %+v"
