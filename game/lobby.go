@@ -68,10 +68,12 @@ type lobby struct {
 
 	refresh bool
 
-	showCreateGame     bool
-	createGameName     *etk.Input
-	createGamePoints   *etk.Input
-	createGamePassword *etk.Input
+	showCreateGame       bool
+	createGameName       *etk.Input
+	createGamePoints     *etk.Input
+	createGamePassword   *etk.Input
+	createGameCheckbox   *etk.Checkbox
+	createGameAceyDeucey bool
 
 	showJoinGame     bool
 	joinGameID       int
@@ -137,6 +139,11 @@ func (l *lobby) toggleKeyboard() error {
 	return nil
 }
 
+func (l *lobby) toggleAceyDeucey() error {
+	l.createGameAceyDeucey = !l.createGameAceyDeucey
+	return nil
+}
+
 func (l *lobby) handleRefreshTimer() {
 	t := time.NewTicker(time.Second)
 	for range t.C {
@@ -184,7 +191,11 @@ func (l *lobby) confirmCreateGame() {
 	if err != nil {
 		points = 1
 	}
-	l.c.Out <- []byte(fmt.Sprintf("c %s %d %s", typeAndPassword, points, game.lobby.createGameName.Text()))
+	acey := 0
+	if game.lobby.createGameAceyDeucey {
+		acey = 1
+	}
+	l.c.Out <- []byte(fmt.Sprintf("c %s %d %d %s", typeAndPassword, points, acey, game.lobby.createGameName.Text()))
 }
 
 func (l *lobby) confirmJoinGame() {

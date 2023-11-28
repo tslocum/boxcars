@@ -697,6 +697,7 @@ func NewGame() *Game {
 		nameLabel := etk.NewText(gotext.Get("Name"))
 		pointsLabel := etk.NewText(gotext.Get("Points"))
 		passwordLabel := etk.NewText(gotext.Get("Password"))
+		variantLabel := etk.NewText(gotext.Get("Variant"))
 
 		g.lobby.createGameName = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
@@ -713,6 +714,27 @@ func NewGame() *Game {
 		})
 		centerInput(g.lobby.createGamePassword)
 
+		g.lobby.createGameCheckbox = etk.NewCheckbox(g.lobby.toggleAceyDeucey)
+		g.lobby.createGameCheckbox.SetBorderColor(triangleA)
+		g.lobby.createGameCheckbox.SetCheckColor(triangleA)
+		g.lobby.createGameCheckbox.SetSelected(false)
+
+		textField := etk.NewText(gotext.Get("Acey-deucey"))
+		aceyDeuceyLabel := &ClickableText{
+			Text: textField,
+			onSelected: func() {
+				g.lobby.createGameCheckbox.SetSelected(!g.lobby.createGameCheckbox.Selected())
+				g.lobby.toggleAceyDeucey()
+			},
+		}
+		aceyDeuceyLabel.SetVertical(messeji.AlignCenter)
+
+		aceyDeuceyGrid := etk.NewGrid()
+		aceyDeuceyGrid.SetColumnSizes(50, -1)
+		aceyDeuceyGrid.SetRowSizes(50, -1)
+		aceyDeuceyGrid.AddChildAt(g.lobby.createGameCheckbox, 0, 0, 1, 1)
+		aceyDeuceyGrid.AddChildAt(aceyDeuceyLabel, 1, 0, 1, 1)
+
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
 		grid.SetRowPadding(20)
@@ -726,6 +748,8 @@ func NewGame() *Game {
 		grid.AddChildAt(g.lobby.createGamePoints, 2, 2, 1, 1)
 		grid.AddChildAt(passwordLabel, 1, 3, 1, 1)
 		grid.AddChildAt(g.lobby.createGamePassword, 2, 3, 1, 1)
+		grid.AddChildAt(variantLabel, 1, 4, 1, 1)
+		grid.AddChildAt(aceyDeuceyGrid, 2, 4, 1, 1)
 		createGameGrid = grid
 
 		createGameContainer = etk.NewGrid()
