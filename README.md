@@ -45,3 +45,4 @@ Please share issues and suggestions [here](https://code.rocket9labs.com/tslocum/
 - [messeji](https://code.rocket9labs.com/tslocum/messeji) - Text display and input widgets
 - [draw2d](https://github.com/llgcode/draw2d) - Shape drawing
 - [resize](https://github.com/nfnt/resize) - Image resizing
+- [tabula](https://code.rocket9labs.com/tslocum/tabula) - Backgammon AI

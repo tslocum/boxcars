@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
+	"code.rocket9labs.com/tslocum/bgammon-tabula-bot/bot"
 	"code.rocket9labs.com/tslocum/bgammon/pkg/server"
 	"code.rocket9labs.com/tslocum/etk"
 	"code.rocketnine.space/tslocum/kibodo"
@@ -38,7 +39,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.5"
+const version = "v1.1.6"
 
 const MaxDebug = 2
 
@@ -834,9 +835,21 @@ func (g *Game) playOffline() {
 	if g.loggedIn {
 		return
 	}
+
+	// Start the local server.
 	server := server.NewServer("", "", false)
-	conn := server.ListenLocal()
-	go g.ConnectLocal(conn)
+	conns := server.ListenLocal()
+
+	// Connect the bot.
+	botConn := <-conns
+	go bot.NewLocalClient(botConn, "", "BOT_tabula", "", 1)
+
+	// Wait for the bot to finish creating a match.
+	time.Sleep(10 * time.Millisecond)
+
+	// Connect the player.
+	playerConn := <-conns
+	go g.ConnectLocal(playerConn)
 }
 
 func (g *Game) handleUpdateTimeLabels() {
@@ -1601,17 +1614,11 @@ func (g *Game) layoutBoard() {
 	g.needLayoutBoard = false
 
 	if g.portraitView() { // Portrait view.
-		g.Board.Lock()
-
 		g.Board.fullHeight = false
 		g.Board.setRect(0, 0, g.screenW, g.screenW)
 
-		g.Board.Unlock()
-
 		g.Board.uiGrid.SetRect(image.Rect(0, g.Board.h, g.screenW, g.screenH))
 	} else { // Landscape view.
-		g.Board.Lock()
-
 		g.Board.fullHeight = true
 		g.Board.setRect(0, 0, g.screenW-g.bufferWidth, g.screenH)
 
@@ -1625,8 +1632,6 @@ func (g *Game) layoutBoard() {
 			g.Board.fullHeight = false
 			g.Board.setRect(0, 0, g.Board.w, g.Board.w)
 		}
-
-		g.Board.Unlock()
 
 		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
 		g.Board.uiGrid.SetRect(image.Rect(g.Board.w+bufferPaddingX, bufferPaddingX, g.screenW-bufferPaddingX, g.screenH-bufferPaddingX))
