@@ -61,9 +61,16 @@ func (c *Client) LoggedIn() bool {
 
 func (c *Client) connectWebSocket() {
 	reconnect := func() {
-		l("*** Reconnecting...")
-		time.Sleep(2 * time.Second)
-		go c.connectWebSocket()
+		for {
+			if !focused() {
+				time.Sleep(2 * time.Second)
+				continue
+			}
+			l("*** Reconnecting...")
+			time.Sleep(2 * time.Second)
+			go c.connectWebSocket()
+			break
+		}
 	}
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
@@ -147,9 +154,16 @@ func (c *Client) connectTCP() {
 	}
 
 	reconnect := func() {
-		l("*** Reconnecting...")
-		time.Sleep(2 * time.Second)
-		go c.connectTCP()
+		for {
+			if !focused() {
+				time.Sleep(2 * time.Second)
+				continue
+			}
+			l("*** Reconnecting...")
+			time.Sleep(2 * time.Second)
+			go c.connectTCP()
+			break
+		}
 	}
 
 	conn, err := net.DialTimeout("tcp", address, 10*time.Second)

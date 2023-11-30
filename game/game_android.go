@@ -50,3 +50,7 @@ func init() {
 func DefaultLocale() string {
 	return ""
 }
+
+func focused() bool {
+	return true
+}
