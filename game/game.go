@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"math/rand"
+	"net"
 	"os"
 	"path"
 	"regexp"
@@ -19,6 +20,7 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
+	"code.rocket9labs.com/tslocum/bgammon/pkg/server"
 	"code.rocket9labs.com/tslocum/etk"
 	"code.rocketnine.space/tslocum/kibodo"
 	"code.rocketnine.space/tslocum/messeji"
@@ -626,11 +628,6 @@ func NewGame() *Game {
 		nameLabel := etk.NewText(gotext.Get("Username"))
 		passwordLabel := etk.NewText(gotext.Get("Password"))
 
-		connectButton := etk.NewButton(gotext.Get("Connect"), func() error {
-			g.selectConnect()
-			return nil
-		})
-
 		g.connectKeyboardButton = etk.NewButton(gotext.Get("Show Keyboard"), func() error {
 			if g.keyboard.Visible() {
 				g.keyboard.Hide()
@@ -661,6 +658,16 @@ func NewGame() *Game {
 		})
 		centerInput(g.connectPassword)
 
+		connectButton := etk.NewButton(gotext.Get("Connect"), func() error {
+			g.selectConnect()
+			return nil
+		})
+
+		offlineButton := etk.NewButton(gotext.Get("Play Offline"), func() error {
+			g.playOffline()
+			return nil
+		})
+
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
 		grid.SetRowPadding(20)
@@ -687,7 +694,7 @@ func NewGame() *Game {
 		}
 		grid.AddChildAt(infoLabel, 1, y, 3, 1)
 		grid.AddChildAt(connectButton, 2, y+1, 1, 1)
-		grid.AddChildAt(g.connectKeyboardButton, 3, y+1, 1, 1)
+		grid.AddChildAt(offlineButton, 3, y+1, 1, 1)
 		grid.AddChildAt(footerLabel, 1, y+2, 3, 1)
 		connectGrid = grid
 	}
@@ -821,6 +828,15 @@ func NewGame() *Game {
 
 	scheduleFrame()
 	return g
+}
+
+func (g *Game) playOffline() {
+	if g.loggedIn {
+		return
+	}
+	server := server.NewServer("", "", false)
+	conn := server.ListenLocal()
+	go g.ConnectLocal(conn)
 }
 
 func (g *Game) handleUpdateTimeLabels() {
@@ -1092,6 +1108,47 @@ func (g *Game) Connect() {
 	}
 
 	go c.Connect()
+}
+
+func (g *Game) ConnectLocal(conn net.Conn) {
+	if g.loggedIn {
+		return
+	}
+	g.loggedIn = true
+
+	l("*** " + gotext.Get("Playing offline."))
+
+	g.keyboard.Hide()
+	g.connectKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
+	g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
+	g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
+
+	g.setRoot(listGamesFrame)
+
+	g.Client = newClient("", g.Username, g.Password)
+	g.lobby.c = g.Client
+	g.Board.Client = g.Client
+
+	g.Username = ""
+	g.Password = ""
+
+	go g.handleEvents()
+
+	c := g.Client
+
+	if g.TV {
+		go func() {
+			time.Sleep(time.Second)
+			c.Out <- []byte("tv")
+		}()
+	} else if g.Watch {
+		go func() {
+			time.Sleep(time.Second)
+			c.Out <- []byte("watch")
+		}()
+	}
+
+	go c.connectTCP(conn)
 }
 
 func (g *Game) selectConnect() error {

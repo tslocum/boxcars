@@ -44,7 +44,7 @@ func (c *Client) Connect() {
 		c.connectWebSocket()
 		return
 	}
-	c.connectTCP()
+	c.connectTCP(nil)
 }
 
 func (c *Client) logIn() []byte {
@@ -147,7 +147,7 @@ func (c *Client) handleWebSocketRead(conn *websocket.Conn) {
 	}
 }
 
-func (c *Client) connectTCP() {
+func (c *Client) connectTCP(conn net.Conn) {
 	address := c.Address
 	if strings.HasPrefix(c.Address, "tcp://") {
 		address = c.Address[6:]
@@ -161,22 +161,25 @@ func (c *Client) connectTCP() {
 			}
 			l("*** Reconnecting...")
 			time.Sleep(2 * time.Second)
-			go c.connectTCP()
+			go c.connectTCP(nil)
 			break
 		}
 	}
 
-	conn, err := net.DialTimeout("tcp", address, 10*time.Second)
-	if err != nil {
-		reconnect()
-		return
+	if conn == nil {
+		var err error
+		conn, err = net.DialTimeout("tcp", address, 10*time.Second)
+		if err != nil {
+			reconnect()
+			return
+		}
 	}
 
 	// Read a single line of text and parse remaining output as JSON.
 	buf := make([]byte, 1)
 	var readBytes int
 	for {
-		_, err = conn.Read(buf)
+		_, err := conn.Read(buf)
 		if err != nil {
 			reconnect()
 			return
@@ -195,19 +198,19 @@ func (c *Client) connectTCP() {
 
 	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 
-	_, err = conn.Write(c.logIn())
+	_, err := conn.Write(c.logIn())
 	if err != nil {
 		reconnect()
 		return
 	}
 
-	go c.handleTCPWrite(conn.(*net.TCPConn))
-	c.handleTCPRead(conn.(*net.TCPConn))
+	go c.handleTCPWrite(conn)
+	c.handleTCPRead(conn)
 
 	reconnect()
 }
 
-func (c *Client) handleTCPWrite(conn *net.TCPConn) {
+func (c *Client) handleTCPWrite(conn net.Conn) {
 	for buf := range c.Out {
 		conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 
@@ -231,7 +234,7 @@ func (c *Client) handleTCPWrite(conn *net.TCPConn) {
 	}
 }
 
-func (c *Client) handleTCPRead(conn *net.TCPConn) {
+func (c *Client) handleTCPRead(conn net.Conn) {
 	conn.SetReadDeadline(time.Now().Add(40 * time.Second))
 
 	scanner := bufio.NewScanner(conn)
