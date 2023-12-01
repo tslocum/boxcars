@@ -1647,12 +1647,14 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	// Center piece in space
 	x += (w - int(b.spaceWidth)) / 2
 
-	sprite.toX = x
-	sprite.toY = y
-	sprite.toTime = moveTime
-	sprite.toStart = time.Now()
+	if !game.Instant {
+		sprite.toX = x
+		sprite.toY = y
+		sprite.toTime = moveTime
+		sprite.toStart = time.Now()
 
-	time.Sleep(moveTime)
+		time.Sleep(moveTime)
+	}
 
 	sprite.x = x
 	sprite.y = y
@@ -1674,7 +1676,9 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	}
 	b.moving = nil
 
-	if pause {
+	if game.Instant {
+		return
+	} else if pause {
 		time.Sleep(pauseTime)
 	} else {
 		time.Sleep(50 * time.Millisecond)
