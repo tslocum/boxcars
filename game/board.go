@@ -56,6 +56,11 @@ type board struct {
 
 	gameState *bgammon.GameState
 
+	opponentRoll1, opponentRoll2 int
+	opponentRollStale            bool
+	playerRoll1, playerRoll2     int
+	playerRollStale              bool
+
 	debug int // Print and draw debug information
 
 	Client *Client
@@ -991,13 +996,6 @@ func (b *board) Draw(screen *ebiten.Image) {
 	}
 
 	b.stateLock.Lock()
-	playerRoll := b.gameState.Roll1
-	opponentRoll := b.gameState.Roll2
-	roll1 := b.gameState.Roll1
-	roll2 := b.gameState.Roll2
-	if b.gameState.PlayerNumber == 2 {
-		playerRoll, opponentRoll = opponentRoll, playerRoll
-	}
 	var highlightSpaces [][]int
 	dragging := b.dragging
 	if b.dragging != nil && b.highlightAvailable && b.draggingSpace != -1 {
@@ -1042,6 +1040,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	// Draw opponent dice
 
+	const diceFadeAlpha = 0.1
 	diceGap := 10.0
 	if game.screenW < 800 {
 		v := 10.0 * (float64(game.screenW) / 800)
@@ -1059,23 +1058,38 @@ func (b *board) Draw(screen *ebiten.Image) {
 	opponent := b.gameState.OpponentPlayer()
 	if opponent.Name != "" {
 		innerCenter := b.innerBoardCenter(false)
+		alpha := float32(1.0)
 		if b.gameState.Turn == 0 {
-			if opponentRoll != 0 {
+			if b.gameState.Roll2 == 0 {
+				alpha = diceFadeAlpha
+			}
+		} else if b.opponentRollStale || b.gameState.Turn == 1 {
+			alpha = diceFadeAlpha
+		}
+
+		op := &ebiten.DrawImageOptions{}
+		op.ColorScale.ScaleAlpha(alpha)
+
+		d1, d2 := b.opponentRoll1, b.opponentRoll2
+
+		if b.gameState.Turn == 0 {
+			if d2 != 0 {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-				screen.DrawImage(diceImage(opponentRoll), op)
+				screen.DrawImage(diceImage(d2), op)
 			}
-		} else if b.gameState.Turn != b.gameState.PlayerNumber && roll1 != 0 {
-			{
-				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-				screen.DrawImage(diceImage(roll1), op)
-			}
+		} else {
+			if d1 != 0 && d2 != 0 {
+				{
+					op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+					screen.DrawImage(diceImage(d1), op)
+				}
 
-			{
-				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-				screen.DrawImage(diceImage(roll2), op)
+				{
+					op.GeoM.Reset()
+					op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+					screen.DrawImage(diceImage(d2), op)
+				}
 			}
 		}
 	}
@@ -1085,23 +1099,37 @@ func (b *board) Draw(screen *ebiten.Image) {
 	player := b.gameState.LocalPlayer()
 	if player.Name != "" {
 		innerCenter := b.innerBoardCenter(true)
+		alpha := float32(1.0)
 		if b.gameState.Turn == 0 {
-			if playerRoll != 0 {
-				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-				screen.DrawImage(diceImage(playerRoll), op)
+			if b.gameState.Roll1 == 0 {
+				alpha = diceFadeAlpha
 			}
-		} else if b.gameState.Turn == b.gameState.PlayerNumber && roll1 != 0 {
-			{
-				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-				screen.DrawImage(diceImage(roll1), op)
-			}
+		} else if b.playerRollStale || b.gameState.Turn == 2 {
+			alpha = diceFadeAlpha
+		}
 
-			{
-				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-				screen.DrawImage(diceImage(roll2), op)
+		op := &ebiten.DrawImageOptions{}
+		op.ColorScale.ScaleAlpha(alpha)
+
+		d1, d2 := b.playerRoll1, b.playerRoll2
+
+		if b.gameState.Turn == 0 {
+			if d1 != 0 {
+				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+				screen.DrawImage(diceImage(d1), op)
+			}
+		} else {
+			if d1 != 0 && d2 != 0 {
+				{
+					op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+					screen.DrawImage(diceImage(d1), op)
+				}
+
+				{
+					op.GeoM.Reset()
+					op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+					screen.DrawImage(diceImage(d2), op)
+				}
 			}
 		}
 	}

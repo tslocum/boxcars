@@ -39,7 +39,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.7"
+const version = "v1.1.7p1"
 
 const MaxDebug = 2
 
@@ -966,6 +966,10 @@ func (g *Game) handleEvent(e interface{}) {
 		} else if ev.PlayerNumber == 2 {
 			g.Board.gameState.Player2.Name = ev.Player
 		}
+		g.Board.playerRoll1, g.Board.playerRoll2 = 0, 0
+		g.Board.opponentRoll1, g.Board.opponentRoll2 = 0, 0
+		g.Board.playerRollStale = false
+		g.Board.opponentRollStale = false
 		g.Board.processState()
 		g.Board.Unlock()
 		setViewBoard(true)
@@ -1002,6 +1006,36 @@ func (g *Game) handleEvent(e interface{}) {
 		g.Board.stateLock.Lock()
 		*g.Board.gameState = ev.GameState
 		*g.Board.gameState.Game = *ev.GameState.Game
+		if g.Board.gameState.Turn == 0 {
+			if g.Board.playerRoll2 != 0 {
+				g.Board.playerRoll1, g.Board.playerRoll2 = 0, 0
+			}
+			if g.Board.opponentRoll1 != 0 {
+				g.Board.opponentRoll1, g.Board.opponentRoll2 = 0, 0
+			}
+			if g.Board.gameState.Roll1 != 0 {
+				g.Board.playerRoll1 = g.Board.gameState.Roll1
+			}
+			if g.Board.gameState.Roll2 != 0 {
+				g.Board.opponentRoll2 = g.Board.gameState.Roll2
+			}
+		} else if g.Board.gameState.Roll1 != 0 {
+			if g.Board.gameState.Turn == 1 {
+				g.Board.playerRoll1, g.Board.playerRoll2 = g.Board.gameState.Roll1, g.Board.gameState.Roll2
+				g.Board.playerRollStale = false
+				g.Board.opponentRollStale = true
+				if g.Board.opponentRoll1 == 0 || g.Board.opponentRoll2 == 0 {
+					g.Board.opponentRoll1, g.Board.opponentRoll2 = 0, 0
+				}
+			} else {
+				g.Board.opponentRoll1, g.Board.opponentRoll2 = g.Board.gameState.Roll1, g.Board.gameState.Roll2
+				g.Board.opponentRollStale = false
+				g.Board.playerRollStale = true
+				if g.Board.playerRoll1 == 0 || g.Board.playerRoll2 == 0 {
+					g.Board.playerRoll1, g.Board.playerRoll2 = 0, 0
+				}
+			}
+		}
 		g.Board.stateLock.Unlock()
 		g.Board.processState()
 		g.Board.Unlock()
@@ -1015,12 +1049,23 @@ func (g *Game) handleEvent(e interface{}) {
 		if g.Board.gameState.Turn == 0 {
 			if g.Board.gameState.Player1.Name == ev.Player {
 				diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll1)
+				g.Board.playerRoll1 = g.Board.gameState.Roll1
+				g.Board.playerRollStale = false
 			} else {
 				diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll2)
+				g.Board.opponentRoll2 = g.Board.gameState.Roll2
+				g.Board.opponentRollStale = false
 			}
 			playSoundEffect(effectDie)
 		} else {
 			diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
+			if g.Board.gameState.Turn == 1 {
+				g.Board.playerRoll1, g.Board.playerRoll2 = g.Board.gameState.Roll1, g.Board.gameState.Roll2
+				g.Board.playerRollStale = false
+			} else {
+				g.Board.opponentRoll1, g.Board.opponentRoll2 = g.Board.gameState.Roll1, g.Board.gameState.Roll2
+				g.Board.opponentRollStale = false
+			}
 			playSoundEffect(effectDice)
 		}
 		g.Board.stateLock.Unlock()
