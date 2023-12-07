@@ -291,13 +291,14 @@ func NewBoard() *board {
 		b.matchStatusGrid.AddChildAt(b.showMenuButton, 2, 0, 1, 1)
 	}
 
-	b.uiGrid.AddChildAt(b.matchStatusGrid, 0, 0, 1, 1)
-	b.uiGrid.AddChildAt(etk.NewBox(), 0, 1, 1, 1)
-	b.uiGrid.AddChildAt(statusBuffer, 0, 2, 1, 1)
-	b.uiGrid.AddChildAt(etk.NewBox(), 0, 3, 1, 1)
-	b.uiGrid.AddChildAt(gameBuffer, 0, 4, 1, 1)
-	b.uiGrid.AddChildAt(etk.NewBox(), 0, 5, 1, 1)
-	b.uiGrid.AddChildAt(b.inputGrid, 0, 6, 1, 1)
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
+	b.uiGrid.AddChildAt(b.matchStatusGrid, 0, 1, 1, 1)
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 2, 1, 1)
+	b.uiGrid.AddChildAt(statusBuffer, 0, 3, 1, 1)
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 4, 1, 1)
+	b.uiGrid.AddChildAt(gameBuffer, 0, 5, 1, 1)
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 6, 1, 1)
+	b.uiGrid.AddChildAt(b.inputGrid, 0, 7, 1, 1)
 
 	b.frame.SetPositionChildren(true)
 
@@ -1172,7 +1173,7 @@ func (b *board) setRect(x, y, w, h int) {
 	if game.scaleFactor >= 1.25 {
 		matchStatus = 44
 	}
-	b.uiGrid.SetRowSizes(matchStatus, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), int(inputAndButtons))
+	b.uiGrid.SetRowSizes(int(b.horizontalBorderSize/2), matchStatus, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), int(inputAndButtons))
 
 	{
 		dialogWidth := game.scale(620)

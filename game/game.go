@@ -39,7 +39,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.6"
+const version = "v1.1.7"
 
 const MaxDebug = 2
 
@@ -1636,7 +1636,7 @@ func (g *Game) layoutBoard() {
 		}
 
 		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
-		g.Board.uiGrid.SetRect(image.Rect(g.Board.w+bufferPaddingX, bufferPaddingX, g.screenW-bufferPaddingX, g.screenH-bufferPaddingX))
+		g.Board.uiGrid.SetRect(image.Rect(g.Board.w+bufferPaddingX, 0, g.screenW-bufferPaddingX, g.screenH-bufferPaddingX))
 	}
 
 	g.setBufferRects()
