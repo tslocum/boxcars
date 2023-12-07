@@ -103,7 +103,13 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "Play Offline"
+msgstr ""
+
 msgid "Play backgammon online via bgammon.org"
+msgstr ""
+
+msgid "Playing offline."
 msgstr ""
 
 msgid "Points"

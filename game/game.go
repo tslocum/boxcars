@@ -844,7 +844,7 @@ func (g *Game) playOffline() {
 
 	// Connect the bot.
 	botConn := <-conns
-	go bot.NewLocalClient(botConn, "", "BOT_tabula", "", 1, 0)
+	go bot.NewLocalClient(botConn, "", "BOT_tabula", "", 1, false, 0)
 
 	// Wait for the bot to finish creating a match.
 	time.Sleep(10 * time.Millisecond)

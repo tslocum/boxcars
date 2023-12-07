@@ -62,8 +62,7 @@ type board struct {
 
 	dragX, dragY int
 
-	availableCache       []int
-	updateAvailableCache bool
+	highlightSpaces [][]int
 
 	spaceHighlight *ebiten.Image
 	foundMoves     map[int]bool
@@ -145,6 +144,7 @@ func NewBoard() *board {
 		gameState: &bgammon.GameState{
 			Game: bgammon.NewGame(false),
 		},
+		highlightSpaces:         make([][]int, 28),
 		spaceHighlight:          ebiten.NewImage(1, 1),
 		foundMoves:              make(map[int]bool),
 		opponentLabel:           NewLabel(color.RGBA{255, 255, 255, 255}),
@@ -997,16 +997,16 @@ func (b *board) Draw(screen *ebiten.Image) {
 	if b.gameState.PlayerNumber == 2 {
 		playerRoll, opponentRoll = opponentRoll, playerRoll
 	}
-	var highlightSpaces []int
+	var highlightSpaces [][]int
 	dragging := b.dragging
 	if b.dragging != nil && b.highlightAvailable && b.draggingSpace != -1 {
-		highlightSpaces = b.allAvailableMoves()
+		highlightSpaces = b.highlightSpaces
 	}
 	b.stateLock.Unlock()
 
 	// Draw space hover overlay when dragging
 	if dragging != nil {
-		for _, m := range highlightSpaces {
+		for _, m := range highlightSpaces[b.draggingSpace] {
 			x, y, _, _ := b.spaceRect(m)
 			x, y = b.offsetPosition(m, x, y)
 			if b.bottomRow(m) {
@@ -1240,29 +1240,6 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 	b.opponentPipCount.SetPadding(padding / 2)
 	b.playerPipCount.SetPadding(padding)
-}
-
-func (b *board) allAvailableMoves() []int {
-	if !b.updateAvailableCache {
-		return b.availableCache
-	}
-	var all []int
-	for _, move := range b.gameState.Available {
-		if move[0] == b.draggingSpace {
-		FOUNDMOVES:
-			for _, m := range allMoves(b.gameState.Game, move[0], move[1], b.foundMoves) {
-				for _, foundMove := range all {
-					if m == foundMove {
-						continue FOUNDMOVES
-					}
-				}
-				all = append(all, m)
-			}
-		}
-	}
-	b.availableCache = all
-	b.updateAvailableCache = false
-	return b.availableCache
 }
 
 func (b *board) updateOpponentLabel() {
@@ -1553,8 +1530,6 @@ func (b *board) processState() {
 	}
 	b.lastPlayerNumber = b.gameState.PlayerNumber
 
-	b.updateAvailableCache = true
-
 	var showGrid *etk.Grid
 	if !b.gameState.Spectating {
 		if b.gameState.MayRoll() {
@@ -1624,6 +1599,26 @@ func (b *board) processState() {
 
 	b.updateOpponentLabel()
 	b.updatePlayerLabel()
+
+	for space := 0; space < 28; space++ {
+		b.highlightSpaces[space] = b.highlightSpaces[space][:0]
+		all := make([]int, 0, 4)
+		for _, move := range b.gameState.Available {
+			if move[0] != space {
+				continue
+			}
+		ALLMOVES:
+			for _, m := range allMoves(b.gameState.Game, move[0], move[1]) {
+				for i := range all {
+					if all[i] == m {
+						continue ALLMOVES
+					}
+				}
+				all = append(all, m)
+			}
+		}
+		b.highlightSpaces[space] = append(b.highlightSpaces[space], all...)
+	}
 }
 
 // _movePiece returns after moving the piece.
@@ -1989,25 +1984,16 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 	return handled, nil
 }
 
-func allMoves(in *bgammon.Game, from int, to int, found map[int]bool) []int {
+func allMoves(in *bgammon.Game, from int, to int) []int {
 	gc := in.Copy()
 	ok, _ := gc.AddMoves([][]int{{from, to}}, true)
 	if !ok {
 		return nil
 	}
-
 	moves := []int{to}
-	for key := range found {
-		delete(found, key)
-	}
 	for _, m := range gc.LegalMoves(true) {
 		if m[0] == to {
-			for _, move := range allMoves(gc, m[0], m[1], found) {
-				if !found[move] {
-					moves = append(moves, move)
-					found[move] = true
-				}
-			}
+			moves = append(moves, allMoves(gc, m[0], m[1])...)
 		}
 	}
 	return moves
