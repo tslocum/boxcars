@@ -1816,6 +1816,14 @@ func (b *board) finishDrag(x int, y int, click bool) {
 							scheduleFrame()
 							processed = true
 							b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
+						} else if time.Since(b.lastDragClick) < 500*time.Millisecond && bgammon.CanBearOff(b.gameState.Board, b.gameState.PlayerNumber, true) {
+							homeStart, homeEnd := bgammon.HomeRange(b.gameState.PlayerNumber)
+							if homeEnd < homeStart {
+								homeStart, homeEnd = homeEnd, homeStart
+							}
+							if index >= homeStart && index <= homeEnd {
+								b.Client.Out <- []byte(fmt.Sprintf("mv %d/off", index))
+							}
 						}
 						break ADDPREMOVE
 					}
