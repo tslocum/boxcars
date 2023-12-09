@@ -970,6 +970,8 @@ func (g *Game) handleEvent(e interface{}) {
 		g.Board.opponentRoll1, g.Board.opponentRoll2 = 0, 0
 		g.Board.playerRollStale = false
 		g.Board.opponentRollStale = false
+		g.Board.playerMoves = nil
+		g.Board.opponentMoves = nil
 		g.Board.processState()
 		g.Board.Unlock()
 		setViewBoard(true)
@@ -1087,6 +1089,13 @@ func (g *Game) handleEvent(e interface{}) {
 			g.Board.movePiece(move[0], move[1])
 		}
 		g.Lock()
+		if g.Board.showMoves {
+			if g.Board.gameState.Turn == 1 {
+				g.Board.playerMoves = expandMoves(g.Board.gameState.Moves)
+			} else if g.Board.gameState.Turn == 2 {
+				g.Board.opponentMoves = expandMoves(g.Board.gameState.Moves)
+			}
+		}
 		g.Board.Unlock()
 	case *bgammon.EventFailedMove:
 		g.Client.Out <- []byte("board") // Refresh game state.

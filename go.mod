@@ -3,8 +3,8 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231203064241-5abce61fabb1
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231207002804-464a7b1265ff
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231208220405-8c4b5112ba77
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231209094518-612426a93d9e
 	code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454
 	code.rocketnine.space/tslocum/kibodo v1.0.2
 	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231128010227-689683b75174
@@ -18,7 +18,7 @@ require (
 )
 
 require (
-	code.rocket9labs.com/tslocum/tabula v0.0.0-20231207014630-bbec0a941eda // indirect
+	code.rocket9labs.com/tslocum/tabula v0.0.0-20231209094435-959d43321c78 // indirect
 	github.com/ebitengine/oto/v3 v3.1.0 // indirect
 	github.com/ebitengine/purego v0.5.1 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect

@@ -1,6 +1,7 @@
 package game
 
 import (
+	"bytes"
 	"fmt"
 	"image"
 	"image/color"
@@ -61,6 +62,9 @@ type board struct {
 	playerRoll1, playerRoll2     int
 	playerRollStale              bool
 
+	opponentMoves [][]int
+	playerMoves   [][]int
+
 	debug int // Print and draw debug information
 
 	Client *Client
@@ -85,8 +89,8 @@ type board struct {
 	opponentLabel *Label
 	playerLabel   *Label
 
-	opponentMoves *etk.Text
-	playerMoves   *etk.Text
+	opponentMovesLabel *etk.Text
+	playerMovesLabel   *etk.Text
 
 	opponentPipCount *etk.Text
 	playerPipCount   *etk.Text
@@ -97,8 +101,9 @@ type board struct {
 
 	menuGrid *etk.Grid
 
-	showPipCountCheckbox *etk.Checkbox
 	highlightCheckbox    *etk.Checkbox
+	showPipCountCheckbox *etk.Checkbox
+	showMovesCheckbox    *etk.Checkbox
 	settingsGrid         *etk.Grid
 
 	matchStatusGrid *etk.Grid
@@ -121,8 +126,9 @@ type board struct {
 	lineHeight int
 	lineOffset int
 
-	showPipCount       bool
 	highlightAvailable bool
+	showPipCount       bool
+	showMoves          bool
 
 	widget *BoardWidget
 
@@ -157,8 +163,8 @@ func NewBoard() *board {
 		foundMoves:              make(map[int]bool),
 		opponentLabel:           NewLabel(color.RGBA{255, 255, 255, 255}),
 		playerLabel:             NewLabel(color.RGBA{0, 0, 0, 255}),
-		opponentMoves:           etk.NewText(""),
-		playerMoves:             etk.NewText(""),
+		opponentMovesLabel:      etk.NewText(""),
+		playerMovesLabel:        etk.NewText(""),
 		opponentPipCount:        etk.NewText("0"),
 		playerPipCount:          etk.NewText("0"),
 		buttonsGrid:             etk.NewGrid(),
@@ -191,20 +197,20 @@ func NewBoard() *board {
 		t.SetScrollBarVisible(false)
 	}
 
-	centerText(b.opponentMoves)
-	centerText(b.playerMoves)
+	centerText(b.opponentMovesLabel)
+	centerText(b.playerMovesLabel)
 
 	centerText(b.opponentPipCount)
 	centerText(b.playerPipCount)
 
-	b.opponentMoves.SetHorizontal(messeji.AlignStart)
-	b.playerMoves.SetHorizontal(messeji.AlignEnd)
+	b.opponentMovesLabel.SetHorizontal(messeji.AlignStart)
+	b.playerMovesLabel.SetHorizontal(messeji.AlignEnd)
 
 	b.opponentPipCount.SetHorizontal(messeji.AlignEnd)
 	b.playerPipCount.SetHorizontal(messeji.AlignStart)
 
-	b.opponentMoves.SetForegroundColor(color.RGBA{255, 255, 255, 255})
-	b.playerMoves.SetForegroundColor(color.RGBA{0, 0, 0, 255})
+	b.opponentMovesLabel.SetForegroundColor(color.RGBA{255, 255, 255, 255})
+	b.playerMovesLabel.SetForegroundColor(color.RGBA{0, 0, 0, 255})
 
 	b.opponentPipCount.SetForegroundColor(color.RGBA{255, 255, 255, 255})
 	b.playerPipCount.SetForegroundColor(color.RGBA{0, 0, 0, 255})
@@ -224,20 +230,6 @@ func NewBoard() *board {
 		settingsLabel := etk.NewText(gotext.Get("Settings"))
 		settingsLabel.SetHorizontal(messeji.AlignCenter)
 
-		b.showPipCountCheckbox = etk.NewCheckbox(b.togglePipCountCheckbox)
-		b.showPipCountCheckbox.SetBorderColor(triangleA)
-		b.showPipCountCheckbox.SetCheckColor(triangleA)
-		b.showPipCountCheckbox.SetSelected(b.showPipCount)
-
-		pipCountLabel := &ClickableText{
-			Text: etk.NewText(gotext.Get("Show pip count")),
-			onSelected: func() {
-				b.showPipCountCheckbox.SetSelected(!b.showPipCountCheckbox.Selected())
-				b.togglePipCountCheckbox()
-			},
-		}
-		pipCountLabel.SetVertical(messeji.AlignCenter)
-
 		b.highlightCheckbox = etk.NewCheckbox(b.toggleHighlightCheckbox)
 		b.highlightCheckbox.SetBorderColor(triangleA)
 		b.highlightCheckbox.SetCheckColor(triangleA)
@@ -252,16 +244,46 @@ func NewBoard() *board {
 		}
 		highlightLabel.SetVertical(messeji.AlignCenter)
 
+		b.showPipCountCheckbox = etk.NewCheckbox(b.togglePipCountCheckbox)
+		b.showPipCountCheckbox.SetBorderColor(triangleA)
+		b.showPipCountCheckbox.SetCheckColor(triangleA)
+		b.showPipCountCheckbox.SetSelected(b.showPipCount)
+
+		pipCountLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Show pip count")),
+			onSelected: func() {
+				b.showPipCountCheckbox.SetSelected(!b.showPipCountCheckbox.Selected())
+				b.togglePipCountCheckbox()
+			},
+		}
+		pipCountLabel.SetVertical(messeji.AlignCenter)
+
+		b.showMovesCheckbox = etk.NewCheckbox(b.toggleMovesCheckbox)
+		b.showMovesCheckbox.SetBorderColor(triangleA)
+		b.showMovesCheckbox.SetCheckColor(triangleA)
+		b.showMovesCheckbox.SetSelected(b.showMoves)
+
+		movesLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Show moves")),
+			onSelected: func() {
+				b.showMovesCheckbox.SetSelected(!b.showMovesCheckbox.Selected())
+				b.toggleMovesCheckbox()
+			},
+		}
+		movesLabel.SetVertical(messeji.AlignCenter)
+
 		checkboxGrid := etk.NewGrid()
-		checkboxGrid.SetRowSizes(-1, 20, -1)
-		checkboxGrid.AddChildAt(b.showPipCountCheckbox, 0, 0, 1, 1)
-		checkboxGrid.AddChildAt(pipCountLabel, 1, 0, 4, 1)
-		checkboxGrid.AddChildAt(b.highlightCheckbox, 0, 2, 1, 1)
-		checkboxGrid.AddChildAt(highlightLabel, 1, 2, 4, 1)
+		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1)
+		checkboxGrid.AddChildAt(b.highlightCheckbox, 0, 0, 1, 1)
+		checkboxGrid.AddChildAt(highlightLabel, 1, 0, 4, 1)
+		checkboxGrid.AddChildAt(b.showPipCountCheckbox, 0, 2, 1, 1)
+		checkboxGrid.AddChildAt(pipCountLabel, 1, 2, 4, 1)
+		checkboxGrid.AddChildAt(b.showMovesCheckbox, 0, 4, 1, 1)
+		checkboxGrid.AddChildAt(movesLabel, 1, 4, 4, 1)
 
 		b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
 		b.settingsGrid.SetColumnSizes(20, -1, -1, 20)
-		b.settingsGrid.SetRowSizes(72, 72+20+72, 20, -1)
+		b.settingsGrid.SetRowSizes(72, 72+20+72+20+72, 20, -1)
 		b.settingsGrid.AddChildAt(settingsLabel, 1, 0, 2, 1)
 		b.settingsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
 		b.settingsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
@@ -323,13 +345,13 @@ func NewBoard() *board {
 
 	{
 		f := etk.NewFrame()
-		f.AddChild(b.opponentMoves)
+		f.AddChild(b.opponentMovesLabel)
 		f.AddChild(b.opponentPipCount)
 		f.AddChild(b.opponentLabel)
 		f.AddChild(b.opponentLabel)
 		f.AddChild(b.playerLabel)
 		f.AddChild(b.playerPipCount)
-		f.AddChild(b.playerMoves)
+		f.AddChild(b.playerMovesLabel)
 		f.AddChild(b.uiGrid)
 		b.frame.AddChild(f)
 	}
@@ -421,8 +443,8 @@ func (b *board) fontUpdated() {
 	b.timerLabel.SetFont(b.fontFace, fontMutex)
 	b.clockLabel.SetFont(b.fontFace, fontMutex)
 
-	b.opponentMoves.SetFont(bufferFont, fontMutex)
-	b.playerMoves.SetFont(bufferFont, fontMutex)
+	b.opponentMovesLabel.SetFont(bufferFont, fontMutex)
+	b.playerMovesLabel.SetFont(bufferFont, fontMutex)
 
 	b.opponentPipCount.SetFont(bufferFont, fontMutex)
 	b.playerPipCount.SetFont(bufferFont, fontMutex)
@@ -664,6 +686,11 @@ func (b *board) selectResign() error {
 	return nil
 }
 
+func (b *board) toggleHighlightCheckbox() error {
+	b.highlightAvailable = b.highlightCheckbox.Selected()
+	return nil
+}
+
 func (b *board) togglePipCountCheckbox() error {
 	b.showPipCount = b.showPipCountCheckbox.Selected()
 	b.updatePlayerLabel()
@@ -671,8 +698,9 @@ func (b *board) togglePipCountCheckbox() error {
 	return nil
 }
 
-func (b *board) toggleHighlightCheckbox() error {
-	b.highlightAvailable = b.highlightCheckbox.Selected()
+func (b *board) toggleMovesCheckbox() error {
+	b.showMoves = b.showMovesCheckbox.Selected()
+	b.processState()
 	return nil
 }
 
@@ -1241,7 +1269,7 @@ func (b *board) setRect(x, y, w, h int) {
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := 72 + 72 + 20 + 72 + 20 + game.scale(baseButtonHeight)
+		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + game.scale(baseButtonHeight)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
@@ -1286,8 +1314,8 @@ func (b *board) setRect(x, y, w, h int) {
 	} else if b.w >= 100 {
 		padding = 5
 	}
-	b.opponentMoves.SetPadding(padding)
-	b.playerMoves.SetPadding(padding / 2)
+	b.opponentMovesLabel.SetPadding(padding)
+	b.playerMovesLabel.SetPadding(padding / 2)
 	b.opponentPipCount.SetPadding(padding / 2)
 	b.playerPipCount.SetPadding(padding)
 }
@@ -1328,8 +1356,8 @@ func (b *board) updateOpponentLabel() {
 		return
 	}
 	{
-		newRect := image.Rect(int(b.horizontalBorderSize), y-bounds.Dy(), x, y+bounds.Dy()*2)
-		b.opponentMoves.SetRect(newRect)
+		newRect := image.Rect(int(b.horizontalBorderSize), y-bounds.Dy()*2, x, y+bounds.Dy()*4)
+		b.opponentMovesLabel.SetRect(newRect)
 	}
 	{
 		newRect := r.Inset(-padding)
@@ -1340,6 +1368,14 @@ func (b *board) updateOpponentLabel() {
 	{
 		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy(), b.innerW/2-int(b.barWidth)/2+int(b.horizontalBorderSize), y+bounds.Dy()*2)
 		b.opponentPipCount.SetRect(newRect)
+	}
+
+	var moves []byte
+	if len(b.opponentMoves) != 0 {
+		moves = bytes.ReplaceAll(bgammon.FormatMoves(b.opponentMoves), []byte(" "), []byte("\n"))
+	}
+	if b.opponentMovesLabel.Text() != string(moves) {
+		b.opponentMovesLabel.SetText(string(moves))
 	}
 
 	if b.showPipCount {
@@ -1388,8 +1424,8 @@ func (b *board) updatePlayerLabel() {
 		return
 	}
 	{
-		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy(), int(b.horizontalBorderSize)+b.innerW, y+bounds.Dy()*2)
-		b.playerMoves.SetRect(newRect)
+		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy()*2, int(b.horizontalBorderSize)+b.innerW, y+bounds.Dy()*4)
+		b.playerMovesLabel.SetRect(newRect)
 	}
 	{
 		newRect := r.Inset(-padding)
@@ -1402,6 +1438,14 @@ func (b *board) updatePlayerLabel() {
 		if !b.playerPipCount.Rect().Eq(newRect) {
 			b.playerPipCount.SetRect(newRect)
 		}
+	}
+
+	var moves []byte
+	if len(b.playerMoves) != 0 {
+		moves = bytes.ReplaceAll(bgammon.FormatMoves(b.playerMoves), []byte(" "), []byte("\n"))
+	}
+	if b.playerMovesLabel.Text() != string(moves) {
+		b.playerMovesLabel.SetText(string(moves))
 	}
 
 	if b.showPipCount {
@@ -1652,6 +1696,14 @@ func (b *board) processState() {
 	}
 
 	b._positionCheckers()
+
+	if b.showMoves && b.gameState.Turn == 1 {
+		b.playerMoves = expandMoves(b.gameState.Moves)
+	} else if b.showMoves && b.gameState.Turn == 2 {
+		b.opponentMoves = expandMoves(b.gameState.Moves)
+	} else {
+		b.playerMoves, b.opponentMoves = nil, nil
+	}
 
 	b.updateOpponentLabel()
 	b.updatePlayerLabel()
@@ -2061,4 +2113,30 @@ func allMoves(in *bgammon.Game, from int, to int) []int {
 		}
 	}
 	return moves
+}
+
+func expandMoves(moves [][]int) [][]int {
+	var expanded bool
+	for _, m := range moves {
+		expandedMoves, ok := game.Board.gameState.ExpandMove(m, m[0], nil, true)
+		if !ok {
+			return moves
+		}
+		if len(expandedMoves) != 1 {
+			expanded = true
+			break
+		}
+	}
+	if !expanded {
+		return moves
+	}
+	var newMoves [][]int
+	for _, m := range moves {
+		expandedMoves, ok := game.Board.gameState.ExpandMove(m, m[0], nil, true)
+		if !ok {
+			return moves
+		}
+		newMoves = append(newMoves, expandedMoves...)
+	}
+	return newMoves
 }
