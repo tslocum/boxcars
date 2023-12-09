@@ -85,6 +85,9 @@ type board struct {
 	opponentLabel *Label
 	playerLabel   *Label
 
+	opponentMoves *etk.Text
+	playerMoves   *etk.Text
+
 	opponentPipCount *etk.Text
 	playerPipCount   *etk.Text
 
@@ -154,6 +157,8 @@ func NewBoard() *board {
 		foundMoves:              make(map[int]bool),
 		opponentLabel:           NewLabel(color.RGBA{255, 255, 255, 255}),
 		playerLabel:             NewLabel(color.RGBA{0, 0, 0, 255}),
+		opponentMoves:           etk.NewText(""),
+		playerMoves:             etk.NewText(""),
 		opponentPipCount:        etk.NewText("0"),
 		playerPipCount:          etk.NewText("0"),
 		buttonsGrid:             etk.NewGrid(),
@@ -186,11 +191,20 @@ func NewBoard() *board {
 		t.SetScrollBarVisible(false)
 	}
 
+	centerText(b.opponentMoves)
+	centerText(b.playerMoves)
+
 	centerText(b.opponentPipCount)
 	centerText(b.playerPipCount)
 
+	b.opponentMoves.SetHorizontal(messeji.AlignStart)
+	b.playerMoves.SetHorizontal(messeji.AlignEnd)
+
 	b.opponentPipCount.SetHorizontal(messeji.AlignEnd)
 	b.playerPipCount.SetHorizontal(messeji.AlignStart)
+
+	b.opponentMoves.SetForegroundColor(color.RGBA{255, 255, 255, 255})
+	b.playerMoves.SetForegroundColor(color.RGBA{0, 0, 0, 255})
 
 	b.opponentPipCount.SetForegroundColor(color.RGBA{255, 255, 255, 255})
 	b.playerPipCount.SetForegroundColor(color.RGBA{0, 0, 0, 255})
@@ -309,11 +323,13 @@ func NewBoard() *board {
 
 	{
 		f := etk.NewFrame()
+		f.AddChild(b.opponentMoves)
 		f.AddChild(b.opponentPipCount)
 		f.AddChild(b.opponentLabel)
 		f.AddChild(b.opponentLabel)
 		f.AddChild(b.playerLabel)
 		f.AddChild(b.playerPipCount)
+		f.AddChild(b.playerMoves)
 		f.AddChild(b.uiGrid)
 		b.frame.AddChild(f)
 	}
@@ -404,6 +420,9 @@ func (b *board) fontUpdated() {
 
 	b.timerLabel.SetFont(b.fontFace, fontMutex)
 	b.clockLabel.SetFont(b.fontFace, fontMutex)
+
+	b.opponentMoves.SetFont(bufferFont, fontMutex)
+	b.playerMoves.SetFont(bufferFont, fontMutex)
 
 	b.opponentPipCount.SetFont(bufferFont, fontMutex)
 	b.playerPipCount.SetFont(bufferFont, fontMutex)
@@ -939,7 +958,7 @@ func (b *board) innerBoardCenter(right bool) int {
 	if right {
 		return b.x + int(b.horizontalBorderSize) + b.innerW - (b.innerW / 4) + int(b.barWidth/4)
 	}
-	return b.x + int(b.horizontalBorderSize) + (b.innerW / 4) - int(b.horizontalBorderSize*1.5)
+	return b.x + int(b.horizontalBorderSize) + b.innerW/4 - int(b.barWidth/4)
 }
 
 func (b *board) Draw(screen *ebiten.Image) {
@@ -1267,6 +1286,8 @@ func (b *board) setRect(x, y, w, h int) {
 	} else if b.w >= 100 {
 		padding = 5
 	}
+	b.opponentMoves.SetPadding(padding)
+	b.playerMoves.SetPadding(padding / 2)
 	b.opponentPipCount.SetPadding(padding / 2)
 	b.playerPipCount.SetPadding(padding)
 }
@@ -1298,13 +1319,17 @@ func (b *board) updateOpponentLabel() {
 
 	padding := 13
 	innerCenter := b.innerBoardCenter(false)
-	x := innerCenter - int(float64(bounds.Dx()/2))
+	x := innerCenter - bounds.Dx()/2
 	y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
 	r := image.Rect(x, y, x+bounds.Dx(), y+bounds.Dy())
 
 	if r.Eq(label.Rect()) && r.Dx() != 0 && r.Dy() != 0 {
 		label.updateBackground()
 		return
+	}
+	{
+		newRect := image.Rect(int(b.horizontalBorderSize), y-bounds.Dy(), x, y+bounds.Dy()*2)
+		b.opponentMoves.SetRect(newRect)
 	}
 	{
 		newRect := r.Inset(-padding)
@@ -1314,9 +1339,7 @@ func (b *board) updateOpponentLabel() {
 	}
 	{
 		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy(), b.innerW/2-int(b.barWidth)/2+int(b.horizontalBorderSize), y+bounds.Dy()*2)
-		if !b.opponentPipCount.Rect().Eq(newRect) {
-			b.opponentPipCount.SetRect(newRect)
-		}
+		b.opponentPipCount.SetRect(newRect)
 	}
 
 	if b.showPipCount {
@@ -1363,6 +1386,10 @@ func (b *board) updatePlayerLabel() {
 	if r.Eq(label.Rect()) && r.Dx() != 0 && r.Dy() != 0 {
 		label.updateBackground()
 		return
+	}
+	{
+		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy(), int(b.horizontalBorderSize)+b.innerW, y+bounds.Dy()*2)
+		b.playerMoves.SetRect(newRect)
 	}
 	{
 		newRect := r.Inset(-padding)
