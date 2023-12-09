@@ -663,6 +663,10 @@ func (b *board) _selectUndo() {
 		return
 	}
 
+	b.dragging = nil
+	b.dragX, b.dragY = 0, 0
+	b._positionCheckers()
+
 	lastMove := b.gameState.Moves[l-1]
 	b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", lastMove[1], lastMove[0]))
 
