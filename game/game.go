@@ -627,7 +627,7 @@ func NewGame() *Game {
 	}
 
 	{
-		headerLabel := etk.NewText(gotext.Get("Welcome to %s", "bgammon.org"))
+		headerLabel := etk.NewText(gotext.Get("%s - Free Online Backgammon", "bgammon.org"))
 		nameLabel := etk.NewText(gotext.Get("Username"))
 		passwordLabel := etk.NewText(gotext.Get("Password"))
 

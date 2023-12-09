@@ -7,6 +7,9 @@ msgstr ""
 "Language: \n"
 "X-Generator: xgotext\n"
 
+msgid "%s - Free Online Backgammon"
+msgstr ""
+
 msgid "%s joined the match."
 msgstr ""
 
@@ -139,6 +142,9 @@ msgstr ""
 msgid "Show Keyboard"
 msgstr ""
 
+msgid "Show moves"
+msgstr ""
+
 msgid "Show pip count"
 msgstr ""
 
@@ -164,9 +170,6 @@ msgid "Variant"
 msgstr ""
 
 msgid "Warning: Received unknown event: %+v"
-msgstr ""
-
-msgid "Welcome to %s"
 msgstr ""
 
 msgid "Yes"
