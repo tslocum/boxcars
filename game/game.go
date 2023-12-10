@@ -43,7 +43,7 @@ const version = "v1.1.7p1"
 
 const MaxDebug = 2
 
-const baseButtonHeight = 56
+const baseButtonHeight = 54
 
 var onlyNumbers = regexp.MustCompile(`[0-9]+`)
 
@@ -64,9 +64,10 @@ var (
 	imgDice5 *ebiten.Image
 	imgDice6 *ebiten.Image
 
-	smallFont  font.Face
-	mediumFont font.Face
-	largeFont  font.Face
+	smallFont      font.Face
+	mediumFont     font.Face
+	largeFont      font.Face
+	extraLargeFont font.Face
 
 	fontMutex = &sync.Mutex{}
 )
@@ -80,17 +81,16 @@ const maxStatusWidthRatio = 0.5
 
 const bufferCharacterWidth = 28
 
-const fieldHeight = 50
-
 const (
 	minWidth  = 320
 	minHeight = 240
 )
 
 const (
-	smallFontSize  = 20
-	mediumFontSize = 24
-	largeFontSize  = 36
+	smallFontSize      = 20
+	mediumFontSize     = 24
+	largeFontSize      = 36
+	extraLargeFontSize = 52
 )
 
 var (
@@ -173,7 +173,11 @@ func init() {
 
 	loadAudioAssets()
 
-	etk.Style.TextFont = largeFont
+	if defaultFontSize == extraLargeFontSize {
+		etk.Style.TextFont = extraLargeFont
+	} else {
+		etk.Style.TextFont = largeFont
+	}
 	etk.Style.TextFontMutex = fontMutex
 
 	etk.Style.TextColorLight = triangleA
@@ -393,6 +397,14 @@ func initializeFonts() {
 	}
 	largeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
 		Size:    largeFontSize,
+		DPI:     dpi,
+		Hinting: font.HintingFull,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	extraLargeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    extraLargeFontSize,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
 	})
@@ -626,10 +638,20 @@ func NewGame() *Game {
 		g.keyboard.SetKeys(kibodo.KeysQWERTY)
 	}
 
+	xPadding := 10
+	yPadding := 20
+	labelWidth := 200
+	if defaultFontSize == extraLargeFontSize {
+		xPadding = 15
+		yPadding = 30
+		labelWidth = 260
+	}
+
 	{
-		headerLabel := etk.NewText(gotext.Get("%s - Free Online Backgammon", "bgammon.org"))
-		nameLabel := etk.NewText(gotext.Get("Username"))
-		passwordLabel := etk.NewText(gotext.Get("Password"))
+		headerLabel := newCenteredText(gotext.Get("%s - Free Online Backgammon", "bgammon.org"))
+		nameLabel := newCenteredText(gotext.Get("Username"))
+		passwordLabel := newCenteredText(gotext.Get("Password"))
+		serverLabel := newCenteredText(gotext.Get("Server"))
 
 		g.connectKeyboardButton = etk.NewButton(gotext.Get("Show Keyboard"), func() error {
 			if g.keyboard.Visible() {
@@ -673,8 +695,8 @@ func NewGame() *Game {
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
-		grid.SetRowPadding(20)
-		grid.SetColumnSizes(10, 200, -1, -1, 10)
+		grid.SetRowPadding(yPadding)
+		grid.SetColumnSizes(xPadding, labelWidth, -1, -1, xPadding)
 		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
 		grid.AddChildAt(etk.NewBox(), 4, 0, 1, 1)
 		grid.AddChildAt(nameLabel, 1, 1, 2, 1)
@@ -691,23 +713,28 @@ func NewGame() *Game {
 				return false
 			})
 			centerInput(g.connectServer)
-			grid.AddChildAt(etk.NewText(gotext.Get("Server")), 1, y, 2, 1)
+			grid.AddChildAt(serverLabel, 1, y, 2, 1)
 			grid.AddChildAt(g.connectServer, 2, y, 2, 1)
 			y++
 		}
-		grid.AddChildAt(infoLabel, 1, y, 3, 1)
-		grid.AddChildAt(connectButton, 2, y+1, 1, 1)
-		grid.AddChildAt(offlineButton, 3, y+1, 1, 1)
+		{
+			subGrid := etk.NewGrid()
+			subGrid.SetColumnSizes(-1, xPadding*2, -1)
+			subGrid.AddChildAt(connectButton, 0, 0, 1, 1)
+			subGrid.AddChildAt(offlineButton, 2, 0, 1, 1)
+			grid.AddChildAt(subGrid, 1, y, 3, 1)
+		}
+		grid.AddChildAt(infoLabel, 1, y+1, 3, 1)
 		grid.AddChildAt(footerLabel, 1, y+2, 3, 1)
 		connectGrid = grid
 	}
 
 	{
-		headerLabel := etk.NewText(gotext.Get("Create match"))
-		nameLabel := etk.NewText(gotext.Get("Name"))
-		pointsLabel := etk.NewText(gotext.Get("Points"))
-		passwordLabel := etk.NewText(gotext.Get("Password"))
-		variantLabel := etk.NewText(gotext.Get("Variant"))
+		headerLabel := newCenteredText(gotext.Get("Create match"))
+		nameLabel := newCenteredText(gotext.Get("Name"))
+		pointsLabel := newCenteredText(gotext.Get("Points"))
+		passwordLabel := newCenteredText(gotext.Get("Password"))
+		variantLabel := newCenteredText(gotext.Get("Variant"))
 
 		g.lobby.createGameName = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
@@ -729,7 +756,7 @@ func NewGame() *Game {
 		g.lobby.createGameCheckbox.SetCheckColor(triangleA)
 		g.lobby.createGameCheckbox.SetSelected(false)
 
-		textField := etk.NewText(gotext.Get("Acey-deucey"))
+		textField := newCenteredText(gotext.Get("Acey-deucey"))
 		aceyDeuceyLabel := &ClickableText{
 			Text: textField,
 			onSelected: func() {
@@ -740,16 +767,16 @@ func NewGame() *Game {
 		aceyDeuceyLabel.SetVertical(messeji.AlignCenter)
 
 		aceyDeuceyGrid := etk.NewGrid()
-		aceyDeuceyGrid.SetColumnSizes(50, -1)
-		aceyDeuceyGrid.SetRowSizes(50, -1)
+		aceyDeuceyGrid.SetColumnSizes(fieldHeight, xPadding, -1)
+		aceyDeuceyGrid.SetRowSizes(fieldHeight, -1)
 		aceyDeuceyGrid.AddChildAt(g.lobby.createGameCheckbox, 0, 0, 1, 1)
-		aceyDeuceyGrid.AddChildAt(aceyDeuceyLabel, 1, 0, 1, 1)
+		aceyDeuceyGrid.AddChildAt(aceyDeuceyLabel, 2, 0, 1, 1)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
-		grid.SetRowPadding(20)
-		grid.SetColumnSizes(10, 200, -1, 10)
-		grid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight)
+		grid.SetRowPadding(yPadding)
+		grid.SetColumnSizes(xPadding, labelWidth, -1, xPadding)
+		grid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, fieldHeight)
 		grid.AddChildAt(headerLabel, 0, 0, 3, 1)
 		grid.AddChildAt(etk.NewBox(), 3, 0, 1, 1)
 		grid.AddChildAt(nameLabel, 1, 1, 1, 1)
@@ -760,6 +787,7 @@ func NewGame() *Game {
 		grid.AddChildAt(g.lobby.createGamePassword, 2, 3, 1, 1)
 		grid.AddChildAt(variantLabel, 1, 4, 1, 1)
 		grid.AddChildAt(aceyDeuceyGrid, 2, 4, 1, 1)
+		grid.AddChildAt(etk.NewBox(), 0, 5, 1, 1)
 		createGameGrid = grid
 
 		createGameContainer = etk.NewGrid()
@@ -774,9 +802,9 @@ func NewGame() *Game {
 	}
 
 	{
-		g.lobby.joinGameLabel = etk.NewText(gotext.Get("Join match"))
+		g.lobby.joinGameLabel = newCenteredText(gotext.Get("Join match"))
 
-		passwordLabel := etk.NewText(gotext.Get("Password"))
+		passwordLabel := newCenteredText(gotext.Get("Password"))
 
 		g.lobby.joinGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
 			return false
@@ -785,8 +813,8 @@ func NewGame() *Game {
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
-		grid.SetRowPadding(20)
-		grid.SetColumnSizes(10, 200, -1, 10)
+		grid.SetRowPadding(yPadding)
+		grid.SetColumnSizes(xPadding, labelWidth, -1, xPadding)
 		grid.SetRowSizes(60, fieldHeight, fieldHeight)
 		grid.AddChildAt(g.lobby.joinGameLabel, 0, 0, 3, 1)
 		grid.AddChildAt(etk.NewBox(), 3, 0, 1, 1)
@@ -1631,10 +1659,15 @@ func (g *Game) scale(v int) int {
 func (g *Game) layoutConnect() {
 	g.needLayoutConnect = false
 
+	infoHeight := 108
+	if defaultFontSize == extraLargeFontSize {
+		infoHeight = 108 * 2
+	}
+
 	if ShowServerSettings {
-		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, 108, g.scale(baseButtonHeight))
+		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, g.scale(baseButtonHeight), infoHeight)
 	} else {
-		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, 108, g.scale(baseButtonHeight))
+		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, g.scale(baseButtonHeight), infoHeight)
 	}
 
 	if !g.loadedConnect {
@@ -2016,8 +2049,19 @@ func (t *ClickableText) HandleMouse(cursor image.Point, pressed bool, clicked bo
 	return true, nil
 }
 
+func newCenteredText(text string) *etk.Text {
+	t := etk.NewText(text)
+	t.SetVertical(messeji.AlignCenter)
+	return t
+}
+
 func centerInput(input *etk.Input) {
 	input.Field.SetVertical(messeji.AlignCenter)
+	paddingSize := 5
+	if defaultFontSize == extraLargeFontSize {
+		paddingSize = 20
+	}
+	input.Field.SetPadding(paddingSize)
 }
 
 func updateAllButtons(w etk.Widget) {
@@ -2025,9 +2069,14 @@ func updateAllButtons(w etk.Widget) {
 		updateAllButtons(c)
 	}
 
+	f := largeFont
+	if defaultFontSize == extraLargeFontSize {
+		f = extraLargeFont
+	}
+
 	btn, ok := w.(*etk.Button)
-	if ok && btn != game.Board.showMenuButton {
-		btn.Label.SetFont(largeFont, fontMutex)
+	if ok && (defaultFontSize == extraLargeFontSize || btn != game.Board.showMenuButton) {
+		btn.Label.SetFont(f, fontMutex)
 	}
 }
 

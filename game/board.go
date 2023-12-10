@@ -273,13 +273,14 @@ func NewBoard() *board {
 		movesLabel.SetVertical(messeji.AlignCenter)
 
 		checkboxGrid := etk.NewGrid()
+		checkboxGrid.SetColumnSizes(72, 20, -1)
 		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1)
 		checkboxGrid.AddChildAt(b.highlightCheckbox, 0, 0, 1, 1)
-		checkboxGrid.AddChildAt(highlightLabel, 1, 0, 4, 1)
+		checkboxGrid.AddChildAt(highlightLabel, 2, 0, 1, 1)
 		checkboxGrid.AddChildAt(b.showPipCountCheckbox, 0, 2, 1, 1)
-		checkboxGrid.AddChildAt(pipCountLabel, 1, 2, 4, 1)
+		checkboxGrid.AddChildAt(pipCountLabel, 2, 2, 1, 1)
 		checkboxGrid.AddChildAt(b.showMovesCheckbox, 0, 4, 1, 1)
-		checkboxGrid.AddChildAt(movesLabel, 1, 4, 4, 1)
+		checkboxGrid.AddChildAt(movesLabel, 2, 4, 1, 1)
 
 		b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
 		b.settingsGrid.SetColumnSizes(20, -1, -1, 20)
@@ -548,18 +549,12 @@ func (b *board) recreateButtonGrid() {
 		return grid
 	}
 
-	button := func(label string, onSelected func() error) *etk.Button {
-		btn := etk.NewButton(label, onSelected)
-		btn.Label.SetFont(largeFont, fontMutex)
-		return btn
-	}
-
-	doubleButton := button(gotext.Get("Double"), b.selectDouble)
-	rollButton := button(gotext.Get("Roll"), b.selectRoll)
-	undoButton := button(gotext.Get("Undo"), b.selectUndo)
-	okButton := button(gotext.Get("OK"), b.selectOK)
-	resignButton := button(gotext.Get("Resign"), b.selectResign)
-	acceptButton := button(gotext.Get("Accept"), b.selectOK)
+	doubleButton := etk.NewButton(gotext.Get("Double"), b.selectDouble)
+	rollButton := etk.NewButton(gotext.Get("Roll"), b.selectRoll)
+	undoButton := etk.NewButton(gotext.Get("Undo"), b.selectUndo)
+	okButton := etk.NewButton(gotext.Get("OK"), b.selectOK)
+	resignButton := etk.NewButton(gotext.Get("Resign"), b.selectResign)
+	acceptButton := etk.NewButton(gotext.Get("Accept"), b.selectOK)
 
 	b.buttonsOnlyRollGrid = buttonGrid(b.buttonsOnlyRollGrid, false, rollButton)
 	b.buttonsOnlyUndoGrid = buttonGrid(b.buttonsOnlyUndoGrid, true, undoButton)
