@@ -1671,11 +1671,13 @@ func (g *Game) layoutBoard() {
 
 	if g.portraitView() { // Portrait view.
 		g.Board.fullHeight = false
+		g.Board.horizontalBorderSize = 0
 		g.Board.setRect(0, 0, g.screenW, g.screenW)
 
 		g.Board.uiGrid.SetRect(image.Rect(0, g.Board.h, g.screenW, g.screenH))
 	} else { // Landscape view.
 		g.Board.fullHeight = true
+		g.Board.horizontalBorderSize = 20
 		g.Board.setRect(0, 0, g.screenW-g.bufferWidth, g.screenH)
 
 		availableWidth := g.screenW - (g.Board.innerW + int(g.Board.horizontalBorderSize*2))

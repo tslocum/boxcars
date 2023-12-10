@@ -1,5 +1,5 @@
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231208220405-8c4b5112ba77 h1:MnAW9Icj5mDOaFnyT3BcH/xRoa0stZEJjs+hQg0lyj0=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231208220405-8c4b5112ba77/go.mod h1:u3nbSwxWnwOXbCNPQD4s3abGTfvA4/gi9U626f7ZN9Q=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231209202320-d80569de319c h1:9vBq8MA4zhH6YIn/LmA5iU467Xk7O42vwW+yFdUgy3U=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231209202320-d80569de319c/go.mod h1:u3nbSwxWnwOXbCNPQD4s3abGTfvA4/gi9U626f7ZN9Q=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231209094518-612426a93d9e h1:l9VIZMa9Zpw7oh6jwQ42qTl+fTRERuMIz9OW+5GFIE0=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231209094518-612426a93d9e/go.mod h1:HzEVxqMCixYFDVGAesdp9bc9onxNzCEJUf+eyDRMZWw=
 code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454 h1:R+KAg2+ORkMT/bcljmlno1nr21OBOxo6hY0Qa2qOk+Y=
@@ -31,8 +31,8 @@ github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsI
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 h1:L0QtFUgDarD7Fpv9jeVMgy/+Ec0mtnmYuImjTz6dtDA=
 github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9/go.mod h1:5TJZWKEWniPve33vlWYSoGYefn3gLQRzjfDlhSJ9ZKM=
-github.com/jackc/pgx/v5 v5.5.0 h1:NxstgwndsTRy7eq9/kqYc/BZh5w2hHJV86wjvO+1xPw=
-github.com/jackc/pgx/v5 v5.5.0/go.mod h1:Ig06C2Vu0t5qXC60W8sqIthScaEnFvojjj9dSljmHRA=
+github.com/jackc/pgx/v5 v5.5.1 h1:5I9etrGkLrN+2XPCsi6XLlV5DITbSL/xBZdmAxFcXPI=
+github.com/jackc/pgx/v5 v5.5.1/go.mod h1:Ig06C2Vu0t5qXC60W8sqIthScaEnFvojjj9dSljmHRA=
 github.com/jackc/puddle/v2 v2.2.1 h1:RhxXJtFG022u4ibrCSMSiu5aOq1i77R3OHKNJj77OAk=
 github.com/jezek/xgb v1.1.1 h1:bE/r8ZZtSv7l9gk6nU0mYx51aXrvnyb44892TwSaqS4=
 github.com/jezek/xgb v1.1.1/go.mod h1:nrhwO0FX/enq75I7Y7G8iN1ubpSGZEiA3v9e9GyRFlk=
