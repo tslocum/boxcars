@@ -803,10 +803,12 @@ func (b *board) updateBackgroundImage() {
 	gc.MoveTo(float64(frameW-int(b.spaceWidth))/2-1, float64(0))
 	gc.LineTo(float64(frameW-int(b.spaceWidth))/2-1, float64(b.h))
 	gc.Stroke()
-	// Outside right.
-	gc.MoveTo(float64(frameW), float64(0))
-	gc.LineTo(float64(frameW), float64(b.h))
-	gc.Stroke()
+	if !game.portraitView() {
+		// Outside right.
+		gc.MoveTo(float64(frameW), float64(0))
+		gc.LineTo(float64(frameW), float64(b.h))
+		gc.Stroke()
+	}
 	// Inside left.
 	gc.SetLineWidth(borderStrokeSize / 2)
 	edge := float64(((float64(b.innerW) + 2 - b.barWidth) / 2) + borderSize)
@@ -862,14 +864,7 @@ func (b *board) updateBackgroundImage() {
 		gc.LineTo(edgeEnd, divEnd)
 		gc.Stroke()
 	}
-	if !b.fullHeight {
-		// Outside left.
-		gc.SetLineWidth(1)
-		gc.MoveTo(float64(0), float64(0))
-		gc.LineTo(float64(0), float64(b.h))
-		// Top.
-		gc.MoveTo(0, float64(0))
-		gc.LineTo(float64(b.w), float64(0))
+	if b.h < game.screenH {
 		// Bottom.
 		gc.MoveTo(0, float64(b.h))
 		gc.LineTo(float64(b.w), float64(b.h))

@@ -3,14 +3,14 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231211001053-d4608ff3b3fb
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231211035857-b914fe5e9f25
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231211185248-f939d053a819
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231212221154-1a5da6bada36
 	code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454
 	code.rocketnine.space/tslocum/kibodo v1.0.2
 	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231128010227-689683b75174
 	github.com/hajimehoshi/ebiten/v2 v2.6.3
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351
-	github.com/llgcode/draw2d v0.0.0-20231022063514-1acb54133d2a
+	github.com/llgcode/draw2d v0.0.0-20231212091825-f55e0c776b44
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	golang.org/x/image v0.14.0
 	golang.org/x/text v0.14.0
@@ -18,7 +18,7 @@ require (
 )
 
 require (
-	code.rocket9labs.com/tslocum/tabula v0.0.0-20231211035832-ed1f6e56c3b9 // indirect
+	code.rocket9labs.com/tslocum/tabula v0.0.0-20231212190831-bfc39a406f20 // indirect
 	github.com/ebitengine/oto/v3 v3.1.0 // indirect
 	github.com/ebitengine/purego v0.5.1 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect

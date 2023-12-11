@@ -175,18 +175,27 @@ func (l *lobby) clampOffset() {
 func (l *lobby) setGameList(games []bgammon.GameListing) {
 	l.games = games
 	l.loaded = true
-
-	sort.Slice(l.games, func(i, j int) bool {
-		if (l.games[i].Players) != (l.games[j].Players) {
-			return l.games[i].Players < l.games[j].Players
-		}
-		if (l.games[i].Password) != (l.games[j].Password) {
-			return !l.games[i].Password
-		}
-		return strings.ToLower(l.games[i].Name) < strings.ToLower(l.games[j].Name)
-	})
-
 	l.bufferDirty = true
+
+	const (
+		aceyPrefix = "(Acey-deucey)"
+		botPrefix  = "BOT_"
+	)
+	sort.Slice(l.games, func(i, j int) bool {
+		a, b := l.games[i], l.games[j]
+		switch {
+		case (a.Password) != (b.Password):
+			return !a.Password
+		case strings.HasPrefix(a.Name, aceyPrefix) != strings.HasPrefix(b.Name, aceyPrefix):
+			return strings.HasPrefix(b.Name, aceyPrefix)
+		case strings.HasPrefix(a.Name, botPrefix) != strings.HasPrefix(b.Name, botPrefix):
+			return strings.HasPrefix(b.Name, botPrefix)
+		case (a.Players) != (b.Players):
+			return a.Players < b.Players
+		default:
+			return strings.ToLower(a.Name) < strings.ToLower(b.Name)
+		}
+	})
 }
 
 func (l *lobby) getButtons() []*lobbyButton {
