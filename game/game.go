@@ -871,15 +871,14 @@ func (g *Game) playOffline() {
 	conns := server.ListenLocal()
 
 	// Connect the bot.
-	botConn := <-conns
-	go bot.NewLocalClient(botConn, "", "BOT_tabula", "", 1, false, 0)
+	go bot.NewLocalClient(<-conns, "", "BOT_tabula", "", 1, false, false, 0)
+	go bot.NewLocalClient(<-conns, "", "BOT_tabula_acey", "", 1, true, false, 0)
 
 	// Wait for the bot to finish creating a match.
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(250 * time.Millisecond)
 
 	// Connect the player.
-	playerConn := <-conns
-	go g.ConnectLocal(playerConn)
+	go g.ConnectLocal(<-conns)
 }
 
 func (g *Game) handleUpdateTimeLabels() {

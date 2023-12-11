@@ -1,11 +1,11 @@
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231209202320-d80569de319c h1:9vBq8MA4zhH6YIn/LmA5iU467Xk7O42vwW+yFdUgy3U=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231209202320-d80569de319c/go.mod h1:u3nbSwxWnwOXbCNPQD4s3abGTfvA4/gi9U626f7ZN9Q=
-code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231209094518-612426a93d9e h1:l9VIZMa9Zpw7oh6jwQ42qTl+fTRERuMIz9OW+5GFIE0=
-code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231209094518-612426a93d9e/go.mod h1:HzEVxqMCixYFDVGAesdp9bc9onxNzCEJUf+eyDRMZWw=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231211001053-d4608ff3b3fb h1:2Mk/hKV347YCWwplpvWLXYxhvAAuqKFWxp6RN+pKkrQ=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231211001053-d4608ff3b3fb/go.mod h1:u3nbSwxWnwOXbCNPQD4s3abGTfvA4/gi9U626f7ZN9Q=
+code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231211035857-b914fe5e9f25 h1:imHYEdUdSlNYnI5fMxVd7imp3u8wdYo46rUHQ0spTN4=
+code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231211035857-b914fe5e9f25/go.mod h1:p2WiGgVb9XDMiJnL4ZpwTd+QBYpsA8NctaHoBQhUF+Q=
 code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454 h1:R+KAg2+ORkMT/bcljmlno1nr21OBOxo6hY0Qa2qOk+Y=
 code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454/go.mod h1:bDrMbdTIhIy9egS6ISZat3Cw1dusd/Raeiq8vKHo9b4=
-code.rocket9labs.com/tslocum/tabula v0.0.0-20231209094435-959d43321c78 h1:5E+Av3zTjMndkoz9n7QSl0icA1eBjnzFXtpbVADhXy8=
-code.rocket9labs.com/tslocum/tabula v0.0.0-20231209094435-959d43321c78/go.mod h1:XtS6M8qcK0fnUn4k5I7h4JcZ2sz2WEAXOcF2DLaQBME=
+code.rocket9labs.com/tslocum/tabula v0.0.0-20231211035832-ed1f6e56c3b9 h1:agCIl7UORXR0QFILAYrICFpQV8cx0HlSUb9ONbO9cCY=
+code.rocket9labs.com/tslocum/tabula v0.0.0-20231211035832-ed1f6e56c3b9/go.mod h1:XtS6M8qcK0fnUn4k5I7h4JcZ2sz2WEAXOcF2DLaQBME=
 code.rocketnine.space/tslocum/kibodo v1.0.2 h1:0RfvVz+IUku8MFx9wvDb+p8byns5gAjQLUo4ZenWP44=
 code.rocketnine.space/tslocum/kibodo v1.0.2/go.mod h1:mAYs1JKFnWlRFzo9BtteAlwjKdk1MIKgEyhQaPdeQDI=
 code.rocketnine.space/tslocum/messeji v1.0.6-0.20231128010227-689683b75174 h1:jxE3JcaE4ovMWaZHLA6MvYgkmdkdbEEUv943Bp+MoxU=
