@@ -55,6 +55,9 @@ msgstr ""
 msgid "Double"
 msgstr ""
 
+msgid "Email"
+msgstr ""
+
 msgid "Failed to join match: %s"
 msgstr ""
 
@@ -115,6 +118,9 @@ msgstr ""
 msgid "Playing offline."
 msgstr ""
 
+msgid "Please enter a valid email address, or it will not be possible to reset your password."
+msgstr ""
+
 msgid "Points"
 msgstr ""
 
@@ -122,6 +128,9 @@ msgid "Private"
 msgstr ""
 
 msgid "Refresh"
+msgstr ""
+
+msgid "Register"
 msgstr ""
 
 msgid "Resign"
@@ -152,6 +161,9 @@ msgid "Started"
 msgstr ""
 
 msgid "Status"
+msgstr ""
+
+msgid "Submit"
 msgstr ""
 
 msgid "To log in as a guest, enter a username (if you want) and do not enter a password."

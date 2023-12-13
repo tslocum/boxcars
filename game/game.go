@@ -116,6 +116,7 @@ var (
 	diceSize int
 
 	connectGrid    *etk.Grid
+	registerGrid   *etk.Grid
 	createGameGrid *etk.Grid
 	joinGameGrid   *etk.Grid
 
@@ -542,8 +543,10 @@ type Game struct {
 	spinnerIndex int
 
 	ServerAddress string
+	Email         string
 	Username      string
 	Password      string
+	register      bool
 	loggedIn      bool
 
 	Watch bool
@@ -570,6 +573,10 @@ type Game struct {
 	connectPassword       *etk.Input
 	connectServer         *etk.Input
 	connectKeyboardButton *etk.Button
+
+	registerEmail    *etk.Input
+	registerUsername *etk.Input
+	registerPassword *etk.Input
 
 	pressedKeys []ebiten.Key
 
@@ -600,6 +607,8 @@ type Game struct {
 	loadedBoard   bool
 
 	loaded bool
+
+	showRegister bool
 
 	*sync.Mutex
 }
@@ -647,6 +656,83 @@ func NewGame() *Game {
 		labelWidth = 260
 	}
 
+	connectAddress := game.ServerAddress
+	if connectAddress == "" {
+		connectAddress = DefaultServerAddress
+	}
+	g.connectServer = etk.NewInput("", connectAddress, func(text string) (handled bool) {
+		return false
+	})
+
+	{
+		headerLabel := newCenteredText(gotext.Get("Register"))
+		emailLabel := newCenteredText(gotext.Get("Email"))
+		nameLabel := newCenteredText(gotext.Get("Username"))
+		passwordLabel := newCenteredText(gotext.Get("Password"))
+		serverLabel := newCenteredText(gotext.Get("Server"))
+
+		g.registerEmail = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		centerInput(g.registerEmail)
+
+		g.registerUsername = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		centerInput(g.registerUsername)
+
+		g.registerPassword = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		centerInput(g.registerPassword)
+
+		cancelButton := etk.NewButton(gotext.Get("Cancel"), func() error {
+			g.selectCancel()
+			return nil
+		})
+
+		submitButton := etk.NewButton(gotext.Get("Submit"), func() error {
+			g.selectConfirmRegister()
+			return nil
+		})
+
+		infoLabel := etk.NewText(gotext.Get("Please enter a valid email address, or it will not be possible to reset your password."))
+
+		footerLabel := etk.NewText("Boxcars " + version)
+		footerLabel.SetHorizontal(messeji.AlignEnd)
+		footerLabel.SetVertical(messeji.AlignEnd)
+
+		grid := etk.NewGrid()
+		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
+		grid.SetRowPadding(yPadding)
+		grid.SetColumnSizes(xPadding, labelWidth, -1, -1, xPadding)
+		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
+		grid.AddChildAt(etk.NewBox(), 4, 0, 1, 1)
+		grid.AddChildAt(emailLabel, 1, 1, 2, 1)
+		grid.AddChildAt(g.registerEmail, 2, 1, 2, 1)
+		grid.AddChildAt(nameLabel, 1, 2, 2, 1)
+		grid.AddChildAt(g.registerUsername, 2, 2, 2, 1)
+		grid.AddChildAt(passwordLabel, 1, 3, 2, 1)
+		grid.AddChildAt(g.registerPassword, 2, 3, 2, 1)
+		y := 4
+		if ShowServerSettings {
+			centerInput(g.connectServer)
+			grid.AddChildAt(serverLabel, 1, y, 2, 1)
+			grid.AddChildAt(g.connectServer, 2, y, 2, 1)
+			y++
+		}
+		{
+			subGrid := etk.NewGrid()
+			subGrid.SetColumnSizes(-1, xPadding*2, -1)
+			subGrid.AddChildAt(cancelButton, 0, 0, 1, 1)
+			subGrid.AddChildAt(submitButton, 2, 0, 1, 1)
+			grid.AddChildAt(subGrid, 1, y, 3, 1)
+		}
+		grid.AddChildAt(infoLabel, 1, y+1, 3, 1)
+		grid.AddChildAt(footerLabel, 1, y+2, 3, 1)
+		registerGrid = grid
+	}
+
 	{
 		headerLabel := newCenteredText(gotext.Get("%s - Free Online Backgammon", "bgammon.org"))
 		nameLabel := newCenteredText(gotext.Get("Username"))
@@ -688,6 +774,8 @@ func NewGame() *Game {
 			return nil
 		})
 
+		registerButton := etk.NewButton(gotext.Get("Register"), g.selectRegister)
+
 		offlineButton := etk.NewButton(gotext.Get("Play Offline"), func() error {
 			g.playOffline()
 			return nil
@@ -705,13 +793,6 @@ func NewGame() *Game {
 		grid.AddChildAt(g.connectPassword, 2, 2, 2, 1)
 		y := 3
 		if ShowServerSettings {
-			connectAddress := game.ServerAddress
-			if connectAddress == "" {
-				connectAddress = DefaultServerAddress
-			}
-			g.connectServer = etk.NewInput("", connectAddress, func(text string) (handled bool) {
-				return false
-			})
 			centerInput(g.connectServer)
 			grid.AddChildAt(serverLabel, 1, y, 2, 1)
 			grid.AddChildAt(g.connectServer, 2, y, 2, 1)
@@ -720,12 +801,14 @@ func NewGame() *Game {
 		{
 			subGrid := etk.NewGrid()
 			subGrid.SetColumnSizes(-1, xPadding*2, -1)
+			subGrid.SetRowSizes(-1, xPadding*2, -1)
 			subGrid.AddChildAt(connectButton, 0, 0, 1, 1)
-			subGrid.AddChildAt(offlineButton, 2, 0, 1, 1)
+			subGrid.AddChildAt(registerButton, 2, 0, 1, 1)
 			grid.AddChildAt(subGrid, 1, y, 3, 1)
 		}
-		grid.AddChildAt(infoLabel, 1, y+1, 3, 1)
-		grid.AddChildAt(footerLabel, 1, y+2, 3, 1)
+		grid.AddChildAt(offlineButton, 1, y+1, 3, 1)
+		grid.AddChildAt(infoLabel, 1, y+2, 3, 1)
+		grid.AddChildAt(footerLabel, 1, y+3, 3, 1)
 		connectGrid = grid
 	}
 
@@ -960,6 +1043,7 @@ func (g *Game) handleEvent(e interface{}) {
 	switch ev := e.(type) {
 	case *bgammon.EventWelcome:
 		g.Client.Username = ev.PlayerName
+		g.register = false
 
 		areIs := "are"
 		if ev.Clients == 1 {
@@ -1184,9 +1268,6 @@ func (g *Game) Connect() {
 	g.lobby.c = g.Client
 	g.Board.Client = g.Client
 
-	g.Username = ""
-	g.Password = ""
-
 	go g.handleEvents()
 
 	c := g.Client
@@ -1247,6 +1328,34 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 	go c.connectTCP(conn)
 }
 
+func (g *Game) selectRegister() error {
+	g.showRegister = true
+	g.registerUsername.Field.SetText(g.connectUsername.Text())
+	g.registerPassword.Field.SetText(g.connectPassword.Text())
+	g.setRoot(registerGrid)
+	etk.SetFocus(g.registerEmail)
+	return nil
+}
+
+func (g *Game) selectCancel() error {
+	g.showRegister = false
+	g.setRoot(connectGrid)
+	etk.SetFocus(g.connectUsername)
+	return nil
+}
+
+func (g *Game) selectConfirmRegister() error {
+	g.Email = g.registerEmail.Text()
+	g.Username = g.registerUsername.Text()
+	g.Password = g.registerPassword.Text()
+	if ShowServerSettings {
+		g.ServerAddress = g.connectServer.Text()
+	}
+	g.register = true
+	g.Connect()
+	return nil
+}
+
 func (g *Game) selectConnect() error {
 	g.Username = g.connectUsername.Text()
 	g.Password = g.connectPassword.Text()
@@ -1268,9 +1377,19 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					etk.SetFocus(g.connectPassword)
 				case g.connectPassword:
 					etk.SetFocus(g.connectUsername)
+				case g.registerEmail:
+					etk.SetFocus(g.registerUsername)
+				case g.registerUsername:
+					etk.SetFocus(g.registerPassword)
+				case g.registerPassword:
+					etk.SetFocus(g.registerEmail)
 				}
 			case ebiten.KeyEnter, ebiten.KeyKPEnter:
-				g.selectConnect()
+				if g.showRegister {
+					g.selectConfirmRegister()
+				} else {
+					g.selectConnect()
+				}
 			}
 		}
 		return nil
@@ -1664,9 +1783,11 @@ func (g *Game) layoutConnect() {
 	}
 
 	if ShowServerSettings {
-		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, g.scale(baseButtonHeight), infoHeight)
+		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, g.scale(baseButtonHeight), g.scale(baseButtonHeight), infoHeight)
+		registerGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, fieldHeight, g.scale(baseButtonHeight), infoHeight)
 	} else {
-		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, g.scale(baseButtonHeight), infoHeight)
+		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, g.scale(baseButtonHeight), g.scale(baseButtonHeight), infoHeight)
+		registerGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, g.scale(baseButtonHeight), infoHeight)
 	}
 
 	if !g.loadedConnect {
