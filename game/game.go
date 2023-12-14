@@ -1147,6 +1147,7 @@ func (g *Game) handleEvent(e interface{}) {
 		g.Board.opponentRoll1, g.Board.opponentRoll2 = 0, 0
 		g.Board.playerRollStale = false
 		g.Board.opponentRollStale = false
+		g.Board.availableStale = false
 		g.Board.playerMoves = nil
 		g.Board.opponentMoves = nil
 		g.Board.processState()
@@ -1215,6 +1216,7 @@ func (g *Game) handleEvent(e interface{}) {
 				}
 			}
 		}
+		g.Board.availableStale = false
 		g.Board.stateLock.Unlock()
 		g.Board.processState()
 		g.Board.Unlock()
@@ -1236,6 +1238,7 @@ func (g *Game) handleEvent(e interface{}) {
 				g.Board.opponentRollStale = false
 			}
 			playSoundEffect(effectDie)
+			g.Board.availableStale = false
 		} else {
 			diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
 			if g.Board.gameState.Turn == 1 {
@@ -1246,6 +1249,7 @@ func (g *Game) handleEvent(e interface{}) {
 				g.Board.opponentRollStale = false
 			}
 			playSoundEffect(effectDice)
+			g.Board.availableStale = true
 		}
 		g.Board.stateLock.Unlock()
 		g.Board.processState()

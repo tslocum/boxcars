@@ -3,9 +3,10 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231214042934-c793dc4aeb17
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231214052750-242b6132e6f9
 	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231214043850-8b2874903a6c
 	code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454
+	code.rocket9labs.com/tslocum/tabula v0.0.0-20231213214359-de3946764327
 	code.rocketnine.space/tslocum/kibodo v1.0.2
 	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231128010227-689683b75174
 	github.com/hajimehoshi/ebiten/v2 v2.6.3
@@ -18,7 +19,6 @@ require (
 )
 
 require (
-	code.rocket9labs.com/tslocum/tabula v0.0.0-20231213214359-de3946764327 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect

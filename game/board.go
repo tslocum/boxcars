@@ -64,6 +64,8 @@ type board struct {
 	playerRoll1, playerRoll2     int
 	playerRollStale              bool
 
+	availableStale bool
+
 	opponentMoves [][]int
 	playerMoves   [][]int
 
@@ -1627,7 +1629,7 @@ func (b *board) processState() {
 	b.lastPlayerNumber = b.gameState.PlayerNumber
 
 	var showGrid *etk.Grid
-	if !b.gameState.Spectating {
+	if !b.gameState.Spectating && !b.availableStale {
 		if b.gameState.MayRoll() {
 			if b.gameState.MayDouble() {
 				showGrid = b.buttonsDoubleRollGrid
@@ -1725,7 +1727,7 @@ func (b *board) processState() {
 	}
 	tabulaBoard[tabula.SpaceEnteredPlayer], tabulaBoard[tabula.SpaceEnteredOpponent], tabulaBoard[tabula.SpaceAcey] = enteredPlayer, enteredOpponent, acey
 	for _, m := range b.gameState.Moves {
-		delta := int8(bgammon.SpaceDiff(m[0], m[1], false))
+		delta := int8(bgammon.SpaceDiff(m[0], m[1], b.gameState.Acey))
 		switch {
 		case tabulaBoard[tabula.SpaceRoll1] == delta:
 			tabulaBoard[tabula.SpaceRoll1] = 0
@@ -1761,6 +1763,8 @@ func (b *board) processState() {
 		b.highlightSpaces[space] = b.highlightSpaces[space][:0]
 	}
 	for i := range available {
+		lastFrom := -1
+		lastTo := -1
 	HIGHLIGHT:
 		for j := range available[i] {
 			move := available[i][j]
@@ -1769,6 +1773,22 @@ func (b *board) processState() {
 			} else if onBar && move[0] != bgammon.SpaceBarPlayer {
 				continue
 			}
+
+			if lastFrom != -1 && move[0] == lastTo {
+				var exists bool
+				for _, existing := range b.highlightSpaces[lastFrom] {
+					if existing == move[1] {
+						exists = true
+						break
+					}
+				}
+				if !exists {
+					b.highlightSpaces[lastFrom] = append(b.highlightSpaces[lastFrom], move[1])
+				}
+			}
+			lastFrom = move[0]
+			lastTo = move[1]
+
 			for _, existing := range b.highlightSpaces[move[0]] {
 				if existing == move[1] {
 					continue HIGHLIGHT
