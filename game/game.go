@@ -79,7 +79,7 @@ var (
 
 const maxStatusWidthRatio = 0.5
 
-const bufferCharacterWidth = 28
+const bufferCharacterWidth = 21
 
 const (
 	minWidth  = 320

@@ -1197,7 +1197,7 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 
 	b.x, b.y, b.w, b.h = x, y, w, h
-	maxWidth := int(float64(b.h) * 1.2)
+	maxWidth := int(float64(b.h) * 1.333)
 	if b.w > maxWidth {
 		b.w = maxWidth
 	}
