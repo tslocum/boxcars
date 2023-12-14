@@ -1237,7 +1237,9 @@ func (g *Game) handleEvent(e interface{}) {
 				g.Board.opponentRoll2 = g.Board.gameState.Roll2
 				g.Board.opponentRollStale = false
 			}
-			playSoundEffect(effectDie)
+			if !ev.Selected {
+				playSoundEffect(effectDie)
+			}
 			g.Board.availableStale = false
 		} else {
 			diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
@@ -1248,7 +1250,9 @@ func (g *Game) handleEvent(e interface{}) {
 				g.Board.opponentRoll1, g.Board.opponentRoll2 = g.Board.gameState.Roll1, g.Board.gameState.Roll2
 				g.Board.opponentRollStale = false
 			}
-			playSoundEffect(effectDice)
+			if !ev.Selected {
+				playSoundEffect(effectDice)
+			}
 			g.Board.availableStale = true
 		}
 		g.Board.stateLock.Unlock()

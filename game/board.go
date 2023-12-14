@@ -7,6 +7,7 @@ import (
 	"image/color"
 	"image/draw"
 	"log"
+	"sort"
 	"strconv"
 	"sync"
 	"time"
@@ -1763,38 +1764,71 @@ func (b *board) processState() {
 		b.highlightSpaces[space] = b.highlightSpaces[space][:0]
 	}
 	for i := range available {
+		var moves [][2]int
+		for _, m := range available[i] {
+			if m[0] == 0 && m[1] == 0 {
+				break
+			}
+			moves = append(moves, m)
+		}
+		sort.Slice(moves, func(i, j int) bool {
+			if moves[i][0] != moves[j][0] {
+				return moves[i][0] > moves[j][0]
+			}
+			return moves[i][1] > moves[j][1]
+		})
+
+		originalFrom := -1
 		lastFrom := -1
 		lastTo := -1
-	HIGHLIGHT:
-		for j := range available[i] {
-			move := available[i][j]
-			if move[0] == 0 && move[1] == 0 {
-				break
-			} else if onBar && move[0] != bgammon.SpaceBarPlayer {
+		for j := range moves {
+			move := moves[j]
+			if onBar && move[0] != bgammon.SpaceBarPlayer {
 				continue
 			}
 
-			if lastFrom != -1 && move[0] == lastTo {
-				var exists bool
-				for _, existing := range b.highlightSpaces[lastFrom] {
-					if existing == move[1] {
-						exists = true
-						break
+			if lastFrom != -1 {
+				if move[0] == lastTo {
+					var exists bool
+					for _, existing := range b.highlightSpaces[originalFrom] {
+						if existing == move[1] {
+							exists = true
+							break
+						}
 					}
+					if !exists {
+						b.highlightSpaces[originalFrom] = append(b.highlightSpaces[originalFrom], move[1])
+					}
+
+					exists = false
+					for _, existing := range b.highlightSpaces[lastFrom] {
+						if existing == move[1] {
+							exists = true
+							break
+						}
+					}
+					if !exists {
+						b.highlightSpaces[lastFrom] = append(b.highlightSpaces[lastFrom], move[1])
+					}
+				} else {
+					originalFrom = move[0]
 				}
-				if !exists {
-					b.highlightSpaces[lastFrom] = append(b.highlightSpaces[lastFrom], move[1])
-				}
+			} else {
+				originalFrom = move[0]
 			}
 			lastFrom = move[0]
 			lastTo = move[1]
 
+			var exists bool
 			for _, existing := range b.highlightSpaces[move[0]] {
 				if existing == move[1] {
-					continue HIGHLIGHT
+					exists = true
+					break
 				}
 			}
-			b.highlightSpaces[move[0]] = append(b.highlightSpaces[move[0]], move[1])
+			if !exists {
+				b.highlightSpaces[move[0]] = append(b.highlightSpaces[move[0]], move[1])
+			}
 		}
 	}
 }

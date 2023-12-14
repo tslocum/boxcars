@@ -1,13 +1,13 @@
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231214052750-242b6132e6f9 h1:fglLRAyBEsRhTIvzn1K8mgQbXVZm5+mgKbn9Dz+unz8=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231214052750-242b6132e6f9/go.mod h1:CqB9JoG/fvQUT26kcmGQPBUbpJKR12ya34ZwYgjw7Lk=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231214080418-a5b4c03e9f62 h1:xneRZK7TpdP1C1roAHpUL3upyEZLiGRvWed2bpmy+vo=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231214080418-a5b4c03e9f62/go.mod h1:CqB9JoG/fvQUT26kcmGQPBUbpJKR12ya34ZwYgjw7Lk=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231214043850-8b2874903a6c h1:wckeZLcjfURRVq/ZmGFRtQxQteM6RvKGuMvgCbns/AI=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231214043850-8b2874903a6c/go.mod h1:Bsf7icsBpzrPIN006mEB06VORZXaQgs+bRO4HzAH+U8=
 code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454 h1:R+KAg2+ORkMT/bcljmlno1nr21OBOxo6hY0Qa2qOk+Y=
 code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454/go.mod h1:bDrMbdTIhIy9egS6ISZat3Cw1dusd/Raeiq8vKHo9b4=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20231213214359-de3946764327 h1:QLnBqgAxpFSyENzum6buVmnIeG9kOZib97pkcyaAbRc=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20231213214359-de3946764327/go.mod h1:XtS6M8qcK0fnUn4k5I7h4JcZ2sz2WEAXOcF2DLaQBME=
-code.rocketnine.space/tslocum/kibodo v1.0.2 h1:0RfvVz+IUku8MFx9wvDb+p8byns5gAjQLUo4ZenWP44=
-code.rocketnine.space/tslocum/kibodo v1.0.2/go.mod h1:mAYs1JKFnWlRFzo9BtteAlwjKdk1MIKgEyhQaPdeQDI=
+code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214065727-85f4e67767c6 h1:k0U8cX2PTika9INZm3W+KPMwwhL+lTMhowbDHy0Mzys=
+code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214065727-85f4e67767c6/go.mod h1:FEGJwIgz3VmyN5khErdyEVX0YBG/VIPwogvNApc9TTQ=
 code.rocketnine.space/tslocum/messeji v1.0.6-0.20231128010227-689683b75174 h1:jxE3JcaE4ovMWaZHLA6MvYgkmdkdbEEUv943Bp+MoxU=
 code.rocketnine.space/tslocum/messeji v1.0.6-0.20231128010227-689683b75174/go.mod h1:yLsZtW6XgrQPpqBpQfJJkueurBUUYNnkPr68cS1MtJc=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
