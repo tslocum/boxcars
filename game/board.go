@@ -12,7 +12,9 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
+	"code.rocket9labs.com/tslocum/bgammon-tabula-bot/bot"
 	"code.rocket9labs.com/tslocum/etk"
+	"code.rocket9labs.com/tslocum/tabula"
 	"code.rocketnine.space/tslocum/messeji"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -1702,24 +1704,78 @@ func (b *board) processState() {
 	b.updateOpponentLabel()
 	b.updatePlayerLabel()
 
+	if b.gameState.Turn != 1 {
+		return
+	}
+
+	tabulaBoard := bot.TabulaBoard(b.gameState.Game.Board)
+	tabulaBoard[tabula.SpaceRoll1], tabulaBoard[tabula.SpaceRoll2], tabulaBoard[tabula.SpaceRoll3], tabulaBoard[tabula.SpaceRoll4] = int8(b.gameState.Game.Roll1), int8(b.gameState.Game.Roll2), 0, 0
+	if b.gameState.Game.Roll1 == b.gameState.Game.Roll2 {
+		tabulaBoard[tabula.SpaceRoll3], tabulaBoard[tabula.SpaceRoll4] = int8(b.gameState.Game.Roll1), int8(b.gameState.Game.Roll2)
+	}
+	enteredPlayer, enteredOpponent, acey := int8(1), int8(1), int8(0)
+	if b.gameState.Acey {
+		if !b.gameState.Player1.Entered {
+			enteredPlayer = 0
+		}
+		if !b.gameState.Player2.Entered {
+			enteredOpponent = 0
+		}
+		acey = 1
+	}
+	tabulaBoard[tabula.SpaceEnteredPlayer], tabulaBoard[tabula.SpaceEnteredOpponent], tabulaBoard[tabula.SpaceAcey] = enteredPlayer, enteredOpponent, acey
+	for _, m := range b.gameState.Moves {
+		delta := int8(bgammon.SpaceDiff(m[0], m[1], false))
+		switch {
+		case tabulaBoard[tabula.SpaceRoll1] == delta:
+			tabulaBoard[tabula.SpaceRoll1] = 0
+			continue
+		case tabulaBoard[tabula.SpaceRoll2] == delta:
+			tabulaBoard[tabula.SpaceRoll2] = 0
+			continue
+		case tabulaBoard[tabula.SpaceRoll3] == delta:
+			tabulaBoard[tabula.SpaceRoll3] = 0
+			continue
+		case tabulaBoard[tabula.SpaceRoll4] == delta:
+			tabulaBoard[tabula.SpaceRoll4] = 0
+			continue
+		}
+		switch {
+		case tabulaBoard[tabula.SpaceRoll1] > delta:
+			tabulaBoard[tabula.SpaceRoll1] = 0
+			continue
+		case tabulaBoard[tabula.SpaceRoll2] > delta:
+			tabulaBoard[tabula.SpaceRoll2] = 0
+			continue
+		case tabulaBoard[tabula.SpaceRoll3] > delta:
+			tabulaBoard[tabula.SpaceRoll3] = 0
+			continue
+		case tabulaBoard[tabula.SpaceRoll4] > delta:
+			tabulaBoard[tabula.SpaceRoll4] = 0
+			continue
+		}
+	}
+	onBar := tabulaBoard[tabula.SpaceBarPlayer] != 0
+	available, _ := tabulaBoard.Available(1)
 	for space := 0; space < 28; space++ {
 		b.highlightSpaces[space] = b.highlightSpaces[space][:0]
-		all := make([]int, 0, 4)
-		for _, move := range b.gameState.Available {
-			if move[0] != space {
+	}
+	for i := range available {
+	HIGHLIGHT:
+		for j := range available[i] {
+			move := available[i][j]
+			if move[0] == 0 && move[1] == 0 {
+				break
+			} else if onBar && move[0] != bgammon.SpaceBarPlayer {
 				continue
 			}
-		ALLMOVES:
-			for _, m := range allMoves(b.gameState.Game, move[0], move[1]) {
-				for i := range all {
-					if all[i] == m {
-						continue ALLMOVES
-					}
+			for _, existing := range b.highlightSpaces[move[0]] {
+				if existing == move[1] {
+					continue HIGHLIGHT
 				}
-				all = append(all, m)
 			}
+			b.highlightSpaces[move[0]] = append(b.highlightSpaces[move[0]], move[1])
 		}
-		b.highlightSpaces[space] = append(b.highlightSpaces[space], all...)
 	}
 }
 
