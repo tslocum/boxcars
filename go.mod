@@ -7,7 +7,7 @@ require (
 	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231214043850-8b2874903a6c
 	code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20231213214359-de3946764327
-	code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214065727-85f4e67767c6
+	code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544
 	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231128010227-689683b75174
 	github.com/hajimehoshi/ebiten/v2 v2.6.3
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351

@@ -14,13 +14,13 @@ import (
 
 const (
 	DefaultServerAddress = "wss://ws.bgammon.org"
-	OptimizeDraw         = false
-	OptimizeSetRect      = false
+	OptimizeDraw         = true
+	OptimizeSetRect      = true
 	AutoEnableTouchInput = true
 	ShowServerSettings   = true
 	APPNAME              = "boxcars-android"
 	fieldHeight          = 100
-	defaultFontSize = extraLargeFontSize
+	defaultFontSize      = extraLargeFontSize
 )
 
 func init() {

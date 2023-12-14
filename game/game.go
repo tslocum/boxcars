@@ -637,6 +637,7 @@ func NewGame() *Game {
 
 		Mutex: &sync.Mutex{},
 	}
+	g.keyboard.SetScheduleFrameFunc(scheduleFrame)
 	game = g
 
 	loadImageAssets(0)
@@ -1692,6 +1693,11 @@ func (g *Game) Update() error {
 	} else {
 		pressed = ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
 	}
+
+	if len(ebiten.AppendTouchIDs(g.touchIDs[:0])) != 0 {
+		scheduleFrame()
+	}
+
 	var skipUpdate bool
 	if pressed && g.keyboard.Visible() {
 		p := image.Point{X: cx, Y: cy}
