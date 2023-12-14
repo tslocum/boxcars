@@ -1238,13 +1238,13 @@ func (b *board) setRect(x, y, w, h int) {
 
 	inputAndButtons := 52
 	if game.TouchInput {
-		inputAndButtons = 52 + int(b.horizontalBorderSize)/2 + game.scale(baseButtonHeight)
+		inputAndButtons = 52 + int(b.verticalBorderSize)/2 + game.scale(baseButtonHeight)
 	}
 	matchStatus := 36
 	if game.scaleFactor >= 1.25 {
 		matchStatus = 44
 	}
-	b.uiGrid.SetRowSizes(int(b.horizontalBorderSize/2), matchStatus, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), -1, int(b.horizontalBorderSize/2), int(inputAndButtons))
+	b.uiGrid.SetRowSizes(int(b.verticalBorderSize/2), matchStatus, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), int(inputAndButtons))
 
 	{
 		dialogWidth := game.scale(620)
@@ -1296,7 +1296,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.menuGrid.SetColumnSizes(-1, game.scale(10), -1, game.scale(10), -1)
 
-	b.chatGrid.SetRowSizes(-1, int(b.horizontalBorderSize)/2, inputAndButtons)
+	b.chatGrid.SetRowSizes(-1, int(b.verticalBorderSize)/2, inputAndButtons)
 
 	var padding int
 	if b.w >= 600 {
