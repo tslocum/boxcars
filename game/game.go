@@ -39,7 +39,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.8p1"
+const version = "v1.1.9"
 
 const MaxDebug = 2
 
@@ -1246,7 +1246,7 @@ func (g *Game) handleEvent(e interface{}) {
 			g.Board.availableStale = false
 		} else {
 			diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
-			if g.Board.gameState.Turn == 1 {
+			if g.Board.gameState.Player1.Name == ev.Player {
 				g.Board.playerRoll1, g.Board.playerRoll2 = g.Board.gameState.Roll1, g.Board.gameState.Roll2
 				g.Board.playerRollStale = false
 			} else {
@@ -1304,6 +1304,19 @@ func (g *Game) handleEvent(e interface{}) {
 			lg(gotext.Get("Type %s to offer a rematch.", "/rematch"))
 		}
 		g.Board.Unlock()
+	case *bgammon.EventSettings:
+		b := g.Board
+		b.Lock()
+		b.highlightAvailable = ev.Highlight
+		b.highlightCheckbox.SetSelected(b.highlightAvailable)
+		b.showPipCount = ev.Pips
+		b.showPipCountCheckbox.SetSelected(b.showPipCount)
+		b.showMoves = ev.Moves
+		b.showMovesCheckbox.SetSelected(b.showMoves)
+		b.processState()
+		b.updatePlayerLabel()
+		b.updateOpponentLabel()
+		b.Unlock()
 	case *bgammon.EventPing:
 		g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
 	default:

@@ -795,6 +795,11 @@ func (b *board) selectChangePassword() error {
 
 func (b *board) toggleHighlightCheckbox() error {
 	b.highlightAvailable = b.highlightCheckbox.Selected()
+	highlight := 0
+	if b.highlightAvailable {
+		highlight = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set highlight %d", highlight))
 	return nil
 }
 
@@ -802,12 +807,22 @@ func (b *board) togglePipCountCheckbox() error {
 	b.showPipCount = b.showPipCountCheckbox.Selected()
 	b.updatePlayerLabel()
 	b.updateOpponentLabel()
+	pips := 0
+	if b.showPipCount {
+		pips = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set pips %d", pips))
 	return nil
 }
 
 func (b *board) toggleMovesCheckbox() error {
 	b.showMoves = b.showMovesCheckbox.Selected()
 	b.processState()
+	moves := 0
+	if b.showMoves {
+		moves = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set moves %d", moves))
 	return nil
 }
 
@@ -1887,10 +1902,6 @@ func (b *board) processState() {
 		lastTo := -1
 		for j := range moves {
 			move := moves[j]
-			if onBar && move[0] != bgammon.SpaceBarPlayer {
-				continue
-			}
-
 			if lastFrom != -1 {
 				if move[0] == lastTo {
 					var exists bool
@@ -1933,6 +1944,11 @@ func (b *board) processState() {
 			if !exists {
 				b.highlightSpaces[move[0]] = append(b.highlightSpaces[move[0]], move[1])
 			}
+		}
+	}
+	if onBar {
+		for space := 0; space <= 25; space++ {
+			b.highlightSpaces[space] = b.highlightSpaces[space][:0]
 		}
 	}
 }
