@@ -1,9 +1,9 @@
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231214080418-a5b4c03e9f62 h1:xneRZK7TpdP1C1roAHpUL3upyEZLiGRvWed2bpmy+vo=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231214080418-a5b4c03e9f62/go.mod h1:CqB9JoG/fvQUT26kcmGQPBUbpJKR12ya34ZwYgjw7Lk=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231215054411-93cfc4da055c h1:bMrusrQr5EpTYab1vTmMPM4sr1m50jO0WZZSp0WeGl4=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231215054411-93cfc4da055c/go.mod h1:CqB9JoG/fvQUT26kcmGQPBUbpJKR12ya34ZwYgjw7Lk=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231214043850-8b2874903a6c h1:wckeZLcjfURRVq/ZmGFRtQxQteM6RvKGuMvgCbns/AI=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231214043850-8b2874903a6c/go.mod h1:Bsf7icsBpzrPIN006mEB06VORZXaQgs+bRO4HzAH+U8=
-code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454 h1:R+KAg2+ORkMT/bcljmlno1nr21OBOxo6hY0Qa2qOk+Y=
-code.rocket9labs.com/tslocum/etk v0.0.0-20231120184929-cba07aae6454/go.mod h1:bDrMbdTIhIy9egS6ISZat3Cw1dusd/Raeiq8vKHo9b4=
+code.rocket9labs.com/tslocum/etk v0.0.0-20231215053253-84765fcd5ad8 h1:BJzXBAxhzQSZEnlZ1QjXufOkXinLku94PqIL8+ThuWs=
+code.rocket9labs.com/tslocum/etk v0.0.0-20231215053253-84765fcd5ad8/go.mod h1:v9aQyuK+852HG8atXL1yaXWLz6nEik4g6ELnM/JdAAg=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20231213214359-de3946764327 h1:QLnBqgAxpFSyENzum6buVmnIeG9kOZib97pkcyaAbRc=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20231213214359-de3946764327/go.mod h1:XtS6M8qcK0fnUn4k5I7h4JcZ2sz2WEAXOcF2DLaQBME=
 code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544 h1:G+yE90iQh2Pmzd6otFl7LEGVI+a/HRCnehcU01CjXyo=
@@ -136,8 +136,8 @@ golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5y
 golang.org/x/crypto v0.14.0/go.mod h1:MVFd36DqK4CsrnJYDkBA3VC4m2GkXAM0PvzMCn4JQf4=
 golang.org/x/crypto v0.16.0 h1:mMMrFzRSCF0GvB7Ne27XVtVAaXLrPmgPC7/v0tkwHaY=
 golang.org/x/crypto v0.16.0/go.mod h1:gCAAfMLgwOJRpTjQ2zCCt2OcSfYMTeZVSRtQlPC7Nq4=
-golang.org/x/exp/shiny v0.0.0-20231206192017-f3f8817b8deb h1:t3SA1mKG2eyhChDjOL0n0VLKZQmqU4J8UlCoQ0+nqSk=
-golang.org/x/exp/shiny v0.0.0-20231206192017-f3f8817b8deb/go.mod h1:UH99kUObWAZkDnWqppdQe5ZhPYESUw8I0zVV1uWBR+0=
+golang.org/x/exp/shiny v0.0.0-20231214170342-aacd6d4b4611 h1:4KULGL0aJvCqUs5c7fA/eWELbK2rVfV9wpZTWW1Qs/I=
+golang.org/x/exp/shiny v0.0.0-20231214170342-aacd6d4b4611/go.mod h1:UH99kUObWAZkDnWqppdQe5ZhPYESUw8I0zVV1uWBR+0=
 golang.org/x/image v0.14.0 h1:tNgSxAFe3jC4uYqvZdTr84SZoM1KfwdC9SKIFrLjFn4=
 golang.org/x/image v0.14.0/go.mod h1:HUYqC05R2ZcZ3ejNQsIHQDQiwWM4JBqmm6MKANTp4LE=
 golang.org/x/mobile v0.0.0-20231127183840-76ac6878050a h1:sYbmY3FwUWCBTodZL1S3JUuOvaW6kM2o+clDzzDNBWg=

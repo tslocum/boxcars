@@ -1345,6 +1345,10 @@ func (g *Game) Connect() {
 
 	go g.handleEvents()
 
+	if g.Password != "" {
+		g.Board.recreateAccountGrid()
+	}
+
 	c := g.Client
 
 	if g.TV {
@@ -1507,6 +1511,8 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					g.Board.menuGrid.SetVisible(false)
 				} else if g.Board.settingsGrid.Visible() {
 					g.Board.settingsGrid.SetVisible(false)
+				} else if g.Board.changePasswordGrid.Visible() {
+					g.Board.hideMenu()
 				} else if g.Board.leaveGameGrid.Visible() {
 					g.Board.leaveGameGrid.SetVisible(false)
 				} else {
@@ -1553,6 +1559,27 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					g.lobby.confirmCreateGame()
 				} else {
 					g.lobby.confirmJoinGame()
+				}
+			}
+		}
+	}
+
+	if viewBoard {
+		for _, key := range keys {
+			switch key {
+			case ebiten.KeyTab:
+				if g.Board.changePasswordGrid.Visible() {
+					focusedWidget := etk.Focused()
+					switch focusedWidget {
+					case g.Board.changePasswordOld:
+						etk.SetFocus(g.Board.changePasswordNew)
+					case g.Board.changePasswordNew:
+						etk.SetFocus(g.Board.changePasswordOld)
+					}
+				}
+			case ebiten.KeyEnter:
+				if g.Board.changePasswordGrid.Visible() {
+					g.Board.selectChangePassword()
 				}
 			}
 		}

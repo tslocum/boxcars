@@ -9,6 +9,7 @@ import (
 	"log"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -106,9 +107,14 @@ type board struct {
 
 	menuGrid *etk.Grid
 
+	changePasswordOld  *etk.Input
+	changePasswordNew  *etk.Input
+	changePasswordGrid *etk.Grid
+
 	highlightCheckbox    *etk.Checkbox
 	showPipCountCheckbox *etk.Checkbox
 	showMovesCheckbox    *etk.Checkbox
+	accountGrid          *etk.Grid
 	settingsGrid         *etk.Grid
 
 	matchStatusGrid *etk.Grid
@@ -181,7 +187,9 @@ func NewBoard() *board {
 		buttonsUndoOKGrid:       etk.NewGrid(),
 		selectRollGrid:          etk.NewGrid(),
 		menuGrid:                etk.NewGrid(),
+		accountGrid:             etk.NewGrid(),
 		settingsGrid:            etk.NewGrid(),
+		changePasswordGrid:      etk.NewGrid(),
 		uiGrid:                  etk.NewGrid(),
 		frame:                   etk.NewFrame(),
 		confirmLeaveGameFrame:   etk.NewFrame(),
@@ -232,6 +240,59 @@ func NewBoard() *board {
 	}
 
 	{
+		headerLabel := etk.NewText(gotext.Get("Change password"))
+		headerLabel.SetHorizontal(messeji.AlignCenter)
+
+		oldLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Current")),
+			onSelected: func() {
+				b.highlightCheckbox.SetSelected(!b.highlightCheckbox.Selected())
+				b.toggleHighlightCheckbox()
+			},
+		}
+		oldLabel.SetVertical(messeji.AlignCenter)
+
+		b.changePasswordOld = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		b.changePasswordOld.Field.SetBackgroundColor(frameColor)
+		centerInput(b.changePasswordOld)
+
+		newLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("New")),
+			onSelected: func() {
+				b.showPipCountCheckbox.SetSelected(!b.showPipCountCheckbox.Selected())
+				b.togglePipCountCheckbox()
+			},
+		}
+		newLabel.SetVertical(messeji.AlignCenter)
+
+		b.changePasswordNew = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		b.changePasswordNew.Field.SetBackgroundColor(frameColor)
+		centerInput(b.changePasswordNew)
+
+		fieldGrid := etk.NewGrid()
+		fieldGrid.SetColumnSizes(-1, -1)
+		fieldGrid.SetRowSizes(-1, 20, -1)
+		fieldGrid.AddChildAt(oldLabel, 0, 0, 1, 1)
+		fieldGrid.AddChildAt(b.changePasswordOld, 1, 0, 2, 1)
+		fieldGrid.AddChildAt(newLabel, 0, 2, 1, 1)
+		fieldGrid.AddChildAt(b.changePasswordNew, 1, 2, 2, 1)
+
+		b.changePasswordGrid.SetBackground(color.RGBA{40, 24, 9, 255})
+		b.changePasswordGrid.SetColumnSizes(20, -1, -1, 20)
+		b.changePasswordGrid.SetRowSizes(72, fieldHeight+20+fieldHeight, -1, game.scale(baseButtonHeight))
+		b.changePasswordGrid.AddChildAt(headerLabel, 1, 0, 2, 1)
+		b.changePasswordGrid.AddChildAt(fieldGrid, 1, 1, 2, 1)
+		b.changePasswordGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
+		b.changePasswordGrid.AddChildAt(etk.NewButton(gotext.Get("Cancel"), b.hideMenu), 0, 3, 2, 1)
+		b.changePasswordGrid.AddChildAt(etk.NewButton(gotext.Get("Submit"), b.selectChangePassword), 2, 3, 2, 1)
+		b.changePasswordGrid.SetVisible(false)
+	}
+
+	{
 		settingsLabel := etk.NewText(gotext.Get("Settings"))
 		settingsLabel.SetHorizontal(messeji.AlignCenter)
 
@@ -277,19 +338,30 @@ func NewBoard() *board {
 		}
 		movesLabel.SetVertical(messeji.AlignCenter)
 
+		accountLabel := etk.NewText(gotext.Get("Account"))
+		accountLabel.SetVertical(messeji.AlignCenter)
+
+		b.recreateAccountGrid()
+
 		checkboxGrid := etk.NewGrid()
 		checkboxGrid.SetColumnSizes(72, 20, -1)
-		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1)
+		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1)
 		checkboxGrid.AddChildAt(b.highlightCheckbox, 0, 0, 1, 1)
 		checkboxGrid.AddChildAt(highlightLabel, 2, 0, 1, 1)
 		checkboxGrid.AddChildAt(b.showPipCountCheckbox, 0, 2, 1, 1)
 		checkboxGrid.AddChildAt(pipCountLabel, 2, 2, 1, 1)
 		checkboxGrid.AddChildAt(b.showMovesCheckbox, 0, 4, 1, 1)
 		checkboxGrid.AddChildAt(movesLabel, 2, 4, 1, 1)
+		{
+			grid := etk.NewGrid()
+			grid.AddChildAt(accountLabel, 0, 0, 1, 1)
+			grid.AddChildAt(b.accountGrid, 1, 0, 2, 1)
+			checkboxGrid.AddChildAt(grid, 0, 6, 3, 1)
+		}
 
 		b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
 		b.settingsGrid.SetColumnSizes(20, -1, -1, 20)
-		b.settingsGrid.SetRowSizes(72, 72+20+72+20+72, 20, -1)
+		b.settingsGrid.SetRowSizes(72, 72+20+72+20+72+20+72, 20, -1)
 		b.settingsGrid.AddChildAt(settingsLabel, 1, 0, 2, 1)
 		b.settingsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
 		b.settingsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
@@ -404,6 +476,7 @@ func NewBoard() *board {
 		f := etk.NewFrame()
 		f.AddChild(b.menuGrid)
 		f.AddChild(b.settingsGrid)
+		f.AddChild(b.changePasswordGrid)
 		f.AddChild(b.leaveGameGrid)
 		b.frame.AddChild(f)
 	}
@@ -569,6 +642,21 @@ func (b *board) recreateButtonGrid() {
 	b.buttonsUndoOKGrid = buttonGrid(b.buttonsUndoOKGrid, false, undoButton, okButton)
 }
 
+func (b *board) recreateAccountGrid() {
+	var w etk.Widget
+	if b.Client == nil || (game.Password == "" && b.Client.Password == "") {
+		guestLabel := etk.NewText(gotext.Get("Logged in as guest"))
+		guestLabel.SetFont(mediumFont, fontMutex)
+		guestLabel.SetVertical(messeji.AlignCenter)
+		w = guestLabel
+	} else {
+		changePasswordButton := etk.NewButton(gotext.Get("Change password"), b.showChangePassword)
+		w = changePasswordButton
+	}
+	b.accountGrid.Clear()
+	b.accountGrid.AddChildAt(w, 0, 0, 1, 1)
+}
+
 func (b *board) cancelLeaveGame() error {
 	b.leaveGameGrid.SetVisible(false)
 	return nil
@@ -591,9 +679,19 @@ func (b *board) showSettings() error {
 	return nil
 }
 
+func (b *board) showChangePassword() error {
+	b.settingsGrid.SetVisible(false)
+	b.changePasswordGrid.SetVisible(true)
+	etk.SetFocus(b.changePasswordOld)
+	return nil
+}
+
 func (b *board) hideMenu() error {
 	b.menuGrid.SetVisible(false)
 	b.settingsGrid.SetVisible(false)
+	b.changePasswordGrid.SetVisible(false)
+	b.changePasswordOld.Field.SetText("")
+	b.changePasswordNew.Field.SetText("")
 	return nil
 }
 
@@ -688,6 +786,11 @@ func (b *board) selectDouble() error {
 func (b *board) selectResign() error {
 	b.Client.Out <- []byte("resign")
 	return nil
+}
+
+func (b *board) selectChangePassword() error {
+	b.Client.Out <- []byte(fmt.Sprintf("password %s %s", strings.ReplaceAll(b.changePasswordOld.Text(), " ", "_"), strings.ReplaceAll(b.changePasswordNew.Text(), " ", "_")))
+	return b.hideMenu()
 }
 
 func (b *board) toggleHighlightCheckbox() error {
@@ -1268,13 +1371,14 @@ func (b *board) setRect(x, y, w, h int) {
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + game.scale(baseButtonHeight)
+		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + game.scale(baseButtonHeight)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
 
 		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
 		b.settingsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+		b.changePasswordGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 		b.selectRollGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 

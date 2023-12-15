@@ -186,12 +186,12 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 		switch {
 		case (a.Password) != (b.Password):
 			return !a.Password
+		case (a.Players) != (b.Players):
+			return a.Players < b.Players
 		case strings.HasPrefix(a.Name, aceyPrefix) != strings.HasPrefix(b.Name, aceyPrefix):
 			return strings.HasPrefix(b.Name, aceyPrefix)
 		case strings.HasPrefix(a.Name, botPrefix) != strings.HasPrefix(b.Name, botPrefix):
 			return strings.HasPrefix(b.Name, botPrefix)
-		case (a.Players) != (b.Players):
-			return a.Players < b.Players
 		default:
 			return strings.ToLower(a.Name) < strings.ToLower(b.Name)
 		}

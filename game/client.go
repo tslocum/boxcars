@@ -49,6 +49,8 @@ func (c *Client) Connect() {
 
 func (c *Client) logIn() []byte {
 	if game.register {
+		c.Username = game.Username
+		c.Password = game.Password
 		return []byte(fmt.Sprintf("rj %s %s %s %s\nlist\n", APPNAME, game.Email, game.Username, game.Password))
 	}
 	loginInfo := strings.ReplaceAll(c.Username, " ", "_")
