@@ -15,22 +15,25 @@ import (
 )
 
 type Client struct {
-	Address    string
-	Username   string
-	Password   string
-	Events     chan interface{}
-	Out        chan []byte
-	connecting bool
+	Address       string
+	Username      string
+	Password      string
+	Events        chan interface{}
+	Out           chan []byte
+	connecting    bool
+	loggedIn      bool
+	resetPassword bool
 }
 
-func newClient(address string, username string, password string) *Client {
+func newClient(address string, username string, password string, resetPassword bool) *Client {
 	const bufferSize = 10
 	return &Client{
-		Address:  address,
-		Username: username,
-		Password: password,
-		Events:   make(chan interface{}, bufferSize),
-		Out:      make(chan []byte, bufferSize),
+		Address:       address,
+		Username:      username,
+		Password:      password,
+		Events:        make(chan interface{}, bufferSize),
+		Out:           make(chan []byte, bufferSize),
+		resetPassword: resetPassword,
 	}
 }
 
@@ -48,7 +51,9 @@ func (c *Client) Connect() {
 }
 
 func (c *Client) logIn() []byte {
-	if game.register {
+	if c.resetPassword {
+		return []byte(fmt.Sprintf("resetpassword %s\n", c.Username))
+	} else if game.register {
 		c.Username = game.Username
 		c.Password = game.Password
 		return []byte(fmt.Sprintf("rj %s %s %s %s\nlist\n", APPNAME, game.Email, game.Username, game.Password))
@@ -66,6 +71,9 @@ func (c *Client) LoggedIn() bool {
 
 func (c *Client) connectWebSocket() {
 	reconnect := func() {
+		if c.resetPassword {
+			return
+		}
 		for {
 			if !focused() {
 				time.Sleep(2 * time.Second)
@@ -99,6 +107,7 @@ func (c *Client) connectWebSocket() {
 			return
 		}
 	}
+	c.loggedIn = true
 
 	go c.handleWebSocketWrite(conn)
 	c.handleWebSocketRead(conn)
@@ -159,6 +168,9 @@ func (c *Client) connectTCP(conn net.Conn) {
 	}
 
 	reconnect := func() {
+		if c.resetPassword {
+			return
+		}
 		for {
 			if !focused() {
 				time.Sleep(2 * time.Second)
@@ -208,6 +220,7 @@ func (c *Client) connectTCP(conn net.Conn) {
 		reconnect()
 		return
 	}
+	c.loggedIn = true
 
 	go c.handleTCPWrite(conn)
 	c.handleTCPRead(conn)

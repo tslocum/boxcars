@@ -579,7 +579,9 @@ type Game struct {
 	registerUsername *etk.Input
 	registerPassword *etk.Input
 
-	resetEmail *etk.Input
+	resetEmail      *etk.Input
+	resetInfo       *etk.Text
+	resetInProgress bool
 
 	pressedKeys []ebiten.Key
 
@@ -758,7 +760,7 @@ func NewGame() *Game {
 			return nil
 		})
 
-		infoLabel := etk.NewText("")
+		g.resetInfo = etk.NewText("")
 
 		footerLabel := etk.NewText("Boxcars " + version)
 		footerLabel.SetHorizontal(messeji.AlignEnd)
@@ -786,7 +788,7 @@ func NewGame() *Game {
 			subGrid.AddChildAt(submitButton, 2, 0, 1, 1)
 			grid.AddChildAt(subGrid, 1, y, 3, 1)
 		}
-		grid.AddChildAt(infoLabel, 1, y+1, 3, 1)
+		grid.AddChildAt(g.resetInfo, 1, y+1, 3, 1)
 		grid.AddChildAt(footerLabel, 1, y+2, 3, 1)
 		resetGrid = grid
 	}
@@ -1339,7 +1341,7 @@ func (g *Game) Connect() {
 	if address == "" {
 		address = DefaultServerAddress
 	}
-	g.Client = newClient(address, g.Username, g.Password)
+	g.Client = newClient(address, g.Username, g.Password, false)
 	g.lobby.c = g.Client
 	g.Board.Client = g.Client
 
@@ -1381,7 +1383,7 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 
 	g.setRoot(listGamesFrame)
 
-	g.Client = newClient("", g.Username, g.Password)
+	g.Client = newClient("", g.Username, g.Password, false)
 	g.lobby.c = g.Client
 	g.Board.Client = g.Client
 
@@ -1444,9 +1446,34 @@ func (g *Game) selectConfirmRegister() error {
 }
 
 func (g *Game) selectConfirmReset() error {
-	// use timeout, call api, api handles sending reset email
-	// up to 3 resets in 24 hours allowed
-	// do not indicate whether an account was found or not
+	if g.resetInProgress {
+		return nil
+	}
+	g.resetInProgress = true
+	address := g.ServerAddress
+	if ShowServerSettings {
+		address = g.connectServer.Text()
+	}
+	client := newClient(address, g.resetEmail.Text(), "", true)
+	go client.Connect()
+	g.resetInfo.SetText("Sending password reset request...")
+	go func() {
+		var i int
+		for {
+			time.Sleep(500 * time.Millisecond)
+			if client.loggedIn {
+				g.resetInfo.SetText("Check your email for a link to reset your password. Be sure to check your spam folder.")
+				g.resetInProgress = false
+				return
+			}
+			i++
+			if i == 40 {
+				g.resetInfo.SetText("Failed to connect to server.")
+				g.resetInProgress = false
+				return
+			}
+		}
+	}()
 	return nil
 }
 
