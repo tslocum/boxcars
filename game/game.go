@@ -39,7 +39,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.9"
+const version = "v1.1.9p1"
 
 const MaxDebug = 2
 
@@ -1885,7 +1885,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		gameUpdateLock.Unlock()
 	}
 
-	screen.Fill(tableColor)
+	if !viewBoard {
+		screen.Fill(frameColor)
+	} else {
+		screen.Fill(tableColor)
+	}
 
 	// Log in screen
 	if !g.loggedIn {
@@ -2022,8 +2026,7 @@ func (g *Game) layoutBoard() {
 			g.Board.setRect(0, 0, g.Board.w, g.Board.w)
 		}
 
-		bufferPaddingX := int(g.Board.horizontalBorderSize / 2)
-		g.Board.uiGrid.SetRect(image.Rect(g.Board.w+bufferPaddingX, 0, g.screenW-bufferPaddingX, g.screenH-bufferPaddingX))
+		g.Board.uiGrid.SetRect(image.Rect(g.Board.w, 0, g.screenW, g.screenH))
 	}
 
 	g.setBufferRects()

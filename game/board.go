@@ -404,12 +404,21 @@ func NewBoard() *board {
 	b.showMenuButton = etk.NewButton("Menu", b.toggleMenu)
 
 	b.matchStatusGrid = etk.NewGrid()
-	b.matchStatusGrid.AddChildAt(b.timerLabel, 0, 0, 1, 1)
-	b.matchStatusGrid.AddChildAt(b.clockLabel, 1, 0, 1, 1)
 	if !AutoEnableTouchInput {
-		b.matchStatusGrid.AddChildAt(b.showMenuButton, 2, 0, 1, 1)
+		b.matchStatusGrid.SetColumnSizes(int(b.verticalBorderSize/4), -1, -1, -1, int(b.verticalBorderSize/4))
+	} else {
+		b.matchStatusGrid.SetColumnSizes(int(b.verticalBorderSize/4), -1, -1, int(b.verticalBorderSize/4))
 	}
+	b.matchStatusGrid.AddChildAt(b.timerLabel, 1, 0, 1, 1)
+	b.matchStatusGrid.AddChildAt(b.clockLabel, 2, 0, 1, 1)
+	x := 3
+	if !AutoEnableTouchInput {
+		b.matchStatusGrid.AddChildAt(b.showMenuButton, x, 0, 1, 1)
+		x++
+	}
+	b.matchStatusGrid.AddChildAt(etk.NewBox(), x, 0, 1, 1)
 
+	b.uiGrid.SetBackground(frameColor)
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
 	b.uiGrid.AddChildAt(b.matchStatusGrid, 0, 1, 1, 1)
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 2, 1, 1)
@@ -454,13 +463,13 @@ func NewBoard() *board {
 	b.frame.AddChild(etk.NewFrame(b.selectRollGrid))
 
 	{
-		b.chatGrid.SetBackground(tableColor)
+		b.chatGrid.SetBackground(frameColor)
 		b.chatGrid.AddChildAt(floatStatusBuffer, 0, 0, 1, 1)
 		b.chatGrid.AddChildAt(etk.NewBox(), 0, 1, 1, 1)
 		b.chatGrid.AddChildAt(b.floatInputGrid, 0, 2, 1, 1)
 
 		padding := etk.NewBox()
-		padding.SetBackground(tableColor)
+		padding.SetBackground(frameColor)
 
 		g := b.floatChatGrid
 		g.SetRowSizes(-1, -1, -1)
@@ -1167,7 +1176,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 	}
 	b.stateLock.Unlock()
 
-	// Draw space hover overlay when dragging
+	// Draw space hover overlay when dragging.
 	if dragging != nil {
 		for _, m := range highlightSpaces[b.draggingSpace] {
 			x, y, _, _ := b.spaceRect(m)
@@ -1202,7 +1211,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	// Draw opponent dice
+	// Draw opponent dice.
 
 	const diceFadeAlpha = 0.1
 	diceGap := 10.0
@@ -1258,7 +1267,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	// Draw player dice
+	// Draw player dice.
 
 	player := b.gameState.LocalPlayer()
 	if player.Name != "" {
@@ -1296,6 +1305,11 @@ func (b *board) Draw(screen *ebiten.Image) {
 				}
 			}
 		}
+	}
+
+	// Draw sidebar border.
+	if !game.portraitView() && b.h < game.screenH {
+		screen.SubImage(image.Rect(b.w-1, 0, b.w, game.screenH)).(*ebiten.Image).Fill(color.RGBA{0, 0, 0, 255})
 	}
 }
 

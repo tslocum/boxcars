@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
+	"github.com/leonelquinteros/gotext"
 	"nhooyr.io/websocket"
 )
 
@@ -149,9 +150,10 @@ func (c *Client) handleWebSocketRead(conn *websocket.Conn) {
 
 		ev, err := bgammon.DecodeEvent(msg)
 		if err != nil {
-			log.Printf("error: failed to parse message: %s", msg)
-			conn.Close(websocket.StatusNormalClosure, "Read error")
-			return
+			log.Printf("warning: failed to parse message: %s", msg)
+			l("*** " + gotext.Get("Warning: Received unrecognized event from server."))
+			l("*** " + gotext.Get("You may need to upgrade your client."))
+			continue
 		}
 		c.Events <- ev
 
@@ -264,9 +266,10 @@ func (c *Client) handleTCPRead(conn net.Conn) {
 
 		ev, err := bgammon.DecodeEvent(scanner.Bytes())
 		if err != nil {
-			log.Printf("error: failed to parse message: %s", scanner.Bytes())
-			conn.Close()
-			return
+			log.Printf("warning: failed to parse message: %s", scanner.Bytes())
+			l("*** " + gotext.Get("Warning: Received unrecognized event from server."))
+			l("*** " + gotext.Get("You may need to upgrade your client."))
+			continue
 		}
 		c.Events <- ev
 

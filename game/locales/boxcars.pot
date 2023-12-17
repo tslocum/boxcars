@@ -28,6 +28,9 @@ msgstr ""
 msgid "Accept"
 msgstr ""
 
+msgid "Account"
+msgstr ""
+
 msgid "Acey-deucey"
 msgstr ""
 
@@ -40,6 +43,9 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+msgid "Change password"
+msgstr ""
+
 msgid "Connect"
 msgstr ""
 
@@ -50,6 +56,9 @@ msgid "Create"
 msgstr ""
 
 msgid "Create match"
+msgstr ""
+
+msgid "Current"
 msgstr ""
 
 msgid "Double"
@@ -94,7 +103,13 @@ msgstr ""
 msgid "Legal moves: %s"
 msgstr ""
 
+msgid "Logged in as guest"
+msgstr ""
+
 msgid "Name"
+msgstr ""
+
+msgid "New"
 msgstr ""
 
 msgid "No"
@@ -131,6 +146,9 @@ msgid "Refresh"
 msgstr ""
 
 msgid "Register"
+msgstr ""
+
+msgid "Reset Password"
 msgstr ""
 
 msgid "Resign"

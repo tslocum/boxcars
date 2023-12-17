@@ -1,9 +1,9 @@
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231215214322-3927cbbc2c96 h1:4lzIZWlkF4xTJpMMpDhI0brBt9O7mrp6oDQZo94J6dw=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20231215214322-3927cbbc2c96/go.mod h1:CqB9JoG/fvQUT26kcmGQPBUbpJKR12ya34ZwYgjw7Lk=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231216194153-c9af67582086 h1:qOYLry2M1yCCb4oNQRQclhDtjyNc8sQfpqliEaxdi1k=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20231216194153-c9af67582086/go.mod h1:CqB9JoG/fvQUT26kcmGQPBUbpJKR12ya34ZwYgjw7Lk=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231214043850-8b2874903a6c h1:wckeZLcjfURRVq/ZmGFRtQxQteM6RvKGuMvgCbns/AI=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231214043850-8b2874903a6c/go.mod h1:Bsf7icsBpzrPIN006mEB06VORZXaQgs+bRO4HzAH+U8=
-code.rocket9labs.com/tslocum/etk v0.0.0-20231215053253-84765fcd5ad8 h1:BJzXBAxhzQSZEnlZ1QjXufOkXinLku94PqIL8+ThuWs=
-code.rocket9labs.com/tslocum/etk v0.0.0-20231215053253-84765fcd5ad8/go.mod h1:v9aQyuK+852HG8atXL1yaXWLz6nEik4g6ELnM/JdAAg=
+code.rocket9labs.com/tslocum/etk v0.0.0-20231217222351-d650cae558c7 h1:iiKuzDSnFykx3N2nwmE2sUUAZZM09C5+2Th/NfdZk7s=
+code.rocket9labs.com/tslocum/etk v0.0.0-20231217222351-d650cae558c7/go.mod h1:v9aQyuK+852HG8atXL1yaXWLz6nEik4g6ELnM/JdAAg=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20231213214359-de3946764327 h1:QLnBqgAxpFSyENzum6buVmnIeG9kOZib97pkcyaAbRc=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20231213214359-de3946764327/go.mod h1:XtS6M8qcK0fnUn4k5I7h4JcZ2sz2WEAXOcF2DLaQBME=
 code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544 h1:G+yE90iQh2Pmzd6otFl7LEGVI+a/HRCnehcU01CjXyo=
