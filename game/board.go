@@ -119,7 +119,9 @@ type board struct {
 
 	matchStatusGrid *etk.Grid
 
-	replayGrid *etk.Grid
+	replayAuto        time.Time
+	replayPauseButton *etk.Button
+	replayGrid        *etk.Grid
 
 	inputGrid          *etk.Grid
 	showKeyboardButton *etk.Button
@@ -420,13 +422,16 @@ func NewBoard() *board {
 	}
 	b.matchStatusGrid.AddChildAt(etk.NewBox(), x, 0, 1, 1)
 
+	b.replayPauseButton = etk.NewButton("|>", b.selectReplayPause)
+
 	b.replayGrid = etk.NewGrid()
 	b.replayGrid.AddChildAt(etk.NewButton("|<<", b.selectReplayStart), 0, 0, 1, 1)
 	b.replayGrid.AddChildAt(etk.NewButton("<<", b.selectReplayJumpBack), 1, 0, 1, 1)
 	b.replayGrid.AddChildAt(etk.NewButton("<", b.selectReplayStepBack), 2, 0, 1, 1)
-	b.replayGrid.AddChildAt(etk.NewButton(">", b.selectReplayStepForward), 3, 0, 1, 1)
-	b.replayGrid.AddChildAt(etk.NewButton(">>", b.selectReplayJumpForward), 4, 0, 1, 1)
-	b.replayGrid.AddChildAt(etk.NewButton(">>|", b.selectReplayEnd), 5, 0, 1, 1)
+	b.replayGrid.AddChildAt(b.replayPauseButton, 3, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton(">", b.selectReplayStepForward), 4, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton(">>", b.selectReplayJumpForward), 5, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton(">>|", b.selectReplayEnd), 6, 0, 1, 1)
 
 	b.uiGrid.SetBackground(frameColor)
 	b.recreateUIGrid()
@@ -716,6 +721,10 @@ func (b *board) confirmLeaveGame() error {
 		ev := &bgammon.EventLeft{}
 		ev.Player = b.Client.Username
 		b.Client.Events <- ev
+		if !b.replayAuto.IsZero() {
+			b.replayAuto = time.Time{}
+			b.replayPauseButton.Label.SetText("|>")
+		}
 		b.recreateUIGrid()
 	} else {
 		b.Client.Out <- []byte("leave")
@@ -853,9 +862,14 @@ func (b *board) selectReplayStart() error {
 	if !game.replay {
 		return nil
 	}
+
+	if !b.replayAuto.IsZero() {
+		b.replayAuto = time.Time{}
+		b.replayPauseButton.Label.SetText("|>")
+	}
+
 	b.playerRoll1, b.playerRoll2 = 0, 0
 	b.opponentRoll1, b.opponentRoll2 = 0, 0
-
 	game.showReplayFrame(1, false)
 	return nil
 }
@@ -863,6 +877,11 @@ func (b *board) selectReplayStart() error {
 func (b *board) selectReplayJumpBack() error {
 	if !game.replay {
 		return nil
+	}
+
+	if !b.replayAuto.IsZero() {
+		b.replayAuto = time.Time{}
+		b.replayPauseButton.Label.SetText("|>")
 	}
 
 	b.playerRoll1, b.playerRoll2 = 0, 0
@@ -881,6 +900,11 @@ func (b *board) selectReplayStepBack() error {
 		return nil
 	}
 
+	if !b.replayAuto.IsZero() {
+		b.replayAuto = time.Time{}
+		b.replayPauseButton.Label.SetText("|>")
+	}
+
 	// TODO Stepping back moves checkers backwards.
 
 	b.playerRoll1, b.playerRoll2 = 0, 0
@@ -894,9 +918,62 @@ func (b *board) selectReplayStepBack() error {
 	return nil
 }
 
+func (b *board) selectReplayPause() error {
+	if !game.replay {
+		return nil
+	} else if !b.replayAuto.IsZero() {
+		b.replayAuto = time.Time{}
+		b.replayPauseButton.Label.SetText("|>")
+		return nil
+	} else if game.replayFrame >= len(game.replayFrames)-1 {
+		return nil
+	}
+	b.replayAuto = time.Now()
+	b.replayPauseButton.Label.SetText("| |")
+	autoStart := b.replayAuto
+	go func() {
+		t := time.NewTicker(3 * time.Second)
+		for {
+			if b.replayAuto != autoStart {
+				return
+			}
+
+			frame := game.replayFrames[game.replayFrame]
+			if len(frame.Event) != 0 {
+				game._handleReplay(&bgammon.GameState{
+					Game:         frame.Game.Copy(),
+					PlayerNumber: 1,
+					Available:    frame.Game.LegalMoves(true),
+					Spectating:   true,
+				}, frame.Event, 0, true, true)
+			}
+
+			replayFrame := game.replayFrame
+			replayFrame++
+			if replayFrame >= len(game.replayFrames)-1 {
+				time.Sleep(2 * time.Second)
+				b.replayAuto = time.Time{}
+				b.replayPauseButton.Label.SetText("|>")
+				return
+			}
+
+			game.replayFrame = replayFrame
+			game.showReplayFrame(replayFrame, false)
+
+			<-t.C
+		}
+	}()
+	return nil
+}
+
 func (b *board) selectReplayStepForward() error {
 	if !game.replay {
 		return nil
+	}
+
+	if !b.replayAuto.IsZero() {
+		b.replayAuto = time.Time{}
+		b.replayPauseButton.Label.SetText("|>")
 	}
 
 	frame := game.replayFrames[game.replayFrame]
@@ -922,6 +999,12 @@ func (b *board) selectReplayJumpForward() error {
 	if !game.replay {
 		return nil
 	}
+
+	if !b.replayAuto.IsZero() {
+		b.replayAuto = time.Time{}
+		b.replayPauseButton.Label.SetText("|>")
+	}
+
 	replayFrame := game.replayFrame
 	replayFrame++
 	if replayFrame < len(game.replayFrames) {
@@ -935,6 +1018,12 @@ func (b *board) selectReplayEnd() error {
 	if !game.replay {
 		return nil
 	}
+
+	if !b.replayAuto.IsZero() {
+		b.replayAuto = time.Time{}
+		b.replayPauseButton.Label.SetText("|>")
+	}
+
 	b.playerRoll1, b.playerRoll2 = 0, 0
 	b.opponentRoll1, b.opponentRoll2 = 0, 0
 	game.showReplayFrame(len(game.replayFrames)-1, false)
