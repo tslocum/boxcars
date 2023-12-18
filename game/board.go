@@ -585,22 +585,20 @@ func (b *board) recreateUIGrid() {
 		summary2 := etk.NewText("")
 		summary2.SetFont(f, fontMutex)
 		summary2.Write(game.replaySummary2)
+		subGrid := etk.NewGrid()
+		subGrid.SetBackground(bufferBackgroundColor)
+		subGrid.AddChildAt(summary2, 0, 0, 1, 1)
+		subGrid.AddChildAt(summary1, 1, 0, 1, 1)
+
 		g := etk.NewGrid()
-		g.SetBackground(bufferBackgroundColor)
-		g.AddChildAt(summary2, 0, 0, 1, 1)
-		g.AddChildAt(summary1, 1, 0, 1, 1)
-		b.uiGrid.AddChildAt(g, 0, 3, 1, 1)
+		g.SetRowSizes(game.scale(baseButtonHeight), int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), lobbyStatusBufferHeight*2)
+		g.AddChildAt(b.replayGrid, 0, 0, 1, 1)
+		g.AddChildAt(subGrid, 0, 2, 1, 1)
+		g.AddChildAt(statusBuffer, 0, 4, 1, 1)
+		b.uiGrid.AddChildAt(g, 0, 3, 1, 3)
 	} else {
 		b.uiGrid.AddChildAt(statusBuffer, 0, 3, 1, 1)
-	}
-	b.uiGrid.AddChildAt(etk.NewBox(), 0, 4, 1, 1)
-	if game.replay {
-		g := etk.NewGrid()
-		g.SetRowSizes(game.scale(baseButtonHeight), -1)
-		g.AddChildAt(b.replayGrid, 0, 0, 1, 1)
-		g.AddChildAt(statusBuffer, 0, 1, 1, 1)
-		b.uiGrid.AddChildAt(g, 0, 5, 1, 1)
-	} else {
+		b.uiGrid.AddChildAt(etk.NewBox(), 0, 4, 1, 1)
 		b.uiGrid.AddChildAt(gameBuffer, 0, 5, 1, 1)
 	}
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 6, 1, 1)
