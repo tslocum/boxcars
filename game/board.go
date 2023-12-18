@@ -77,7 +77,7 @@ type board struct {
 
 	dragX, dragY int
 
-	highlightSpaces [][]int
+	highlightSpaces [][]int8
 
 	spaceHighlight *ebiten.Image
 	foundMoves     map[int]bool
@@ -169,7 +169,7 @@ func NewBoard() *board {
 		gameState: &bgammon.GameState{
 			Game: bgammon.NewGame(false),
 		},
-		highlightSpaces:         make([][]int, 28),
+		highlightSpaces:         make([][]int8, 28),
 		spaceHighlight:          ebiten.NewImage(1, 1),
 		foundMoves:              make(map[int]bool),
 		opponentLabel:           NewLabel(color.RGBA{255, 255, 255, 255}),
@@ -1176,7 +1176,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 	}
 
 	b.stateLock.Lock()
-	var highlightSpaces [][]int
+	var highlightSpaces [][]int8
 	dragging := b.dragging
 	if b.dragging != nil && b.highlightAvailable && b.draggingSpace != -1 {
 		highlightSpaces = b.highlightSpaces
@@ -1185,7 +1185,8 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	// Draw space hover overlay when dragging.
 	if dragging != nil {
-		for _, m := range highlightSpaces[b.draggingSpace] {
+		for i := range highlightSpaces[b.draggingSpace] {
+			m := int(highlightSpaces[b.draggingSpace][i])
 			x, y, _, _ := b.spaceRect(m)
 			x, y = b.offsetPosition(m, x, y)
 			if b.bottomRow(m) {
@@ -1454,8 +1455,8 @@ func (b *board) setRect(x, y, w, h int) {
 		padding = 5
 	}
 	b.opponentMovesLabel.SetPadding(padding)
-	b.playerMovesLabel.SetPadding(padding / 2)
-	b.opponentPipCount.SetPadding(padding / 2)
+	b.playerMovesLabel.SetPadding(padding)
+	b.opponentPipCount.SetPadding(padding)
 	b.playerPipCount.SetPadding(padding)
 }
 
@@ -1904,7 +1905,7 @@ func (b *board) processState() {
 		b.highlightSpaces[space] = b.highlightSpaces[space][:0]
 	}
 	for i := range available {
-		var moves [][2]int
+		var moves [][2]int8
 		for _, m := range available[i] {
 			if m[0] == 0 && m[1] == 0 {
 				break
@@ -1918,16 +1919,16 @@ func (b *board) processState() {
 			return moves[i][1] > moves[j][1]
 		})
 
-		originalFrom := -1
-		lastFrom := -1
-		lastTo := -1
+		originalFrom := int8(-1)
+		lastFrom := int8(-1)
+		lastTo := int8(-1)
 		for j := range moves {
 			move := moves[j]
 			if lastFrom != -1 {
 				if move[0] == lastTo {
 					var exists bool
 					for _, existing := range b.highlightSpaces[originalFrom] {
-						if existing == move[1] {
+						if int8(existing) == move[1] {
 							exists = true
 							break
 						}

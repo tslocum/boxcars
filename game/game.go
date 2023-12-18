@@ -1221,6 +1221,7 @@ func (g *Game) handleEvent(e interface{}) {
 				if g.Board.playerRoll1 == 0 || g.Board.playerRoll2 == 0 {
 					g.Board.playerRoll1, g.Board.playerRoll2 = 0, 0
 				}
+				g.Board.dragging = nil
 			}
 		}
 		g.Board.availableStale = false
