@@ -3,6 +3,8 @@
 package game
 
 import (
+	"fmt"
+	"net/http"
 	"syscall/js"
 )
 
@@ -25,4 +27,22 @@ func focused() bool {
 	document := js.Global().Get("document")
 	hasFocus := document.Call("hasFocus", nil)
 	return hasFocus.Truthy()
+}
+
+func loadUsername() string {
+	document := js.Global().Get("document")
+	header := http.Header{}
+	header.Add("Cookie", document.Get("cookie").String())
+	request := http.Request{Header: header}
+	for _, cookie := range request.Cookies() {
+		if cookie.Name == "boxcars_username" {
+			return cookie.Value
+		}
+	}
+	return ""
+}
+
+func saveUsername(username string) {
+	document := js.Global().Get("document")
+	document.Set("cookie", fmt.Sprintf("boxcars_username=%s; path=/", username))
 }

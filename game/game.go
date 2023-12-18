@@ -1008,7 +1008,14 @@ func NewGame() *Game {
 	g.needLayoutBoard = true
 
 	g.setRoot(connectGrid)
-	etk.SetFocus(g.connectUsername)
+
+	username := loadUsername()
+	if username != "" {
+		g.connectUsername.Field.SetText(username)
+		etk.SetFocus(g.connectPassword)
+	} else {
+		etk.SetFocus(g.connectUsername)
+	}
 
 	go g.handleAutoRefresh()
 	go g.handleUpdateTimeLabels()
@@ -1686,7 +1693,9 @@ func (g *Game) Connect() {
 		}()
 	}
 
+	username := g.Username
 	go c.Connect()
+	go saveUsername(username)
 }
 
 func (g *Game) ConnectLocal(conn net.Conn) {
