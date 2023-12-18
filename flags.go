@@ -70,7 +70,7 @@ func parseFlags() *game.Game {
 		if err != nil {
 			log.Fatalf("failed to open replay file %s: %s", flag.Arg(0), err)
 		}
-		go g.HandleReplay(replay)
+		g.LoadReplay = replay
 	}
 
 	return g

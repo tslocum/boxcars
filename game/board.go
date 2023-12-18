@@ -119,6 +119,8 @@ type board struct {
 
 	matchStatusGrid *etk.Grid
 
+	replayGrid *etk.Grid
+
 	inputGrid          *etk.Grid
 	showKeyboardButton *etk.Button
 	uiGrid             *etk.Grid
@@ -418,15 +420,16 @@ func NewBoard() *board {
 	}
 	b.matchStatusGrid.AddChildAt(etk.NewBox(), x, 0, 1, 1)
 
+	b.replayGrid = etk.NewGrid()
+	b.replayGrid.AddChildAt(etk.NewButton("|<<", b.selectReplayStart), 0, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton("<<", b.selectReplayJumpBack), 1, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton("<", b.selectReplayStepBack), 2, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton(">", b.selectReplayStepForward), 3, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton(">>", b.selectReplayJumpForward), 4, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton(">>|", b.selectReplayEnd), 5, 0, 1, 1)
+
 	b.uiGrid.SetBackground(frameColor)
-	b.uiGrid.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
-	b.uiGrid.AddChildAt(b.matchStatusGrid, 0, 1, 1, 1)
-	b.uiGrid.AddChildAt(etk.NewBox(), 0, 2, 1, 1)
-	b.uiGrid.AddChildAt(statusBuffer, 0, 3, 1, 1)
-	b.uiGrid.AddChildAt(etk.NewBox(), 0, 4, 1, 1)
-	b.uiGrid.AddChildAt(gameBuffer, 0, 5, 1, 1)
-	b.uiGrid.AddChildAt(etk.NewBox(), 0, 6, 1, 1)
-	b.uiGrid.AddChildAt(b.inputGrid, 0, 7, 1, 1)
+	b.recreateUIGrid()
 
 	b.frame.SetPositionChildren(true)
 
@@ -566,6 +569,44 @@ func (b *board) recreateInputGrid() {
 	}
 }
 
+func (b *board) recreateUIGrid() {
+	b.uiGrid.Clear()
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
+	b.uiGrid.AddChildAt(b.matchStatusGrid, 0, 1, 1, 1)
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 2, 1, 1)
+	if game.replay {
+		f := smallFont
+		if defaultFontSize == extraLargeFontSize {
+			f = mediumFont
+		}
+		summary1 := etk.NewText("")
+		summary1.SetFont(f, fontMutex)
+		summary1.Write(game.replaySummary1)
+		summary2 := etk.NewText("")
+		summary2.SetFont(f, fontMutex)
+		summary2.Write(game.replaySummary2)
+		g := etk.NewGrid()
+		g.SetBackground(bufferBackgroundColor)
+		g.AddChildAt(summary2, 0, 0, 1, 1)
+		g.AddChildAt(summary1, 1, 0, 1, 1)
+		b.uiGrid.AddChildAt(g, 0, 3, 1, 1)
+	} else {
+		b.uiGrid.AddChildAt(statusBuffer, 0, 3, 1, 1)
+	}
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 4, 1, 1)
+	if game.replay {
+		g := etk.NewGrid()
+		g.SetRowSizes(game.scale(baseButtonHeight), -1)
+		g.AddChildAt(b.replayGrid, 0, 0, 1, 1)
+		g.AddChildAt(statusBuffer, 0, 1, 1, 1)
+		b.uiGrid.AddChildAt(g, 0, 5, 1, 1)
+	} else {
+		b.uiGrid.AddChildAt(gameBuffer, 0, 5, 1, 1)
+	}
+	b.uiGrid.AddChildAt(etk.NewBox(), 0, 6, 1, 1)
+	b.uiGrid.AddChildAt(b.inputGrid, 0, 7, 1, 1)
+}
+
 func (b *board) showButtonGrid(buttonGrid *etk.Grid) {
 	b.buttonsOnlyRollGrid.SetVisible(false)
 	b.buttonsOnlyUndoGrid.SetVisible(false)
@@ -677,6 +718,7 @@ func (b *board) confirmLeaveGame() error {
 		ev := &bgammon.EventLeft{}
 		ev.Player = b.Client.Username
 		b.Client.Events <- ev
+		b.recreateUIGrid()
 	} else {
 		b.Client.Out <- []byte("leave")
 	}
@@ -807,6 +849,98 @@ func (b *board) selectResign() error {
 func (b *board) selectChangePassword() error {
 	b.Client.Out <- []byte(fmt.Sprintf("password %s %s", strings.ReplaceAll(b.changePasswordOld.Text(), " ", "_"), strings.ReplaceAll(b.changePasswordNew.Text(), " ", "_")))
 	return b.hideMenu()
+}
+
+func (b *board) selectReplayStart() error {
+	if !game.replay {
+		return nil
+	}
+	b.playerRoll1, b.playerRoll2 = 0, 0
+	b.opponentRoll1, b.opponentRoll2 = 0, 0
+
+	game.showReplayFrame(1, false)
+	return nil
+}
+
+func (b *board) selectReplayJumpBack() error {
+	if !game.replay {
+		return nil
+	}
+
+	b.playerRoll1, b.playerRoll2 = 0, 0
+	b.opponentRoll1, b.opponentRoll2 = 0, 0
+	replayFrame := game.replayFrame
+	replayFrame--
+	if replayFrame < 1 {
+		replayFrame = 1
+	}
+	game.showReplayFrame(replayFrame, false)
+	return nil
+}
+
+func (b *board) selectReplayStepBack() error {
+	if !game.replay {
+		return nil
+	}
+
+	// TODO Stepping back moves checkers backwards.
+
+	b.playerRoll1, b.playerRoll2 = 0, 0
+	b.opponentRoll1, b.opponentRoll2 = 0, 0
+	replayFrame := game.replayFrame
+	replayFrame--
+	if replayFrame < 1 {
+		replayFrame = 1
+	}
+	game.showReplayFrame(replayFrame, false)
+	return nil
+}
+
+func (b *board) selectReplayStepForward() error {
+	if !game.replay {
+		return nil
+	}
+
+	frame := game.replayFrames[game.replayFrame]
+	if len(frame.Event) != 0 {
+		game._handleReplay(&bgammon.GameState{
+			Game:         frame.Game.Copy(),
+			PlayerNumber: 1,
+			Available:    frame.Game.LegalMoves(true),
+			Spectating:   true,
+		}, frame.Event, 0, true, true)
+	}
+
+	replayFrame := game.replayFrame
+	replayFrame++
+	if replayFrame < len(game.replayFrames) {
+		game.replayFrame = replayFrame
+		game.showReplayFrame(replayFrame, false)
+	}
+	return nil
+}
+
+func (b *board) selectReplayJumpForward() error {
+	if !game.replay {
+		return nil
+	}
+	replayFrame := game.replayFrame
+	replayFrame++
+	if replayFrame < len(game.replayFrames) {
+		game.replayFrame = replayFrame
+		game.showReplayFrame(replayFrame, false)
+	}
+	return nil
+}
+
+func (b *board) selectReplayEnd() error {
+	if !game.replay {
+		return nil
+	}
+	b.playerRoll1, b.playerRoll2 = 0, 0
+	b.opponentRoll1, b.opponentRoll2 = 0, 0
+	game.showReplayFrame(len(game.replayFrames)-1, false)
+	return nil
 }
 
 func (b *board) toggleHighlightCheckbox() error {

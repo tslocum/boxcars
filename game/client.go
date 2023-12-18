@@ -27,7 +27,7 @@ type Client struct {
 }
 
 func newClient(address string, username string, password string, resetPassword bool) *Client {
-	const bufferSize = 10
+	const bufferSize = 64
 	return &Client{
 		Address:       address,
 		Username:      username,

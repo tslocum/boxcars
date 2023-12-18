@@ -538,6 +538,11 @@ func scheduleFrame() {
 	drawScreen = 2
 }
 
+type replayFrame struct {
+	Game  *bgammon.Game
+	Event []byte
+}
+
 type Game struct {
 	screenW, screenH int
 
@@ -613,12 +618,18 @@ type Game struct {
 	loadedLobby   bool
 	loadedBoard   bool
 
+	LoadReplay []byte
+
 	loaded bool
 
 	showRegister bool
 	showReset    bool
 
-	replay bool
+	replay         bool
+	replayFrame    int
+	replayFrames   []*replayFrame
+	replaySummary1 []byte
+	replaySummary2 []byte
 
 	*sync.Mutex
 }
@@ -1349,9 +1360,11 @@ func (g *Game) handleEvents() {
 	}
 }
 
-func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int) bool {
-	g.Lock()
-	defer g.Unlock()
+func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int, sendEvent bool, haveLock bool) bool {
+	if !haveLock {
+		g.Lock()
+		defer g.Unlock()
+	}
 
 	if !g.replay {
 		return false
@@ -1371,7 +1384,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int)
 			return false
 		}
 
-		{
+		if sendEvent {
 			ev := &bgammon.EventJoined{
 				GameID: 1,
 			}
@@ -1413,22 +1426,25 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int)
 			return false
 		}
 
-		ev := &bgammon.EventBoard{
-			GameState: bgammon.GameState{
-				Game:         gs.Game.Copy(),
-				PlayerNumber: 1,
-				Available:    gs.Available,
-				Spectating:   true,
-			},
+		if sendEvent {
+			ev := &bgammon.EventBoard{
+				GameState: bgammon.GameState{
+					Game:         gs.Game.Copy(),
+					PlayerNumber: 1,
+					Available:    gs.Available,
+					Spectating:   true,
+				},
+			}
+			g.Client.Events <- ev
 		}
-		g.Client.Events <- ev
 
 		timestamp, err := strconv.ParseInt(string(split[1]), 10, 64)
 		if err != nil {
 			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
 			return false
 		}
-		l(fmt.Sprintf("*** Replaying %s vs. %s (%s)", gs.Player1.Name, gs.Player2.Name, time.Unix(timestamp, 0).Format("2006-01-02 15:04")))
+		gs.Started = time.Unix(timestamp, 0)
+		gs.Ended = gs.Started
 	case bytes.Equal(split[0], []byte("1")), bytes.Equal(split[0], []byte("2")):
 		if len(split) < 3 {
 			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
@@ -1481,33 +1497,39 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int)
 				gs.Turn = player
 				gs.Available = nil
 				gs.Moves = nil
-				ev := &bgammon.EventBoard{
-					GameState: bgammon.GameState{
-						Game:         gs.Game.Copy(),
-						PlayerNumber: 1,
-						Available:    gs.Available,
-						Spectating:   true,
-					},
+				if sendEvent {
+					ev := &bgammon.EventBoard{
+						GameState: bgammon.GameState{
+							Game:         gs.Game.Copy(),
+							PlayerNumber: 1,
+							Available:    gs.Available,
+							Spectating:   true,
+						},
+					}
+					g.Client.Events <- ev
 				}
-				g.Client.Events <- ev
 			}
 
 			playerName := gs.Player1.Name
 			if player == 2 {
 				playerName = gs.Player2.Name
 			}
-			ev := &bgammon.EventRolled{
-				Roll1: r1,
-				Roll2: r2,
-			}
-			ev.Player = playerName
-			g.Client.Events <- ev
-			gs.Roll1, gs.Roll2 = r1, r2
 
+			if sendEvent {
+				ev := &bgammon.EventRolled{
+					Roll1: r1,
+					Roll2: r2,
+				}
+				ev.Player = playerName
+				g.Client.Events <- ev
+			}
+
+			gs.Roll1, gs.Roll2 = r1, r2
 			gs.Turn = player
 			gs.Available = gs.LegalMoves(true)
 			gs.Moves = nil
-			{
+
+			if sendEvent {
 				ev := &bgammon.EventBoard{
 					GameState: bgammon.GameState{
 						Game:         gs.Game.Copy(),
@@ -1540,11 +1562,13 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int)
 				if to == bgammon.SpaceHomePlayer && player == 2 {
 					to = bgammon.SpaceHomeOpponent
 				}
-				ev := &bgammon.EventMoved{
-					Moves: [][]int{{from, to}},
+				if sendEvent {
+					ev := &bgammon.EventMoved{
+						Moves: [][]int{{from, to}},
+					}
+					ev.Player = playerName
+					g.Client.Events <- ev
 				}
-				ev.Player = playerName
-				g.Client.Events <- ev
 				ok, _ := gs.AddMoves([][]int{{from, to}}, false)
 				if !ok {
 					log.Panicf("failed to move checkers during replay from %d to %d", from, to)
@@ -1589,14 +1613,16 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int)
 					}
 				}
 
-				ev := &bgammon.EventWin{
-					Points: winPoints * gs.DoubleValue,
+				if sendEvent {
+					ev := &bgammon.EventWin{
+						Points: winPoints * gs.DoubleValue,
+					}
+					ev.Player = playerName
+					g.Client.Events <- ev
 				}
-				ev.Player = playerName
-				g.Client.Events <- ev
 			}
 
-			{
+			if sendEvent {
 				ev := &bgammon.EventBoard{
 					GameState: bgammon.GameState{
 						Game:         gs.Game.Copy(),
@@ -1618,6 +1644,37 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int)
 	return true
 }
 
+func (g *Game) showReplayFrame(replayFrame int, showInfo bool) {
+	if !g.replay || replayFrame < 0 || replayFrame >= len(g.replayFrames) {
+		return
+	}
+
+	if g.needLayoutBoard {
+		g.layoutBoard()
+	}
+
+	if replayFrame == 1 && showInfo {
+		g.Board.recreateUIGrid()
+	}
+
+	g.replayFrame = replayFrame
+	frame := g.replayFrames[replayFrame]
+
+	ev := &bgammon.EventBoard{
+		GameState: bgammon.GameState{
+			Game:         frame.Game.Copy(),
+			PlayerNumber: 1,
+			Available:    frame.Game.LegalMoves(true),
+			Spectating:   true,
+		},
+	}
+	g.Client.Events <- ev
+
+	if replayFrame == 1 && showInfo {
+		l(fmt.Sprintf("*** Replaying %s vs. %s (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, frame.Game.Started.Format("2006-01-02 15:04")))
+	}
+}
+
 func (g *Game) HandleReplay(replay []byte) {
 	g.Lock()
 	if g.replay {
@@ -1625,6 +1682,8 @@ func (g *Game) HandleReplay(replay []byte) {
 		return
 	}
 	g.replay = true
+	g.replayFrame = 0
+	g.replayFrames = g.replayFrames[:0]
 	g.Unlock()
 
 	if !g.loggedIn {
@@ -1632,22 +1691,74 @@ func (g *Game) HandleReplay(replay []byte) {
 		time.Sleep(500 * time.Millisecond)
 	}
 
-	gs := &bgammon.GameState{}
+	gs := &bgammon.GameState{
+		Game: bgammon.NewGame(false),
+	}
+
+	g.replaySummary1 = g.replaySummary1[:0]
+	g.replaySummary2 = g.replaySummary2[:0]
+	var haveRoll bool
+	var wrote1 bool
+	var wrote2 bool
 
 	var lineNumber int
 	scanner := bufio.NewScanner(bytes.NewReader(replay))
 	for scanner.Scan() {
+		if !bytes.HasPrefix(scanner.Bytes(), []byte("bgammon-reply")) && !bytes.HasPrefix(scanner.Bytes(), []byte("i ")) {
+			g.replayFrames = append(g.replayFrames, &replayFrame{
+				Game:  gs.Game.Copy(),
+				Event: scanner.Bytes(),
+			})
+		}
 		lineNumber++
-		if !g._handleReplay(gs, scanner.Bytes(), lineNumber) {
+		if !g._handleReplay(gs, scanner.Bytes(), lineNumber, false, false) {
 			return
 		}
-		if lineNumber != 1 {
-			time.Sleep(3 * time.Second)
+
+		if bytes.HasPrefix(scanner.Bytes(), []byte("1 r ")) || bytes.HasPrefix(scanner.Bytes(), []byte("2 r ")) {
+			player := 1
+			if bytes.HasPrefix(scanner.Bytes(), []byte("2")) {
+				player = 2
+			}
+
+			if player == 1 {
+				if wrote1 {
+					g.replaySummary1 = append(g.replaySummary1, '\n')
+				}
+				g.replaySummary1 = append(g.replaySummary1, scanner.Bytes()[4:]...)
+				haveRoll = true
+				wrote1 = true
+			} else {
+				if wrote2 {
+					g.replaySummary2 = append(g.replaySummary2, '\n')
+				}
+				g.replaySummary2 = append(g.replaySummary2, scanner.Bytes()[4:]...)
+				wrote2 = true
+				if !haveRoll {
+					g.replaySummary1 = append(g.replaySummary1, '\n')
+					haveRoll = true
+				}
+			}
 		}
 	}
 	if scanner.Err() != nil {
 		log.Printf("warning: failed to read replay: %s", scanner.Err())
+		return
 	}
+
+	if len(g.replayFrames) < 2 {
+		log.Printf("warning: failed to read replay: no frames were loaded")
+		return
+	}
+
+	g.replayFrames = append(g.replayFrames, &replayFrame{
+		Game:  gs.Game.Copy(),
+		Event: nil,
+	})
+
+	g.Lock()
+	g.showReplayFrame(1, true)
+	g.Unlock()
 }
 
 func (g *Game) Connect() {
@@ -2452,6 +2563,11 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 	g.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
 
+	if g.LoadReplay != nil {
+		go g.HandleReplay(g.LoadReplay)
+		g.LoadReplay = nil
+	}
+
 	return outsideWidth, outsideHeight
 }
 
@@ -2543,7 +2659,7 @@ var (
 )
 
 func playSoundEffect(effect SoundEffect) {
-	if game.volume == 0 {
+	if game.volume == 0 || game.replay {
 		return
 	}
 
