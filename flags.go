@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"code.rocket9labs.com/tslocum/boxcars/game"
 	"golang.org/x/text/language"
@@ -62,6 +63,14 @@ func parseFlags() *game.Game {
 		go func() {
 			log.Fatal(http.ListenAndServe(fmt.Sprintf("localhost:%d", debug), nil))
 		}()
+	}
+
+	if len(flag.Args()) > 0 {
+		replay, err := os.ReadFile(flag.Arg(0))
+		if err != nil {
+			log.Fatalf("failed to open replay file %s: %s", flag.Arg(0), err)
+		}
+		go g.HandleReplay(replay)
 	}
 
 	return g

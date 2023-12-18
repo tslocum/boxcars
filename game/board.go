@@ -672,7 +672,14 @@ func (b *board) cancelLeaveGame() error {
 }
 
 func (b *board) confirmLeaveGame() error {
-	b.Client.Out <- []byte("leave")
+	if game.replay {
+		game.replay = false
+		ev := &bgammon.EventLeft{}
+		ev.Player = b.Client.Username
+		b.Client.Events <- ev
+	} else {
+		b.Client.Out <- []byte("leave")
+	}
 	return nil
 }
 

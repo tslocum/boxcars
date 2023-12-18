@@ -1,6 +1,7 @@
 package game
 
 import (
+	"bufio"
 	"bytes"
 	"embed"
 	"fmt"
@@ -15,6 +16,7 @@ import (
 	"path"
 	"regexp"
 	"runtime/pprof"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -615,6 +617,8 @@ type Game struct {
 
 	showRegister bool
 	showReset    bool
+
+	replay bool
 
 	*sync.Mutex
 }
@@ -1317,6 +1321,8 @@ func (g *Game) handleEvent(e interface{}) {
 		b.updatePlayerLabel()
 		b.updateOpponentLabel()
 		b.Unlock()
+	case *bgammon.EventReplay:
+		go game.HandleReplay(ev.Content)
 	case *bgammon.EventPing:
 		g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
 	default:
@@ -1332,6 +1338,307 @@ func (g *Game) handleEvents() {
 		g.Board.Unlock()
 		g.handleEvent(e)
 		g.Unlock()
+	}
+}
+
+func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int) bool {
+	g.Lock()
+	defer g.Unlock()
+
+	if !g.replay {
+		return false
+	}
+
+	split := bytes.Split(line, []byte(" "))
+	if len(split) < 2 {
+		log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+		return false
+	}
+	switch {
+	case bytes.Equal(split[0], []byte("bgammon-replay")):
+		return true
+	case bytes.Equal(split[0], []byte("i")):
+		if len(split) < 10 {
+			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+			return false
+		}
+
+		{
+			ev := &bgammon.EventJoined{
+				GameID: 1,
+			}
+			ev.PlayerNumber = 1
+			ev.Player = game.Client.Username
+			g.Client.Events <- ev
+		}
+
+		acey, err := strconv.Atoi(string(split[9]))
+		if err != nil || acey < 0 || acey > 1 {
+			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+			return false
+		}
+
+		*gs = bgammon.GameState{
+			Game: bgammon.NewGame(acey == 1),
+		}
+		gs.PlayerNumber = 1
+		gs.Spectating = true
+		gs.Turn = 0
+
+		gs.Player1.Name, gs.Player2.Name = string(split[2]), string(split[3])
+
+		gs.Points, err = strconv.Atoi(string(split[4]))
+		if err != nil || gs.Points < 1 {
+			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+			return false
+		}
+
+		gs.Player1.Points, err = strconv.Atoi(string(split[5]))
+		if err != nil || gs.Player1.Points < 0 {
+			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+			return false
+		}
+
+		gs.Player2.Points, err = strconv.Atoi(string(split[6]))
+		if err != nil || gs.Player1.Points < 0 {
+			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+			return false
+		}
+
+		ev := &bgammon.EventBoard{
+			GameState: bgammon.GameState{
+				Game:         gs.Game.Copy(),
+				PlayerNumber: 1,
+				Available:    gs.Available,
+				Spectating:   true,
+			},
+		}
+		g.Client.Events <- ev
+
+		timestamp, err := strconv.ParseInt(string(split[1]), 10, 64)
+		if err != nil {
+			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+			return false
+		}
+		l(fmt.Sprintf("*** Replaying %s vs. %s (%s)", gs.Player1.Name, gs.Player2.Name, time.Unix(timestamp, 0).Format("2006-01-02 15:04")))
+	case bytes.Equal(split[0], []byte("1")), bytes.Equal(split[0], []byte("2")):
+		if len(split) < 3 {
+			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+			return false
+		}
+		player := 1
+		if bytes.Equal(split[0], []byte("2")) {
+			player = 2
+		}
+		switch {
+		case bytes.Equal(split[1], []byte("d")):
+			if len(split) < 4 {
+				log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+				return false
+			}
+			doubleValue, err := strconv.Atoi(string(split[2]))
+			if err != nil || doubleValue < 2 {
+				log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+				return false
+			}
+			resultValue, err := strconv.Atoi(string(split[3]))
+			if err != nil || resultValue < 0 || resultValue > 1 {
+				log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+				return false
+			}
+			resultText := "accepts"
+			if resultValue == 0 {
+				resultText = "declines"
+			}
+			l(fmt.Sprintf("*** %s offers a double (%d points). %s %s.", gs.Player1.Name, doubleValue, gs.Player2.Name, resultText))
+		case bytes.Equal(split[1], []byte("r")):
+			rollSplit := bytes.Split(split[2], []byte("-"))
+			if len(rollSplit) != 2 || len(rollSplit[0]) != 1 || len(rollSplit[1]) != 1 {
+				log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+				return false
+			}
+			r1, err := strconv.Atoi(string(rollSplit[0]))
+			if err != nil || r1 < 1 || r1 > 6 {
+				log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+				return false
+			}
+			r2, err := strconv.Atoi(string(rollSplit[1]))
+			if err != nil || r2 < 1 || r2 > 6 {
+				log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+				return false
+			}
+
+			gs.Moves = nil
+			if gs.Turn == 0 {
+				gs.Turn = player
+				gs.Available = nil
+				gs.Moves = nil
+				ev := &bgammon.EventBoard{
+					GameState: bgammon.GameState{
+						Game:         gs.Game.Copy(),
+						PlayerNumber: 1,
+						Available:    gs.Available,
+						Spectating:   true,
+					},
+				}
+				g.Client.Events <- ev
+			}
+
+			playerName := gs.Player1.Name
+			if player == 2 {
+				playerName = gs.Player2.Name
+			}
+			ev := &bgammon.EventRolled{
+				Roll1: r1,
+				Roll2: r2,
+			}
+			ev.Player = playerName
+			g.Client.Events <- ev
+			gs.Roll1, gs.Roll2 = r1, r2
+
+			gs.Turn = player
+			gs.Available = gs.LegalMoves(true)
+			gs.Moves = nil
+			{
+				ev := &bgammon.EventBoard{
+					GameState: bgammon.GameState{
+						Game:         gs.Game.Copy(),
+						PlayerNumber: 1,
+						Available:    gs.Available,
+						Spectating:   true,
+					},
+				}
+				g.Client.Events <- ev
+			}
+
+			if len(split) == 3 {
+				return true
+			}
+			for _, move := range split[3:] {
+				moveSplit := bytes.Split(move, []byte("/"))
+				if len(moveSplit) != 2 || len(moveSplit[0]) > 3 || len(moveSplit[1]) > 3 {
+					log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+					return false
+				}
+				from, to := bgammon.ParseSpace(string(moveSplit[0])), bgammon.ParseSpace(string(moveSplit[1]))
+				if from < 0 || to < 0 || from == to {
+					log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+					return false
+				} else if from == bgammon.SpaceBarPlayer && player == 2 {
+					from = bgammon.SpaceBarOpponent
+				} else if from == bgammon.SpaceHomePlayer && player == 2 {
+					from = bgammon.SpaceHomeOpponent
+				}
+				if to == bgammon.SpaceHomePlayer && player == 2 {
+					to = bgammon.SpaceHomeOpponent
+				}
+				ev := &bgammon.EventMoved{
+					Moves: [][]int{{from, to}},
+				}
+				ev.Player = playerName
+				g.Client.Events <- ev
+				ok, _ := gs.AddMoves([][]int{{from, to}}, false)
+				if !ok {
+					log.Panicf("failed to move checkers during replay from %d to %d", from, to)
+				}
+			}
+
+			if gs.Winner != 0 {
+				playerBar := bgammon.SpaceBarPlayer
+				opponentHome := bgammon.SpaceHomeOpponent
+				opponent := 2
+				if player == 2 {
+					playerBar = bgammon.SpaceBarOpponent
+					opponentHome = bgammon.SpaceHomePlayer
+					opponent = 1
+				}
+
+				backgammon := bgammon.PlayerCheckers(gs.Board[playerBar], opponent) != 0
+				if !backgammon {
+					homeStart, homeEnd := bgammon.HomeRange(gs.Winner)
+					bgammon.IterateSpaces(homeStart, homeEnd, gs.Acey, func(space, spaceCount int) {
+						if bgammon.PlayerCheckers(gs.Board[space], opponent) != 0 {
+							backgammon = true
+						}
+					})
+				}
+
+				var winPoints int
+				if !gs.Acey {
+					if backgammon {
+						winPoints = 3 // Award backgammon.
+					} else if gs.Board[opponentHome] == 0 {
+						winPoints = 2 // Award gammon.
+					} else {
+						winPoints = 1
+					}
+				} else {
+					for space := 0; space < bgammon.BoardSpaces; space++ {
+						if (space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent) && ((opponent == 1 && gs.Player1.Entered) || (opponent == 2 && gs.Player2.Entered)) {
+							continue
+						}
+						winPoints += bgammon.PlayerCheckers(gs.Board[space], opponent)
+					}
+				}
+
+				ev := &bgammon.EventWin{
+					Points: winPoints * gs.DoubleValue,
+				}
+				ev.Player = playerName
+				g.Client.Events <- ev
+			}
+
+			{
+				ev := &bgammon.EventBoard{
+					GameState: bgammon.GameState{
+						Game:         gs.Game.Copy(),
+						PlayerNumber: 1,
+						Available:    gs.Available,
+						Spectating:   true,
+					},
+				}
+				g.Client.Events <- ev
+			}
+		default:
+			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+			return false
+		}
+	default:
+		log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+		return false
+	}
+	return true
+}
+
+func (g *Game) HandleReplay(replay []byte) {
+	g.Lock()
+	if g.replay {
+		g.Unlock()
+		return
+	}
+	g.replay = true
+	g.Unlock()
+
+	if !g.loggedIn {
+		go g.playOffline()
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	gs := &bgammon.GameState{}
+
+	var lineNumber int
+	scanner := bufio.NewScanner(bytes.NewReader(replay))
+	for scanner.Scan() {
+		lineNumber++
+		if !g._handleReplay(gs, scanner.Bytes(), lineNumber) {
+			return
+		}
+		if lineNumber != 1 {
+			time.Sleep(3 * time.Second)
+		}
+	}
+	if scanner.Err() != nil {
+		log.Printf("warning: failed to read replay: %s", scanner.Err())
 	}
 }
 
