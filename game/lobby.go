@@ -108,7 +108,7 @@ func NewLobby() *lobby {
 
 	l := &lobby{
 		refresh:     true,
-		fontFace:    mediumFont,
+		fontFace:    largeFont,
 		buttonsGrid: etk.NewGrid(),
 	}
 	l.fontUpdated()
@@ -365,9 +365,15 @@ func (l *lobby) drawBuffer() {
 		fontMutex.Lock()
 		defer fontMutex.Unlock()
 
-		text.Draw(img, colA, l.fontFace, 4, l.lineOffset, labelColor)
-		text.Draw(img, colB, l.fontFace, 250, l.lineOffset, labelColor)
-		text.Draw(img, colC, l.fontFace, 500, l.lineOffset, labelColor)
+		const (
+			indentA = 4
+			indentB = 200
+			indentC = 350
+		)
+
+		text.Draw(img, colA, l.fontFace, indentA, l.lineOffset, labelColor)
+		text.Draw(img, colB, l.fontFace, indentB, l.lineOffset, labelColor)
+		text.Draw(img, colC, l.fontFace, indentC, l.lineOffset, labelColor)
 
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(cx, cy)
