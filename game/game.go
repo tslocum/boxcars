@@ -470,7 +470,6 @@ func setViewBoard(view bool) {
 		game.lobby.showCreateGame = false
 		game.lobby.createGameName.Field.SetText("")
 		game.lobby.createGamePassword.Field.SetText("")
-		game.lobby.bufferDirty = true
 		game.lobby.rebuildButtonsGrid()
 
 		etk.SetRoot(game.Board.frame)
@@ -1005,10 +1004,41 @@ func NewGame() *Game {
 
 		g.lobby.rebuildButtonsGrid()
 
+		dividerLine := etk.NewBox()
+		dividerLine.SetBackground(bufferTextColor)
+
+		dividerGrid := etk.NewGrid()
+		dividerGrid.SetRowSizes(4, 2, 4)
+		dividerGrid.AddChildAt(dividerLine, 0, 1, 1, 1)
+		dividerGrid.AddChildAt(etk.NewBox(), 0, 2, 1, 1)
+
+		statusLabel := newCenteredText(gotext.Get("Status"))
+		statusLabel.SetFollow(false)
+		statusLabel.SetScrollBarVisible(false)
+		pointsLabel := newCenteredText(gotext.Get("Points"))
+		pointsLabel.SetFollow(false)
+		pointsLabel.SetScrollBarVisible(false)
+		nameLabel := newCenteredText(gotext.Get("Name"))
+		nameLabel.SetFollow(false)
+		nameLabel.SetScrollBarVisible(false)
+
+		indentA, indentB := lobbyIndentA, lobbyIndentB
+		if defaultFontSize == extraLargeFontSize {
+			indentA, indentB = int(float64(indentA)*1.3), int(float64(indentB)*1.3)
+		}
+
+		headerGrid := etk.NewGrid()
+		headerGrid.SetColumnSizes(indentA, indentB-indentA, -1)
+		headerGrid.AddChildAt(statusLabel, 0, 0, 1, 1)
+		headerGrid.AddChildAt(pointsLabel, 1, 0, 1, 1)
+		headerGrid.AddChildAt(nameLabel, 2, 0, 1, 1)
+
 		listGamesContainer = etk.NewGrid()
-		listGamesContainer.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
-		listGamesContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
-		listGamesContainer.AddChildAt(g.lobby.buttonsGrid, 0, 2, 1, 1)
+		listGamesContainer.AddChildAt(headerGrid, 0, 0, 1, 1)
+		listGamesContainer.AddChildAt(dividerGrid, 0, 1, 1, 1)
+		listGamesContainer.AddChildAt(g.lobby.availableMatchesList, 0, 2, 1, 1)
+		listGamesContainer.AddChildAt(statusBuffer, 0, 3, 1, 1)
+		listGamesContainer.AddChildAt(g.lobby.buttonsGrid, 0, 4, 1, 1)
 
 		listGamesFrame.SetPositionChildren(true)
 		listGamesFrame.AddChild(listGamesContainer)
@@ -1112,7 +1142,7 @@ func (g *Game) setBufferRects() {
 
 	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
-	listGamesContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
+	listGamesContainer.SetRowSizes(g.lobby.itemHeight, 10, -1, statusBufferHeight, g.lobby.buttonBarHeight)
 }
 
 func (g *Game) handleAutoRefresh() {
@@ -2232,8 +2262,6 @@ func (g *Game) Update() error {
 	}
 
 	if !viewBoard {
-		g.lobby.update()
-
 		if g.lobby.showCreateGame || g.lobby.showJoinGame {
 			if g.lobby.showCreateGame {
 				if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
@@ -2329,9 +2357,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	if !viewBoard { // Lobby
-		g.lobby.draw(screen)
-	} else { // Game board
+	if viewBoard {
 		g.Board.Draw(screen)
 	}
 
@@ -2408,14 +2434,6 @@ func (g *Game) layoutConnect() {
 
 func (g *Game) layoutLobby() {
 	g.needLayoutLobby = false
-
-	if g.portraitView() { // Portrait view.
-		g.lobby.fullscreen = true
-		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
-	} else { // Landscape view.
-		g.lobby.fullscreen = true
-		g.lobby.setRect(0, 0, g.screenW, g.screenH-lobbyStatusBufferHeight-g.lobby.buttonBarHeight)
-	}
 
 	g.lobby.buttonBarHeight = g.scale(baseButtonHeight)
 	g.setBufferRects()
