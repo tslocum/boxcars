@@ -122,7 +122,6 @@ var (
 	resetGrid      *etk.Grid
 	createGameGrid *etk.Grid
 	joinGameGrid   *etk.Grid
-	historyGrid    *etk.Grid
 
 	createGameContainer *etk.Grid
 	joinGameContainer   *etk.Grid
@@ -634,6 +633,8 @@ type Game struct {
 	showRegister bool
 	showReset    bool
 
+	downloadReplay int
+
 	replay         bool
 	replayFrame    int
 	replayFrames   []*replayFrame
@@ -1036,10 +1037,15 @@ func NewGame() *Game {
 			return false
 		})
 		centerInput(g.lobby.historyUsername)
+		g.lobby.historyUsername.Field.SetScrollBarVisible(false)
 
 		searchButton := etk.NewButton("Search", g.selectHistorySearch)
 
-		g.lobby.historyList = etk.NewList(48, nil)
+		itemHeight := 48
+		if defaultFontSize == extraLargeFontSize {
+			itemHeight = 72
+		}
+		g.lobby.historyList = etk.NewList(itemHeight, g.lobby.selectHistory)
 		g.lobby.historyList.SetColumnSizes(int(float64(indentA)*1.25), int(float64(indentB)*1.25)-int(float64(indentA)*1.25), -1)
 		g.lobby.historyList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
 
@@ -1434,6 +1440,14 @@ func (g *Game) handleEvent(e interface{}) {
 		b.updateOpponentLabel()
 		b.Unlock()
 	case *bgammon.EventReplay:
+		if game.downloadReplay == ev.ID {
+			err := saveReplay(ev.ID, ev.Content)
+			if err != nil {
+				l("*** " + gotext.Get("Failed to download replay: %s", err))
+			}
+			game.downloadReplay = 0
+			return
+		}
 		go game.HandleReplay(ev.Content)
 	case *bgammon.EventHistory:
 		game.lobby.historyMatches = ev.Matches
@@ -2163,11 +2177,13 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 		}
 	}
 
-	if !viewBoard && (g.lobby.showCreateGame || g.lobby.showJoinGame) {
+	if !viewBoard && (g.lobby.showCreateGame || g.lobby.showJoinGame || g.lobby.showHistory) {
 		for _, key := range keys {
 			if key == ebiten.KeyEnter || key == ebiten.KeyKPEnter {
 				if g.lobby.showCreateGame {
 					g.lobby.confirmCreateGame()
+				} else if g.lobby.showHistory {
+					g.selectHistorySearch()
 				} else {
 					g.lobby.confirmJoinGame()
 				}
@@ -2709,6 +2725,15 @@ func acceptInput(text string) (handled bool) {
 
 	if text[0] == '/' {
 		text = text[1:]
+		if strings.ToLower(text) == "download" {
+			if game.downloadReplay == 0 {
+				game.downloadReplay = -1
+				game.Client.Out <- []byte("replay")
+			} else {
+				l("*** Replay download already in progress.")
+			}
+			return true
+		}
 	} else {
 		l(fmt.Sprintf("<%s> %s", game.Client.Username, text))
 		text = "say " + text

@@ -46,3 +46,8 @@ func saveUsername(username string) {
 	document := js.Global().Get("document")
 	document.Set("cookie", fmt.Sprintf("boxcars_username=%s; path=/", username))
 }
+
+func saveReplay(id int, content []byte) error {
+	l(fmt.Sprintf("*** To download this replay visit https://bgammon.org/match/%d", id))
+	return nil
+}

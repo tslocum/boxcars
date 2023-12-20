@@ -4,6 +4,7 @@ package game
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -61,11 +62,11 @@ func focused() bool {
 }
 
 func loadUsername() string {
-	config := configPath()
-	if config == "" {
+	configDir := userConfigDir()
+	if configDir == "" {
 		return ""
 	}
-	buf, err := os.ReadFile(config)
+	buf, err := os.ReadFile(path.Join(configDir, "config"))
 	if err != nil {
 		return ""
 	}
@@ -73,18 +74,23 @@ func loadUsername() string {
 }
 
 func saveUsername(username string) {
-	config := configPath()
-	if config == "" {
+	configDir := userConfigDir()
+	if configDir == "" {
 		return
 	}
-	_ = os.MkdirAll(filepath.Dir(config), 0700)
-	_ = os.WriteFile(config, []byte(username), 0600)
+	_ = os.MkdirAll(filepath.Dir(configDir), 0700)
+	_ = os.WriteFile(path.Join(configDir, "config"), []byte(username), 0600)
 }
 
-func configPath() string {
+func userConfigDir() string {
 	configDir, err := os.UserConfigDir()
 	if err != nil {
 		return ""
 	}
-	return path.Join(configDir, "boxcars", "config")
+	return path.Join(configDir, "boxcars")
+}
+
+func saveReplay(id int, content []byte) error {
+	l(fmt.Sprintf("*** To download this replay visit https://bgammon.org/match/%d", id))
+	return nil
 }

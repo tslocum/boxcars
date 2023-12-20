@@ -73,10 +73,12 @@ type lobby struct {
 	joinGameLabel    *etk.Text
 	joinGamePassword *etk.Input
 
-	showHistory     bool
-	historyMatches  []*bgammon.HistoryMatch
-	historyUsername *etk.Input
-	historyList     *etk.List
+	showHistory      bool
+	historySelected  int
+	historyLastClick time.Time
+	historyMatches   []*bgammon.HistoryMatch
+	historyUsername  *etk.Input
+	historyList      *etk.List
 
 	availableMatchesList *etk.List
 
@@ -278,7 +280,15 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				l.rebuildButtonsGrid()
 				game.setRoot(listGamesFrame)
 			case lobbyButtonHistoryDownload:
-				// TODO
+				if game.downloadReplay != 0 {
+					return nil
+				}
+				_, selected := l.historyList.SelectedItem()
+				if selected >= 0 && selected < len(l.historyMatches) {
+					match := l.historyMatches[selected]
+					game.downloadReplay = match.ID
+					game.Client.Out <- []byte(fmt.Sprintf("replay %d", match.ID))
+				}
 			case lobbyButtonHistoryView:
 				_, selected := l.historyList.SelectedItem()
 				if selected >= 0 && selected < len(l.historyMatches) {
@@ -378,5 +388,24 @@ func (l *lobby) selectMatch(index int) bool {
 
 	l.lastClick = time.Now()
 	l.selected = index
+	return true
+}
+
+func (l *lobby) selectHistory(index int) bool {
+	if index < 0 || index >= len(l.historyMatches) {
+		return false
+	}
+	const doubleClickDuration = 200 * time.Millisecond
+	if l.historySelected == index && l.historySelected >= 0 && l.historySelected < len(l.historyMatches) {
+		if time.Since(l.historyLastClick) <= doubleClickDuration {
+			match := l.historyMatches[l.historySelected]
+			l.c.Out <- []byte(fmt.Sprintf("replay %d", match.ID))
+			l.historyLastClick = time.Time{}
+			return true
+		}
+	}
+
+	l.historyLastClick = time.Now()
+	l.historySelected = index
 	return true
 }
