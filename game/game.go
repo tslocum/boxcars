@@ -636,6 +636,7 @@ type Game struct {
 	downloadReplay int
 
 	replay         bool
+	replayData     []byte
 	replayFrame    int
 	replayFrames   []*replayFrame
 	replaySummary1 []byte
@@ -1811,6 +1812,7 @@ func (g *Game) HandleReplay(replay []byte) {
 	g.replay = true
 	g.replayFrame = 0
 	g.replayFrames = g.replayFrames[:0]
+	g.replayData = replay
 	g.Unlock()
 
 	if !g.loggedIn {
@@ -2726,11 +2728,18 @@ func acceptInput(text string) (handled bool) {
 	if text[0] == '/' {
 		text = text[1:]
 		if strings.ToLower(text) == "download" {
-			if game.downloadReplay == 0 {
-				game.downloadReplay = -1
-				game.Client.Out <- []byte("replay")
+			if game.replay {
+				err := saveReplay(-1, game.replayData)
+				if err != nil {
+					l("*** " + gotext.Get("Failed to download replay: %s", err))
+				}
 			} else {
-				l("*** Replay download already in progress.")
+				if game.downloadReplay == 0 {
+					game.downloadReplay = -1
+					game.Client.Out <- []byte("replay")
+				} else {
+					l("*** Replay download already in progress.")
+				}
 			}
 			return true
 		}

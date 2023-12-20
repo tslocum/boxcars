@@ -48,6 +48,9 @@ func saveUsername(username string) {
 }
 
 func saveReplay(id int, content []byte) error {
+	if id <= 0 {
+		return nil
+	}
 	l(fmt.Sprintf("*** To download this replay visit https://bgammon.org/match/%d", id))
 	return nil
 }
