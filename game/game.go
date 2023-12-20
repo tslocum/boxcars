@@ -122,13 +122,16 @@ var (
 	resetGrid      *etk.Grid
 	createGameGrid *etk.Grid
 	joinGameGrid   *etk.Grid
+	historyGrid    *etk.Grid
 
 	createGameContainer *etk.Grid
 	joinGameContainer   *etk.Grid
+	historyContainer    *etk.Grid
 	listGamesContainer  *etk.Grid
 
 	createGameFrame *etk.Frame
 	joinGameFrame   *etk.Frame
+	historyFrame    *etk.Frame
 	listGamesFrame  *etk.Frame
 )
 
@@ -483,6 +486,8 @@ func setViewBoard(view bool) {
 			game.setRoot(createGameFrame)
 		} else if game.lobby.showJoinGame {
 			game.setRoot(joinGameFrame)
+		} else if game.lobby.showHistory {
+			game.setRoot(historyFrame)
 		} else {
 			game.setRoot(listGamesFrame)
 		}
@@ -492,6 +497,11 @@ func setViewBoard(view bool) {
 		game.Board.leaveGameGrid.SetVisible(false)
 
 		statusBuffer.SetRect(statusBuffer.Rect())
+
+		game.Board.playerRoll1, game.Board.playerRoll2 = 0, 0
+		game.Board.playerRollStale = false
+		game.Board.opponentRoll1, game.Board.opponentRoll2 = 0, 0
+		game.Board.opponentRollStale = false
 	}
 
 	if refreshLobby && game.Client != nil {
@@ -1000,17 +1010,65 @@ func NewGame() *Game {
 	}
 
 	{
-		listGamesFrame = etk.NewFrame()
+		historyFrame = etk.NewFrame()
 
 		g.lobby.rebuildButtonsGrid()
 
 		dividerLine := etk.NewBox()
 		dividerLine.SetBackground(bufferTextColor)
 
-		dividerGrid := etk.NewGrid()
-		dividerGrid.SetRowSizes(4, 2, 4)
-		dividerGrid.AddChildAt(dividerLine, 0, 1, 1, 1)
-		dividerGrid.AddChildAt(etk.NewBox(), 0, 2, 1, 1)
+		dateLabel := newCenteredText(gotext.Get("Date"))
+		dateLabel.SetFollow(false)
+		dateLabel.SetScrollBarVisible(false)
+		resultLabel := newCenteredText(gotext.Get("Result"))
+		resultLabel.SetFollow(false)
+		resultLabel.SetScrollBarVisible(false)
+		opponentLabel := newCenteredText(gotext.Get("Opponent"))
+		opponentLabel.SetFollow(false)
+		opponentLabel.SetScrollBarVisible(false)
+
+		indentA, indentB := lobbyIndentA, lobbyIndentB
+		if defaultFontSize == extraLargeFontSize {
+			indentA, indentB = int(float64(indentA)*1.3), int(float64(indentB)*1.3)
+		}
+
+		g.lobby.historyUsername = etk.NewInput("", "", func(text string) (handled bool) {
+			return false
+		})
+		centerInput(g.lobby.historyUsername)
+
+		searchButton := etk.NewButton("Search", g.selectHistorySearch)
+
+		g.lobby.historyList = etk.NewList(48, nil)
+		g.lobby.historyList.SetColumnSizes(int(float64(indentA)*1.25), int(float64(indentB)*1.25)-int(float64(indentA)*1.25), -1)
+		g.lobby.historyList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
+
+		headerGrid := etk.NewGrid()
+		headerGrid.SetColumnSizes(int(float64(indentA)*1.25), int(float64(indentB)*1.25)-int(float64(indentA)*1.25), -1, 400, 200)
+		headerGrid.AddChildAt(dateLabel, 0, 0, 1, 1)
+		headerGrid.AddChildAt(resultLabel, 1, 0, 1, 1)
+		headerGrid.AddChildAt(opponentLabel, 2, 0, 1, 1)
+		headerGrid.AddChildAt(g.lobby.historyUsername, 3, 0, 1, 1)
+		headerGrid.AddChildAt(searchButton, 4, 0, 1, 1)
+
+		historyContainer = etk.NewGrid()
+		historyContainer.AddChildAt(headerGrid, 0, 0, 1, 1)
+		historyContainer.AddChildAt(dividerLine, 0, 1, 1, 1)
+		historyContainer.AddChildAt(g.lobby.historyList, 0, 2, 1, 1)
+		historyContainer.AddChildAt(statusBuffer, 0, 3, 1, 1)
+		historyContainer.AddChildAt(g.lobby.buttonsGrid, 0, 4, 1, 1)
+
+		historyFrame.SetPositionChildren(true)
+		historyFrame.AddChild(historyContainer)
+	}
+
+	{
+		listGamesFrame = etk.NewFrame()
+
+		g.lobby.rebuildButtonsGrid()
+
+		dividerLine := etk.NewBox()
+		dividerLine.SetBackground(bufferTextColor)
 
 		statusLabel := newCenteredText(gotext.Get("Status"))
 		statusLabel.SetFollow(false)
@@ -1027,15 +1085,19 @@ func NewGame() *Game {
 			indentA, indentB = int(float64(indentA)*1.3), int(float64(indentB)*1.3)
 		}
 
+		g.lobby.historyButton = etk.NewButton(gotext.Get("History"), game.selectHistory)
+		g.lobby.historyButton.SetVisible(false)
+
 		headerGrid := etk.NewGrid()
-		headerGrid.SetColumnSizes(indentA, indentB-indentA, -1)
+		headerGrid.SetColumnSizes(indentA, indentB-indentA, -1, 400)
 		headerGrid.AddChildAt(statusLabel, 0, 0, 1, 1)
 		headerGrid.AddChildAt(pointsLabel, 1, 0, 1, 1)
 		headerGrid.AddChildAt(nameLabel, 2, 0, 1, 1)
+		headerGrid.AddChildAt(g.lobby.historyButton, 3, 0, 1, 1)
 
 		listGamesContainer = etk.NewGrid()
 		listGamesContainer.AddChildAt(headerGrid, 0, 0, 1, 1)
-		listGamesContainer.AddChildAt(dividerGrid, 0, 1, 1, 1)
+		listGamesContainer.AddChildAt(dividerLine, 0, 1, 1, 1)
 		listGamesContainer.AddChildAt(g.lobby.availableMatchesList, 0, 2, 1, 1)
 		listGamesContainer.AddChildAt(statusBuffer, 0, 3, 1, 1)
 		listGamesContainer.AddChildAt(g.lobby.buttonsGrid, 0, 4, 1, 1)
@@ -1142,7 +1204,8 @@ func (g *Game) setBufferRects() {
 
 	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
-	listGamesContainer.SetRowSizes(g.lobby.itemHeight, 10, -1, statusBufferHeight, g.lobby.buttonBarHeight)
+	historyContainer.SetRowSizes(g.lobby.itemHeight, 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
+	listGamesContainer.SetRowSizes(g.lobby.itemHeight, 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
 }
 
 func (g *Game) handleAutoRefresh() {
@@ -1372,6 +1435,26 @@ func (g *Game) handleEvent(e interface{}) {
 		b.Unlock()
 	case *bgammon.EventReplay:
 		go game.HandleReplay(ev.Content)
+	case *bgammon.EventHistory:
+		game.lobby.historyMatches = ev.Matches
+		list := game.lobby.historyList
+		list.Clear()
+		if len(ev.Matches) == 0 {
+			scheduleFrame()
+			return
+		}
+		list.SetSelectionMode(etk.SelectRow)
+		for i, match := range ev.Matches {
+			result := "W"
+			if match.Winner == 2 {
+				result = "L"
+			}
+			list.AddChildAt(newCenteredText(time.Unix(match.Timestamp, 0).Format("2006-01-02")), 0, i)
+			list.AddChildAt(newCenteredText(result), 1, i)
+			list.AddChildAt(newCenteredText(match.Opponent), 2, i)
+		}
+		list.SetSelectedItem(0, 0)
+		scheduleFrame()
 	case *bgammon.EventPing:
 		g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
 	default:
@@ -1804,6 +1887,10 @@ func (g *Game) Connect() {
 	g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 
+	if g.Password != "" {
+		g.lobby.historyButton.SetVisible(true)
+	}
+
 	g.setRoot(listGamesFrame)
 
 	address := g.ServerAddress
@@ -1955,6 +2042,32 @@ func (g *Game) selectConnect() error {
 		g.ServerAddress = g.connectServer.Text()
 	}
 	g.Connect()
+	return nil
+}
+
+func (g *Game) searchMatches(username string) {
+	g.lobby.historyList.Clear()
+	g.lobby.historyList.SetSelectionMode(etk.SelectNone)
+	g.lobby.historyList.AddChildAt(newCenteredText(gotext.Get("Loading...")), 0, 0)
+	g.Client.Out <- []byte(fmt.Sprintf("history %s", username))
+}
+
+func (g *Game) selectHistory() error {
+	g.lobby.showHistory = true
+	g.setRoot(historyFrame)
+	g.lobby.historyUsername.Field.SetText(g.Client.Username)
+	g.searchMatches(g.Client.Username)
+	etk.SetFocus(g.lobby.historyUsername)
+	g.lobby.rebuildButtonsGrid()
+	return nil
+}
+
+func (g *Game) selectHistorySearch() error {
+	username := g.lobby.historyUsername.Text()
+	if strings.TrimSpace(username) == "" {
+		return nil
+	}
+	g.searchMatches(username)
 	return nil
 }
 

@@ -26,6 +26,12 @@ const (
 )
 
 const (
+	lobbyButtonHistoryCancel = iota
+	lobbyButtonHistoryDownload
+	lobbyButtonHistoryView
+)
+
+const (
 	lobbyIndentA = 200
 	lobbyIndentB = 350
 )
@@ -34,11 +40,10 @@ type lobbyButton struct {
 	label string
 }
 
-// TODO get button labels dynamically later as it needs to be after gotext loads
-
 var mainButtons []*lobbyButton
 var createButtons []*lobbyButton
 var cancelJoinButtons []*lobbyButton
+var historyButtons []*lobbyButton
 
 type lobby struct {
 	buttonBarHeight int
@@ -68,8 +73,14 @@ type lobby struct {
 	joinGameLabel    *etk.Text
 	joinGamePassword *etk.Input
 
+	showHistory     bool
+	historyMatches  []*bgammon.HistoryMatch
+	historyUsername *etk.Input
+	historyList     *etk.List
+
 	availableMatchesList *etk.List
 
+	historyButton      *etk.Button
 	showKeyboardButton *etk.Button
 	buttonsGrid        *etk.Grid
 	frame              *etk.Frame
@@ -92,6 +103,12 @@ func NewLobby() *lobby {
 		{gotext.Get("Join")},
 	}
 
+	historyButtons = []*lobbyButton{
+		{gotext.Get("Return")},
+		{gotext.Get("Download")},
+		{gotext.Get("View")},
+	}
+
 	itemHeight := 48
 	if defaultFontSize == extraLargeFontSize {
 		itemHeight = 72
@@ -111,6 +128,7 @@ func NewLobby() *lobby {
 	matchList.SetSelectionMode(etk.SelectRow)
 	matchList.SetColumnSizes(indentA, indentB-indentA, -1)
 	matchList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
+	matchList.AddChildAt(newCenteredText(gotext.Get("Loading...")), 0, 0)
 	l.availableMatchesList = matchList
 
 	l.showKeyboardButton = etk.NewButton(gotext.Get("Show Keyboard"), l.toggleKeyboard)
@@ -200,6 +218,8 @@ func (l *lobby) getButtons() []*lobbyButton {
 		return createButtons
 	} else if l.showJoinGame {
 		return cancelJoinButtons
+	} else if l.showHistory {
+		return historyButtons
 	}
 	return mainButtons
 }
@@ -251,8 +271,23 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				l.confirmJoinGame()
 			}
 			return nil
+		} else if l.showHistory {
+			switch buttonIndex {
+			case lobbyButtonCreateCancel:
+				l.showHistory = false
+				l.rebuildButtonsGrid()
+				game.setRoot(listGamesFrame)
+			case lobbyButtonHistoryDownload:
+				// TODO
+			case lobbyButtonHistoryView:
+				_, selected := l.historyList.SelectedItem()
+				if selected >= 0 && selected < len(l.historyMatches) {
+					match := l.historyMatches[selected]
+					game.Client.Out <- []byte(fmt.Sprintf("replay %d", match.ID))
+				}
+			}
+			return nil
 		}
-
 		switch buttonIndex {
 		case lobbyButtonRefresh:
 			l.refresh = true

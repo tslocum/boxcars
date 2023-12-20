@@ -61,7 +61,13 @@ msgstr ""
 msgid "Current"
 msgstr ""
 
+msgid "Date"
+msgstr ""
+
 msgid "Double"
+msgstr ""
+
+msgid "Download"
 msgstr ""
 
 msgid "Email"
@@ -85,6 +91,9 @@ msgstr ""
 msgid "Highlight legal moves"
 msgstr ""
 
+msgid "History"
+msgstr ""
+
 msgid "Join"
 msgstr ""
 
@@ -103,6 +112,9 @@ msgstr ""
 msgid "Legal moves: %s"
 msgstr ""
 
+msgid "Loading..."
+msgstr ""
+
 msgid "Logged in as guest"
 msgstr ""
 
@@ -115,10 +127,10 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-msgid "No matches available. Please create one."
+msgid "OK"
 msgstr ""
 
-msgid "OK"
+msgid "Opponent"
 msgstr ""
 
 msgid "Password"
@@ -152,6 +164,9 @@ msgid "Reset Password"
 msgstr ""
 
 msgid "Resign"
+msgstr ""
+
+msgid "Result"
 msgstr ""
 
 msgid "Return"
@@ -199,7 +214,13 @@ msgstr ""
 msgid "Variant"
 msgstr ""
 
+msgid "View"
+msgstr ""
+
 msgid "Warning: Received unknown event: %+v"
+msgstr ""
+
+msgid "Warning: Received unrecognized event from server."
 msgstr ""
 
 msgid "Yes"
