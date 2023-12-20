@@ -7,6 +7,7 @@ import (
 	"image/color"
 	"image/draw"
 	"log"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -870,7 +871,7 @@ func (b *board) selectReplayStart() error {
 
 	b.playerRoll1, b.playerRoll2 = 0, 0
 	b.opponentRoll1, b.opponentRoll2 = 0, 0
-	game.showReplayFrame(1, false)
+	game.showReplayFrame(0, false)
 	return nil
 }
 
@@ -888,8 +889,8 @@ func (b *board) selectReplayJumpBack() error {
 	b.opponentRoll1, b.opponentRoll2 = 0, 0
 	replayFrame := game.replayFrame
 	replayFrame--
-	if replayFrame < 1 {
-		replayFrame = 1
+	if replayFrame < 0 {
+		replayFrame = 0
 	}
 	game.showReplayFrame(replayFrame, false)
 	return nil
@@ -911,8 +912,8 @@ func (b *board) selectReplayStepBack() error {
 	b.opponentRoll1, b.opponentRoll2 = 0, 0
 	replayFrame := game.replayFrame
 	replayFrame--
-	if replayFrame < 1 {
-		replayFrame = 1
+	if replayFrame < 0 {
+		replayFrame = 0
 	}
 	game.showReplayFrame(replayFrame, false)
 	return nil
@@ -1181,7 +1182,7 @@ func (b *board) updateBackgroundImage() {
 	gc.Stroke()
 	// Inside right.
 	leftEdge := float64((b.innerW-int(b.barWidth))/2) + borderSize + b.barWidth
-	edge = leftEdge + float64((b.innerW-int(b.barWidth))/2)
+	edge = leftEdge + math.Ceil(float64((b.innerW-int(b.barWidth)))/2)
 	gc.MoveTo(leftEdge, float64(b.verticalBorderSize))
 	gc.LineTo(edge, float64(b.verticalBorderSize))
 	gc.LineTo(edge, float64(b.h-int(b.verticalBorderSize)))

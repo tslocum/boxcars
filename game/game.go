@@ -41,7 +41,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.1.9p1"
+const version = "v1.2.0"
 
 const MaxDebug = 2
 
@@ -1390,7 +1390,7 @@ func (g *Game) handleEvent(e interface{}) {
 		l(fmt.Sprintf("*** Failed to roll: %s", ev.Reason))
 	case *bgammon.EventMoved:
 		lg(gotext.Get("%s moved %s.", ev.Player, bgammon.FormatMoves(ev.Moves)))
-		if ev.Player == g.Client.Username {
+		if ev.Player == g.Client.Username && !g.Board.gameState.Spectating {
 			return
 		}
 		g.Board.Lock()
@@ -1781,7 +1781,7 @@ func (g *Game) showReplayFrame(replayFrame int, showInfo bool) {
 		g.layoutBoard()
 	}
 
-	if replayFrame == 1 && showInfo {
+	if replayFrame == 0 && showInfo {
 		g.Board.recreateUIGrid()
 	}
 
@@ -1798,7 +1798,7 @@ func (g *Game) showReplayFrame(replayFrame int, showInfo bool) {
 	}
 	g.Client.Events <- ev
 
-	if replayFrame == 1 && showInfo {
+	if replayFrame == 0 && showInfo {
 		l(fmt.Sprintf("*** Replaying %s vs. %s (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, frame.Game.Started.Format("2006-01-02 15:04")))
 	}
 }
@@ -1821,7 +1821,9 @@ func (g *Game) HandleReplay(replay []byte) {
 	}
 
 	gs := &bgammon.GameState{
-		Game: bgammon.NewGame(false),
+		Game:         bgammon.NewGame(false),
+		PlayerNumber: 1,
+		Spectating:   true,
 	}
 
 	g.replaySummary1 = g.replaySummary1[:0]
@@ -1886,7 +1888,7 @@ func (g *Game) HandleReplay(replay []byte) {
 	})
 
 	g.Lock()
-	g.showReplayFrame(1, true)
+	g.showReplayFrame(0, true)
 	g.Unlock()
 }
 
@@ -2668,6 +2670,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	floatStatusBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	gameBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	g.lobby.availableMatchesList.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	g.lobby.historyList.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 
 	{
 		scrollBarWidth := g.scale(32)
