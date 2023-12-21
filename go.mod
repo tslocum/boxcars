@@ -4,9 +4,9 @@ go 1.17
 
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231220024350-6d63fc5db3ee
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231219063647-0743647a120d
-	code.rocket9labs.com/tslocum/etk v0.0.0-20231220043313-a54ad08ea582
-	code.rocket9labs.com/tslocum/tabula v0.0.0-20231219063620-705c06ed35f6
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231221040642-782266f817d8
+	code.rocket9labs.com/tslocum/etk v0.0.0-20231220185311-408674fd595e
+	code.rocket9labs.com/tslocum/tabula v0.0.0-20231221040542-3f9c7726ae54
 	code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544
 	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231218071755-e4087431ad9f
 	github.com/hajimehoshi/ebiten/v2 v2.6.3
@@ -19,6 +19,7 @@ require (
 )
 
 require (
+	code.rocket9labs.com/tslocum/bei v0.0.0-20231221030347-e8e4525d44b1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect

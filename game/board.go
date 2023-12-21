@@ -2371,6 +2371,23 @@ func (b *board) finishDrag(x int, y int, click bool) {
 							if index >= homeStart && index <= homeEnd {
 								b.Client.Out <- []byte(fmt.Sprintf("mv %d/off", index))
 							}
+						} else if time.Since(b.lastDragClick) < 500*time.Millisecond && space == bgammon.SpaceHomePlayer && !b.gameState.Player1.Entered {
+							var found bool
+							for _, m := range b.gameState.Available {
+								if m[0] == bgammon.SpaceHomePlayer && bgammon.SpaceDiff(m[0], m[1], b.gameState.Acey) == b.gameState.Roll1 {
+									b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
+									found = true
+									break
+								}
+							}
+							if !found {
+								for _, m := range b.gameState.Available {
+									if m[0] == bgammon.SpaceHomePlayer {
+										b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
+										break
+									}
+								}
+							}
 						}
 						break ADDPREMOVE
 					}
