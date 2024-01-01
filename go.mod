@@ -3,10 +3,10 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231220024350-6d63fc5db3ee
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231221040642-782266f817d8
-	code.rocket9labs.com/tslocum/etk v0.0.0-20231220185311-408674fd595e
-	code.rocket9labs.com/tslocum/tabula v0.0.0-20231221040542-3f9c7726ae54
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20231230223848-4af5394f2660
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231230070310-ccf9dd359e84
+	code.rocket9labs.com/tslocum/etk v0.0.0-20231225090418-db70da18e067
+	code.rocket9labs.com/tslocum/tabula v0.0.0-20231223213411-12f4416eafe1
 	code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544
 	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231218071755-e4087431ad9f
 	github.com/hajimehoshi/ebiten/v2 v2.6.3
@@ -19,7 +19,7 @@ require (
 )
 
 require (
-	code.rocket9labs.com/tslocum/bei v0.0.0-20231221030347-e8e4525d44b1 // indirect
+	code.rocket9labs.com/tslocum/bei v0.0.0-20231223213316-ef6cb993c773 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
@@ -44,6 +44,7 @@ require (
 	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/jfreymuth/oggvorbis v1.0.5 // indirect
 	github.com/jfreymuth/vorbis v1.0.2 // indirect
+	github.com/jlouis/glicko2 v1.0.0 // indirect
 	github.com/matcornic/hermes/v2 v2.1.0 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
@@ -55,7 +56,7 @@ require (
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.20.2 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
-	golang.org/x/exp/shiny v0.0.0-20231219180239-dc181d75b848 // indirect
+	golang.org/x/exp/shiny v0.0.0-20231226003508-02704c960a9b // indirect
 	golang.org/x/mobile v0.0.0-20231127183840-76ac6878050a // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect

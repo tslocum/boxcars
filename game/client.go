@@ -80,7 +80,7 @@ func (c *Client) connectWebSocket() {
 				time.Sleep(2 * time.Second)
 				continue
 			}
-			l("*** Reconnecting...")
+			l(fmt.Sprintf("*** %s...", gotext.Get("Reconnecting")))
 			time.Sleep(2 * time.Second)
 			go c.connectWebSocket()
 			break
@@ -129,7 +129,7 @@ func (c *Client) handleWebSocketWrite(conn *websocket.Conn) {
 
 			err := conn.Write(ctx, websocket.MessageText, split[i])
 			if err != nil {
-				conn.Close(websocket.StatusNormalClosure, "Write error")
+				conn.Close(websocket.StatusNormalClosure, gotext.Get("Write error"))
 				return
 			}
 
@@ -144,7 +144,7 @@ func (c *Client) handleWebSocketRead(conn *websocket.Conn) {
 	for {
 		msgType, msg, err := conn.Read(context.Background())
 		if err != nil || msgType != websocket.MessageText {
-			conn.Close(websocket.StatusNormalClosure, "Read error")
+			conn.Close(websocket.StatusNormalClosure, gotext.Get("Read error"))
 			return
 		}
 
@@ -178,7 +178,7 @@ func (c *Client) connectTCP(conn net.Conn) {
 				time.Sleep(2 * time.Second)
 				continue
 			}
-			l("*** Reconnecting...")
+			l(fmt.Sprintf("*** %s...", gotext.Get("Reconnecting")))
 			time.Sleep(2 * time.Second)
 			go c.connectTCP(nil)
 			break

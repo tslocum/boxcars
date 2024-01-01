@@ -41,7 +41,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.2.0"
+const version = "v1.2.0p1"
 
 const MaxDebug = 2
 
@@ -1040,7 +1040,7 @@ func NewGame() *Game {
 		centerInput(g.lobby.historyUsername)
 		g.lobby.historyUsername.Field.SetScrollBarVisible(false)
 
-		searchButton := etk.NewButton("Search", g.selectHistorySearch)
+		searchButton := etk.NewButton(gotext.Get("Search"), g.selectHistorySearch)
 
 		itemHeight := 48
 		if defaultFontSize == extraLargeFontSize {
@@ -1140,14 +1140,14 @@ func (g *Game) playOffline() {
 	}
 
 	// Start the local server.
-	server := server.NewServer("", "", "", "", "", false, false)
+	server := server.NewServer("", "", "", "", "", false, true, false)
 	conns := server.ListenLocal()
 
-	// Connect the bot.
+	// Connect the bots.
 	go bot.NewLocalClient(<-conns, "", "BOT_tabula", "", 1, false, false, 0)
 	go bot.NewLocalClient(<-conns, "", "BOT_tabula_acey", "", 1, true, false, 0)
 
-	// Wait for the bot to finish creating a match.
+	// Wait for the bots to finish creating matches.
 	time.Sleep(250 * time.Millisecond)
 
 	// Connect the player.
@@ -1387,7 +1387,7 @@ func (g *Game) handleEvent(e interface{}) {
 		scheduleFrame()
 		lg(gotext.Get("%s rolled %s.", ev.Player, diceFormatted))
 	case *bgammon.EventFailedRoll:
-		l(fmt.Sprintf("*** Failed to roll: %s", ev.Reason))
+		l(fmt.Sprintf("*** %s: %s", gotext.Get("Failed to roll"), ev.Reason))
 	case *bgammon.EventMoved:
 		lg(gotext.Get("%s moved %s.", ev.Player, bgammon.FormatMoves(ev.Moves)))
 		if ev.Player == g.Client.Username && !g.Board.gameState.Spectating {
@@ -1413,7 +1413,7 @@ func (g *Game) handleEvent(e interface{}) {
 
 		var extra string
 		if ev.From != 0 || ev.To != 0 {
-			extra = fmt.Sprintf(" from %s to %s", bgammon.FormatSpace(ev.From), bgammon.FormatSpace(ev.To))
+			extra = " " + gotext.Get("from %s to %s", bgammon.FormatSpace(ev.From), bgammon.FormatSpace(ev.To))
 		}
 		l("*** " + gotext.Get("Failed to move checker%s: %s", extra, ev.Reason))
 		l("*** " + gotext.Get("Legal moves: %s", bgammon.FormatMoves(g.Board.gameState.Available)))
@@ -1799,7 +1799,7 @@ func (g *Game) showReplayFrame(replayFrame int, showInfo bool) {
 	g.Client.Events <- ev
 
 	if replayFrame == 0 && showInfo {
-		l(fmt.Sprintf("*** Replaying %s vs. %s (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, frame.Game.Started.Format("2006-01-02 15:04")))
+		l(fmt.Sprintf("*** "+gotext.Get("Replaying %s vs. %s")+" (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, frame.Game.Started.Format("2006-01-02 15:04")))
 	}
 }
 
@@ -2032,19 +2032,19 @@ func (g *Game) selectConfirmReset() error {
 	}
 	client := newClient(address, g.resetEmail.Text(), "", true)
 	go client.Connect()
-	g.resetInfo.SetText("Sending password reset request...")
+	g.resetInfo.SetText(gotext.Get("Sending password reset request") + "...")
 	go func() {
 		var i int
 		for {
 			time.Sleep(500 * time.Millisecond)
 			if client.loggedIn {
-				g.resetInfo.SetText("Check your email for a link to reset your password. Be sure to check your spam folder.")
+				g.resetInfo.SetText(gotext.Get("Check your email for a link to reset your password. Be sure to check your spam folder."))
 				g.resetInProgress = false
 				return
 			}
 			i++
 			if i == 40 {
-				g.resetInfo.SetText("Failed to connect to server.")
+				g.resetInfo.SetText(gotext.Get("Failed to connect to server."))
 				g.resetInProgress = false
 				return
 			}
@@ -2742,7 +2742,7 @@ func acceptInput(text string) (handled bool) {
 					game.downloadReplay = -1
 					game.Client.Out <- []byte("replay")
 				} else {
-					l("*** Replay download already in progress.")
+					l("*** " + gotext.Get("Replay download already in progress."))
 				}
 			}
 			return true
@@ -2769,7 +2769,7 @@ func (g *Game) EnableTouchInput() {
 	g.forceLayout = true
 
 	b := g.Board
-	b.matchStatusGrid.Empty()
+	b.matchStatusGrid.Clear()
 	b.matchStatusGrid.AddChildAt(b.timerLabel, 0, 0, 1, 1)
 	b.matchStatusGrid.AddChildAt(b.clockLabel, 1, 0, 1, 1)
 
@@ -2988,3 +2988,6 @@ var _ = gotext.Get("Play backgammon online via bgammon.org")
 
 // Long description.
 var _ = gotext.Get("Boxcars is a client for playing backgammon via bgammon.org, a free and open source backgammon service.")
+
+// This string is used when targetting WebAssembly and Android.
+var _ = gotext.Get("To download this replay visit")

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"syscall/js"
+
+	"github.com/leonelquinteros/gotext"
 )
 
 const (
@@ -51,6 +53,6 @@ func saveReplay(id int, content []byte) error {
 	if id <= 0 {
 		return nil
 	}
-	l(fmt.Sprintf("*** To download this replay visit https://bgammon.org/match/%d", id))
+	l(fmt.Sprintf("*** %s https://bgammon.org/match/%d", gotext.Get("To download this replay visit"), id))
 	return nil
 }

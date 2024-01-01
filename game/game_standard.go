@@ -10,6 +10,8 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+
+	"github.com/leonelquinteros/gotext"
 )
 
 const (
@@ -100,6 +102,6 @@ func saveReplay(id int, content []byte) error {
 	if err != nil {
 		return fmt.Errorf("failed to write replay to %s: %s", filePath, err)
 	}
-	l(fmt.Sprintf("*** Downloaded replay: %s", filePath))
+	l(fmt.Sprintf("*** %s: %s", gotext.Get("Downloaded replay"), filePath))
 	return nil
 }

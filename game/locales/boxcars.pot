@@ -46,6 +46,9 @@ msgstr ""
 msgid "Change password"
 msgstr ""
 
+msgid "Check your email for a link to reset your password. Be sure to check your spam folder."
+msgstr ""
+
 msgid "Connect"
 msgstr ""
 
@@ -70,7 +73,16 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
+msgid "Downloaded replay"
+msgstr ""
+
 msgid "Email"
+msgstr ""
+
+msgid "Failed to connect to server."
+msgstr ""
+
+msgid "Failed to download replay: %s"
 msgstr ""
 
 msgid "Failed to join match: %s"
@@ -80,6 +92,9 @@ msgid "Failed to leave match: %s"
 msgstr ""
 
 msgid "Failed to move checker%s: %s"
+msgstr ""
+
+msgid "Failed to roll"
 msgstr ""
 
 msgid "Failed to submit moves: %s"
@@ -107,6 +122,9 @@ msgid "Leave"
 msgstr ""
 
 msgid "Leave match?"
+msgstr ""
+
+msgid "Left match"
 msgstr ""
 
 msgid "Legal moves: %s"
@@ -154,10 +172,22 @@ msgstr ""
 msgid "Private"
 msgstr ""
 
+msgid "Read error"
+msgstr ""
+
+msgid "Reconnecting"
+msgstr ""
+
 msgid "Refresh"
 msgstr ""
 
 msgid "Register"
+msgstr ""
+
+msgid "Replay download already in progress."
+msgstr ""
+
+msgid "Replaying %s vs. %s"
 msgstr ""
 
 msgid "Reset Password"
@@ -173,6 +203,12 @@ msgid "Return"
 msgstr ""
 
 msgid "Roll"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "Sending password reset request"
 msgstr ""
 
 msgid "Server"
@@ -199,6 +235,9 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
+msgid "To download this replay visit"
+msgstr ""
+
 msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
 msgstr ""
 
@@ -217,14 +256,23 @@ msgstr ""
 msgid "View"
 msgstr ""
 
+msgid "Waiting"
+msgstr ""
+
 msgid "Warning: Received unknown event: %+v"
 msgstr ""
 
 msgid "Warning: Received unrecognized event from server."
 msgstr ""
 
+msgid "Write error"
+msgstr ""
+
 msgid "Yes"
 msgstr ""
 
 msgid "You may need to upgrade your client."
+msgstr ""
+
+msgid "from %s to %s"
 msgstr ""

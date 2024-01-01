@@ -551,9 +551,9 @@ func (b *board) recreateInputGrid() {
 	if b.inputGrid == nil {
 		b.inputGrid = etk.NewGrid()
 	} else {
-		b.inputGrid.Empty()
+		b.inputGrid.Clear()
 	}
-	b.floatInputGrid.Empty()
+	b.floatInputGrid.Clear()
 
 	if game.TouchInput {
 		b.inputGrid.AddChildAt(inputBuffer, 0, 0, 2, 1)
@@ -626,7 +626,7 @@ func (b *board) showButtonGrid(buttonGrid *etk.Grid) {
 	grid := b.buttonsGrid
 	grid.SetColumnSizes(int(b.horizontalBorderSize)*2+b.innerW, -1)
 	grid.SetRowSizes(int(b.verticalBorderSize)*2+b.innerH, -1)
-	grid.Empty()
+	grid.Clear()
 	grid.AddChildAt(buttonGrid, 0, 0, 1, 1)
 
 	buttonGrid.SetVisible(true)
@@ -657,7 +657,7 @@ func (b *board) recreateButtonGrid() {
 		if grid == nil {
 			grid = etk.NewGrid()
 		} else {
-			grid.Empty()
+			grid.Clear()
 		}
 		grid.SetColumnSizes(-1, w, -1, padding, -1, w, -1, w, -1)
 		grid.SetRowSizes(-1, h+75, h, -1)
@@ -1692,9 +1692,9 @@ func (b *board) updateOpponentLabel() {
 	} else if len(player.Name) > 0 {
 		text = player.Name
 	} else if b.gameState.Started.IsZero() {
-		text = "Waiting..."
+		text = fmt.Sprintf("%s...", gotext.Get("Waiting"))
 	} else {
-		text = "Left match"
+		text = gotext.Get("Left match")
 	}
 	if label.Text.Text() != text {
 		label.SetText(text)
@@ -1761,9 +1761,9 @@ func (b *board) updatePlayerLabel() {
 	} else if len(player.Name) > 0 {
 		text = player.Name
 	} else if b.gameState.Started.IsZero() {
-		text = "Waiting..."
+		text = fmt.Sprintf("%s...", gotext.Get("Waiting"))
 	} else {
-		text = "Left match"
+		text = gotext.Get("Left match")
 	}
 	if label.Text.Text() != text {
 		label.SetText(text)
