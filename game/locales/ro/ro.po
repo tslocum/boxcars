@@ -8,6 +8,9 @@ msgstr ""
 "20)) ? 1 : 2;\n"
 "X-Generator: xgotext\n"
 
+msgid "%s - Free Online Backgammon"
+msgstr ""
+
 msgid "%s joined the match."
 msgstr ""
 
@@ -24,6 +27,12 @@ msgid "%s wins!"
 msgstr ""
 
 msgid "Accept"
+msgstr ""
+
+msgid "Acey-deucey"
+msgstr ""
+
+msgid "Available"
 msgstr ""
 
 msgid ""
@@ -49,7 +58,7 @@ msgstr ""
 msgid "Double"
 msgstr ""
 
-msgid "Drag here to bear off"
+msgid "Email"
 msgstr ""
 
 msgid "Failed to join match: %s"
@@ -62,9 +71,6 @@ msgid "Failed to move checker%s: %s"
 msgstr ""
 
 msgid "Failed to submit moves: %s"
-msgstr ""
-
-msgid "Full"
 msgstr ""
 
 msgid "Hide Keyboard"
@@ -103,13 +109,21 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-msgid "Open"
-msgstr ""
-
 msgid "Password"
 msgstr ""
 
+msgid "Play Offline"
+msgstr ""
+
 msgid "Play backgammon online via bgammon.org"
+msgstr ""
+
+msgid "Playing offline."
+msgstr ""
+
+msgid ""
+"Please enter a valid email address, or it will not be possible to reset your "
+"password."
 msgstr ""
 
 msgid "Points"
@@ -119,6 +133,9 @@ msgid "Private"
 msgstr ""
 
 msgid "Refresh"
+msgstr ""
+
+msgid "Register"
 msgstr ""
 
 msgid "Resign"
@@ -139,7 +156,19 @@ msgstr ""
 msgid "Show Keyboard"
 msgstr ""
 
+msgid "Show moves"
+msgstr ""
+
+msgid "Show pip count"
+msgstr ""
+
+msgid "Started"
+msgstr ""
+
 msgid "Status"
+msgstr ""
+
+msgid "Submit"
 msgstr ""
 
 msgid ""
@@ -156,10 +185,10 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-msgid "Warning: Received unknown event: %+v"
+msgid "Variant"
 msgstr ""
 
-msgid "Welcome to %s"
+msgid "Warning: Received unknown event: %+v"
 msgstr ""
 
 msgid "Yes"

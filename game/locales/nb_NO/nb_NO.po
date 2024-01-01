@@ -11,6 +11,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 5.2-dev\n"
 
+msgid "%s - Free Online Backgammon"
+msgstr ""
+
 msgid "%s joined the match."
 msgstr "%s tok del i spillet."
 
@@ -28,6 +31,12 @@ msgstr "%s vant."
 
 msgid "Accept"
 msgstr "Godta"
+
+msgid "Acey-deucey"
+msgstr ""
+
+msgid "Available"
+msgstr ""
 
 msgid ""
 "Boxcars is a client for playing backgammon via bgammon.org, a free and open "
@@ -53,7 +62,7 @@ msgstr "Opprett spill"
 msgid "Double"
 msgstr "Dobling"
 
-msgid "Drag here to bear off"
+msgid "Email"
 msgstr ""
 
 #, fuzzy
@@ -71,9 +80,6 @@ msgstr "Klarte ikke å flytte brikke%s: %s"
 #, fuzzy
 msgid "Failed to submit moves: %s"
 msgstr "Klarte ikke å sende inn trekk: %s"
-
-msgid "Full"
-msgstr ""
 
 msgid "Hide Keyboard"
 msgstr "Skjul tastatur"
@@ -112,13 +118,21 @@ msgstr "Ingen spill tilgjengelig. Opprett ett."
 msgid "OK"
 msgstr "OK"
 
-msgid "Open"
-msgstr ""
-
 msgid "Password"
 msgstr "Passord"
 
+msgid "Play Offline"
+msgstr ""
+
 msgid "Play backgammon online via bgammon.org"
+msgstr ""
+
+msgid "Playing offline."
+msgstr ""
+
+msgid ""
+"Please enter a valid email address, or it will not be possible to reset your "
+"password."
 msgstr ""
 
 msgid "Points"
@@ -128,6 +142,9 @@ msgid "Private"
 msgstr ""
 
 msgid "Refresh"
+msgstr ""
+
+msgid "Register"
 msgstr ""
 
 msgid "Resign"
@@ -148,7 +165,19 @@ msgstr ""
 msgid "Show Keyboard"
 msgstr "Vis tastatur"
 
+msgid "Show moves"
+msgstr ""
+
+msgid "Show pip count"
+msgstr ""
+
+msgid "Started"
+msgstr ""
+
 msgid "Status"
+msgstr ""
+
+msgid "Submit"
 msgstr ""
 
 #, fuzzy
@@ -166,11 +195,11 @@ msgstr ""
 msgid "Username"
 msgstr "Brukernavn"
 
+msgid "Variant"
+msgstr ""
+
 msgid "Warning: Received unknown event: %+v"
 msgstr "Advarsel: Mottok ukjent begivenhet: %s+v"
-
-msgid "Welcome to %s"
-msgstr ""
 
 msgid "Yes"
 msgstr "Ja"

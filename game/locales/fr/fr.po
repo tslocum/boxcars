@@ -11,6 +11,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Generator: Weblate 5.2\n"
 
+msgid "%s - Free Online Backgammon"
+msgstr ""
+
 msgid "%s joined the match."
 msgstr "%s a rejoint la partie."
 
@@ -28,6 +31,12 @@ msgstr "%s gagne !"
 
 msgid "Accept"
 msgstr "Accepter"
+
+msgid "Acey-deucey"
+msgstr ""
+
+msgid "Available"
+msgstr ""
 
 msgid ""
 "Boxcars is a client for playing backgammon via bgammon.org, a free and open "
@@ -54,7 +63,7 @@ msgstr "Créer une partie"
 msgid "Double"
 msgstr "Double"
 
-msgid "Drag here to bear off"
+msgid "Email"
 msgstr ""
 
 msgid "Failed to join match: %s"
@@ -68,9 +77,6 @@ msgstr ""
 
 msgid "Failed to submit moves: %s"
 msgstr "Impossible d'envoyer le mouvement : %s"
-
-msgid "Full"
-msgstr "Plein"
 
 msgid "Hide Keyboard"
 msgstr "Masquer le clavier"
@@ -108,13 +114,21 @@ msgstr "Aucune partie disponible. Veuillez en créer une."
 msgid "OK"
 msgstr "OK"
 
-msgid "Open"
-msgstr "Ouvrir"
-
 msgid "Password"
 msgstr "Mot de passe"
 
+msgid "Play Offline"
+msgstr ""
+
 msgid "Play backgammon online via bgammon.org"
+msgstr ""
+
+msgid "Playing offline."
+msgstr ""
+
+msgid ""
+"Please enter a valid email address, or it will not be possible to reset your "
+"password."
 msgstr ""
 
 msgid "Points"
@@ -125,6 +139,9 @@ msgstr "Privée"
 
 msgid "Refresh"
 msgstr "Actualiser"
+
+msgid "Register"
+msgstr ""
 
 msgid "Resign"
 msgstr "Capituler"
@@ -144,8 +161,20 @@ msgstr "Réglages"
 msgid "Show Keyboard"
 msgstr "Afficher le clavier"
 
+msgid "Show moves"
+msgstr ""
+
+msgid "Show pip count"
+msgstr ""
+
+msgid "Started"
+msgstr ""
+
 msgid "Status"
 msgstr "État"
+
+msgid "Submit"
+msgstr ""
 
 msgid ""
 "To log in as a guest, enter a username (if you want) and do not enter a "
@@ -163,14 +192,23 @@ msgstr "Annuler"
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
+msgid "Variant"
+msgstr ""
+
 msgid "Warning: Received unknown event: %+v"
 msgstr "Attention : Événement inconnu reçu : %+v"
-
-msgid "Welcome to %s"
-msgstr "Bienvenue dans %s"
 
 msgid "Yes"
 msgstr "Oui"
 
 msgid "You may need to upgrade your client."
 msgstr "Vous devez peut-être mettre à jour votre client."
+
+#~ msgid "Full"
+#~ msgstr "Plein"
+
+#~ msgid "Open"
+#~ msgstr "Ouvrir"
+
+#~ msgid "Welcome to %s"
+#~ msgstr "Bienvenue dans %s"

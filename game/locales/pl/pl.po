@@ -12,6 +12,9 @@ msgstr ""
 "|| n%100>=20) ? 1 : 2;\n"
 "X-Generator: Weblate 5.2-dev\n"
 
+msgid "%s - Free Online Backgammon"
+msgstr ""
+
 msgid "%s joined the match."
 msgstr "%s dołączył/a do meczu."
 
@@ -29,6 +32,12 @@ msgstr "%s wygrywa!"
 
 msgid "Accept"
 msgstr "Akceptuj"
+
+msgid "Acey-deucey"
+msgstr ""
+
+msgid "Available"
+msgstr ""
 
 msgid ""
 "Boxcars is a client for playing backgammon via bgammon.org, a free and open "
@@ -54,8 +63,8 @@ msgstr "Stwórz mecz"
 msgid "Double"
 msgstr "Dubluj"
 
-msgid "Drag here to bear off"
-msgstr "Przeciągnij tutaj, aby wystartować"
+msgid "Email"
+msgstr ""
 
 msgid "Failed to join match: %s"
 msgstr "Nie udało się dołączyć do meczu: %s"
@@ -68,9 +77,6 @@ msgstr "Nie udało się poruszyć szachownicy%s: %s"
 
 msgid "Failed to submit moves: %s"
 msgstr "Nie udało się przesłać ruchów: %s"
-
-msgid "Full"
-msgstr ""
 
 msgid "Hide Keyboard"
 msgstr "Ukryj klawiaturę"
@@ -108,13 +114,21 @@ msgstr "Brak dostępnych meczów. Utwórz mecz."
 msgid "OK"
 msgstr "OK"
 
-msgid "Open"
-msgstr ""
-
 msgid "Password"
 msgstr "Hasło"
 
+msgid "Play Offline"
+msgstr ""
+
 msgid "Play backgammon online via bgammon.org"
+msgstr ""
+
+msgid "Playing offline."
+msgstr ""
+
+msgid ""
+"Please enter a valid email address, or it will not be possible to reset your "
+"password."
 msgstr ""
 
 msgid "Points"
@@ -124,6 +138,9 @@ msgid "Private"
 msgstr ""
 
 msgid "Refresh"
+msgstr ""
+
+msgid "Register"
 msgstr ""
 
 msgid "Resign"
@@ -144,7 +161,19 @@ msgstr ""
 msgid "Show Keyboard"
 msgstr "Pokaż klawiaturę"
 
+msgid "Show moves"
+msgstr ""
+
+msgid "Show pip count"
+msgstr ""
+
+msgid "Started"
+msgstr ""
+
 msgid "Status"
+msgstr ""
+
+msgid "Submit"
 msgstr ""
 
 msgid ""
@@ -163,14 +192,20 @@ msgstr ""
 msgid "Username"
 msgstr "Nazwa użytkownika"
 
+msgid "Variant"
+msgstr ""
+
 msgid "Warning: Received unknown event: %+v"
 msgstr "Ostrzeżenie: Otrzymano nieznane zdarzenie: %+v"
-
-msgid "Welcome to %s"
-msgstr "Witamy w %s"
 
 msgid "Yes"
 msgstr "Tak"
 
 msgid "You may need to upgrade your client."
 msgstr "Konieczna może być aktualizacja twojego klienta."
+
+#~ msgid "Drag here to bear off"
+#~ msgstr "Przeciągnij tutaj, aby wystartować"
+
+#~ msgid "Welcome to %s"
+#~ msgstr "Witamy w %s"

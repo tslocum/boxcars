@@ -11,6 +11,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 5.2-dev\n"
 
+msgid "%s - Free Online Backgammon"
+msgstr ""
+
 msgid "%s joined the match."
 msgstr "%s csatlakozott a játékhoz."
 
@@ -29,7 +32,15 @@ msgstr "%s nyert!"
 msgid "Accept"
 msgstr "Elfogadás"
 
-msgid "Boxcars is a client for playing backgammon via bgammon.org, a free and open source backgammon service."
+msgid "Acey-deucey"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid ""
+"Boxcars is a client for playing backgammon via bgammon.org, a free and open "
+"source backgammon service."
 msgstr ""
 "A Boxcar egy kliens, amivel ostáblát lehet játszani a bgammon.org-on, a "
 "szabad és nyílt forráskódú ostábla szolgáltatáson."
@@ -52,8 +63,8 @@ msgstr "Játék létrehozása"
 msgid "Double"
 msgstr "Duplázás"
 
-msgid "Drag here to bear off"
-msgstr "Húzza ide a bábú kiviteléhez"
+msgid "Email"
+msgstr ""
 
 msgid "Failed to join match: %s"
 msgstr "Csatlakozás a játékhoz nem sikerült: %s"
@@ -66,9 +77,6 @@ msgstr "Bábu mozgatása nem sikerült: %s"
 
 msgid "Failed to submit moves: %s"
 msgstr "Mozgatás elküldése nem sikerült: %s"
-
-msgid "Full"
-msgstr "Megtelt"
 
 msgid "Hide Keyboard"
 msgstr "Billentyűzet elrejtése"
@@ -106,14 +114,22 @@ msgstr "Játék nem elérhető. Hozzon létre egyet."
 msgid "OK"
 msgstr "OK"
 
-msgid "Open"
-msgstr "Nyílt"
-
 msgid "Password"
 msgstr "Jelszó"
 
+msgid "Play Offline"
+msgstr ""
+
 msgid "Play backgammon online via bgammon.org"
 msgstr "Játsszon ostáblát az interneten a bgammon.org-on"
+
+msgid "Playing offline."
+msgstr ""
+
+msgid ""
+"Please enter a valid email address, or it will not be possible to reset your "
+"password."
+msgstr ""
 
 msgid "Points"
 msgstr "Pontok"
@@ -123,6 +139,9 @@ msgstr "Privát"
 
 msgid "Refresh"
 msgstr "Frissítés"
+
+msgid "Register"
+msgstr ""
 
 msgid "Resign"
 msgstr "Feladás"
@@ -142,10 +161,24 @@ msgstr "Beállítások"
 msgid "Show Keyboard"
 msgstr "Billentyűzet megjelenítése"
 
+msgid "Show moves"
+msgstr ""
+
+msgid "Show pip count"
+msgstr ""
+
+msgid "Started"
+msgstr ""
+
 msgid "Status"
 msgstr "Állapot"
 
-msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
+msgid "Submit"
+msgstr ""
+
+msgid ""
+"To log in as a guest, enter a username (if you want) and do not enter a "
+"password."
 msgstr ""
 "Vendégként való belépéshez adja meg a felhasználónevét (ha akarja) és ne "
 "adjon meg jelszót."
@@ -159,14 +192,26 @@ msgstr "Visszavonás"
 msgid "Username"
 msgstr "Felhasználónév"
 
+msgid "Variant"
+msgstr ""
+
 msgid "Warning: Received unknown event: %+v"
 msgstr "Figyelmeztetés: Ismeretlen esemény érkezett: %+v"
-
-msgid "Welcome to %s"
-msgstr "Üdvözli a %s"
 
 msgid "Yes"
 msgstr "Igen"
 
 msgid "You may need to upgrade your client."
 msgstr "A kliens frissítése szükséges."
+
+#~ msgid "Drag here to bear off"
+#~ msgstr "Húzza ide a bábú kiviteléhez"
+
+#~ msgid "Full"
+#~ msgstr "Megtelt"
+
+#~ msgid "Open"
+#~ msgstr "Nyílt"
+
+#~ msgid "Welcome to %s"
+#~ msgstr "Üdvözli a %s"
