@@ -18,7 +18,6 @@ import (
 )
 
 const (
-	DefaultServerAddress = "wss://ws.bgammon.org"
 	OptimizeDraw         = true
 	OptimizeSetRect      = true
 	AutoEnableTouchInput = true

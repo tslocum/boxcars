@@ -43,6 +43,8 @@ import (
 
 const version = "v1.2.0p1"
 
+const DefaultServerAddress = "wss://ws.bgammon.org"
+
 const MaxDebug = 2
 
 const baseButtonHeight = 54

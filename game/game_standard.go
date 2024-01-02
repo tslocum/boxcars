@@ -15,7 +15,6 @@ import (
 )
 
 const (
-	DefaultServerAddress = "tcp://bgammon.org:1337"
 	OptimizeDraw         = true
 	OptimizeSetRect      = true
 	AutoEnableTouchInput = false
