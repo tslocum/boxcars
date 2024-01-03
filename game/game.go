@@ -1801,7 +1801,7 @@ func (g *Game) showReplayFrame(replayFrame int, showInfo bool) {
 	g.Client.Events <- ev
 
 	if replayFrame == 0 && showInfo {
-		l(fmt.Sprintf("*** "+gotext.Get("Replaying %s vs. %s")+" (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, frame.Game.Started.Format("2006-01-02 15:04")))
+		l(fmt.Sprintf("*** "+gotext.Get("Replaying %s vs. %s", "%s", "%s")+" (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, frame.Game.Started.Format("2006-01-02 15:04")))
 	}
 }
 

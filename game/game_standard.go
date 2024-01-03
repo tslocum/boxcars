@@ -62,8 +62,8 @@ func userConfigDir() string {
 }
 
 func saveReplay(id int, content []byte) error {
-	configDir := userConfigDir()
-	if configDir == "" {
+	replayDir := ReplayDir()
+	if replayDir == "" {
 		return fmt.Errorf("failed to determine default download location")
 	}
 
@@ -94,9 +94,8 @@ func saveReplay(id int, content []byte) error {
 		}
 	}
 
-	replaysPath := path.Join(configDir, "replays")
-	_ = os.MkdirAll(replaysPath, 0700)
-	filePath := path.Join(replaysPath, fmt.Sprintf("%d_%s_%s.match", timestamp, player1, player2))
+	_ = os.MkdirAll(replayDir, 0700)
+	filePath := path.Join(replayDir, fmt.Sprintf("%d_%s_%s.match", timestamp, player1, player2))
 	err = os.WriteFile(filePath, content, 0600)
 	if err != nil {
 		return fmt.Errorf("failed to write replay to %s: %s", filePath, err)
