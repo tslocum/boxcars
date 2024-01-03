@@ -910,7 +910,7 @@ func NewGame() *Game {
 	}
 
 	{
-		headerLabel := newCenteredText(gotext.Get("Create match"))
+		headerLabel := newCenteredText(gotext.Get("Create new match"))
 		nameLabel := newCenteredText(gotext.Get("Name"))
 		pointsLabel := newCenteredText(gotext.Get("Points"))
 		passwordLabel := newCenteredText(gotext.Get("Password"))
@@ -1085,7 +1085,7 @@ func NewGame() *Game {
 		pointsLabel := newCenteredText(gotext.Get("Points"))
 		pointsLabel.SetFollow(false)
 		pointsLabel.SetScrollBarVisible(false)
-		nameLabel := newCenteredText(gotext.Get("Name"))
+		nameLabel := newCenteredText(gotext.Get("Match Name"))
 		nameLabel.SetFollow(false)
 		nameLabel.SetScrollBarVisible(false)
 
@@ -1098,7 +1098,7 @@ func NewGame() *Game {
 		g.lobby.historyButton.SetVisible(false)
 
 		headerGrid := etk.NewGrid()
-		headerGrid.SetColumnSizes(indentA, indentB-indentA, -1, 400)
+		headerGrid.SetColumnSizes(indentA, indentB-indentA, -1, 300)
 		headerGrid.AddChildAt(statusLabel, 0, 0, 1, 1)
 		headerGrid.AddChildAt(pointsLabel, 1, 0, 1, 1)
 		headerGrid.AddChildAt(nameLabel, 2, 0, 1, 1)

@@ -90,25 +90,25 @@ type lobby struct {
 
 func NewLobby() *lobby {
 	mainButtons = []*lobbyButton{
-		{gotext.Get("Refresh")},
-		{gotext.Get("Create")},
-		{gotext.Get("Join")},
+		{gotext.Get("Refresh matches")},
+		{gotext.Get("Create new match")},
+		{gotext.Get("Join match")},
 	}
 
 	createButtons = []*lobbyButton{
 		{gotext.Get("Cancel")},
-		{gotext.Get("Create")},
+		{gotext.Get("Create match")},
 	}
 
 	cancelJoinButtons = []*lobbyButton{
 		{gotext.Get("Cancel")},
-		{gotext.Get("Join")},
+		{gotext.Get("Join match")},
 	}
 
 	historyButtons = []*lobbyButton{
 		{gotext.Get("Return")},
-		{gotext.Get("Download")},
-		{gotext.Get("View")},
+		{gotext.Get("Download replay")},
+		{gotext.Get("View replay")},
 	}
 
 	itemHeight := 48

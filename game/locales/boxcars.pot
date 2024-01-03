@@ -55,10 +55,10 @@ msgstr ""
 msgid "Connecting..."
 msgstr ""
 
-msgid "Create"
+msgid "Create match"
 msgstr ""
 
-msgid "Create match"
+msgid "Create new match"
 msgstr ""
 
 msgid "Current"
@@ -70,7 +70,7 @@ msgstr ""
 msgid "Double"
 msgstr ""
 
-msgid "Download"
+msgid "Download replay"
 msgstr ""
 
 msgid "Downloaded replay"
@@ -109,9 +109,6 @@ msgstr ""
 msgid "History"
 msgstr ""
 
-msgid "Join"
-msgstr ""
-
 msgid "Join match"
 msgstr ""
 
@@ -134,6 +131,9 @@ msgid "Loading..."
 msgstr ""
 
 msgid "Logged in as guest"
+msgstr ""
+
+msgid "Match Name"
 msgstr ""
 
 msgid "Name"
@@ -178,7 +178,7 @@ msgstr ""
 msgid "Reconnecting"
 msgstr ""
 
-msgid "Refresh"
+msgid "Refresh matches"
 msgstr ""
 
 msgid "Register"
@@ -253,7 +253,7 @@ msgstr ""
 msgid "Variant"
 msgstr ""
 
-msgid "View"
+msgid "View replay"
 msgstr ""
 
 msgid "Waiting"
