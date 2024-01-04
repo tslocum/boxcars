@@ -620,6 +620,9 @@ type Game struct {
 
 	Instant bool
 
+	connectGridY            int
+	showConnectStatusBuffer bool
+
 	needLayoutConnect bool
 	needLayoutLobby   bool
 	needLayoutBoard   bool
@@ -881,12 +884,12 @@ func NewGame() *Game {
 		grid.AddChildAt(g.connectUsername, 2, 1, 2, 1)
 		grid.AddChildAt(passwordLabel, 1, 2, 2, 1)
 		grid.AddChildAt(g.connectPassword, 2, 2, 2, 1)
-		y := 3
+		g.connectGridY = 3
 		if ShowServerSettings {
 			centerInput(g.connectServer)
-			grid.AddChildAt(serverLabel, 1, y, 2, 1)
-			grid.AddChildAt(g.connectServer, 2, y, 2, 1)
-			y++
+			grid.AddChildAt(serverLabel, 1, g.connectGridY, 2, 1)
+			grid.AddChildAt(g.connectServer, 2, g.connectGridY, 2, 1)
+			g.connectGridY++
 		}
 		{
 			subGrid := etk.NewGrid()
@@ -894,7 +897,7 @@ func NewGame() *Game {
 			subGrid.SetRowSizes(-1, xPadding*2, -1)
 			subGrid.AddChildAt(connectButton, 0, 0, 1, 1)
 			subGrid.AddChildAt(registerButton, 2, 0, 1, 1)
-			grid.AddChildAt(subGrid, 1, y, 3, 1)
+			grid.AddChildAt(subGrid, 1, g.connectGridY, 3, 1)
 		}
 		{
 			subGrid := etk.NewGrid()
@@ -902,10 +905,10 @@ func NewGame() *Game {
 			subGrid.SetRowSizes(-1, xPadding*2, -1)
 			subGrid.AddChildAt(resetButton, 0, 0, 1, 1)
 			subGrid.AddChildAt(offlineButton, 2, 0, 1, 1)
-			grid.AddChildAt(subGrid, 1, y+1, 3, 1)
+			grid.AddChildAt(subGrid, 1, g.connectGridY+1, 3, 1)
 		}
-		grid.AddChildAt(infoLabel, 1, y+2, 3, 1)
-		grid.AddChildAt(footerLabel, 1, y+3, 3, 1)
+		grid.AddChildAt(infoLabel, 1, g.connectGridY+2, 3, 1)
+		grid.AddChildAt(footerLabel, 1, g.connectGridY+3, 3, 1)
 		connectGrid = grid
 	}
 
@@ -1077,7 +1080,7 @@ func NewGame() *Game {
 		g.lobby.rebuildButtonsGrid()
 
 		dividerLine := etk.NewBox()
-		dividerLine.SetBackground(bufferTextColor)
+		dividerLine.SetBackground(triangleA)
 
 		statusLabel := newCenteredText(gotext.Get("Status"))
 		statusLabel.SetFollow(false)
@@ -1941,6 +1944,27 @@ func (g *Game) Connect() {
 		}()
 	}
 
+	connectTime := time.Now()
+	t := time.NewTicker(250 * time.Millisecond)
+	go func() {
+		for {
+			<-t.C
+			if c.loggedIn {
+				return
+			} else if !c.connecting || time.Since(connectTime) >= 20*time.Second {
+				if !g.showConnectStatusBuffer {
+					connectGrid.AddChildAt(statusBuffer, 0, g.connectGridY+4, 5, 1)
+					g.showConnectStatusBuffer = true
+				}
+
+				g.loggedIn = false
+				g.setRoot(connectGrid)
+				scheduleFrame()
+				return
+			}
+		}
+	}()
+
 	username := g.Username
 	go c.Connect()
 	go saveUsername(username)
@@ -2036,21 +2060,10 @@ func (g *Game) selectConfirmReset() error {
 	go client.Connect()
 	g.resetInfo.SetText(gotext.Get("Sending password reset request") + "...")
 	go func() {
-		var i int
-		for {
-			time.Sleep(500 * time.Millisecond)
-			if client.loggedIn {
-				g.resetInfo.SetText(gotext.Get("Check your email for a link to reset your password. Be sure to check your spam folder."))
-				g.resetInProgress = false
-				return
-			}
-			i++
-			if i == 40 {
-				g.resetInfo.SetText(gotext.Get("Failed to connect to server."))
-				g.resetInProgress = false
-				return
-			}
-		}
+		time.Sleep(10 * time.Second)
+		g.resetInfo.SetText(gotext.Get("Check your email for a link to reset your password. Be sure to check your spam folder."))
+		g.resetInProgress = false
+		scheduleFrame()
 	}()
 	return nil
 }

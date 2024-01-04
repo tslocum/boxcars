@@ -71,8 +71,10 @@ func (c *Client) LoggedIn() bool {
 }
 
 func (c *Client) connectWebSocket() {
+	connectTime := time.Now()
 	reconnect := func() {
-		if c.resetPassword {
+		if c.resetPassword || time.Since(connectTime) < 20*time.Second {
+			c.connecting = false
 			return
 		}
 		for {
@@ -108,7 +110,6 @@ func (c *Client) connectWebSocket() {
 			return
 		}
 	}
-	c.loggedIn = true
 
 	go c.handleWebSocketWrite(conn)
 	c.handleWebSocketRead(conn)
@@ -155,6 +156,11 @@ func (c *Client) handleWebSocketRead(conn *websocket.Conn) {
 			l("*** " + gotext.Get("You may need to upgrade your client."))
 			continue
 		}
+		if !c.loggedIn {
+			if _, ok := ev.(*bgammon.EventWelcome); ok {
+				c.loggedIn = true
+			}
+		}
 		c.Events <- ev
 
 		if Debug > 0 {
@@ -169,8 +175,10 @@ func (c *Client) connectTCP(conn net.Conn) {
 		address = c.Address[6:]
 	}
 
+	connectTime := time.Now()
 	reconnect := func() {
-		if c.resetPassword {
+		if c.resetPassword || time.Since(connectTime) < 20*time.Second {
+			c.connecting = false
 			return
 		}
 		for {
@@ -222,7 +230,6 @@ func (c *Client) connectTCP(conn net.Conn) {
 		reconnect()
 		return
 	}
-	c.loggedIn = true
 
 	go c.handleTCPWrite(conn)
 	c.handleTCPRead(conn)
@@ -270,6 +277,11 @@ func (c *Client) handleTCPRead(conn net.Conn) {
 			l("*** " + gotext.Get("Warning: Received unrecognized event from server."))
 			l("*** " + gotext.Get("You may need to upgrade your client."))
 			continue
+		}
+		if !c.loggedIn {
+			if _, ok := ev.(*bgammon.EventWelcome); ok {
+				c.loggedIn = true
+			}
 		}
 		c.Events <- ev
 
