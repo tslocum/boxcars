@@ -130,6 +130,8 @@ var (
 	historyContainer    *etk.Grid
 	listGamesContainer  *etk.Grid
 
+	tutorialFrame *etk.Frame
+
 	createGameFrame *etk.Frame
 	joinGameFrame   *etk.Frame
 	historyFrame    *etk.Frame
@@ -600,6 +602,9 @@ type Game struct {
 	resetInfo       *etk.Text
 	resetInProgress bool
 
+	tutorial      *tutorialWidget
+	tutorialFrame *etk.Frame
+
 	pressedKeys []ebiten.Key
 
 	cursorX, cursorY int
@@ -664,6 +669,8 @@ func NewGame() *Game {
 
 		TouchInput: AutoEnableTouchInput,
 
+		tutorialFrame: etk.NewFrame(),
+
 		debugImg:    ebiten.NewImage(200, 200),
 		volume:      1,
 		scaleFactor: 1,
@@ -671,6 +678,7 @@ func NewGame() *Game {
 		Mutex: &sync.Mutex{},
 	}
 	g.keyboard.SetScheduleFrameFunc(scheduleFrame)
+	g.tutorialFrame.SetPositionChildren(true)
 	game = g
 
 	loadImageAssets(0)
@@ -982,6 +990,7 @@ func NewGame() *Game {
 		createGameFrame.SetPositionChildren(true)
 		createGameFrame.AddChild(createGameContainer)
 		createGameFrame.AddChild(etk.NewFrame(g.lobby.showKeyboardButton))
+		createGameFrame.AddChild(g.tutorialFrame)
 	}
 
 	{
@@ -1014,6 +1023,7 @@ func NewGame() *Game {
 		joinGameFrame.SetPositionChildren(true)
 		joinGameFrame.AddChild(joinGameContainer)
 		joinGameFrame.AddChild(etk.NewFrame(g.lobby.showKeyboardButton))
+		joinGameFrame.AddChild(g.tutorialFrame)
 	}
 
 	{
@@ -1116,6 +1126,7 @@ func NewGame() *Game {
 
 		listGamesFrame.SetPositionChildren(true)
 		listGamesFrame.AddChild(listGamesContainer)
+		listGamesFrame.AddChild(g.tutorialFrame)
 	}
 
 	g.needLayoutConnect = true
@@ -1254,6 +1265,10 @@ func (g *Game) handleEvent(e interface{}) {
 			matchesPlural = ""
 		}
 		l(fmt.Sprintf("*** Welcome, %s. There %s %d client%s playing %d match%s.", ev.PlayerName, areIs, ev.Clients, clientsPlural, ev.Games, matchesPlural))
+
+		if strings.HasPrefix(g.Client.Username, "Guest_") {
+			g.tutorialFrame.AddChild(NewTutorialWidget())
+		}
 	case *bgammon.EventHelp:
 		l(fmt.Sprintf("*** Help: %s", ev.Message))
 	case *bgammon.EventNotice:
@@ -1968,6 +1983,9 @@ func (g *Game) Connect() {
 	username := g.Username
 	go c.Connect()
 	go saveUsername(username)
+
+	// TODO
+
 }
 
 func (g *Game) ConnectLocal(conn net.Conn) {

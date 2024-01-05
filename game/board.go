@@ -499,6 +499,8 @@ func NewBoard() *board {
 		b.frame.AddChild(f)
 	}
 
+	b.frame.AddChild(game.tutorialFrame)
+
 	b.fontUpdated()
 
 	for i := range b.Sprites.sprites {

@@ -37,6 +37,12 @@ msgstr ""
 msgid "Available"
 msgstr ""
 
+msgid "Bearing Off"
+msgstr ""
+
+msgid "Board"
+msgstr ""
+
 msgid "Boxcars is a client for playing backgammon via bgammon.org, a free and open source backgammon service."
 msgstr ""
 
@@ -55,6 +61,12 @@ msgstr ""
 msgid "Connecting..."
 msgstr ""
 
+msgid "Create Match"
+msgstr ""
+
+msgid "Create a match if you would like to play against someone else. Backgammon and acey-deucey games are supported."
+msgstr ""
+
 msgid "Create match"
 msgstr ""
 
@@ -70,6 +82,9 @@ msgstr ""
 msgid "Double"
 msgstr ""
 
+msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
+msgstr ""
+
 msgid "Download replay"
 msgstr ""
 
@@ -77,9 +92,6 @@ msgid "Downloaded replay"
 msgstr ""
 
 msgid "Email"
-msgstr ""
-
-msgid "Failed to connect to server."
 msgstr ""
 
 msgid "Failed to download replay: %s"
@@ -98,6 +110,9 @@ msgid "Failed to roll"
 msgstr ""
 
 msgid "Failed to submit moves: %s"
+msgstr ""
+
+msgid "Good Luck, Have Fun"
 msgstr ""
 
 msgid "Hide Keyboard"
@@ -134,6 +149,9 @@ msgid "Logged in as guest"
 msgstr ""
 
 msgid "Match Name"
+msgstr ""
+
+msgid "Matches List"
 msgstr ""
 
 msgid "Name"
@@ -235,10 +253,19 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
+msgid "This concludes the tutorial. Join the community via Matrix/Discord/IRC at %s"
+msgstr ""
+
+msgid "This screen lists the matches that are currently available. A few bots are always available to play against."
+msgstr ""
+
 msgid "To download this replay visit"
 msgstr ""
 
 msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
+msgstr ""
+
+msgid "Tutorial"
 msgstr ""
 
 msgid "Type %s to offer a rematch."
@@ -265,10 +292,16 @@ msgstr ""
 msgid "Warning: Received unrecognized event from server."
 msgstr ""
 
+msgid "Welcome to the guided tutorial. Click anywhere outside of this message box to close the tutorial. Click anywhere inside of this message box to view the next page."
+msgstr ""
+
 msgid "Write error"
 msgstr ""
 
 msgid "Yes"
+msgstr ""
+
+msgid "You have the black checkers. You can move a checker by either clicking it or dragging it."
 msgstr ""
 
 msgid "You may need to upgrade your client."
