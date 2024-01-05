@@ -34,6 +34,7 @@ func (w *tutorialWidget) hide() {
 	game.lobby.showCreateGame = false
 	game.setRoot(listGamesFrame)
 	setViewBoard(false)
+	game.Board.gameState.PlayerNumber = 0
 	w.grid.Clear()
 }
 
@@ -81,6 +82,10 @@ func (w *tutorialWidget) setPage(page int) {
 	case 3:
 		game.lobby.showCreateGame = false
 		game.setRoot(listGamesFrame)
+		game.Board.gameState.PlayerNumber = 1
+		if game.needLayoutBoard {
+			game.layoutBoard()
+		}
 		setViewBoard(true)
 		title = gotext.Get("Board")
 		message = gotext.Get("You have the black checkers. You can move a checker by either clicking it or dragging it.")

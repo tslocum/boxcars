@@ -91,7 +91,7 @@ type lobby struct {
 func NewLobby() *lobby {
 	mainButtons = []*lobbyButton{
 		{gotext.Get("Refresh matches")},
-		{gotext.Get("Create new match")},
+		{gotext.Get("Create match")},
 		{gotext.Get("Join match")},
 	}
 
@@ -322,12 +322,6 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 			l.createGamePassword.Field.SetText("")
 			l.rebuildButtonsGrid()
 			scheduleFrame()
-		/*case lobbyButtonWatch:
-		if l.selected < 0 || l.selected >= len(l.games) {
-			return
-		}
-		l.c.Out <- []byte(fmt.Sprintf("watch %d", l.games[l.selected].ID))
-		setViewBoard(true)*/
 		case lobbyButtonJoin:
 			if l.selected < 0 || l.selected >= len(l.games) {
 				return nil

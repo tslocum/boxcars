@@ -115,6 +115,7 @@ type board struct {
 	highlightCheckbox    *etk.Checkbox
 	showPipCountCheckbox *etk.Checkbox
 	showMovesCheckbox    *etk.Checkbox
+	flipBoardCheckbox    *etk.Checkbox
 	accountGrid          *etk.Grid
 	settingsGrid         *etk.Grid
 
@@ -145,6 +146,7 @@ type board struct {
 	highlightAvailable bool
 	showPipCount       bool
 	showMoves          bool
+	flipBoard          bool
 
 	widget *BoardWidget
 
@@ -156,6 +158,11 @@ type board struct {
 
 const (
 	baseBoardVerticalSize = 25
+)
+
+var (
+	colorWhite = color.RGBA{255, 255, 255, 255}
+	colorBlack = color.RGBA{0, 0, 0, 255}
 )
 
 func NewBoard() *board {
@@ -177,8 +184,8 @@ func NewBoard() *board {
 		highlightSpaces:         make([][]int8, 28),
 		spaceHighlight:          ebiten.NewImage(1, 1),
 		foundMoves:              make(map[int]bool),
-		opponentLabel:           NewLabel(color.RGBA{255, 255, 255, 255}),
-		playerLabel:             NewLabel(color.RGBA{0, 0, 0, 255}),
+		opponentLabel:           NewLabel(colorWhite),
+		playerLabel:             NewLabel(colorBlack),
 		opponentMovesLabel:      etk.NewText(""),
 		playerMovesLabel:        etk.NewText(""),
 		opponentPipCount:        etk.NewText("0"),
@@ -343,6 +350,20 @@ func NewBoard() *board {
 		}
 		movesLabel.SetVertical(messeji.AlignCenter)
 
+		b.flipBoardCheckbox = etk.NewCheckbox(b.toggleFlipBoardCheckbox)
+		b.flipBoardCheckbox.SetBorderColor(triangleA)
+		b.flipBoardCheckbox.SetCheckColor(triangleA)
+		b.flipBoardCheckbox.SetSelected(b.flipBoard)
+
+		flipBoardLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Flip board")),
+			onSelected: func() {
+				b.flipBoardCheckbox.SetSelected(!b.flipBoardCheckbox.Selected())
+				b.toggleFlipBoardCheckbox()
+			},
+		}
+		flipBoardLabel.SetVertical(messeji.AlignCenter)
+
 		accountLabel := etk.NewText(gotext.Get("Account"))
 		accountLabel.SetVertical(messeji.AlignCenter)
 
@@ -350,23 +371,25 @@ func NewBoard() *board {
 
 		checkboxGrid := etk.NewGrid()
 		checkboxGrid.SetColumnSizes(72, 20, -1)
-		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1)
+		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1)
 		checkboxGrid.AddChildAt(b.highlightCheckbox, 0, 0, 1, 1)
 		checkboxGrid.AddChildAt(highlightLabel, 2, 0, 1, 1)
 		checkboxGrid.AddChildAt(b.showPipCountCheckbox, 0, 2, 1, 1)
 		checkboxGrid.AddChildAt(pipCountLabel, 2, 2, 1, 1)
 		checkboxGrid.AddChildAt(b.showMovesCheckbox, 0, 4, 1, 1)
 		checkboxGrid.AddChildAt(movesLabel, 2, 4, 1, 1)
+		checkboxGrid.AddChildAt(b.flipBoardCheckbox, 0, 6, 1, 1)
+		checkboxGrid.AddChildAt(flipBoardLabel, 2, 6, 1, 1)
 		{
 			grid := etk.NewGrid()
 			grid.AddChildAt(accountLabel, 0, 0, 1, 1)
 			grid.AddChildAt(b.accountGrid, 1, 0, 2, 1)
-			checkboxGrid.AddChildAt(grid, 0, 6, 3, 1)
+			checkboxGrid.AddChildAt(grid, 0, 8, 3, 1)
 		}
 
 		b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
 		b.settingsGrid.SetColumnSizes(20, -1, -1, 20)
-		b.settingsGrid.SetRowSizes(72, 72+20+72+20+72+20+72, 20, -1)
+		b.settingsGrid.SetRowSizes(72, 72+20+72+20+72+20+72+20+72, 20, -1)
 		b.settingsGrid.AddChildAt(settingsLabel, 1, 0, 2, 1)
 		b.settingsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
 		b.settingsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
@@ -1066,6 +1089,20 @@ func (b *board) toggleMovesCheckbox() error {
 	return nil
 }
 
+func (b *board) toggleFlipBoardCheckbox() error {
+	b.flipBoard = b.flipBoardCheckbox.Selected()
+	b.setSpaceRects()
+	b.updateBackgroundImage()
+
+	flipBoard := 0
+	if b.flipBoard {
+		flipBoard = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set flip %d", flipBoard))
+	b.Client.Out <- []byte("board")
+	return nil
+}
+
 func (b *board) newSprite(white bool) *Sprite {
 	s := &Sprite{}
 	s.colorWhite = white
@@ -1632,7 +1669,7 @@ func (b *board) setRect(x, y, w, h int) {
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + game.scale(baseButtonHeight)
+		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + game.scale(baseButtonHeight)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
@@ -1916,7 +1953,7 @@ func (b *board) setSpaceRects() {
 	}
 
 	// Flip board.
-	if b.gameState.PlayerNumber == 1 {
+	if b.gameState.PlayerNumber == 1 && !b.flipBoard {
 		for i := 0; i < 6; i++ {
 			j, k, l, m := 1+i, 12-i, 13+i, 24-i
 			b.spaceRects[j], b.spaceRects[k], b.spaceRects[l], b.spaceRects[m] = b.spaceRects[k], b.spaceRects[j], b.spaceRects[m], b.spaceRects[l]
@@ -1943,7 +1980,7 @@ func (b *board) bottomRow(space int) bool {
 	bottomEnd := 12
 	bottomBar := bgammon.SpaceBarPlayer
 	bottomHome := bgammon.SpaceHomePlayer
-	if b.gameState.PlayerNumber == 2 {
+	if b.flipBoard || b.gameState.PlayerNumber == 2 {
 		bottomStart = 1
 		bottomEnd = 12
 	}
@@ -1994,6 +2031,42 @@ func (b *board) processState() {
 	}
 	b.lastPlayerNumber = b.gameState.PlayerNumber
 
+	if b.flipBoard || b.gameState.PlayerNumber == 2 {
+		if b.opponentLabel.activeColor != colorBlack {
+			b.opponentLabel.activeColor = colorBlack
+			b.opponentLabel.SetForegroundColor(colorBlack)
+			b.opponentPipCount.SetForegroundColor(colorBlack)
+			b.opponentMovesLabel.SetForegroundColor(colorBlack)
+			b.opponentLabel.lastActive = !b.opponentLabel.active
+			b.opponentLabel.updateBackground()
+		}
+		if b.playerLabel.activeColor != colorWhite {
+			b.playerLabel.activeColor = colorWhite
+			b.playerLabel.SetForegroundColor(colorWhite)
+			b.playerPipCount.SetForegroundColor(colorWhite)
+			b.playerMovesLabel.SetForegroundColor(colorWhite)
+			b.playerLabel.lastActive = !b.opponentLabel.active
+			b.playerLabel.updateBackground()
+		}
+	} else {
+		if b.opponentLabel.activeColor != colorWhite {
+			b.opponentLabel.activeColor = colorWhite
+			b.opponentLabel.SetForegroundColor(colorWhite)
+			b.opponentPipCount.SetForegroundColor(colorWhite)
+			b.opponentMovesLabel.SetForegroundColor(colorWhite)
+			b.opponentLabel.lastActive = !b.opponentLabel.active
+			b.opponentLabel.updateBackground()
+		}
+		if b.playerLabel.activeColor != colorBlack {
+			b.playerLabel.activeColor = colorBlack
+			b.playerLabel.SetForegroundColor(colorBlack)
+			b.playerPipCount.SetForegroundColor(colorBlack)
+			b.playerMovesLabel.SetForegroundColor(colorBlack)
+			b.playerLabel.lastActive = !b.opponentLabel.active
+			b.playerLabel.updateBackground()
+		}
+	}
+
 	var showGrid *etk.Grid
 	if !b.gameState.Spectating && !b.availableStale {
 		if b.gameState.MayRoll() {
@@ -2024,6 +2097,9 @@ func (b *board) processState() {
 		spaceValue := b.gameState.Board[space]
 
 		white := spaceValue < 0
+		if b.flipBoard {
+			white = !white
+		}
 
 		abs := spaceValue
 		if abs < 0 {
@@ -2072,7 +2148,7 @@ func (b *board) processState() {
 	b.updateOpponentLabel()
 	b.updatePlayerLabel()
 
-	if b.gameState.Turn != 1 {
+	if b.gameState.Turn != b.gameState.PlayerNumber {
 		return
 	}
 
@@ -2233,14 +2309,7 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 	sprite.y = y
 	sprite.toStart = time.Time{}
 
-	/*homeSpace := b.ClientWebSocket.Board.PlayerHomeSpace()
-	if b.gameState.Turn != b.gameState.Player {
-		homeSpace = 25 - homeSpace
-	}
-
-	if to != homeSpace {*/
 	b.spaceSprites[to] = append(b.spaceSprites[to], sprite)
-	/*}*/
 	for i, s := range b.spaceSprites[from] {
 		if s == sprite {
 			b.spaceSprites[from] = append(b.spaceSprites[from][:i], b.spaceSprites[from][i+1:]...)
@@ -2569,7 +2638,7 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 		if !handled && b.playerTurn() && clicked && (b.lastDragClick.IsZero() || time.Since(b.lastDragClick) >= 50*time.Millisecond) {
 			s, space := b.spriteAt(cx, cy)
-			if s != nil && s.colorWhite == (b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomeOpponent && (space != bgammon.SpaceHomePlayer || !game.Board.gameState.Acey || !game.Board.gameState.Player1.Entered) {
+			if s != nil && s.colorWhite == (b.flipBoard || b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomeOpponent && (space != bgammon.SpaceHomePlayer || !game.Board.gameState.Acey || !game.Board.gameState.Player1.Entered) {
 				b.startDrag(s, space, false)
 				handled = true
 			}

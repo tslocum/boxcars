@@ -112,6 +112,9 @@ msgstr ""
 msgid "Failed to submit moves: %s"
 msgstr ""
 
+msgid "Flip board"
+msgstr ""
+
 msgid "Good Luck, Have Fun"
 msgstr ""
 

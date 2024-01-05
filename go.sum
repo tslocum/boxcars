@@ -1,7 +1,7 @@
 code.rocket9labs.com/tslocum/bei v0.0.0-20240104011455-722dd38546ef h1:pE3r8hvM5fWnbtHoaY6TL/mlixMATbMo9y16u2F0cXU=
 code.rocket9labs.com/tslocum/bei v0.0.0-20240104011455-722dd38546ef/go.mod h1:tS60/VNAJphKvDBkSLQhKALa15msIAuWWfEKNc4oFZc=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20240103025410-1146b1c5c390 h1:hnmyhy/coq51rFCvReDk12ZOli5JjWrZm8/52ibbAoI=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20240103025410-1146b1c5c390/go.mod h1:6NKX9J8GqNltV66SCqPwJpA8tGLY/rsE9bsMzCcHUbg=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20240105195235-fb58a25c67de h1:qCHSTtVclOAUW2x1nX72XWDaR4za2/J6q7GceCxhEX8=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20240105195235-fb58a25c67de/go.mod h1:qoXFACgj2k4y5996rU5+GxZ2x9De1ZyA3+GraUJpFj8=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231230070310-ccf9dd359e84 h1:OG0cqxT6PRDJYEUKE7Wof+REP9vvPau6ycGMT5VW/X8=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231230070310-ccf9dd359e84/go.mod h1:OPxtBXWd9keQ8LekCXT6bdfVqIVN3CqvM/lnekib4D8=
 code.rocket9labs.com/tslocum/etk v0.0.0-20231225090418-db70da18e067 h1:DmzeAyFImu/z58bv3hPLybYoFEviCt4ugEp7SM0Y+qM=
@@ -10,8 +10,8 @@ code.rocket9labs.com/tslocum/tabula v0.0.0-20240102002109-32165ed8d7ec h1:Ugo9B7
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240102002109-32165ed8d7ec/go.mod h1:ZvMo2xto5GUODvzLiTNEg5DjHoKULK+HGt8wfYHHq78=
 code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544 h1:G+yE90iQh2Pmzd6otFl7LEGVI+a/HRCnehcU01CjXyo=
 code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544/go.mod h1:FEGJwIgz3VmyN5khErdyEVX0YBG/VIPwogvNApc9TTQ=
-code.rocketnine.space/tslocum/messeji v1.0.6-0.20231218071755-e4087431ad9f h1:/6Mpu+9TfQyee7uJ1epZEEfGGCT67bvZKpVhWy8T7cs=
-code.rocketnine.space/tslocum/messeji v1.0.6-0.20231218071755-e4087431ad9f/go.mod h1:hA/frrbchjCX75HUG/GH97X3eH8xw++AKC2F+z+uXyA=
+code.rocketnine.space/tslocum/messeji v1.0.6-0.20240105201028-fc0897906b05 h1:2nhD6fTuIJU94hIFD9hoSx+Jwr2WKxGLFv6jxgdmEIU=
+code.rocketnine.space/tslocum/messeji v1.0.6-0.20240105201028-fc0897906b05/go.mod h1:cznUGfvC7BKbc5sx4I36XpLsF0ar3TPJYZlrND0IlDQ=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
 github.com/Masterminds/goutils v1.1.1/go.mod h1:8cTjp+g8YejhMuvIA5y2vz3BpJxksy863GQaJW2MFNU=
 github.com/Masterminds/semver v1.4.2/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=

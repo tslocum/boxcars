@@ -3,12 +3,12 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240103025410-1146b1c5c390
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240105195235-fb58a25c67de
 	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231230070310-ccf9dd359e84
 	code.rocket9labs.com/tslocum/etk v0.0.0-20231225090418-db70da18e067
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240102002109-32165ed8d7ec
 	code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544
-	code.rocketnine.space/tslocum/messeji v1.0.6-0.20231218071755-e4087431ad9f
+	code.rocketnine.space/tslocum/messeji v1.0.6-0.20240105201028-fc0897906b05
 	github.com/hajimehoshi/ebiten/v2 v2.6.3
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351
 	github.com/llgcode/draw2d v0.0.0-20231212091825-f55e0c776b44

@@ -41,7 +41,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.2.0p1"
+const version = "v1.2.1"
 
 const DefaultServerAddress = "wss://ws.bgammon.org"
 
@@ -569,8 +569,7 @@ type Game struct {
 	register      bool
 	loggedIn      bool
 
-	Watch bool
-	TV    bool
+	TV bool
 
 	Client *Client
 
@@ -1328,6 +1327,7 @@ func (g *Game) handleEvent(e interface{}) {
 		}
 	case *bgammon.EventBoard:
 		g.Board.Lock()
+
 		g.Board.stateLock.Lock()
 		*g.Board.gameState = ev.GameState
 		*g.Board.gameState.Game = *ev.GameState.Game
@@ -1364,8 +1364,10 @@ func (g *Game) handleEvent(e interface{}) {
 		}
 		g.Board.availableStale = false
 		g.Board.stateLock.Unlock()
+
 		g.Board.processState()
 		g.Board.Unlock()
+
 		setViewBoard(true)
 	case *bgammon.EventRolled:
 		g.Board.Lock()
@@ -1413,6 +1415,7 @@ func (g *Game) handleEvent(e interface{}) {
 		if ev.Player == g.Client.Username && !g.Board.gameState.Spectating {
 			return
 		}
+
 		g.Board.Lock()
 		g.Unlock()
 		for _, move := range ev.Moves {
@@ -1456,6 +1459,10 @@ func (g *Game) handleEvent(e interface{}) {
 		b.showPipCountCheckbox.SetSelected(b.showPipCount)
 		b.showMoves = ev.Moves
 		b.showMovesCheckbox.SetSelected(b.showMoves)
+		b.flipBoard = ev.Flip
+		b.flipBoardCheckbox.SetSelected(b.flipBoard)
+		b.setSpaceRects()
+		b.updateBackgroundImage()
 		b.processState()
 		b.updatePlayerLabel()
 		b.updateOpponentLabel()
@@ -1952,11 +1959,6 @@ func (g *Game) Connect() {
 			time.Sleep(time.Second)
 			c.Out <- []byte("tv")
 		}()
-	} else if g.Watch {
-		go func() {
-			time.Sleep(time.Second)
-			c.Out <- []byte("watch")
-		}()
 	}
 
 	connectTime := time.Now()
@@ -2018,11 +2020,6 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 		go func() {
 			time.Sleep(time.Second)
 			c.Out <- []byte("tv")
-		}()
-	} else if g.Watch {
-		go func() {
-			time.Sleep(time.Second)
-			c.Out <- []byte("watch")
 		}()
 	}
 
