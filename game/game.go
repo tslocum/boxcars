@@ -113,7 +113,7 @@ var (
 
 	lobbyStatusBufferHeight = 75
 
-	Debug int
+	Debug int8
 
 	game *Game
 
@@ -423,7 +423,7 @@ func initializeFonts() {
 	}
 }
 
-func diceImage(roll int) *ebiten.Image {
+func diceImage(roll int8) *ebiten.Image {
 	switch roll {
 	case 1:
 		return imgDice1
@@ -1461,6 +1461,9 @@ func (g *Game) handleEvent(e interface{}) {
 		b.showMovesCheckbox.SetSelected(b.showMoves)
 		b.flipBoard = ev.Flip
 		b.flipBoardCheckbox.SetSelected(b.flipBoard)
+		if g.needLayoutBoard {
+			g.layoutBoard()
+		}
 		b.setSpaceRects()
 		b.updateBackgroundImage()
 		b.processState()
@@ -1563,23 +1566,26 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 
 		gs.Player1.Name, gs.Player2.Name = string(split[2]), string(split[3])
 
-		gs.Points, err = strconv.Atoi(string(split[4]))
+		points, err := strconv.Atoi(string(split[4]))
 		if err != nil || gs.Points < 1 {
 			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
 			return false
 		}
+		gs.Points = int8(points)
 
-		gs.Player1.Points, err = strconv.Atoi(string(split[5]))
+		points, err = strconv.Atoi(string(split[5]))
 		if err != nil || gs.Player1.Points < 0 {
 			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
 			return false
 		}
+		gs.Player1.Points = int8(points)
 
-		gs.Player2.Points, err = strconv.Atoi(string(split[6]))
+		points, err = strconv.Atoi(string(split[6]))
 		if err != nil || gs.Player1.Points < 0 {
 			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
 			return false
 		}
+		gs.Player2.Points = int8(points)
 
 		if sendEvent {
 			ev := &bgammon.EventBoard{
@@ -1605,7 +1611,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
 			return false
 		}
-		player := 1
+		var player int8 = 1
 		if bytes.Equal(split[0], []byte("2")) {
 			player = 2
 		}
@@ -1672,14 +1678,14 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 
 			if sendEvent {
 				ev := &bgammon.EventRolled{
-					Roll1: r1,
-					Roll2: r2,
+					Roll1: int8(r1),
+					Roll2: int8(r2),
 				}
 				ev.Player = playerName
 				g.Client.Events <- ev
 			}
 
-			gs.Roll1, gs.Roll2 = r1, r2
+			gs.Roll1, gs.Roll2 = int8(r1), int8(r2)
 			gs.Turn = player
 			gs.Available = gs.LegalMoves(true)
 			gs.Moves = nil
@@ -1719,12 +1725,12 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 				}
 				if sendEvent {
 					ev := &bgammon.EventMoved{
-						Moves: [][]int{{from, to}},
+						Moves: [][]int8{{from, to}},
 					}
 					ev.Player = playerName
 					g.Client.Events <- ev
 				}
-				ok, _ := gs.AddMoves([][]int{{from, to}}, false)
+				ok, _ := gs.AddMoves([][]int8{{from, to}}, false)
 				if !ok {
 					log.Panicf("failed to move checkers during replay from %d to %d", from, to)
 				}
@@ -1733,7 +1739,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 			if gs.Winner != 0 {
 				playerBar := bgammon.SpaceBarPlayer
 				opponentHome := bgammon.SpaceHomeOpponent
-				opponent := 2
+				var opponent int8 = 2
 				if player == 2 {
 					playerBar = bgammon.SpaceBarOpponent
 					opponentHome = bgammon.SpaceHomePlayer
@@ -1743,14 +1749,14 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 				backgammon := bgammon.PlayerCheckers(gs.Board[playerBar], opponent) != 0
 				if !backgammon {
 					homeStart, homeEnd := bgammon.HomeRange(gs.Winner)
-					bgammon.IterateSpaces(homeStart, homeEnd, gs.Acey, func(space, spaceCount int) {
+					bgammon.IterateSpaces(homeStart, homeEnd, gs.Acey, func(space int8, spaceCount int8) {
 						if bgammon.PlayerCheckers(gs.Board[space], opponent) != 0 {
 							backgammon = true
 						}
 					})
 				}
 
-				var winPoints int
+				var winPoints int8
 				if !gs.Acey {
 					if backgammon {
 						winPoints = 3 // Award backgammon.
@@ -1760,7 +1766,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 						winPoints = 1
 					}
 				} else {
-					for space := 0; space < bgammon.BoardSpaces; space++ {
+					for space := int8(0); space < bgammon.BoardSpaces; space++ {
 						if (space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent) && ((opponent == 1 && gs.Player1.Entered) || (opponent == 2 && gs.Player2.Entered)) {
 							continue
 						}

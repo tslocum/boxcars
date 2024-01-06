@@ -3,8 +3,8 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240105195235-fb58a25c67de
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20231230070310-ccf9dd359e84
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240106024113-469865395f77
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240106031324-a73bb828ec31
 	code.rocket9labs.com/tslocum/etk v0.0.0-20231225090418-db70da18e067
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240102002109-32165ed8d7ec
 	code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544

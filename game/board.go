@@ -44,7 +44,7 @@ type board struct {
 	spaceSprites [][]*Sprite // Space contents
 
 	dragging      *Sprite
-	draggingSpace int
+	draggingSpace int8
 	draggingClick bool // Drag started with mouse click
 	lastDragClick time.Time
 	moving        *Sprite // Moving automatically
@@ -58,21 +58,21 @@ type board struct {
 	verticalBorderSize   float64
 	overlapSize          float64
 
-	lastPlayerNumber int
+	lastPlayerNumber int8
 
 	gameState *bgammon.GameState
 
-	opponentRoll1, opponentRoll2 int
+	opponentRoll1, opponentRoll2 int8
 	opponentRollStale            bool
-	playerRoll1, playerRoll2     int
+	playerRoll1, playerRoll2     int8
 	playerRollStale              bool
 
 	availableStale bool
 
-	opponentMoves [][]int
-	playerMoves   [][]int
+	opponentMoves [][]int8
+	playerMoves   [][]int8
 
-	debug int // Print and draw debug information
+	debug int8 // Print and draw debug information
 
 	Client *Client
 
@@ -1291,7 +1291,7 @@ func (b *board) updateBackgroundImage() {
 			x -= 2
 		}
 		y := 0
-		if b.bottomRow(space) {
+		if b.bottomRow(int8(space)) {
 			y = b.h - int(b.verticalBorderSize)
 		}
 		text.Draw(b.backgroundImage, sp, b.fontFace, x, y+(int(b.verticalBorderSize)-b.lineHeight)/2+b.lineOffset, spaceLabelColor)
@@ -1390,8 +1390,8 @@ func (b *board) Draw(screen *ebiten.Image) {
 		screen.DrawImage(b.backgroundImage, op)
 	}
 
-	for space := 0; space < bgammon.BoardSpaces; space++ {
-		var numPieces int
+	for space := int8(0); space < bgammon.BoardSpaces; space++ {
+		var numPieces int8
 		for i, sprite := range b.spaceSprites[space] {
 			if sprite == b.dragging || sprite == b.moving {
 				continue
@@ -1447,7 +1447,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 	// Draw space hover overlay when dragging.
 	if dragging != nil {
 		for i := range highlightSpaces[b.draggingSpace] {
-			m := int(highlightSpaces[b.draggingSpace][i])
+			m := highlightSpaces[b.draggingSpace][i]
 			x, y, _, _ := b.spaceRect(m)
 			x, y = b.offsetPosition(m, x, y)
 			if b.bottomRow(m) {
@@ -1860,7 +1860,7 @@ func (b *board) updatePlayerLabel() {
 	}
 }
 
-func (b *board) offsetPosition(space, x, y int) (int, int) {
+func (b *board) offsetPosition(space int8, x, y int) (int, int) {
 	if space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent {
 		x += 1
 	}
@@ -1869,7 +1869,7 @@ func (b *board) offsetPosition(space, x, y int) (int, int) {
 
 // Do not call _positionCheckers directly.  Call processState instead.
 func (b *board) _positionCheckers() {
-	for space := 0; space < bgammon.BoardSpaces; space++ {
+	for space := int8(0); space < bgammon.BoardSpaces; space++ {
 		sprites := b.spaceSprites[space]
 
 		for i := range sprites {
@@ -1878,7 +1878,7 @@ func (b *board) _positionCheckers() {
 				continue
 			}
 
-			x, y, w, _ := b.stackSpaceRect(space, i)
+			x, y, w, _ := b.stackSpaceRect(space, int8(i))
 			s.x, s.y = b.offsetPosition(space, x, y)
 			// Center piece in space
 			s.x += (w - s.w) / 2
@@ -1886,7 +1886,7 @@ func (b *board) _positionCheckers() {
 	}
 }
 
-func (b *board) spriteAt(x, y int) (*Sprite, int) {
+func (b *board) spriteAt(x, y int) (*Sprite, int8) {
 	space := b.spaceAt(x, y)
 	if space == -1 {
 		return nil, -1
@@ -1898,8 +1898,8 @@ func (b *board) spriteAt(x, y int) (*Sprite, int) {
 	return pieces[len(pieces)-1], space
 }
 
-func (b *board) spaceAt(x, y int) int {
-	for i := 0; i < bgammon.BoardSpaces; i++ {
+func (b *board) spaceAt(x, y int) int8 {
+	for i := int8(0); i < bgammon.BoardSpaces; i++ {
 		sx, sy, sw, sh := b.spaceRect(i)
 		sx, sy = b.offsetPosition(i, sx, sy)
 		if x >= sx && x < sx+sw && y >= sy && y < sy+sh {
@@ -1911,7 +1911,7 @@ func (b *board) spaceAt(x, y int) int {
 
 func (b *board) setSpaceRects() {
 	var x, y, w, h int
-	for space := 0; space < bgammon.BoardSpaces; space++ {
+	for space := int8(0); space < bgammon.BoardSpaces; space++ {
 		if !b.bottomRow(space) {
 			y = 0
 		} else {
@@ -1920,7 +1920,7 @@ func (b *board) setSpaceRects() {
 
 		w = int(b.spaceWidth)
 
-		var hspace int // horizontal space
+		var hspace int8 // horizontal space
 		var add int
 		if space == bgammon.SpaceBarPlayer || space == bgammon.SpaceBarOpponent {
 			hspace = 6
@@ -1970,14 +1970,14 @@ func (b *board) setSpaceRects() {
 }
 
 // relX, relY
-func (b *board) spaceRect(space int) (x, y, w, h int) {
+func (b *board) spaceRect(space int8) (x, y, w, h int) {
 	rect := b.spaceRects[space]
 	return rect[0], rect[1], rect[2], rect[3]
 }
 
-func (b *board) bottomRow(space int) bool {
-	bottomStart := 1
-	bottomEnd := 12
+func (b *board) bottomRow(space int8) bool {
+	var bottomStart int8 = 1
+	var bottomEnd int8 = 12
 	bottomBar := bgammon.SpaceBarPlayer
 	bottomHome := bgammon.SpaceHomePlayer
 	if b.flipBoard || b.gameState.PlayerNumber == 2 {
@@ -1988,7 +1988,7 @@ func (b *board) bottomRow(space int) bool {
 }
 
 // relX, relY
-func (b *board) stackSpaceRect(space int, stack int) (x, y, w, h int) {
+func (b *board) stackSpaceRect(space int8, stack int8) (x, y, w, h int) {
 	x, y, _, h = b.spaceRect(space)
 
 	// Stack pieces
@@ -2105,7 +2105,7 @@ func (b *board) processState() {
 		if abs < 0 {
 			abs *= -1
 		}
-		for i := 0; i < abs; i++ {
+		for i := int8(0); i < abs; i++ {
 			var s *Sprite
 			if !white {
 				for i := range b.Sprites.sprites[nextBlack:] {
@@ -2276,7 +2276,7 @@ func (b *board) processState() {
 }
 
 // _movePiece returns after moving the piece.
-func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bool) {
+func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause bool) {
 	moveTime := (650 * time.Millisecond) / time.Duration(speed)
 	pauseTime := 250 * time.Millisecond
 
@@ -2291,7 +2291,7 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 		stack++
 	}
 
-	x, y, w, _ := b.stackSpaceRect(space, stack)
+	x, y, w, _ := b.stackSpaceRect(space, int8(stack))
 	x, y = b.offsetPosition(space, x, y)
 	// Center piece in space
 	x += (w - int(b.spaceWidth)) / 2
@@ -2328,7 +2328,7 @@ func (b *board) _movePiece(sprite *Sprite, from int, to int, speed int, pause bo
 }
 
 // movePiece returns when finished moving the piece.
-func (b *board) movePiece(from int, to int) {
+func (b *board) movePiece(from int8, to int8) {
 	pieces := b.spaceSprites[from]
 	if len(pieces) == 0 {
 		log.Printf("ERROR: NO SPRITE FOR MOVE %d/%d", from, to)
@@ -2363,7 +2363,7 @@ func (b *board) playerTurn() bool {
 	return b.playingGame() && (b.gameState.MayRoll() || b.gameState.Turn == b.gameState.PlayerNumber)
 }
 
-func (b *board) startDrag(s *Sprite, space int, click bool) {
+func (b *board) startDrag(s *Sprite, space int8, click bool) {
 	b.dragging = s
 	b.draggingSpace = space
 	b.draggingClick = click
@@ -2424,12 +2424,13 @@ func (b *board) finishDrag(x int, y int, click bool) {
 		var processed bool
 		if index >= 0 && b.Client != nil {
 		ADDPREMOVE:
-			for space, pieces := range b.spaceSprites {
+			for sp, pieces := range b.spaceSprites {
+				space := int8(sp)
 				for _, piece := range pieces {
 					if piece == dropped {
 						if space != index {
 							playSoundEffect(effectMove)
-							b.gameState.AddLocalMove([]int{space, index})
+							b.gameState.AddLocalMove([]int8{space, index})
 							b.processState()
 							scheduleFrame()
 							processed = true
@@ -2580,10 +2581,10 @@ func (l *Label) Draw(screen *ebiten.Image) error {
 
 type DieButton struct {
 	*etk.Button
-	Value int
+	Value int8
 }
 
-func NewDieButton(value int, onSelected func() error) *DieButton {
+func NewDieButton(value int8, onSelected func() error) *DieButton {
 	return &DieButton{
 		Button: etk.NewButton(" ", onSelected),
 		Value:  value,
@@ -2656,13 +2657,13 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 	return handled, nil
 }
 
-func allMoves(in *bgammon.Game, from int, to int) []int {
+func allMoves(in *bgammon.Game, from int8, to int8) []int8 {
 	gc := in.Copy()
-	ok, _ := gc.AddMoves([][]int{{from, to}}, true)
+	ok, _ := gc.AddMoves([][]int8{{from, to}}, true)
 	if !ok {
 		return nil
 	}
-	moves := []int{to}
+	moves := []int8{to}
 	for _, m := range gc.LegalMoves(true) {
 		if m[0] == to {
 			moves = append(moves, allMoves(gc, m[0], m[1])...)
@@ -2671,7 +2672,7 @@ func allMoves(in *bgammon.Game, from int, to int) []int {
 	return moves
 }
 
-func expandMoves(moves [][]int) [][]int {
+func expandMoves(moves [][]int8) [][]int8 {
 	var expanded bool
 	for _, m := range moves {
 		expandedMoves, ok := game.Board.gameState.ExpandMove(m, m[0], nil, true)
@@ -2686,7 +2687,7 @@ func expandMoves(moves [][]int) [][]int {
 	if !expanded {
 		return moves
 	}
-	var newMoves [][]int
+	var newMoves [][]int8
 	for _, m := range moves {
 		expandedMoves, ok := game.Board.gameState.ExpandMove(m, m[0], nil, true)
 		if !ok {
