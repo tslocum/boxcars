@@ -41,7 +41,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.2.1"
+const version = "v1.2.2"
 
 const DefaultServerAddress = "wss://ws.bgammon.org"
 
@@ -501,9 +501,9 @@ func setViewBoard(view bool) {
 
 		statusBuffer.SetRect(statusBuffer.Rect())
 
-		game.Board.playerRoll1, game.Board.playerRoll2 = 0, 0
+		game.Board.playerRoll1, game.Board.playerRoll2, game.Board.playerRoll3 = 0, 0, 0
 		game.Board.playerRollStale = false
-		game.Board.opponentRoll1, game.Board.opponentRoll2 = 0, 0
+		game.Board.opponentRoll1, game.Board.opponentRoll2, game.Board.opponentRoll3 = 0, 0, 0
 		game.Board.opponentRollStale = false
 	}
 
@@ -941,17 +941,16 @@ func NewGame() *Game {
 		})
 		centerInput(g.lobby.createGamePassword)
 
-		g.lobby.createGameCheckbox = etk.NewCheckbox(g.lobby.toggleAceyDeucey)
-		g.lobby.createGameCheckbox.SetBorderColor(triangleA)
-		g.lobby.createGameCheckbox.SetCheckColor(triangleA)
-		g.lobby.createGameCheckbox.SetSelected(false)
+		g.lobby.createGameAceyCheckbox = etk.NewCheckbox(g.lobby.toggleVariantAcey)
+		g.lobby.createGameAceyCheckbox.SetBorderColor(triangleA)
+		g.lobby.createGameAceyCheckbox.SetCheckColor(triangleA)
+		g.lobby.createGameAceyCheckbox.SetSelected(false)
 
-		textField := newCenteredText(gotext.Get("Acey-deucey"))
 		aceyDeuceyLabel := &ClickableText{
-			Text: textField,
+			Text: newCenteredText(gotext.Get("Acey-deucey")),
 			onSelected: func() {
-				g.lobby.createGameCheckbox.SetSelected(!g.lobby.createGameCheckbox.Selected())
-				g.lobby.toggleAceyDeucey()
+				g.lobby.createGameAceyCheckbox.SetSelected(!g.lobby.createGameAceyCheckbox.Selected())
+				g.lobby.toggleVariantAcey()
 			},
 		}
 		aceyDeuceyLabel.SetVertical(messeji.AlignCenter)
@@ -959,8 +958,32 @@ func NewGame() *Game {
 		aceyDeuceyGrid := etk.NewGrid()
 		aceyDeuceyGrid.SetColumnSizes(fieldHeight, xPadding, -1)
 		aceyDeuceyGrid.SetRowSizes(fieldHeight, -1)
-		aceyDeuceyGrid.AddChildAt(g.lobby.createGameCheckbox, 0, 0, 1, 1)
+		aceyDeuceyGrid.AddChildAt(g.lobby.createGameAceyCheckbox, 0, 0, 1, 1)
 		aceyDeuceyGrid.AddChildAt(aceyDeuceyLabel, 2, 0, 1, 1)
+
+		g.lobby.createGameTabulaCheckbox = etk.NewCheckbox(g.lobby.toggleVariantTabula)
+		g.lobby.createGameTabulaCheckbox.SetBorderColor(triangleA)
+		g.lobby.createGameTabulaCheckbox.SetCheckColor(triangleA)
+		g.lobby.createGameTabulaCheckbox.SetSelected(false)
+
+		tabulaLabel := &ClickableText{
+			Text: newCenteredText(gotext.Get("Tabula")),
+			onSelected: func() {
+				g.lobby.createGameTabulaCheckbox.SetSelected(!g.lobby.createGameTabulaCheckbox.Selected())
+				g.lobby.toggleVariantTabula()
+			},
+		}
+		tabulaLabel.SetVertical(messeji.AlignCenter)
+
+		tabulaGrid := etk.NewGrid()
+		tabulaGrid.SetColumnSizes(fieldHeight, xPadding, -1)
+		tabulaGrid.SetRowSizes(fieldHeight, -1)
+		tabulaGrid.AddChildAt(g.lobby.createGameTabulaCheckbox, 0, 0, 1, 1)
+		tabulaGrid.AddChildAt(tabulaLabel, 2, 0, 1, 1)
+
+		variantGrid := etk.NewGrid()
+		variantGrid.AddChildAt(aceyDeuceyGrid, 0, 0, 1, 1)
+		variantGrid.AddChildAt(tabulaGrid, 1, 0, 1, 1)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
@@ -976,7 +999,7 @@ func NewGame() *Game {
 		grid.AddChildAt(passwordLabel, 1, 3, 1, 1)
 		grid.AddChildAt(g.lobby.createGamePassword, 2, 3, 1, 1)
 		grid.AddChildAt(variantLabel, 1, 4, 1, 1)
-		grid.AddChildAt(aceyDeuceyGrid, 2, 4, 1, 1)
+		grid.AddChildAt(variantGrid, 2, 4, 1, 1)
 		grid.AddChildAt(etk.NewBox(), 0, 5, 1, 1)
 		createGameGrid = grid
 
@@ -1159,8 +1182,9 @@ func (g *Game) playOffline() {
 	conns := server.ListenLocal()
 
 	// Connect the bots.
-	go bot.NewLocalClient(<-conns, "", "BOT_tabula", "", 1, false, false, 0)
-	go bot.NewLocalClient(<-conns, "", "BOT_tabula_acey", "", 1, true, false, 0)
+	go bot.NewLocalClient(<-conns, "", "BOT_tabula", "", 1, bgammon.VariantBackgammon, false, 0)
+	go bot.NewLocalClient(<-conns, "", "BOT_tabula_acey", "", 1, bgammon.VariantAceyDeucey, false, 0)
+	go bot.NewLocalClient(<-conns, "", "BOT_tabula_tabula", "", 1, bgammon.VariantTabula, false, 0)
 
 	// Wait for the bots to finish creating matches.
 	time.Sleep(250 * time.Millisecond)
@@ -1287,8 +1311,8 @@ func (g *Game) handleEvent(e interface{}) {
 		} else if ev.PlayerNumber == 2 {
 			g.Board.gameState.Player2.Name = ev.Player
 		}
-		g.Board.playerRoll1, g.Board.playerRoll2 = 0, 0
-		g.Board.opponentRoll1, g.Board.opponentRoll2 = 0, 0
+		g.Board.playerRoll1, g.Board.playerRoll2, g.Board.playerRoll3 = 0, 0, 0
+		g.Board.opponentRoll1, g.Board.opponentRoll2, g.Board.opponentRoll3 = 0, 0, 0
 		g.Board.playerRollStale = false
 		g.Board.opponentRollStale = false
 		g.Board.availableStale = false
@@ -1333,10 +1357,10 @@ func (g *Game) handleEvent(e interface{}) {
 		*g.Board.gameState.Game = *ev.GameState.Game
 		if g.Board.gameState.Turn == 0 {
 			if g.Board.playerRoll2 != 0 {
-				g.Board.playerRoll1, g.Board.playerRoll2 = 0, 0
+				g.Board.playerRoll1, g.Board.playerRoll2, g.Board.playerRoll3 = 0, 0, 0
 			}
 			if g.Board.opponentRoll1 != 0 {
-				g.Board.opponentRoll1, g.Board.opponentRoll2 = 0, 0
+				g.Board.opponentRoll1, g.Board.opponentRoll2, g.Board.opponentRoll3 = 0, 0, 0
 			}
 			if g.Board.gameState.Roll1 != 0 {
 				g.Board.playerRoll1 = g.Board.gameState.Roll1
@@ -1346,18 +1370,18 @@ func (g *Game) handleEvent(e interface{}) {
 			}
 		} else if g.Board.gameState.Roll1 != 0 {
 			if g.Board.gameState.Turn == 1 {
-				g.Board.playerRoll1, g.Board.playerRoll2 = g.Board.gameState.Roll1, g.Board.gameState.Roll2
+				g.Board.playerRoll1, g.Board.playerRoll2, g.Board.playerRoll3 = g.Board.gameState.Roll1, g.Board.gameState.Roll2, g.Board.gameState.Roll3
 				g.Board.playerRollStale = false
 				g.Board.opponentRollStale = true
 				if g.Board.opponentRoll1 == 0 || g.Board.opponentRoll2 == 0 {
-					g.Board.opponentRoll1, g.Board.opponentRoll2 = 0, 0
+					g.Board.opponentRoll1, g.Board.opponentRoll2, g.Board.opponentRoll3 = 0, 0, 0
 				}
 			} else {
-				g.Board.opponentRoll1, g.Board.opponentRoll2 = g.Board.gameState.Roll1, g.Board.gameState.Roll2
+				g.Board.opponentRoll1, g.Board.opponentRoll2, g.Board.opponentRoll3 = g.Board.gameState.Roll1, g.Board.gameState.Roll2, g.Board.gameState.Roll3
 				g.Board.opponentRollStale = false
 				g.Board.playerRollStale = true
 				if g.Board.playerRoll1 == 0 || g.Board.playerRoll2 == 0 {
-					g.Board.playerRoll1, g.Board.playerRoll2 = 0, 0
+					g.Board.playerRoll1, g.Board.playerRoll2, g.Board.playerRoll3 = 0, 0, 0
 				}
 				g.Board.dragging = nil
 			}
@@ -1374,6 +1398,7 @@ func (g *Game) handleEvent(e interface{}) {
 		g.Board.stateLock.Lock()
 		g.Board.gameState.Roll1 = ev.Roll1
 		g.Board.gameState.Roll2 = ev.Roll2
+		g.Board.gameState.Roll3 = ev.Roll3
 		var diceFormatted string
 		if g.Board.gameState.Turn == 0 {
 			if g.Board.gameState.Player1.Name == ev.Player {
@@ -1392,11 +1417,14 @@ func (g *Game) handleEvent(e interface{}) {
 		} else {
 			diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
 			if g.Board.gameState.Player1.Name == ev.Player {
-				g.Board.playerRoll1, g.Board.playerRoll2 = g.Board.gameState.Roll1, g.Board.gameState.Roll2
+				g.Board.playerRoll1, g.Board.playerRoll2, g.Board.playerRoll3 = g.Board.gameState.Roll1, g.Board.gameState.Roll2, g.Board.gameState.Roll3
 				g.Board.playerRollStale = false
 			} else {
-				g.Board.opponentRoll1, g.Board.opponentRoll2 = g.Board.gameState.Roll1, g.Board.gameState.Roll2
+				g.Board.opponentRoll1, g.Board.opponentRoll2, g.Board.opponentRoll3 = g.Board.gameState.Roll1, g.Board.gameState.Roll2, g.Board.gameState.Roll3
 				g.Board.opponentRollStale = false
+			}
+			if g.Board.gameState.Roll3 != 0 {
+				diceFormatted += fmt.Sprintf("-%d", g.Board.gameState.Roll3)
 			}
 			if !ev.Selected {
 				playSoundEffect(effectDice)
@@ -1551,14 +1579,14 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 			g.Client.Events <- ev
 		}
 
-		acey, err := strconv.Atoi(string(split[9]))
-		if err != nil || acey < 0 || acey > 1 {
+		variant, err := strconv.Atoi(string(split[9]))
+		if err != nil || variant < 0 || variant > 2 {
 			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
 			return false
 		}
 
 		*gs = bgammon.GameState{
-			Game: bgammon.NewGame(acey == 1),
+			Game: bgammon.NewGame(int8(variant)),
 		}
 		gs.PlayerNumber = 1
 		gs.Spectating = true
@@ -1638,7 +1666,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 			l(fmt.Sprintf("*** %s offers a double (%d points). %s %s.", gs.Player1.Name, doubleValue, gs.Player2.Name, resultText))
 		case bytes.Equal(split[1], []byte("r")):
 			rollSplit := bytes.Split(split[2], []byte("-"))
-			if len(rollSplit) != 2 || len(rollSplit[0]) != 1 || len(rollSplit[1]) != 1 {
+			if len(rollSplit) < 2 || len(rollSplit[0]) != 1 || len(rollSplit[1]) != 1 {
 				log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
 				return false
 			}
@@ -1651,6 +1679,14 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 			if err != nil || r2 < 1 || r2 > 6 {
 				log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
 				return false
+			}
+			var r3 int
+			if len(rollSplit) > 2 {
+				r3, err = strconv.Atoi(string(rollSplit[2]))
+				if err != nil || r3 < 1 || r3 > 6 {
+					log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
+					return false
+				}
 			}
 
 			gs.Moves = nil
@@ -1680,6 +1716,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 				ev := &bgammon.EventRolled{
 					Roll1: int8(r1),
 					Roll2: int8(r2),
+					Roll3: int8(r3),
 				}
 				ev.Player = playerName
 				g.Client.Events <- ev
@@ -1748,8 +1785,8 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 
 				backgammon := bgammon.PlayerCheckers(gs.Board[playerBar], opponent) != 0
 				if !backgammon {
-					homeStart, homeEnd := bgammon.HomeRange(gs.Winner)
-					bgammon.IterateSpaces(homeStart, homeEnd, gs.Acey, func(space int8, spaceCount int8) {
+					homeStart, homeEnd := bgammon.HomeRange(gs.Winner, gs.Variant)
+					bgammon.IterateSpaces(homeStart, homeEnd, gs.Variant, func(space int8, spaceCount int8) {
 						if bgammon.PlayerCheckers(gs.Board[space], opponent) != 0 {
 							backgammon = true
 						}
@@ -1757,7 +1794,8 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 				}
 
 				var winPoints int8
-				if !gs.Acey {
+				switch gs.Variant {
+				case bgammon.VariantBackgammon:
 					if backgammon {
 						winPoints = 3 // Award backgammon.
 					} else if gs.Board[opponentHome] == 0 {
@@ -1765,13 +1803,15 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 					} else {
 						winPoints = 1
 					}
-				} else {
+				case bgammon.VariantAceyDeucey:
 					for space := int8(0); space < bgammon.BoardSpaces; space++ {
 						if (space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent) && ((opponent == 1 && gs.Player1.Entered) || (opponent == 2 && gs.Player2.Entered)) {
 							continue
 						}
 						winPoints += bgammon.PlayerCheckers(gs.Board[space], opponent)
 					}
+				case bgammon.VariantTabula:
+					winPoints = 1
 				}
 
 				if sendEvent {
@@ -1854,7 +1894,7 @@ func (g *Game) HandleReplay(replay []byte) {
 	}
 
 	gs := &bgammon.GameState{
-		Game:         bgammon.NewGame(false),
+		Game:         bgammon.NewGame(bgammon.VariantBackgammon),
 		PlayerNumber: 1,
 		Spectating:   true,
 	}

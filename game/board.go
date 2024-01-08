@@ -59,13 +59,14 @@ type board struct {
 	overlapSize          float64
 
 	lastPlayerNumber int8
+	lastVariant      int8
 
 	gameState *bgammon.GameState
 
-	opponentRoll1, opponentRoll2 int8
-	opponentRollStale            bool
-	playerRoll1, playerRoll2     int8
-	playerRollStale              bool
+	opponentRoll1, opponentRoll2, opponentRoll3 int8
+	opponentRollStale                           bool
+	playerRoll1, playerRoll2, playerRoll3       int8
+	playerRollStale                             bool
 
 	availableStale bool
 
@@ -179,7 +180,7 @@ func NewBoard() *board {
 		spaceSprites: make([][]*Sprite, bgammon.BoardSpaces),
 		spaceRects:   make([][4]int, bgammon.BoardSpaces),
 		gameState: &bgammon.GameState{
-			Game: bgammon.NewGame(false),
+			Game: bgammon.NewGame(bgammon.VariantBackgammon),
 		},
 		highlightSpaces:         make([][]int8, 28),
 		spaceHighlight:          ebiten.NewImage(1, 1),
@@ -894,8 +895,8 @@ func (b *board) selectReplayStart() error {
 		b.replayPauseButton.Label.SetText("|>")
 	}
 
-	b.playerRoll1, b.playerRoll2 = 0, 0
-	b.opponentRoll1, b.opponentRoll2 = 0, 0
+	b.playerRoll1, b.playerRoll2, b.playerRoll3 = 0, 0, 0
+	b.opponentRoll1, b.opponentRoll2, b.opponentRoll3 = 0, 0, 0
 	game.showReplayFrame(0, false)
 	return nil
 }
@@ -910,8 +911,8 @@ func (b *board) selectReplayJumpBack() error {
 		b.replayPauseButton.Label.SetText("|>")
 	}
 
-	b.playerRoll1, b.playerRoll2 = 0, 0
-	b.opponentRoll1, b.opponentRoll2 = 0, 0
+	b.playerRoll1, b.playerRoll2, b.playerRoll3 = 0, 0, 0
+	b.opponentRoll1, b.opponentRoll2, b.opponentRoll3 = 0, 0, 0
 	replayFrame := game.replayFrame
 	replayFrame--
 	if replayFrame < 0 {
@@ -933,8 +934,8 @@ func (b *board) selectReplayStepBack() error {
 
 	// TODO Stepping back moves checkers backwards.
 
-	b.playerRoll1, b.playerRoll2 = 0, 0
-	b.opponentRoll1, b.opponentRoll2 = 0, 0
+	b.playerRoll1, b.playerRoll2, b.playerRoll3 = 0, 0, 0
+	b.opponentRoll1, b.opponentRoll2, b.opponentRoll3 = 0, 0, 0
 	replayFrame := game.replayFrame
 	replayFrame--
 	if replayFrame < 0 {
@@ -1050,8 +1051,8 @@ func (b *board) selectReplayEnd() error {
 		b.replayPauseButton.Label.SetText("|>")
 	}
 
-	b.playerRoll1, b.playerRoll2 = 0, 0
-	b.opponentRoll1, b.opponentRoll2 = 0, 0
+	b.playerRoll1, b.playerRoll2, b.playerRoll3 = 0, 0, 0
+	b.opponentRoll1, b.opponentRoll2, b.opponentRoll3 = 0, 0, 0
 	game.showReplayFrame(len(game.replayFrames)-1, false)
 	return nil
 }
@@ -1285,6 +1286,9 @@ func (b *board) updateBackgroundImage() {
 		}
 
 		sp := strconv.Itoa(space)
+		if b.gameState.Variant == bgammon.VariantTabula {
+			sp = romanNumerals(space)
+		}
 		bounds := etk.BoundString(b.fontFace, sp)
 		x := r[0] + r[2]/2 + int(b.horizontalBorderSize) - bounds.Dx()/2 - 2
 		if space == 1 || space > 9 {
@@ -1512,7 +1516,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		op := &ebiten.DrawImageOptions{}
 		op.ColorScale.ScaleAlpha(alpha)
 
-		d1, d2 := b.opponentRoll1, b.opponentRoll2
+		d1, d2, d3 := b.opponentRoll1, b.opponentRoll2, b.opponentRoll3
 
 		if b.gameState.Turn == 0 {
 			if d2 != 0 {
@@ -1522,15 +1526,34 @@ func (b *board) Draw(screen *ebiten.Image) {
 			}
 		} else {
 			if d1 != 0 && d2 != 0 {
-				{
-					op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-					screen.DrawImage(diceImage(d1), op)
-				}
+				if d3 != 0 {
+					{
+						op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap-float64(diceSize/2)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+						screen.DrawImage(diceImage(d1), op)
+					}
 
-				{
-					op.GeoM.Reset()
-					op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-					screen.DrawImage(diceImage(d2), op)
+					{
+						op.GeoM.Reset()
+						op.GeoM.Translate(float64(innerCenter)-float64(diceSize)/2, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+						screen.DrawImage(diceImage(d2), op)
+					}
+
+					{
+						op.GeoM.Reset()
+						op.GeoM.Translate(float64(innerCenter)+diceGap+float64(diceSize/2)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+						screen.DrawImage(diceImage(d3), op)
+					}
+				} else {
+					{
+						op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+						screen.DrawImage(diceImage(d1), op)
+					}
+
+					{
+						op.GeoM.Reset()
+						op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+						screen.DrawImage(diceImage(d2), op)
+					}
 				}
 			}
 		}
@@ -1553,7 +1576,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		op := &ebiten.DrawImageOptions{}
 		op.ColorScale.ScaleAlpha(alpha)
 
-		d1, d2 := b.playerRoll1, b.playerRoll2
+		d1, d2, d3 := b.playerRoll1, b.playerRoll2, b.playerRoll3
 
 		if b.gameState.Turn == 0 {
 			if d1 != 0 {
@@ -1562,15 +1585,34 @@ func (b *board) Draw(screen *ebiten.Image) {
 			}
 		} else {
 			if d1 != 0 && d2 != 0 {
-				{
-					op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-					screen.DrawImage(diceImage(d1), op)
-				}
+				if d3 != 0 {
+					{
+						op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap-float64(diceSize/2)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+						screen.DrawImage(diceImage(d1), op)
+					}
 
-				{
-					op.GeoM.Reset()
-					op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
-					screen.DrawImage(diceImage(d2), op)
+					{
+						op.GeoM.Reset()
+						op.GeoM.Translate(float64(innerCenter)-float64(diceSize)/2, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+						screen.DrawImage(diceImage(d2), op)
+					}
+
+					{
+						op.GeoM.Reset()
+						op.GeoM.Translate(float64(innerCenter)+diceGap+float64(diceSize/2)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+						screen.DrawImage(diceImage(d3), op)
+					}
+				} else {
+					{
+						op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+						screen.DrawImage(diceImage(d1), op)
+					}
+
+					{
+						op.GeoM.Reset()
+						op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
+						screen.DrawImage(diceImage(d2), op)
+					}
 				}
 			}
 		}
@@ -1980,7 +2022,10 @@ func (b *board) bottomRow(space int8) bool {
 	var bottomEnd int8 = 12
 	bottomBar := bgammon.SpaceBarPlayer
 	bottomHome := bgammon.SpaceHomePlayer
-	if b.flipBoard || b.gameState.PlayerNumber == 2 {
+	if b.gameState.Variant == bgammon.VariantTabula {
+		bottomStart = 13
+		bottomEnd = 24
+	} else if b.flipBoard || b.gameState.PlayerNumber == 2 {
 		bottomStart = 1
 		bottomEnd = 12
 	}
@@ -2025,11 +2070,12 @@ func (b *board) processState() {
 	b.stateLock.Lock()
 	defer b.stateLock.Unlock()
 
-	if b.lastPlayerNumber != b.gameState.PlayerNumber {
+	if b.lastPlayerNumber != b.gameState.PlayerNumber || b.lastVariant != b.gameState.Variant {
 		b.setSpaceRects()
 		b.updateBackgroundImage()
 	}
 	b.lastPlayerNumber = b.gameState.PlayerNumber
+	b.lastVariant = b.gameState.Variant
 
 	if b.flipBoard || b.gameState.PlayerNumber == 2 {
 		if b.opponentLabel.activeColor != colorBlack {
@@ -2154,22 +2200,23 @@ func (b *board) processState() {
 
 	tabulaBoard := bot.TabulaBoard(b.gameState.Game.Board)
 	tabulaBoard[tabula.SpaceRoll1], tabulaBoard[tabula.SpaceRoll2], tabulaBoard[tabula.SpaceRoll3], tabulaBoard[tabula.SpaceRoll4] = int8(b.gameState.Game.Roll1), int8(b.gameState.Game.Roll2), 0, 0
-	if b.gameState.Game.Roll1 == b.gameState.Game.Roll2 {
+	if b.gameState.Variant == bgammon.VariantTabula {
+		tabulaBoard[tabula.SpaceRoll3] = int8(b.gameState.Game.Roll3)
+	} else if b.gameState.Game.Roll1 == b.gameState.Game.Roll2 {
 		tabulaBoard[tabula.SpaceRoll3], tabulaBoard[tabula.SpaceRoll4] = int8(b.gameState.Game.Roll1), int8(b.gameState.Game.Roll2)
 	}
-	enteredPlayer, enteredOpponent, acey := int8(1), int8(1), int8(0)
-	if b.gameState.Acey {
+	enteredPlayer, enteredOpponent := int8(1), int8(1)
+	if b.gameState.Variant != bgammon.VariantBackgammon {
 		if !b.gameState.Player1.Entered {
 			enteredPlayer = 0
 		}
 		if !b.gameState.Player2.Entered {
 			enteredOpponent = 0
 		}
-		acey = 1
 	}
-	tabulaBoard[tabula.SpaceEnteredPlayer], tabulaBoard[tabula.SpaceEnteredOpponent], tabulaBoard[tabula.SpaceAcey] = enteredPlayer, enteredOpponent, acey
+	tabulaBoard[tabula.SpaceEnteredPlayer], tabulaBoard[tabula.SpaceEnteredOpponent], tabulaBoard[tabula.SpaceVariant] = enteredPlayer, enteredOpponent, b.gameState.Variant
 	for _, m := range b.gameState.Moves {
-		delta := int8(bgammon.SpaceDiff(m[0], m[1], b.gameState.Acey))
+		delta := int8(bgammon.SpaceDiff(m[0], m[1], b.gameState.Variant))
 		switch {
 		case tabulaBoard[tabula.SpaceRoll1] == delta:
 			tabulaBoard[tabula.SpaceRoll1] = 0
@@ -2435,8 +2482,8 @@ func (b *board) finishDrag(x int, y int, click bool) {
 							scheduleFrame()
 							processed = true
 							b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
-						} else if time.Since(b.lastDragClick) < 500*time.Millisecond && bgammon.CanBearOff(b.gameState.Board, b.gameState.PlayerNumber, true) {
-							homeStart, homeEnd := bgammon.HomeRange(b.gameState.PlayerNumber)
+						} else if time.Since(b.lastDragClick) < 500*time.Millisecond && b.gameState.MayBearOff(b.gameState.PlayerNumber, true) {
+							homeStart, homeEnd := bgammon.HomeRange(b.gameState.PlayerNumber, b.gameState.Variant)
 							if homeEnd < homeStart {
 								homeStart, homeEnd = homeEnd, homeStart
 							}
@@ -2446,7 +2493,7 @@ func (b *board) finishDrag(x int, y int, click bool) {
 						} else if time.Since(b.lastDragClick) < 500*time.Millisecond && space == bgammon.SpaceHomePlayer && !b.gameState.Player1.Entered {
 							var found bool
 							for _, m := range b.gameState.Available {
-								if m[0] == bgammon.SpaceHomePlayer && bgammon.SpaceDiff(m[0], m[1], b.gameState.Acey) == b.gameState.Roll1 {
+								if m[0] == bgammon.SpaceHomePlayer && bgammon.SpaceDiff(m[0], m[1], b.gameState.Variant) == b.gameState.Roll1 {
 									b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
 									found = true
 									break
@@ -2639,7 +2686,7 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 		if !handled && b.playerTurn() && clicked && (b.lastDragClick.IsZero() || time.Since(b.lastDragClick) >= 50*time.Millisecond) {
 			s, space := b.spriteAt(cx, cy)
-			if s != nil && s.colorWhite == (b.flipBoard || b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomeOpponent && (space != bgammon.SpaceHomePlayer || !game.Board.gameState.Acey || !game.Board.gameState.Player1.Entered) {
+			if s != nil && s.colorWhite == (b.flipBoard || b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomeOpponent && (game.Board.gameState.Variant == bgammon.VariantBackgammon || space != bgammon.SpaceHomePlayer || !game.Board.gameState.Player1.Entered) {
 				b.startDrag(s, space, false)
 				handled = true
 			}
@@ -2696,4 +2743,19 @@ func expandMoves(moves [][]int8) [][]int8 {
 		newMoves = append(newMoves, expandedMoves...)
 	}
 	return newMoves
+}
+
+func romanNumerals(i int) string {
+	var roman string = ""
+	var numbers = []int{1, 4, 5, 9, 10}
+	var numerals = []string{"I", "IV", "V", "IX", "X"}
+	var index = len(numerals) - 1
+	for i > 0 {
+		for numbers[index] <= i {
+			roman += numerals[index]
+			i -= numbers[index]
+		}
+		index -= 1
+	}
+	return roman
 }

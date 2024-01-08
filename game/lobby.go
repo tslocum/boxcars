@@ -61,12 +61,12 @@ type lobby struct {
 
 	refresh bool
 
-	showCreateGame       bool
-	createGameName       *etk.Input
-	createGamePoints     *etk.Input
-	createGamePassword   *etk.Input
-	createGameCheckbox   *etk.Checkbox
-	createGameAceyDeucey bool
+	showCreateGame           bool
+	createGameName           *etk.Input
+	createGamePoints         *etk.Input
+	createGamePassword       *etk.Input
+	createGameAceyCheckbox   *etk.Checkbox
+	createGameTabulaCheckbox *etk.Checkbox
 
 	showJoinGame     bool
 	joinGameID       int
@@ -150,8 +150,13 @@ func (l *lobby) toggleKeyboard() error {
 	return nil
 }
 
-func (l *lobby) toggleAceyDeucey() error {
-	l.createGameAceyDeucey = !l.createGameAceyDeucey
+func (l *lobby) toggleVariantAcey() error {
+	l.createGameTabulaCheckbox.SetSelected(false)
+	return nil
+}
+
+func (l *lobby) toggleVariantTabula() error {
+	l.createGameAceyCheckbox.SetSelected(false)
 	return nil
 }
 
@@ -160,8 +165,9 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 	l.loaded = true
 
 	const (
-		aceyPrefix = "(Acey-deucey)"
-		botPrefix  = "BOT_"
+		aceyPrefix   = "(Acey-deucey)"
+		tabulaPrefix = "(Tabula)"
+		botPrefix    = "BOT_"
 	)
 	sort.Slice(l.games, func(i, j int) bool {
 		a, b := l.games[i], l.games[j]
@@ -170,6 +176,8 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 			return !a.Password
 		case (a.Players) != (b.Players):
 			return a.Players < b.Players
+		case strings.HasPrefix(a.Name, tabulaPrefix) != strings.HasPrefix(b.Name, tabulaPrefix):
+			return strings.HasPrefix(b.Name, tabulaPrefix)
 		case strings.HasPrefix(a.Name, aceyPrefix) != strings.HasPrefix(b.Name, aceyPrefix):
 			return strings.HasPrefix(b.Name, aceyPrefix)
 		case strings.HasPrefix(a.Name, botPrefix) != strings.HasPrefix(b.Name, botPrefix):
@@ -235,11 +243,13 @@ func (l *lobby) confirmCreateGame() {
 	if err != nil {
 		points = 1
 	}
-	acey := 0
-	if game.lobby.createGameAceyDeucey {
-		acey = 1
+	var variant int8
+	if game.lobby.createGameAceyCheckbox.Selected() {
+		variant = bgammon.VariantAceyDeucey
+	} else if game.lobby.createGameTabulaCheckbox.Selected() {
+		variant = bgammon.VariantTabula
 	}
-	l.c.Out <- []byte(fmt.Sprintf("c %s %d %d %s", typeAndPassword, points, acey, game.lobby.createGameName.Text()))
+	l.c.Out <- []byte(fmt.Sprintf("c %s %d %d %s", typeAndPassword, points, variant, game.lobby.createGameName.Text()))
 }
 
 func (l *lobby) confirmJoinGame() {
