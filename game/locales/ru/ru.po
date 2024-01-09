@@ -29,10 +29,19 @@ msgstr ""
 msgid "Accept"
 msgstr ""
 
+msgid "Account"
+msgstr ""
+
 msgid "Acey-deucey"
 msgstr ""
 
 msgid "Available"
+msgstr ""
+
+msgid "Bearing Off"
+msgstr ""
+
+msgid "Board"
 msgstr ""
 
 msgid ""
@@ -43,22 +52,56 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+msgid "Change password"
+msgstr ""
+
+msgid ""
+"Check your email for a link to reset your password. Be sure to check your "
+"spam folder."
+msgstr ""
+
 msgid "Connect"
 msgstr ""
 
 msgid "Connecting..."
 msgstr ""
 
-msgid "Create"
+msgid "Create Match"
+msgstr ""
+
+msgid ""
+"Create a match if you would like to play against someone else. Backgammon "
+"and several of its variants are supported."
 msgstr ""
 
 msgid "Create match"
 msgstr ""
 
+msgid "Create new match"
+msgstr ""
+
+msgid "Current"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
 msgid "Double"
 msgstr ""
 
+msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
+msgstr ""
+
+msgid "Download replay"
+msgstr ""
+
+msgid "Downloaded replay"
+msgstr ""
+
 msgid "Email"
+msgstr ""
+
+msgid "Failed to download replay: %s"
 msgstr ""
 
 msgid "Failed to join match: %s"
@@ -70,7 +113,16 @@ msgstr ""
 msgid "Failed to move checker%s: %s"
 msgstr ""
 
+msgid "Failed to roll"
+msgstr ""
+
 msgid "Failed to submit moves: %s"
+msgstr ""
+
+msgid "Flip board"
+msgstr ""
+
+msgid "Good Luck, Have Fun"
 msgstr ""
 
 msgid "Hide Keyboard"
@@ -79,7 +131,7 @@ msgstr ""
 msgid "Highlight legal moves"
 msgstr ""
 
-msgid "Join"
+msgid "History"
 msgstr ""
 
 msgid "Join match"
@@ -94,19 +146,37 @@ msgstr ""
 msgid "Leave match?"
 msgstr ""
 
+msgid "Left match"
+msgstr ""
+
 msgid "Legal moves: %s"
+msgstr ""
+
+msgid "Loading..."
+msgstr ""
+
+msgid "Logged in as guest"
+msgstr ""
+
+msgid "Match Name"
+msgstr ""
+
+msgid "Matches List"
 msgstr ""
 
 msgid "Name"
 msgstr ""
 
+msgid "New"
+msgstr ""
+
 msgid "No"
 msgstr ""
 
-msgid "No matches available. Please create one."
+msgid "OK"
 msgstr ""
 
-msgid "OK"
+msgid "Opponent"
 msgstr ""
 
 msgid "Password"
@@ -132,19 +202,43 @@ msgstr ""
 msgid "Private"
 msgstr ""
 
-msgid "Refresh"
+msgid "Read error"
+msgstr ""
+
+msgid "Reconnecting"
+msgstr ""
+
+msgid "Refresh matches"
 msgstr ""
 
 msgid "Register"
 msgstr ""
 
+msgid "Replay download already in progress."
+msgstr ""
+
+msgid "Replaying %s vs. %s"
+msgstr ""
+
+msgid "Reset Password"
+msgstr ""
+
 msgid "Resign"
+msgstr ""
+
+msgid "Result"
 msgstr ""
 
 msgid "Return"
 msgstr ""
 
 msgid "Roll"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "Sending password reset request"
 msgstr ""
 
 msgid "Server"
@@ -171,9 +265,28 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
+msgid "Tabula"
+msgstr ""
+
+msgid ""
+"This concludes the tutorial. To share feedback and chat with other players "
+"visit %s"
+msgstr ""
+
+msgid ""
+"This screen lists the matches that are currently available. A few bots are "
+"always available to play against."
+msgstr ""
+
+msgid "To download this replay visit"
+msgstr ""
+
 msgid ""
 "To log in as a guest, enter a username (if you want) and do not enter a "
 "password."
+msgstr ""
+
+msgid "Tutorial"
 msgstr ""
 
 msgid "Type %s to offer a rematch."
@@ -188,11 +301,37 @@ msgstr ""
 msgid "Variant"
 msgstr ""
 
+msgid "View replay"
+msgstr ""
+
+msgid "Waiting"
+msgstr ""
+
 msgid "Warning: Received unknown event: %+v"
+msgstr ""
+
+msgid "Warning: Received unrecognized event from server."
+msgstr ""
+
+msgid ""
+"Welcome to the guided tutorial. Click anywhere outside of this message box "
+"to close the tutorial. Click anywhere inside of this message box to view the "
+"next page."
+msgstr ""
+
+msgid "Write error"
 msgstr ""
 
 msgid "Yes"
 msgstr ""
 
+msgid ""
+"You have the black checkers. You can move a checker by either clicking it or "
+"dragging it."
+msgstr ""
+
 msgid "You may need to upgrade your client."
+msgstr ""
+
+msgid "from %s to %s"
 msgstr ""

@@ -32,10 +32,19 @@ msgstr "%s nyert!"
 msgid "Accept"
 msgstr "Elfogadás"
 
+msgid "Account"
+msgstr ""
+
 msgid "Acey-deucey"
 msgstr ""
 
 msgid "Available"
+msgstr ""
+
+msgid "Bearing Off"
+msgstr ""
+
+msgid "Board"
 msgstr ""
 
 msgid ""
@@ -48,22 +57,56 @@ msgstr ""
 msgid "Cancel"
 msgstr "Mégse"
 
+msgid "Change password"
+msgstr ""
+
+msgid ""
+"Check your email for a link to reset your password. Be sure to check your "
+"spam folder."
+msgstr ""
+
 msgid "Connect"
 msgstr "Kapcsolódás"
 
 msgid "Connecting..."
 msgstr "Kapcsolódás..."
 
-msgid "Create"
-msgstr "Létrehozás"
+msgid "Create Match"
+msgstr ""
+
+msgid ""
+"Create a match if you would like to play against someone else. Backgammon "
+"and several of its variants are supported."
+msgstr ""
 
 msgid "Create match"
 msgstr "Játék létrehozása"
 
+msgid "Create new match"
+msgstr ""
+
+msgid "Current"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
 msgid "Double"
 msgstr "Duplázás"
 
+msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
+msgstr ""
+
+msgid "Download replay"
+msgstr ""
+
+msgid "Downloaded replay"
+msgstr ""
+
 msgid "Email"
+msgstr ""
+
+msgid "Failed to download replay: %s"
 msgstr ""
 
 msgid "Failed to join match: %s"
@@ -75,8 +118,17 @@ msgstr "Játék elhagyása nem sikerült: %s"
 msgid "Failed to move checker%s: %s"
 msgstr "Bábu mozgatása nem sikerült: %s"
 
+msgid "Failed to roll"
+msgstr ""
+
 msgid "Failed to submit moves: %s"
 msgstr "Mozgatás elküldése nem sikerült: %s"
+
+msgid "Flip board"
+msgstr ""
+
+msgid "Good Luck, Have Fun"
+msgstr ""
 
 msgid "Hide Keyboard"
 msgstr "Billentyűzet elrejtése"
@@ -84,8 +136,8 @@ msgstr "Billentyűzet elrejtése"
 msgid "Highlight legal moves"
 msgstr "Szabályos lépések kiemelése"
 
-msgid "Join"
-msgstr "Csatlakozás"
+msgid "History"
+msgstr ""
 
 msgid "Join match"
 msgstr "Csatlakozás a játékhoz"
@@ -99,20 +151,38 @@ msgstr "Elhagyás"
 msgid "Leave match?"
 msgstr "Játék elhagyása?"
 
+msgid "Left match"
+msgstr ""
+
 msgid "Legal moves: %s"
 msgstr "Szabályos lépések: %s"
+
+msgid "Loading..."
+msgstr ""
+
+msgid "Logged in as guest"
+msgstr ""
+
+msgid "Match Name"
+msgstr ""
+
+msgid "Matches List"
+msgstr ""
 
 msgid "Name"
 msgstr "Név"
 
+msgid "New"
+msgstr ""
+
 msgid "No"
 msgstr "Nem"
 
-msgid "No matches available. Please create one."
-msgstr "Játék nem elérhető. Hozzon létre egyet."
-
 msgid "OK"
 msgstr "OK"
+
+msgid "Opponent"
+msgstr ""
 
 msgid "Password"
 msgstr "Jelszó"
@@ -137,20 +207,44 @@ msgstr "Pontok"
 msgid "Private"
 msgstr "Privát"
 
-msgid "Refresh"
-msgstr "Frissítés"
+msgid "Read error"
+msgstr ""
+
+msgid "Reconnecting"
+msgstr ""
+
+msgid "Refresh matches"
+msgstr ""
 
 msgid "Register"
 msgstr ""
 
+msgid "Replay download already in progress."
+msgstr ""
+
+msgid "Replaying %s vs. %s"
+msgstr ""
+
+msgid "Reset Password"
+msgstr ""
+
 msgid "Resign"
 msgstr "Feladás"
+
+msgid "Result"
+msgstr ""
 
 msgid "Return"
 msgstr "Visszatérés"
 
 msgid "Roll"
 msgstr "Dobás"
+
+msgid "Search"
+msgstr ""
+
+msgid "Sending password reset request"
+msgstr ""
 
 msgid "Server"
 msgstr "Szerver"
@@ -176,12 +270,31 @@ msgstr "Állapot"
 msgid "Submit"
 msgstr ""
 
+msgid "Tabula"
+msgstr ""
+
+msgid ""
+"This concludes the tutorial. To share feedback and chat with other players "
+"visit %s"
+msgstr ""
+
+msgid ""
+"This screen lists the matches that are currently available. A few bots are "
+"always available to play against."
+msgstr ""
+
+msgid "To download this replay visit"
+msgstr ""
+
 msgid ""
 "To log in as a guest, enter a username (if you want) and do not enter a "
 "password."
 msgstr ""
 "Vendégként való belépéshez adja meg a felhasználónevét (ha akarja) és ne "
 "adjon meg jelszót."
+
+msgid "Tutorial"
+msgstr ""
 
 msgid "Type %s to offer a rematch."
 msgstr "Gépelje be, hogy %s, visszavágó felajánlásához."
@@ -195,14 +308,52 @@ msgstr "Felhasználónév"
 msgid "Variant"
 msgstr ""
 
+msgid "View replay"
+msgstr ""
+
+msgid "Waiting"
+msgstr ""
+
 msgid "Warning: Received unknown event: %+v"
 msgstr "Figyelmeztetés: Ismeretlen esemény érkezett: %+v"
+
+msgid "Warning: Received unrecognized event from server."
+msgstr ""
+
+msgid ""
+"Welcome to the guided tutorial. Click anywhere outside of this message box "
+"to close the tutorial. Click anywhere inside of this message box to view the "
+"next page."
+msgstr ""
+
+msgid "Write error"
+msgstr ""
 
 msgid "Yes"
 msgstr "Igen"
 
+msgid ""
+"You have the black checkers. You can move a checker by either clicking it or "
+"dragging it."
+msgstr ""
+
 msgid "You may need to upgrade your client."
 msgstr "A kliens frissítése szükséges."
+
+msgid "from %s to %s"
+msgstr ""
+
+#~ msgid "Create"
+#~ msgstr "Létrehozás"
+
+#~ msgid "Join"
+#~ msgstr "Csatlakozás"
+
+#~ msgid "No matches available. Please create one."
+#~ msgstr "Játék nem elérhető. Hozzon létre egyet."
+
+#~ msgid "Refresh"
+#~ msgstr "Frissítés"
 
 #~ msgid "Drag here to bear off"
 #~ msgstr "Húzza ide a bábú kiviteléhez"
