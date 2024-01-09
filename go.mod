@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240108183627-118a7f78eb98
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240108183700-4b782c6de3e1
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240108213827-c677af332056
 	code.rocket9labs.com/tslocum/etk v0.0.0-20231225090418-db70da18e067
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240108183445-695ea428ae21
 	code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544

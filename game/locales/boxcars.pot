@@ -64,7 +64,7 @@ msgstr ""
 msgid "Create Match"
 msgstr ""
 
-msgid "Create a match if you would like to play against someone else. Backgammon and acey-deucey games are supported."
+msgid "Create a match if you would like to play against someone else. Backgammon and several of its variants are supported."
 msgstr ""
 
 msgid "Create match"
@@ -256,7 +256,10 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-msgid "This concludes the tutorial. Join the community via Matrix/Discord/IRC at %s"
+msgid "Tabula"
+msgstr ""
+
+msgid "This concludes the tutorial. To share feedback and chat with other players visit %s"
 msgstr ""
 
 msgid "This screen lists the matches that are currently available. A few bots are always available to play against."

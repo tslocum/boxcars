@@ -40,6 +40,7 @@ func (w *tutorialWidget) hide() {
 
 func (w *tutorialWidget) dialogText(message string) *tutorialDialog {
 	t := etk.NewText(message)
+	t.SetPadding(10)
 	t.SetBackgroundColor(bufferBackgroundColor)
 	return &tutorialDialog{
 		Text: t,
@@ -78,7 +79,7 @@ func (w *tutorialWidget) setPage(page int) {
 		game.setRoot(createGameFrame)
 		etk.SetFocus(game.lobby.createGameName)
 		title = gotext.Get("Create Match")
-		message = gotext.Get("Create a match if you would like to play against someone else. Backgammon and acey-deucey games are supported.")
+		message = gotext.Get("Create a match if you would like to play against someone else. Backgammon and several of its variants are supported.")
 	case 3:
 		game.lobby.showCreateGame = false
 		game.setRoot(listGamesFrame)
@@ -94,7 +95,7 @@ func (w *tutorialWidget) setPage(page int) {
 		message = gotext.Get("Double click a checker to bear it off. Bear off all 15 checkers to win.")
 	case 5:
 		title = gotext.Get("Good Luck, Have Fun")
-		message = gotext.Get("This concludes the tutorial. Join the community via Matrix/Discord/IRC at %s", "bgammon.org/community")
+		message = gotext.Get("This concludes the tutorial. To share feedback and chat with other players visit %s", "bgammon.org/community")
 	case 6:
 		w.hide()
 		return
