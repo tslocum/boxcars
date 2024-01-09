@@ -90,7 +90,7 @@ msgid "Create new match"
 msgstr "Crea una nuova partita"
 
 msgid "Current"
-msgstr "In corso"
+msgstr "Attuale"
 
 msgid "Date"
 msgstr "Data"
@@ -131,7 +131,7 @@ msgid "Failed to submit moves: %s"
 msgstr "Errore nella trasmissione delle mosse: %s"
 
 msgid "Flip board"
-msgstr "Gira il tavoliere"
+msgstr "Gira tavoliere"
 
 msgid "Good Luck, Have Fun"
 msgstr "In bocca al lupo, buon divertimento!"
@@ -143,10 +143,10 @@ msgid "Highlight legal moves"
 msgstr "Mosse legali in evidenza"
 
 msgid "History"
-msgstr "Mosse"
+msgstr "Registro"
 
 msgid "Join match"
-msgstr "Entra in partita"
+msgstr "Entra nella partita"
 
 msgid "Join match: %s"
 msgstr "Entra in partita: %s"
@@ -155,7 +155,7 @@ msgid "Leave"
 msgstr "Esci"
 
 msgid "Leave match?"
-msgstr "Esci dalla partita"
+msgstr "Esci dalla partita?"
 
 msgid "Left match"
 msgstr "Partita lasciata"
@@ -182,7 +182,7 @@ msgid "New"
 msgstr "Nuovo"
 
 msgid "No"
-msgstr "Sì"
+msgstr "No"
 
 msgid "OK"
 msgstr "Ok"
@@ -243,7 +243,7 @@ msgid "Result"
 msgstr "Risultato"
 
 msgid "Return"
-msgstr "Ritorna"
+msgstr "Indietro"
 
 msgid "Roll"
 msgstr "Lancia"
@@ -302,7 +302,7 @@ msgid ""
 "password."
 msgstr ""
 "Per entrare come ospite, scrivi un nome (se ti va) e lascia la password"
-"vuota."
+" vuota."
 
 msgid "Tutorial"
 msgstr "Guida per iniziare"
@@ -344,7 +344,7 @@ msgid "Write error"
 msgstr "Errore in scrittura"
 
 msgid "Yes"
-msgstr "Si."
+msgstr "Sì"
 
 msgid ""
 "You have the black checkers. You can move a checker by either clicking it or "

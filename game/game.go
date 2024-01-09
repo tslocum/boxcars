@@ -41,7 +41,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.2.2"
+const version = "v1.2.2p2"
 
 const DefaultServerAddress = "wss://ws.bgammon.org"
 
@@ -2975,14 +2975,18 @@ func LoadLocale(forceLanguage *language.Tag) error {
 		return err
 	}
 
-	var available = []language.Tag{
+	var availableTags = []language.Tag{
 		language.MustParse("en_US"),
+	}
+	var availableNames = []string{
+		"",
 	}
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
 		}
-		available = append(available, language.MustParse(entry.Name()))
+		availableTags = append(availableTags, language.MustParse(entry.Name()))
+		availableNames = append(availableNames, entry.Name())
 	}
 
 	var preferred = []language.Tag{}
@@ -2998,13 +3002,14 @@ func LoadLocale(forceLanguage *language.Tag) error {
 		}
 	}
 
-	useLanguage, _, _ := language.NewMatcher(available).Match(preferred...)
+	useLanguage, index, _ := language.NewMatcher(availableTags).Match(preferred...)
 	useLanguageCode := useLanguage.String()
-	if useLanguageCode == "" || strings.HasPrefix(useLanguageCode, "en") {
+	if index <= 0 || useLanguageCode == "" || strings.HasPrefix(useLanguageCode, "en") {
 		return nil
 	}
+	useLanguageName := availableNames[index]
 
-	b, err := assetFS.ReadFile(fmt.Sprintf("locales/%s/%s.po", strings.ReplaceAll(useLanguageCode, "-", "_"), strings.ReplaceAll(useLanguageCode, "-", "_")))
+	b, err := assetFS.ReadFile(fmt.Sprintf("locales/%s/%s.po", useLanguageName, useLanguageName))
 	if err != nil {
 		return nil
 	}

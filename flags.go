@@ -35,6 +35,9 @@ func parseFlags() *game.Game {
 	flag.Parse()
 
 	var forceLanguage *language.Tag
+	if locale == "" {
+		locale = game.DefaultLocale()
+	}
 	if locale != "" {
 		tag, err := language.Parse(locale)
 		if err != nil {
