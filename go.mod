@@ -5,10 +5,10 @@ go 1.17
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240108183627-118a7f78eb98
 	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240108213827-c677af332056
-	code.rocket9labs.com/tslocum/etk v0.0.0-20231225090418-db70da18e067
+	code.rocket9labs.com/tslocum/etk v0.0.0-20240110022520-8493ce83dfc4
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240108183445-695ea428ae21
-	code.rocketnine.space/tslocum/kibodo v1.0.3-0.20231214093410-c8a7dcdbc544
-	code.rocketnine.space/tslocum/messeji v1.0.6-0.20240105201028-fc0897906b05
+	code.rocketnine.space/tslocum/kibodo v1.0.3-0.20240109203209-1e5886fd3422
+	code.rocketnine.space/tslocum/messeji v1.0.6-0.20240109205105-4ffeffdd2441
 	github.com/hajimehoshi/ebiten/v2 v2.6.3
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351
 	github.com/llgcode/draw2d v0.0.0-20231212091825-f55e0c776b44

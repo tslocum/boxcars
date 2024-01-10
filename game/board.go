@@ -806,14 +806,14 @@ func (b *board) toggleKeyboard() error {
 	b.lastKeyboardToggle = t
 
 	if game.keyboard.Visible() {
-		game.keyboard.Hide()
+		game.keyboard.SetVisible(false)
 		b.floatChatGrid.SetVisible(false)
 		b.uiGrid.SetRect(b.uiGrid.Rect())
 		b.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	} else {
 		b.floatChatGrid.SetVisible(true)
 		b.floatChatGrid.SetRect(b.floatChatGrid.Rect())
-		game.keyboard.Show()
+		game.keyboard.SetVisible(true)
 		b.showKeyboardButton.Label.SetText(gotext.Get("Hide Keyboard"))
 	}
 	return nil
@@ -2673,10 +2673,6 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 
 	b := game.Board
 	if b.Client == nil || !b.playerTurn() {
-		return false, nil
-	}
-
-	if game.keyboard.Visible() && cursor.In(game.keyboard.Rect()) {
 		return false, nil
 	}
 

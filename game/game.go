@@ -132,6 +132,7 @@ var (
 
 	tutorialFrame *etk.Frame
 
+	connectFrame    *etk.Frame
 	createGameFrame *etk.Frame
 	joinGameFrame   *etk.Frame
 	historyFrame    *etk.Frame
@@ -461,7 +462,7 @@ func setViewBoard(view bool) {
 
 	g := game
 	if g.keyboard.Visible() || g.Board.floatChatGrid.Visible() {
-		g.keyboard.Hide()
+		g.keyboard.SetVisible(false)
 		g.Board.floatChatGrid.SetVisible(false)
 		g.connectKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 		g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
@@ -484,7 +485,7 @@ func setViewBoard(view bool) {
 		game.Board.uiGrid.SetRect(game.Board.uiGrid.Rect())
 	} else {
 		if !game.loggedIn {
-			game.setRoot(connectGrid)
+			game.setRoot(connectFrame)
 		} else if game.lobby.showCreateGame {
 			game.setRoot(createGameFrame)
 		} else if game.lobby.showJoinGame {
@@ -583,7 +584,7 @@ type Game struct {
 
 	debugImg *ebiten.Image
 
-	keyboard      *kibodo.Keyboard
+	keyboard      *etk.Keyboard
 	keyboardInput []*kibodo.Input
 
 	cpuProfile *os.File
@@ -601,7 +602,6 @@ type Game struct {
 	resetInfo       *etk.Text
 	resetInProgress bool
 
-	tutorial      *tutorialWidget
 	tutorialFrame *etk.Frame
 
 	pressedKeys []ebiten.Key
@@ -615,7 +615,6 @@ type Game struct {
 
 	lastRefresh time.Time
 
-	skipUpdate  bool
 	forceLayout bool
 
 	scaleFactor float64
@@ -664,7 +663,7 @@ func NewGame() *Game {
 	g := &Game{
 		runeBuffer: make([]rune, 24),
 
-		keyboard: kibodo.NewKeyboard(),
+		keyboard: etk.NewKeyboard(),
 
 		TouchInput: AutoEnableTouchInput,
 
@@ -677,6 +676,7 @@ func NewGame() *Game {
 		Mutex: &sync.Mutex{},
 	}
 	g.keyboard.SetScheduleFrameFunc(scheduleFrame)
+	g.keyboard.SetVisible(false)
 	g.tutorialFrame.SetPositionChildren(true)
 	game = g
 
@@ -839,13 +839,13 @@ func NewGame() *Game {
 
 		g.connectKeyboardButton = etk.NewButton(gotext.Get("Show Keyboard"), func() error {
 			if g.keyboard.Visible() {
-				g.keyboard.Hide()
+				g.keyboard.SetVisible(false)
 				g.connectKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 				g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 				g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 			} else {
 				g.EnableTouchInput()
-				g.keyboard.Show()
+				g.keyboard.SetVisible(true)
 				g.connectKeyboardButton.Label.SetText(gotext.Get("Hide Keyboard"))
 			}
 			return nil
@@ -917,6 +917,9 @@ func NewGame() *Game {
 		grid.AddChildAt(infoLabel, 1, g.connectGridY+2, 3, 1)
 		grid.AddChildAt(footerLabel, 1, g.connectGridY+3, 3, 1)
 		connectGrid = grid
+
+		connectFrame = etk.NewFrame(connectGrid, etk.NewFrame(game.keyboard))
+		connectFrame.SetPositionChildren(true)
 	}
 
 	{
@@ -1011,7 +1014,7 @@ func NewGame() *Game {
 		createGameFrame = etk.NewFrame()
 		createGameFrame.SetPositionChildren(true)
 		createGameFrame.AddChild(createGameContainer)
-		createGameFrame.AddChild(etk.NewFrame(g.lobby.showKeyboardButton))
+		createGameFrame.AddChild(etk.NewFrame(g.keyboard, g.lobby.showKeyboardButton))
 		createGameFrame.AddChild(g.tutorialFrame)
 	}
 
@@ -1044,7 +1047,7 @@ func NewGame() *Game {
 		joinGameFrame = etk.NewFrame()
 		joinGameFrame.SetPositionChildren(true)
 		joinGameFrame.AddChild(joinGameContainer)
-		joinGameFrame.AddChild(etk.NewFrame(g.lobby.showKeyboardButton))
+		joinGameFrame.AddChild(etk.NewFrame(g.keyboard, g.lobby.showKeyboardButton))
 		joinGameFrame.AddChild(g.tutorialFrame)
 	}
 
@@ -1155,7 +1158,7 @@ func NewGame() *Game {
 	g.needLayoutLobby = true
 	g.needLayoutBoard = true
 
-	g.setRoot(connectGrid)
+	g.setRoot(connectFrame)
 
 	username := loadUsername()
 	if username != "" {
@@ -1586,10 +1589,10 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 		}
 
 		*gs = bgammon.GameState{
-			Game: bgammon.NewGame(int8(variant)),
+			Game:         bgammon.NewGame(int8(variant)),
+			PlayerNumber: 1,
+			Spectating:   true,
 		}
-		gs.PlayerNumber = 1
-		gs.Spectating = true
 		gs.Turn = 0
 
 		gs.Player1.Name, gs.Player2.Name = string(split[2]), string(split[3])
@@ -1722,7 +1725,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 				g.Client.Events <- ev
 			}
 
-			gs.Roll1, gs.Roll2 = int8(r1), int8(r2)
+			gs.Roll1, gs.Roll2, gs.Roll3 = int8(r1), int8(r2), int8(r3)
 			gs.Turn = player
 			gs.Available = gs.LegalMoves(true)
 			gs.Moves = nil
@@ -1973,7 +1976,7 @@ func (g *Game) Connect() {
 
 	l("*** " + gotext.Get("Connecting..."))
 
-	g.keyboard.Hide()
+	g.keyboard.SetVisible(false)
 	g.connectKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
@@ -2021,7 +2024,7 @@ func (g *Game) Connect() {
 				}
 
 				g.loggedIn = false
-				g.setRoot(connectGrid)
+				g.setRoot(connectFrame)
 				scheduleFrame()
 				return
 			}
@@ -2044,7 +2047,7 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 
 	l("*** " + gotext.Get("Playing offline."))
 
-	g.keyboard.Hide()
+	g.keyboard.SetVisible(false)
 	g.connectKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	g.lobby.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	g.Board.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
@@ -2091,7 +2094,7 @@ func (g *Game) selectReset() error {
 func (g *Game) selectCancel() error {
 	g.showRegister = false
 	g.showReset = false
-	g.setRoot(connectGrid)
+	g.setRoot(connectFrame)
 	etk.SetFocus(g.connectUsername)
 	return nil
 }
@@ -2304,7 +2307,7 @@ func (g *Game) handleTouch(p image.Point) {
 	}
 	switch w.(type) {
 	case *etk.Input:
-		g.keyboard.Show()
+		g.keyboard.SetVisible(true)
 		var btn *etk.Button
 		if !g.loggedIn {
 			btn = g.connectKeyboardButton
@@ -2385,6 +2388,19 @@ func (g *Game) Update() error {
 		etk.SetDebug(Debug == 2)
 	}
 
+	// Handle touch input.
+	if cx == 0 && cy == 0 {
+		g.touchIDs = inpututil.AppendJustPressedTouchIDs(g.touchIDs[:0])
+		for _, id := range g.touchIDs {
+			g.EnableTouchInput()
+			cx, cy = ebiten.TouchPosition(id)
+			if cx != 0 || cy != 0 {
+				g.handleTouch(image.Point{cx, cy})
+				break
+			}
+		}
+	}
+
 	// Handle physical keyboard.
 	g.pressedKeys = inpututil.AppendJustPressedKeys(g.pressedKeys[:0])
 	err := g.handleInput(g.pressedKeys)
@@ -2392,57 +2408,15 @@ func (g *Game) Update() error {
 		return err
 	}
 
-	// Handle on-screen keyboard.
-	err = g.keyboard.Update()
-	if err != nil {
-		return err
-	}
-	g.keyboardInput = g.keyboard.AppendInput(g.keyboardInput[:0])
-	g.pressedKeys = g.pressedKeys[:0]
-	for _, input := range g.keyboardInput {
-		if input.Rune == 0 {
-			g.pressedKeys = append(g.pressedKeys, input.Key)
-		}
-	}
-	if len(g.pressedKeys) > 0 {
-		err = g.handleInput(g.pressedKeys)
-		if err != nil {
-			return err
-		}
-	}
-
-	var pressed bool
-	var pressedTouch image.Point
-	if cx == 0 && cy == 0 {
+	if !g.TouchInput {
 		g.touchIDs = inpututil.AppendJustPressedTouchIDs(g.touchIDs[:0])
-		for _, id := range g.touchIDs {
-			game.EnableTouchInput()
-			cx, cy = ebiten.TouchPosition(id)
-			if cx != 0 || cy != 0 {
-				pressed = true
-				pressedTouch = image.Point{cx, cy}
-				break
-			}
+		if len(g.touchIDs) > 0 {
+			g.EnableTouchInput()
 		}
-	} else {
-		pressed = ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
 	}
 
 	if len(ebiten.AppendTouchIDs(g.touchIDs[:0])) != 0 {
 		scheduleFrame()
-	}
-
-	var skipUpdate bool
-	if pressed && g.keyboard.Visible() {
-		p := image.Point{X: cx, Y: cy}
-		if p.In(g.keyboard.Rect()) {
-			skipUpdate = true
-			g.skipUpdate = true
-		}
-	}
-	if g.skipUpdate && !skipUpdate {
-		skipUpdate = true
-		g.skipUpdate = false
 	}
 
 	if !g.loggedIn {
@@ -2459,14 +2433,10 @@ func (g *Game) Update() error {
 			}
 		}
 
-		if skipUpdate {
-			return nil
-		}
 		err = etk.Update()
 		if err != nil {
 			return err
 		}
-		g.handleTouch(pressedTouch)
 		return nil
 	}
 
@@ -2515,14 +2485,10 @@ func (g *Game) Update() error {
 		}
 	}
 
-	if skipUpdate {
-		return nil
-	}
 	err = etk.Update()
 	if err != nil {
 		return err
 	}
-	g.handleTouch(pressedTouch)
 	return nil
 }
 
@@ -2562,7 +2528,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		game.keyboard.Draw(screen)
 		return
 	}
 
@@ -2576,8 +2541,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	g.Board.drawDraggedCheckers(screen)
-
-	game.keyboard.Draw(screen)
 
 	if Debug > 0 {
 		g.drawBuffer.Reset()
@@ -2790,7 +2753,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.Board.updateOpponentLabel()
 	g.Board.updatePlayerLabel()
 
-	g.keyboard.SetRect(0, game.screenH-game.screenH/3, game.screenW, game.screenH/3)
+	g.keyboard.SetRect(image.Rect(0, game.screenH-game.screenH/3, game.screenW, game.screenH))
 
 	if g.LoadReplay != nil {
 		go g.HandleReplay(g.LoadReplay)

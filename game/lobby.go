@@ -141,10 +141,10 @@ func NewLobby() *lobby {
 
 func (l *lobby) toggleKeyboard() error {
 	if game.keyboard.Visible() {
-		game.keyboard.Hide()
+		game.keyboard.SetVisible(false)
 		l.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
 	} else {
-		game.keyboard.Show()
+		game.keyboard.SetVisible(true)
 		l.showKeyboardButton.Label.SetText(gotext.Get("Hide Keyboard"))
 	}
 	return nil
