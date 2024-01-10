@@ -4,12 +4,12 @@ code.rocket9labs.com/tslocum/bgammon v0.0.0-20240108183627-118a7f78eb98 h1:6lndX
 code.rocket9labs.com/tslocum/bgammon v0.0.0-20240108183627-118a7f78eb98/go.mod h1:0DTOM6NviKJsDDBANcB7hbk2fseN5qtHJZAFeKsnAPQ=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240108213827-c677af332056 h1:RNSgusDjNJjw5bpYVZlnAulF945MdczMysgxy79CayM=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240108213827-c677af332056/go.mod h1:O3EuShNwEt4CJd3yQ9UDqK7+rx4a5FIcFzzdIsEnLJ4=
-code.rocket9labs.com/tslocum/etk v0.0.0-20240110022520-8493ce83dfc4 h1:nb/7h9IOPP8nM/uy9pCtNYJ+q1GSi7bvTOvkmHt9JSg=
-code.rocket9labs.com/tslocum/etk v0.0.0-20240110022520-8493ce83dfc4/go.mod h1:rClnvZGGTlW7nKl5lK+TApKlS7dfWJj3ypuXhJIzQkA=
+code.rocket9labs.com/tslocum/etk v0.0.0-20240110043858-127665c19898 h1:DfKN6JwNQPxDbt5KpXtqNr64gFRfgJ37Lv6lY7YWuWM=
+code.rocket9labs.com/tslocum/etk v0.0.0-20240110043858-127665c19898/go.mod h1:ZZDAzxFb3FzgluVsKLlh9wfE/0VcO0nmwkRB8lrxgwA=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240108183445-695ea428ae21 h1:1VG88tdhCSVv7wGoIKQe8A8KfBXJsdz5pDsyP4ymDwk=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240108183445-695ea428ae21/go.mod h1:WEJXESKXqrMFLAArikQ79lpRibNeeE1C0VruxXYMF5M=
-code.rocketnine.space/tslocum/kibodo v1.0.3-0.20240109203209-1e5886fd3422 h1:T2WK/ci6fc/Ee+Puu/0k+ziU3EI49F7uYEREhrtmqbA=
-code.rocketnine.space/tslocum/kibodo v1.0.3-0.20240109203209-1e5886fd3422/go.mod h1:U9KpaLHr7nPZ8XfRUI81uAQMrxob+bI3C/IXzeXe7gw=
+code.rocketnine.space/tslocum/kibodo v1.0.3-0.20240110043547-31f31eb07497 h1:QpzLvcDV7DsaeFKrQZcHkDfq1PqsHcwUVnRXRKBAxe0=
+code.rocketnine.space/tslocum/kibodo v1.0.3-0.20240110043547-31f31eb07497/go.mod h1:U9KpaLHr7nPZ8XfRUI81uAQMrxob+bI3C/IXzeXe7gw=
 code.rocketnine.space/tslocum/messeji v1.0.6-0.20240109205105-4ffeffdd2441 h1:pe5QsaN6Tvil0Y+jodbMLfdMWaL5MBb2vyorBIfQwqk=
 code.rocketnine.space/tslocum/messeji v1.0.6-0.20240109205105-4ffeffdd2441/go.mod h1:cznUGfvC7BKbc5sx4I36XpLsF0ar3TPJYZlrND0IlDQ=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=

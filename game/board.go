@@ -523,6 +523,8 @@ func NewBoard() *board {
 		b.frame.AddChild(f)
 	}
 
+	b.frame.AddChild(etk.NewFrame(game.keyboard))
+
 	b.frame.AddChild(game.tutorialFrame)
 
 	b.fontUpdated()

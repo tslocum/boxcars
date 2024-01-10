@@ -73,7 +73,7 @@ func (w *tutorialWidget) setPage(page int) {
 		message = gotext.Get("Welcome to the guided tutorial. Click anywhere outside of this message box to close the tutorial. Click anywhere inside of this message box to view the next page.")
 	case 1:
 		title = gotext.Get("Matches List")
-		message = gotext.Get("This screen lists the matches that are currently available. A few bots are always available to play against.")
+		message = gotext.Get("This screen lists the matches that are currently available. A few bots are always available to play against. You can also spectate ongoing public matches.")
 	case 2:
 		game.lobby.showCreateGame = true
 		game.setRoot(createGameFrame)
