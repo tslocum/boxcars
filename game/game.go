@@ -1621,7 +1621,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 		if sendEvent {
 			ev := &bgammon.EventBoard{
 				GameState: bgammon.GameState{
-					Game:         gs.Game.Copy(),
+					Game:         gs.Game.Copy(true),
 					PlayerNumber: 1,
 					Available:    gs.Available,
 					Spectating:   true,
@@ -1700,7 +1700,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 				if sendEvent {
 					ev := &bgammon.EventBoard{
 						GameState: bgammon.GameState{
-							Game:         gs.Game.Copy(),
+							Game:         gs.Game.Copy(true),
 							PlayerNumber: 1,
 							Available:    gs.Available,
 							Spectating:   true,
@@ -1733,7 +1733,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 			if sendEvent {
 				ev := &bgammon.EventBoard{
 					GameState: bgammon.GameState{
-						Game:         gs.Game.Copy(),
+						Game:         gs.Game.Copy(true),
 						PlayerNumber: 1,
 						Available:    gs.Available,
 						Spectating:   true,
@@ -1829,7 +1829,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 			if sendEvent {
 				ev := &bgammon.EventBoard{
 					GameState: bgammon.GameState{
-						Game:         gs.Game.Copy(),
+						Game:         gs.Game.Copy(true),
 						PlayerNumber: 1,
 						Available:    gs.Available,
 						Spectating:   true,
@@ -1866,7 +1866,7 @@ func (g *Game) showReplayFrame(replayFrame int, showInfo bool) {
 
 	ev := &bgammon.EventBoard{
 		GameState: bgammon.GameState{
-			Game:         frame.Game.Copy(),
+			Game:         frame.Game.Copy(true),
 			PlayerNumber: 1,
 			Available:    frame.Game.LegalMoves(true),
 			Spectating:   true,
@@ -1913,7 +1913,7 @@ func (g *Game) HandleReplay(replay []byte) {
 	for scanner.Scan() {
 		if !bytes.HasPrefix(scanner.Bytes(), []byte("bgammon-reply")) && !bytes.HasPrefix(scanner.Bytes(), []byte("i ")) {
 			g.replayFrames = append(g.replayFrames, &replayFrame{
-				Game:  gs.Game.Copy(),
+				Game:  gs.Game.Copy(true),
 				Event: scanner.Bytes(),
 			})
 		}
@@ -1959,7 +1959,7 @@ func (g *Game) HandleReplay(replay []byte) {
 	}
 
 	g.replayFrames = append(g.replayFrames, &replayFrame{
-		Game:  gs.Game.Copy(),
+		Game:  gs.Game.Copy(true),
 		Event: nil,
 	})
 

@@ -970,7 +970,7 @@ func (b *board) selectReplayPause() error {
 			frame := game.replayFrames[game.replayFrame]
 			if len(frame.Event) != 0 {
 				game._handleReplay(&bgammon.GameState{
-					Game:         frame.Game.Copy(),
+					Game:         frame.Game.Copy(true),
 					PlayerNumber: 1,
 					Available:    frame.Game.LegalMoves(true),
 					Spectating:   true,
@@ -1009,7 +1009,7 @@ func (b *board) selectReplayStepForward() error {
 	frame := game.replayFrames[game.replayFrame]
 	if len(frame.Event) != 0 {
 		game._handleReplay(&bgammon.GameState{
-			Game:         frame.Game.Copy(),
+			Game:         frame.Game.Copy(true),
 			PlayerNumber: 1,
 			Available:    frame.Game.LegalMoves(true),
 			Spectating:   true,
@@ -2701,21 +2701,6 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		sprite.y = y - (sprite.h / 2)
 	}
 	return handled, nil
-}
-
-func allMoves(in *bgammon.Game, from int8, to int8) []int8 {
-	gc := in.Copy()
-	ok, _ := gc.AddMoves([][]int8{{from, to}}, true)
-	if !ok {
-		return nil
-	}
-	moves := []int8{to}
-	for _, m := range gc.LegalMoves(true) {
-		if m[0] == to {
-			moves = append(moves, allMoves(gc, m[0], m[1])...)
-		}
-	}
-	return moves
 }
 
 func expandMoves(moves [][]int8) [][]int8 {

@@ -1,9 +1,9 @@
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b h1:Y0a14Kf/hSYepSmp4ZfDeE4CZZGBGBS97CNjCbKJm0c=
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b/go.mod h1:tS60/VNAJphKvDBkSLQhKALa15msIAuWWfEKNc4oFZc=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20240111054243-b77a42abd7e2 h1:1hv+E8DnOOB6Lb7/FoZEiBjDNe0bIJgRVbuCTqCFSRI=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20240111054243-b77a42abd7e2/go.mod h1:xx2+IXvAb0vrvrNpoBvCZjq04tcDu4DwokIFJcIiqQk=
-code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240111053915-885888ea1868 h1:Ur7sBaEy88nfbSq5ZMrn0z34lOX2sQBKPPIEDUX5shw=
-code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240111053915-885888ea1868/go.mod h1:8/w2CAzqfaITbzRsFSvejUlqERRJZf/+PRuYA+2NpDs=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20240111071346-3eb433e57356 h1:7D4HYPNbhugFbnRgACpvbAzzzElY9McrDsGyMnzLz6M=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20240111071346-3eb433e57356/go.mod h1:65vhSKgeQb6ccjUm5NJlbBdwuAH3VSFoSApZ/aVG3+4=
+code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240111071420-cf312f82fe00 h1:bfEFJAS+nWLzqjvwcyJIdl1ZzClpSShOEXiIyhuiY20=
+code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240111071420-cf312f82fe00/go.mod h1:+QuJeLxK5sWeQZnLxxjLmF0rBNY89R1PHXDgSUXu9mk=
 code.rocket9labs.com/tslocum/etk v0.0.0-20240110043858-127665c19898 h1:DfKN6JwNQPxDbt5KpXtqNr64gFRfgJ37Lv6lY7YWuWM=
 code.rocket9labs.com/tslocum/etk v0.0.0-20240110043858-127665c19898/go.mod h1:ZZDAzxFb3FzgluVsKLlh9wfE/0VcO0nmwkRB8lrxgwA=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240108183445-695ea428ae21 h1:1VG88tdhCSVv7wGoIKQe8A8KfBXJsdz5pDsyP4ymDwk=
