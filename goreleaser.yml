@@ -17,6 +17,7 @@ archives:
     id: boxcars
     builds:
       - boxcars
+    wrap_in_directory: boxcars
     replacements:
       386: i386
     format_overrides:
