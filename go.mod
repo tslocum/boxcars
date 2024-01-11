@@ -3,8 +3,8 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240108183627-118a7f78eb98
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240108213827-c677af332056
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240111054243-b77a42abd7e2
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240111053915-885888ea1868
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240110043858-127665c19898
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240108183445-695ea428ae21
 	code.rocketnine.space/tslocum/kibodo v1.0.3-0.20240110043547-31f31eb07497
@@ -56,7 +56,7 @@ require (
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.20.2 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/exp/shiny v0.0.0-20240103183307-be819d1f06fc // indirect
+	golang.org/x/exp/shiny v0.0.0-20240110193028-0dcbfd608b1e // indirect
 	golang.org/x/mobile v0.0.0-20231127183840-76ac6878050a // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect

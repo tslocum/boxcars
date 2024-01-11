@@ -1438,12 +1438,12 @@ func (g *Game) handleEvent(e interface{}) {
 		g.Board.processState()
 		g.Board.Unlock()
 		scheduleFrame()
-		lg(gotext.Get("%s rolled %s.", ev.Player, diceFormatted))
+		lg(gotext.Get("%s rolled %s", ev.Player, diceFormatted))
 	case *bgammon.EventFailedRoll:
 		l(fmt.Sprintf("*** %s: %s", gotext.Get("Failed to roll"), ev.Reason))
 	case *bgammon.EventMoved:
-		lg(gotext.Get("%s moved %s.", ev.Player, bgammon.FormatMoves(ev.Moves)))
-		if ev.Player == g.Client.Username && !g.Board.gameState.Spectating {
+		lg(gotext.Get("%s moved %s", ev.Player, bgammon.FormatMoves(ev.Moves)))
+		if ev.Player == g.Client.Username && !g.Board.gameState.Spectating && !g.Board.gameState.Forced {
 			return
 		}
 

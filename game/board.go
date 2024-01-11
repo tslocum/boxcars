@@ -983,6 +983,7 @@ func (b *board) selectReplayPause() error {
 				time.Sleep(2 * time.Second)
 				b.replayAuto = time.Time{}
 				b.replayPauseButton.Label.SetText("|>")
+				scheduleFrame()
 				return
 			}
 
