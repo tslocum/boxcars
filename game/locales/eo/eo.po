@@ -282,7 +282,8 @@ msgstr ""
 
 msgid ""
 "This screen lists the matches that are currently available. A few bots are "
-"always available to play against."
+"always available to play against. You can also spectate ongoing public "
+"matches."
 msgstr ""
 
 msgid "To download this replay visit"
