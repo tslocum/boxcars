@@ -1444,7 +1444,14 @@ func (g *Game) handleEvent(e interface{}) {
 	case *bgammon.EventMoved:
 		lg(gotext.Get("%s moved %s", ev.Player, bgammon.FormatMoves(ev.Moves)))
 		if ev.Player == g.Client.Username && !g.Board.gameState.Spectating && !g.Board.gameState.Forced {
-			return
+			var delta int8
+			for _, move := range ev.Moves {
+				delta = move[1] - move[0]
+				break
+			}
+			if (delta < 0) == (g.Board.gameState.Variant == bgammon.VariantTabula) {
+				return
+			}
 		}
 
 		g.Board.Lock()
@@ -1492,6 +1499,10 @@ func (g *Game) handleEvent(e interface{}) {
 		b.showMovesCheckbox.SetSelected(b.showMoves)
 		b.flipBoard = ev.Flip
 		b.flipBoardCheckbox.SetSelected(b.flipBoard)
+		if !AutoEnableTouchInput {
+			b.advancedMovement = ev.Advanced
+			b.advancedMovementCheckbox.SetSelected(b.advancedMovement)
+		}
 		if g.needLayoutBoard {
 			g.layoutBoard()
 		}

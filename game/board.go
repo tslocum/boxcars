@@ -43,11 +43,12 @@ type board struct {
 	spaceRects   [][4]int
 	spaceSprites [][]*Sprite // Space contents
 
-	dragging      *Sprite
-	draggingSpace int8
-	draggingClick bool // Drag started with mouse click
-	lastDragClick time.Time
-	moving        *Sprite // Moving automatically
+	dragging           *Sprite
+	draggingSpace      int8
+	draggingClick      bool // Drag started with mouse click
+	draggingRightClick bool // Movement started with right mouse click
+	lastDragClick      time.Time
+	moving             *Sprite // Moving automatically
 
 	touchIDs []ebiten.TouchID
 
@@ -113,12 +114,13 @@ type board struct {
 	changePasswordNew  *etk.Input
 	changePasswordGrid *etk.Grid
 
-	highlightCheckbox    *etk.Checkbox
-	showPipCountCheckbox *etk.Checkbox
-	showMovesCheckbox    *etk.Checkbox
-	flipBoardCheckbox    *etk.Checkbox
-	accountGrid          *etk.Grid
-	settingsGrid         *etk.Grid
+	highlightCheckbox        *etk.Checkbox
+	showPipCountCheckbox     *etk.Checkbox
+	showMovesCheckbox        *etk.Checkbox
+	flipBoardCheckbox        *etk.Checkbox
+	advancedMovementCheckbox *etk.Checkbox
+	accountGrid              *etk.Grid
+	settingsGrid             *etk.Grid
 
 	matchStatusGrid *etk.Grid
 
@@ -148,6 +150,7 @@ type board struct {
 	showPipCount       bool
 	showMoves          bool
 	flipBoard          bool
+	advancedMovement   bool
 
 	widget *BoardWidget
 
@@ -365,6 +368,20 @@ func NewBoard() *board {
 		}
 		flipBoardLabel.SetVertical(messeji.AlignCenter)
 
+		b.advancedMovementCheckbox = etk.NewCheckbox(b.toggleAdvancedMovementCheckbox)
+		b.advancedMovementCheckbox.SetBorderColor(triangleA)
+		b.advancedMovementCheckbox.SetCheckColor(triangleA)
+		b.advancedMovementCheckbox.SetSelected(b.advancedMovement)
+
+		advancedMovementLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Advanced movement")),
+			onSelected: func() {
+				b.advancedMovementCheckbox.SetSelected(!b.advancedMovementCheckbox.Selected())
+				b.toggleAdvancedMovementCheckbox()
+			},
+		}
+		advancedMovementLabel.SetVertical(messeji.AlignCenter)
+
 		accountLabel := etk.NewText(gotext.Get("Account"))
 		accountLabel.SetVertical(messeji.AlignCenter)
 
@@ -372,7 +389,7 @@ func NewBoard() *board {
 
 		checkboxGrid := etk.NewGrid()
 		checkboxGrid.SetColumnSizes(72, 20, -1)
-		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1)
+		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
 		checkboxGrid.AddChildAt(b.highlightCheckbox, 0, 0, 1, 1)
 		checkboxGrid.AddChildAt(highlightLabel, 2, 0, 1, 1)
 		checkboxGrid.AddChildAt(b.showPipCountCheckbox, 0, 2, 1, 1)
@@ -381,16 +398,26 @@ func NewBoard() *board {
 		checkboxGrid.AddChildAt(movesLabel, 2, 4, 1, 1)
 		checkboxGrid.AddChildAt(b.flipBoardCheckbox, 0, 6, 1, 1)
 		checkboxGrid.AddChildAt(flipBoardLabel, 2, 6, 1, 1)
+		gridY := 8
+		if !AutoEnableTouchInput {
+			checkboxGrid.AddChildAt(b.advancedMovementCheckbox, 0, 8, 1, 1)
+			checkboxGrid.AddChildAt(advancedMovementLabel, 2, 8, 1, 1)
+			gridY += 2
+		}
 		{
 			grid := etk.NewGrid()
 			grid.AddChildAt(accountLabel, 0, 0, 1, 1)
 			grid.AddChildAt(b.accountGrid, 1, 0, 2, 1)
-			checkboxGrid.AddChildAt(grid, 0, 8, 3, 1)
+			checkboxGrid.AddChildAt(grid, 0, gridY, 3, 1)
 		}
 
+		gridSize := 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72
+		if !AutoEnableTouchInput {
+			gridSize += 20 + 72
+		}
 		b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
 		b.settingsGrid.SetColumnSizes(20, -1, -1, 20)
-		b.settingsGrid.SetRowSizes(72, 72+20+72+20+72+20+72+20+72, 20, -1)
+		b.settingsGrid.SetRowSizes(72, gridSize, 20, -1)
 		b.settingsGrid.AddChildAt(settingsLabel, 1, 0, 2, 1)
 		b.settingsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
 		b.settingsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
@@ -1104,6 +1131,17 @@ func (b *board) toggleFlipBoardCheckbox() error {
 	}
 	b.Client.Out <- []byte(fmt.Sprintf("set flip %d", flipBoard))
 	b.Client.Out <- []byte("board")
+	return nil
+}
+
+func (b *board) toggleAdvancedMovementCheckbox() error {
+	b.advancedMovement = b.advancedMovementCheckbox.Selected()
+
+	advancedMovement := 0
+	if b.advancedMovement {
+		advancedMovement = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set advanced %d", advancedMovement))
 	return nil
 }
 
@@ -2669,6 +2707,81 @@ func NewBoardWidget() *BoardWidget {
 	}
 }
 
+func (bw *BoardWidget) finishClick(cursor image.Point, double bool) {
+	if game.Board.draggingSpace == -1 || len(game.Board.gameState.Available) == 0 {
+		return
+	}
+	rolls := game.Board.gameState.DiceRolls()
+	if len(rolls) == 0 {
+		return
+	}
+	space := game.Board.spaceAt(cursor.X, cursor.Y)
+	if space == -1 || space != game.Board.draggingSpace {
+		return
+	} else if !double {
+		lowest := int8(math.MaxInt8)
+		highest := int8(math.MinInt8)
+		for _, roll := range rolls {
+			if roll < lowest {
+				lowest = roll
+			}
+			if roll > highest {
+				highest = roll
+			}
+		}
+		var roll int8
+		if game.Board.draggingRightClick {
+			roll = lowest
+		} else {
+			roll = highest
+		}
+		var useMove []int8
+		for _, move := range game.Board.gameState.Available {
+			if move[0] != space {
+				continue
+			}
+			diff := bgammon.SpaceDiff(move[0], move[1], game.Board.gameState.Variant)
+			haveRoll := diff == roll && game.Board.gameState.Game.HaveDiceRoll(move[0], move[1]) > 0
+			if !haveRoll && (move[1] == bgammon.SpaceHomePlayer || move[1] == bgammon.SpaceHomeOpponent) {
+				haveRoll = diff <= roll && game.Board.gameState.Game.HaveBearOffDiceRoll(diff) > 0
+			}
+			if haveRoll {
+				useMove = move
+				break
+			}
+		}
+		if len(useMove) == 0 {
+			return
+		}
+		game.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", useMove[0], useMove[1]))
+		return
+	}
+
+	var useMoves [][]int8
+FINDMOVE:
+	for _, move := range game.Board.gameState.Available {
+		expanded := expandMoves([][]int8{{move[0], space}})
+		for _, m := range expanded {
+			diff := bgammon.SpaceDiff(m[0], m[1], game.Board.gameState.Variant)
+			haveRoll := game.Board.gameState.Game.HaveDiceRoll(m[0], m[1]) > 0
+			if !haveRoll && (m[1] == bgammon.SpaceHomePlayer || m[1] == bgammon.SpaceHomeOpponent) {
+				haveRoll = game.Board.gameState.Game.HaveBearOffDiceRoll(diff) > 0
+			}
+			if !haveRoll {
+				continue FINDMOVE
+			}
+		}
+		useMoves = expanded
+		break
+	}
+	if len(useMoves) == 0 {
+		return
+	}
+	for _, move := range useMoves {
+		game.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", move[0], move[1]))
+	}
+}
+
 func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
 	if !pressed && !clicked && game.Board.dragging == nil {
 		return false, nil
@@ -2682,6 +2795,34 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 	cx, cy := cursor.X, cursor.Y
 
 	if b.dragging == nil {
+		if b.advancedMovement && clicked {
+			const doubleClickDuration = 250 * time.Millisecond
+			space := b.spaceAt(cx, cy)
+			if space != -1 {
+				if time.Since(b.lastDragClick) >= doubleClickDuration {
+					setTime := time.Now()
+					b.draggingSpace = space
+					b.draggingRightClick = ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight)
+					b.lastDragClick = setTime
+					go func() {
+						time.Sleep(doubleClickDuration)
+						game.Lock()
+						defer game.Unlock()
+						if !b.lastDragClick.Equal(setTime) {
+							return
+						}
+						bw.finishClick(cursor, false)
+						b.lastDragClick = time.Now()
+					}()
+					return true, nil
+				}
+				bw.finishClick(cursor, true)
+				b.lastDragClick = time.Now()
+				return true, nil
+			}
+			return false, nil
+		}
+
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 		if !handled && b.playerTurn() && clicked && (b.lastDragClick.IsZero() || time.Since(b.lastDragClick) >= 50*time.Millisecond) {
 			s, space := b.spriteAt(cx, cy)
