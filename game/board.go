@@ -98,6 +98,9 @@ type board struct {
 	opponentLabel *Label
 	playerLabel   *Label
 
+	opponentForcedLabel *etk.Text
+	playerForcedLabel   *etk.Text
+
 	opponentMovesLabel *etk.Text
 	playerMovesLabel   *etk.Text
 
@@ -192,6 +195,8 @@ func NewBoard() *board {
 		foundMoves:              make(map[int]bool),
 		opponentLabel:           NewLabel(colorWhite),
 		playerLabel:             NewLabel(colorBlack),
+		opponentForcedLabel:     etk.NewText(fmt.Sprintf("=%s=", gotext.Get("Forced"))),
+		playerForcedLabel:       etk.NewText(fmt.Sprintf("=%s=", gotext.Get("Forced"))),
 		opponentMovesLabel:      etk.NewText(""),
 		playerMovesLabel:        etk.NewText(""),
 		opponentPipCount:        etk.NewText("0"),
@@ -224,6 +229,23 @@ func NewBoard() *board {
 		Mutex:                   &sync.Mutex{},
 	}
 
+	{
+		padding := 15
+		if AutoEnableTouchInput {
+			padding = 30
+		}
+		b.opponentForcedLabel.SetPadding(padding)
+		b.opponentForcedLabel.SetHorizontal(messeji.AlignCenter)
+		b.opponentForcedLabel.SetVertical(messeji.AlignEnd)
+		b.opponentForcedLabel.SetScrollBarVisible(false)
+		b.opponentForcedLabel.SetVisible(false)
+		b.playerForcedLabel.SetPadding(padding)
+		b.playerForcedLabel.SetHorizontal(messeji.AlignCenter)
+		b.playerForcedLabel.SetVertical(messeji.AlignEnd)
+		b.playerForcedLabel.SetScrollBarVisible(false)
+		b.playerForcedLabel.SetVisible(false)
+	}
+
 	centerText := func(t *etk.Text) {
 		t.SetVertical(messeji.AlignCenter)
 		t.SetScrollBarVisible(false)
@@ -240,6 +262,9 @@ func NewBoard() *board {
 
 	b.opponentPipCount.SetHorizontal(messeji.AlignEnd)
 	b.playerPipCount.SetHorizontal(messeji.AlignStart)
+
+	b.opponentForcedLabel.SetForegroundColor(color.RGBA{255, 255, 255, 255})
+	b.playerForcedLabel.SetForegroundColor(color.RGBA{0, 0, 0, 255})
 
 	b.opponentMovesLabel.SetForegroundColor(color.RGBA{255, 255, 255, 255})
 	b.playerMovesLabel.SetForegroundColor(color.RGBA{0, 0, 0, 255})
@@ -520,6 +545,7 @@ func NewBoard() *board {
 
 	{
 		f := etk.NewFrame()
+		f.AddChild(b.opponentForcedLabel)
 		f.AddChild(b.opponentMovesLabel)
 		f.AddChild(b.opponentPipCount)
 		f.AddChild(b.opponentLabel)
@@ -527,6 +553,7 @@ func NewBoard() *board {
 		f.AddChild(b.playerLabel)
 		f.AddChild(b.playerPipCount)
 		f.AddChild(b.playerMovesLabel)
+		f.AddChild(b.playerForcedLabel)
 		f.AddChild(b.uiGrid)
 		b.frame.AddChild(f)
 	}
@@ -627,6 +654,14 @@ func (b *board) fontUpdated() {
 
 	b.timerLabel.SetFont(b.fontFace, fontMutex)
 	b.clockLabel.SetFont(b.fontFace, fontMutex)
+
+	if game.TouchInput {
+		b.opponentForcedLabel.SetFont(largeFont, fontMutex)
+		b.playerForcedLabel.SetFont(largeFont, fontMutex)
+	} else {
+		b.opponentForcedLabel.SetFont(mediumFont, fontMutex)
+		b.playerForcedLabel.SetFont(mediumFont, fontMutex)
+	}
 
 	b.opponentMovesLabel.SetFont(bufferFont, fontMutex)
 	b.playerMovesLabel.SetFont(bufferFont, fontMutex)
@@ -1885,6 +1920,10 @@ func (b *board) updateOpponentLabel() {
 		return
 	}
 	{
+		newRect := image.Rect(x-bounds.Dx(), y-bounds.Dy()-diceSize-game.itemHeight(), x+bounds.Dx()*2, y-bounds.Dy()/2-diceSize)
+		b.opponentForcedLabel.SetRect(newRect)
+	}
+	{
 		newRect := image.Rect(int(b.horizontalBorderSize), y-bounds.Dy()*2, x, y+bounds.Dy()*4)
 		b.opponentMovesLabel.SetRect(newRect)
 	}
@@ -1951,6 +1990,10 @@ func (b *board) updatePlayerLabel() {
 	if r.Eq(label.Rect()) && r.Dx() != 0 && r.Dy() != 0 {
 		label.updateBackground()
 		return
+	}
+	{
+		newRect := image.Rect(x-bounds.Dx(), y-bounds.Dy()-diceSize-game.itemHeight(), x+bounds.Dx()*2, y-bounds.Dy()/2-diceSize)
+		b.playerForcedLabel.SetRect(newRect)
 	}
 	{
 		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy()*2, int(b.horizontalBorderSize)+b.innerW, y+bounds.Dy()*4)
@@ -2167,6 +2210,7 @@ func (b *board) processState() {
 		if b.opponentLabel.activeColor != colorBlack {
 			b.opponentLabel.activeColor = colorBlack
 			b.opponentLabel.SetForegroundColor(colorBlack)
+			b.opponentForcedLabel.SetForegroundColor(colorBlack)
 			b.opponentPipCount.SetForegroundColor(colorBlack)
 			b.opponentMovesLabel.SetForegroundColor(colorBlack)
 			b.opponentLabel.lastActive = !b.opponentLabel.active
@@ -2175,6 +2219,7 @@ func (b *board) processState() {
 		if b.playerLabel.activeColor != colorWhite {
 			b.playerLabel.activeColor = colorWhite
 			b.playerLabel.SetForegroundColor(colorWhite)
+			b.playerForcedLabel.SetForegroundColor(colorWhite)
 			b.playerPipCount.SetForegroundColor(colorWhite)
 			b.playerMovesLabel.SetForegroundColor(colorWhite)
 			b.playerLabel.lastActive = !b.opponentLabel.active
@@ -2184,6 +2229,7 @@ func (b *board) processState() {
 		if b.opponentLabel.activeColor != colorWhite {
 			b.opponentLabel.activeColor = colorWhite
 			b.opponentLabel.SetForegroundColor(colorWhite)
+			b.opponentForcedLabel.SetForegroundColor(colorWhite)
 			b.opponentPipCount.SetForegroundColor(colorWhite)
 			b.opponentMovesLabel.SetForegroundColor(colorWhite)
 			b.opponentLabel.lastActive = !b.opponentLabel.active
@@ -2192,12 +2238,16 @@ func (b *board) processState() {
 		if b.playerLabel.activeColor != colorBlack {
 			b.playerLabel.activeColor = colorBlack
 			b.playerLabel.SetForegroundColor(colorBlack)
+			b.playerForcedLabel.SetForegroundColor(colorBlack)
 			b.playerPipCount.SetForegroundColor(colorBlack)
 			b.playerMovesLabel.SetForegroundColor(colorBlack)
 			b.playerLabel.lastActive = !b.opponentLabel.active
 			b.playerLabel.updateBackground()
 		}
 	}
+
+	b.opponentForcedLabel.SetVisible(b.gameState.Forced && b.gameState.Turn != b.gameState.PlayerNumber)
+	b.playerForcedLabel.SetVisible(b.gameState.Forced && b.gameState.Turn == b.gameState.PlayerNumber)
 
 	var showGrid *etk.Grid
 	if !b.gameState.Spectating && !b.availableStale {
@@ -2416,8 +2466,8 @@ func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause
 	case bgammon.SpeedSlow:
 		moveTime += moveTime / 2
 	case bgammon.SpeedFast:
-		moveTime /= 2
-		pauseTime /= 2
+		moveTime -= moveTime / 2
+		pauseTime -= pauseTime / 2
 	case bgammon.SpeedInstant:
 		moveTime = 0
 		pauseTime = 0
