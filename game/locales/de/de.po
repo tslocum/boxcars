@@ -20,11 +20,11 @@ msgstr "%s ist dem Spiel beigetreten."
 msgid "%s left the match."
 msgstr "%s hat das Spiel verlassen."
 
-msgid "%s moved %s."
-msgstr "%s zog %s."
+msgid "%s moved %s"
+msgstr ""
 
-msgid "%s rolled %s."
-msgstr "%s würfelte %s."
+msgid "%s rolled %s"
+msgstr ""
 
 msgid "%s wins!"
 msgstr "%s hat gewonnen!"
@@ -37,6 +37,9 @@ msgstr "Account"
 
 msgid "Acey-deucey"
 msgstr "Acey Deucey"
+
+msgid "Advanced movement"
+msgstr ""
 
 msgid "Available"
 msgstr "Verfügbar"
@@ -130,8 +133,14 @@ msgstr "Würfelwurf fehlgeschlagen"
 msgid "Failed to submit moves: %s"
 msgstr "Konnte Zug nicht übertragen: %s"
 
+msgid "Fast"
+msgstr ""
+
 msgid "Flip board"
 msgstr "Spielbrett drehen"
+
+msgid "Forced"
+msgstr ""
 
 msgid "Good Luck, Have Fun"
 msgstr "Viel Glück und Spaß"
@@ -144,6 +153,9 @@ msgstr "Erlaubte Züge hervorheben"
 
 msgid "History"
 msgstr "Verlauf"
+
+msgid "Instant"
+msgstr ""
 
 msgid "Join match"
 msgstr "Spiel beitreten"
@@ -174,6 +186,9 @@ msgstr "Spiel Name"
 
 msgid "Matches List"
 msgstr "Spiel Liste"
+
+msgid "Medium"
+msgstr ""
 
 msgid "Name"
 msgstr "Name"
@@ -269,6 +284,12 @@ msgstr "Züge anzeigen"
 msgid "Show pip count"
 msgstr "Pip count anzeigen"
 
+msgid "Slow"
+msgstr ""
+
+msgid "Speed"
+msgstr ""
+
 msgid "Started"
 msgstr "Gestartet"
 
@@ -361,3 +382,9 @@ msgstr "Du musst vielleicht deinen Client updaten."
 
 msgid "from %s to %s"
 msgstr "von %s nach %s"
+
+#~ msgid "%s moved %s."
+#~ msgstr "%s zog %s."
+
+#~ msgid "%s rolled %s."
+#~ msgstr "%s würfelte %s."

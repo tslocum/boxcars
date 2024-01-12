@@ -1,3 +1,6 @@
+1.2.5:
+- Add setting for auto-playing forced moves
+
 1.2.4:
 - Add checker animation speed setting
 - Support advanced checker movement

@@ -20,10 +20,10 @@ msgstr "%s entrou na partida."
 msgid "%s left the match."
 msgstr "%s saiu da partida."
 
-msgid "%s moved %s."
+msgid "%s moved %s"
 msgstr ""
 
-msgid "%s rolled %s."
+msgid "%s rolled %s"
 msgstr ""
 
 msgid "%s wins!"
@@ -36,6 +36,9 @@ msgid "Account"
 msgstr "Conta"
 
 msgid "Acey-deucey"
+msgstr ""
+
+msgid "Advanced movement"
 msgstr ""
 
 msgid "Available"
@@ -126,8 +129,14 @@ msgstr "Falha ao rolar"
 msgid "Failed to submit moves: %s"
 msgstr "Falha ao enviar movimentos: %s"
 
+msgid "Fast"
+msgstr ""
+
 msgid "Flip board"
 msgstr "Inverter placar"
+
+msgid "Forced"
+msgstr ""
 
 msgid "Good Luck, Have Fun"
 msgstr "Boa Sorte, Divirta-se"
@@ -140,6 +149,9 @@ msgstr ""
 
 msgid "History"
 msgstr "Histórico"
+
+msgid "Instant"
+msgstr ""
 
 msgid "Join match"
 msgstr "Entrar na partida"
@@ -170,6 +182,9 @@ msgstr "Nome da Partida"
 
 msgid "Matches List"
 msgstr "Lista de Partidas"
+
+msgid "Medium"
+msgstr ""
 
 msgid "Name"
 msgstr "Nome"
@@ -263,6 +278,12 @@ msgid "Show moves"
 msgstr "Exibir movimentos"
 
 msgid "Show pip count"
+msgstr ""
+
+msgid "Slow"
+msgstr ""
+
+msgid "Speed"
 msgstr ""
 
 msgid "Started"

@@ -20,11 +20,11 @@ msgstr "%s aliĝis la partion."
 msgid "%s left the match."
 msgstr "%s forlasis la partion."
 
-msgid "%s moved %s."
-msgstr "%s movis %s."
+msgid "%s moved %s"
+msgstr ""
 
-msgid "%s rolled %s."
-msgstr "Ĵetrezulto de %s estis %s."
+msgid "%s rolled %s"
+msgstr ""
 
 msgid "%s wins!"
 msgstr "%s gajnis la ludon!"
@@ -37,6 +37,9 @@ msgstr ""
 
 msgid "Acey-deucey"
 msgstr "Aso-duo"
+
+msgid "Advanced movement"
+msgstr ""
 
 msgid "Available"
 msgstr "Disponebla"
@@ -124,7 +127,13 @@ msgstr ""
 msgid "Failed to submit moves: %s"
 msgstr "Malsukcesis submeti movon: %s"
 
+msgid "Fast"
+msgstr ""
+
 msgid "Flip board"
+msgstr ""
+
+msgid "Forced"
 msgstr ""
 
 msgid "Good Luck, Have Fun"
@@ -137,6 +146,9 @@ msgid "Highlight legal moves"
 msgstr "Reliefigi eblajn movojn"
 
 msgid "History"
+msgstr ""
+
+msgid "Instant"
 msgstr ""
 
 msgid "Join match"
@@ -167,6 +179,9 @@ msgid "Match Name"
 msgstr ""
 
 msgid "Matches List"
+msgstr ""
+
+msgid "Medium"
 msgstr ""
 
 msgid "Name"
@@ -263,6 +278,12 @@ msgstr "Montri movojn"
 msgid "Show pip count"
 msgstr "Montri nombron de fakoj"
 
+msgid "Slow"
+msgstr ""
+
+msgid "Speed"
+msgstr ""
+
 msgid "Started"
 msgstr "Komencita"
 
@@ -345,6 +366,12 @@ msgstr "Vi eble devas ĝisdatigi vian programon."
 
 msgid "from %s to %s"
 msgstr ""
+
+#~ msgid "%s moved %s."
+#~ msgstr "%s movis %s."
+
+#~ msgid "%s rolled %s."
+#~ msgstr "Ĵetrezulto de %s estis %s."
 
 #~ msgid "Create"
 #~ msgstr "Krei"

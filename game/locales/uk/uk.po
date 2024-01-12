@@ -21,11 +21,11 @@ msgstr "%s заходить у кімнату."
 msgid "%s left the match."
 msgstr "%s покидає кімнату."
 
-msgid "%s moved %s."
-msgstr "%s робить хід %s."
+msgid "%s moved %s"
+msgstr ""
 
-msgid "%s rolled %s."
-msgstr "%s викидає %s."
+msgid "%s rolled %s"
+msgstr ""
 
 msgid "%s wins!"
 msgstr "%s перемагає!"
@@ -38,6 +38,9 @@ msgstr "Обл. запис"
 
 msgid "Acey-deucey"
 msgstr "Ейсі-дусі"
+
+msgid "Advanced movement"
+msgstr ""
 
 msgid "Available"
 msgstr "Гру не почато"
@@ -129,8 +132,14 @@ msgstr "Помилка кидку"
 msgid "Failed to submit moves: %s"
 msgstr "Помилка підтвердження ходів: %s"
 
+msgid "Fast"
+msgstr ""
+
 msgid "Flip board"
 msgstr "Розвернути дошку"
+
+msgid "Forced"
+msgstr ""
 
 msgid "Good Luck, Have Fun"
 msgstr "Щасти вам, розважайтеся"
@@ -143,6 +152,9 @@ msgstr "Підсвічувати можливі ходи"
 
 msgid "History"
 msgstr "Історія"
+
+msgid "Instant"
+msgstr ""
 
 msgid "Join match"
 msgstr "Увійти в кімнату"
@@ -173,6 +185,9 @@ msgstr "Назва кімнати"
 
 msgid "Matches List"
 msgstr "Список кімнат"
+
+msgid "Medium"
+msgstr ""
 
 msgid "Name"
 msgstr "Назва"
@@ -268,6 +283,12 @@ msgstr "Показувати ходи"
 msgid "Show pip count"
 msgstr "Показувати кількість пунктів"
 
+msgid "Slow"
+msgstr ""
+
+msgid "Speed"
+msgstr ""
+
 msgid "Started"
 msgstr "Гру почато"
 
@@ -355,6 +376,12 @@ msgstr "Можливо, потрібно оновити клієнт."
 
 msgid "from %s to %s"
 msgstr "з %s до %s"
+
+#~ msgid "%s moved %s."
+#~ msgstr "%s робить хід %s."
+
+#~ msgid "%s rolled %s."
+#~ msgstr "%s викидає %s."
 
 #~ msgid ""
 #~ "This screen lists the matches that are currently available. A few bots "

@@ -16,10 +16,10 @@ msgstr ""
 msgid "%s left the match."
 msgstr ""
 
-msgid "%s moved %s."
+msgid "%s moved %s"
 msgstr ""
 
-msgid "%s rolled %s."
+msgid "%s rolled %s"
 msgstr ""
 
 msgid "%s wins!"
@@ -32,6 +32,12 @@ msgid "Account"
 msgstr ""
 
 msgid "Acey-deucey"
+msgstr ""
+
+msgid "Advanced movement"
+msgstr ""
+
+msgid "Auto-play forced moves"
 msgstr ""
 
 msgid "Available"
@@ -112,7 +118,13 @@ msgstr ""
 msgid "Failed to submit moves: %s"
 msgstr ""
 
+msgid "Fast"
+msgstr ""
+
 msgid "Flip board"
+msgstr ""
+
+msgid "Forced"
 msgstr ""
 
 msgid "Good Luck, Have Fun"
@@ -125,6 +137,9 @@ msgid "Highlight legal moves"
 msgstr ""
 
 msgid "History"
+msgstr ""
+
+msgid "Instant"
 msgstr ""
 
 msgid "Join match"
@@ -155,6 +170,9 @@ msgid "Match Name"
 msgstr ""
 
 msgid "Matches List"
+msgstr ""
+
+msgid "Medium"
 msgstr ""
 
 msgid "Name"
@@ -245,6 +263,12 @@ msgid "Show moves"
 msgstr ""
 
 msgid "Show pip count"
+msgstr ""
+
+msgid "Slow"
+msgstr ""
+
+msgid "Speed"
 msgstr ""
 
 msgid "Started"

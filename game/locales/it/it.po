@@ -20,11 +20,11 @@ msgstr "%s è entrato in partita."
 msgid "%s left the match."
 msgstr "%s ha lasciato la partita."
 
-msgid "%s moved %s."
-msgstr "%s ha mosso %s."
+msgid "%s moved %s"
+msgstr ""
 
-msgid "%s rolled %s."
-msgstr "%s ha tirato %s."
+msgid "%s rolled %s"
+msgstr ""
 
 msgid "%s wins!"
 msgstr "%s è il vincitore!"
@@ -37,6 +37,9 @@ msgstr "Profilo"
 
 msgid "Acey-deucey"
 msgstr "Acey-deucey"
+
+msgid "Advanced movement"
+msgstr ""
 
 msgid "Available"
 msgstr "Disponibile"
@@ -130,8 +133,14 @@ msgstr "Errore nel lancio dei dadi"
 msgid "Failed to submit moves: %s"
 msgstr "Errore nella trasmissione delle mosse: %s"
 
+msgid "Fast"
+msgstr ""
+
 msgid "Flip board"
 msgstr "Gira tavoliere"
+
+msgid "Forced"
+msgstr ""
 
 msgid "Good Luck, Have Fun"
 msgstr "In bocca al lupo, buon divertimento!"
@@ -144,6 +153,9 @@ msgstr "Mosse legali in evidenza"
 
 msgid "History"
 msgstr "Registro"
+
+msgid "Instant"
+msgstr ""
 
 msgid "Join match"
 msgstr "Entra nella partita"
@@ -174,6 +186,9 @@ msgstr "Nome della partita"
 
 msgid "Matches List"
 msgstr "Lista delle partite"
+
+msgid "Medium"
+msgstr ""
 
 msgid "Name"
 msgstr "Nome"
@@ -269,6 +284,12 @@ msgstr "Mostra mosse"
 msgid "Show pip count"
 msgstr "Mostra punteggio"
 
+msgid "Slow"
+msgstr ""
+
+msgid "Speed"
+msgstr ""
+
 msgid "Started"
 msgstr "Iniziata"
 
@@ -356,6 +377,12 @@ msgstr "Potresti dover aggiornare il programma."
 
 msgid "from %s to %s"
 msgstr "da %s a %s"
+
+#~ msgid "%s moved %s."
+#~ msgstr "%s ha mosso %s."
+
+#~ msgid "%s rolled %s."
+#~ msgstr "%s ha tirato %s."
 
 #~ msgid ""
 #~ "This screen lists the matches that are currently available. A few bots "

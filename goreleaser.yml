@@ -7,8 +7,6 @@ builds:
       - js
       - linux
       - windows
-#      - darwin
-#      - freebsd
     goarch:
       - amd64
       - wasm
@@ -18,8 +16,6 @@ archives:
     builds:
       - boxcars
     wrap_in_directory: boxcars
-    replacements:
-      386: i386
     format_overrides:
       - goos: windows
         format: zip

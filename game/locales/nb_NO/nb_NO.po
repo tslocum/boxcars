@@ -20,11 +20,11 @@ msgstr "%s tok del i spillet."
 msgid "%s left the match."
 msgstr "%s forlot spillet."
 
-msgid "%s moved %s."
-msgstr "%s flyttet %s."
+msgid "%s moved %s"
+msgstr ""
 
-msgid "%s rolled %s."
-msgstr "%s rullet %s."
+msgid "%s rolled %s"
+msgstr ""
 
 msgid "%s wins!"
 msgstr "%s vant."
@@ -36,6 +36,9 @@ msgid "Account"
 msgstr ""
 
 msgid "Acey-deucey"
+msgstr ""
+
+msgid "Advanced movement"
 msgstr ""
 
 msgid "Available"
@@ -126,7 +129,13 @@ msgstr ""
 msgid "Failed to submit moves: %s"
 msgstr "Klarte ikke å sende inn trekk: %s"
 
+msgid "Fast"
+msgstr ""
+
 msgid "Flip board"
+msgstr ""
+
+msgid "Forced"
 msgstr ""
 
 msgid "Good Luck, Have Fun"
@@ -139,6 +148,9 @@ msgid "Highlight legal moves"
 msgstr ""
 
 msgid "History"
+msgstr ""
+
+msgid "Instant"
 msgstr ""
 
 msgid "Join match"
@@ -170,6 +182,9 @@ msgid "Match Name"
 msgstr ""
 
 msgid "Matches List"
+msgstr ""
+
+msgid "Medium"
 msgstr ""
 
 msgid "Name"
@@ -264,6 +279,12 @@ msgstr ""
 msgid "Show pip count"
 msgstr ""
 
+msgid "Slow"
+msgstr ""
+
+msgid "Speed"
+msgstr ""
+
 msgid "Started"
 msgstr ""
 
@@ -346,6 +367,12 @@ msgstr "Det kan hende du må installere en nyere versjon av programmet."
 
 msgid "from %s to %s"
 msgstr ""
+
+#~ msgid "%s moved %s."
+#~ msgstr "%s flyttet %s."
+
+#~ msgid "%s rolled %s."
+#~ msgstr "%s rullet %s."
 
 #, fuzzy
 #~ msgid "Create"

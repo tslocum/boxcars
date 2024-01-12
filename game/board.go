@@ -122,6 +122,7 @@ type board struct {
 	showMovesCheckbox        *etk.Checkbox
 	flipBoardCheckbox        *etk.Checkbox
 	advancedMovementCheckbox *etk.Checkbox
+	autoPlayCheckbox         *etk.Checkbox
 	selectSpeed              *etk.Select
 	accountGrid              *etk.Grid
 	settingsGrid             *etk.Grid
@@ -410,14 +411,27 @@ func NewBoard() *board {
 		}
 		advancedMovementLabel.SetVertical(messeji.AlignCenter)
 
+		b.autoPlayCheckbox = etk.NewCheckbox(b.toggleAutoPlayCheckbox)
+		b.autoPlayCheckbox.SetBorderColor(triangleA)
+		b.autoPlayCheckbox.SetCheckColor(triangleA)
+
+		autoPlayLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Auto-play forced moves")),
+			onSelected: func() {
+				b.autoPlayCheckbox.SetSelected(!b.autoPlayCheckbox.Selected())
+				b.toggleAutoPlayCheckbox()
+			},
+		}
+		autoPlayLabel.SetVertical(messeji.AlignCenter)
+
 		b.recreateAccountGrid()
 
 		checkboxGrid := etk.NewGrid()
 		checkboxGrid.SetColumnSizes(72, 20, -1)
 		if !AutoEnableTouchInput {
-			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
+			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
 		} else {
-			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
+			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
 		}
 		{
 			accountLabel := etk.NewText(gotext.Get("Account"))
@@ -459,12 +473,16 @@ func NewBoard() *board {
 		checkboxGrid.AddChildAt(movesLabel, 2, 8, 1, 1)
 		checkboxGrid.AddChildAt(cGrid(b.flipBoardCheckbox), 0, 10, 1, 1)
 		checkboxGrid.AddChildAt(flipBoardLabel, 2, 10, 1, 1)
+		gridY := 12
 		if !AutoEnableTouchInput {
-			checkboxGrid.AddChildAt(cGrid(b.advancedMovementCheckbox), 0, 12, 1, 1)
-			checkboxGrid.AddChildAt(advancedMovementLabel, 2, 12, 1, 1)
+			checkboxGrid.AddChildAt(cGrid(b.advancedMovementCheckbox), 0, gridY, 1, 1)
+			checkboxGrid.AddChildAt(advancedMovementLabel, 2, gridY, 1, 1)
+			gridY += 2
 		}
+		checkboxGrid.AddChildAt(cGrid(b.autoPlayCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(autoPlayLabel, 2, gridY, 1, 1)
 
-		gridSize := 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72
+		gridSize := 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72
 		if !AutoEnableTouchInput {
 			gridSize += 20 + 72
 		}
@@ -1200,6 +1218,15 @@ func (b *board) toggleMovesCheckbox() error {
 	return nil
 }
 
+func (b *board) toggleAutoPlayCheckbox() error {
+	autoPlay := 0
+	if b.autoPlayCheckbox.Selected() {
+		autoPlay = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set autoplay %d", autoPlay))
+	return nil
+}
+
 func (b *board) toggleFlipBoardCheckbox() error {
 	b.flipBoard = b.flipBoardCheckbox.Selected()
 	b.setSpaceRects()
@@ -1832,7 +1859,7 @@ func (b *board) setRect(x, y, w, h int) {
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + game.scale(baseButtonHeight)
+		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + game.scale(baseButtonHeight)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}

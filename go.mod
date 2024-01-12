@@ -3,7 +3,7 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240112024704-5410496772f5
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240113211439-3b818ab272bd
 	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240111193502-f01ac821f8ba
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240112010933-fb51eb32adda
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240108183445-695ea428ae21
@@ -39,7 +39,7 @@ require (
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
-	github.com/jackc/pgx/v5 v5.5.1 // indirect
+	github.com/jackc/pgx/v5 v5.5.2 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/jfreymuth/oggvorbis v1.0.5 // indirect
@@ -56,8 +56,8 @@ require (
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.20.2 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/exp/shiny v0.0.0-20240110193028-0dcbfd608b1e // indirect
-	golang.org/x/mobile v0.0.0-20231127183840-76ac6878050a // indirect
+	golang.org/x/exp/shiny v0.0.0-20240112132812-db7319d0e0e3 // indirect
+	golang.org/x/mobile v0.0.0-20240112133503-c713f31d574b // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect

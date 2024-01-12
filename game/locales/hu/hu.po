@@ -20,11 +20,11 @@ msgstr "%s csatlakozott a játékhoz."
 msgid "%s left the match."
 msgstr "%s elhagyta a játékot."
 
-msgid "%s moved %s."
-msgstr "%s lépett: %s."
+msgid "%s moved %s"
+msgstr ""
 
-msgid "%s rolled %s."
-msgstr "%s dobott: %s."
+msgid "%s rolled %s"
+msgstr ""
 
 msgid "%s wins!"
 msgstr "%s nyert!"
@@ -36,6 +36,9 @@ msgid "Account"
 msgstr ""
 
 msgid "Acey-deucey"
+msgstr ""
+
+msgid "Advanced movement"
 msgstr ""
 
 msgid "Available"
@@ -124,7 +127,13 @@ msgstr ""
 msgid "Failed to submit moves: %s"
 msgstr "Mozgatás elküldése nem sikerült: %s"
 
+msgid "Fast"
+msgstr ""
+
 msgid "Flip board"
+msgstr ""
+
+msgid "Forced"
 msgstr ""
 
 msgid "Good Luck, Have Fun"
@@ -137,6 +146,9 @@ msgid "Highlight legal moves"
 msgstr "Szabályos lépések kiemelése"
 
 msgid "History"
+msgstr ""
+
+msgid "Instant"
 msgstr ""
 
 msgid "Join match"
@@ -167,6 +179,9 @@ msgid "Match Name"
 msgstr ""
 
 msgid "Matches List"
+msgstr ""
+
+msgid "Medium"
 msgstr ""
 
 msgid "Name"
@@ -261,6 +276,12 @@ msgstr ""
 msgid "Show pip count"
 msgstr ""
 
+msgid "Slow"
+msgstr ""
+
+msgid "Speed"
+msgstr ""
+
 msgid "Started"
 msgstr ""
 
@@ -343,6 +364,12 @@ msgstr "A kliens frissítése szükséges."
 
 msgid "from %s to %s"
 msgstr ""
+
+#~ msgid "%s moved %s."
+#~ msgstr "%s lépett: %s."
+
+#~ msgid "%s rolled %s."
+#~ msgstr "%s dobott: %s."
 
 #~ msgid "Create"
 #~ msgstr "Létrehozás"

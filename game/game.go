@@ -41,7 +41,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.2.4"
+const version = "v1.2.5"
 
 const DefaultServerAddress = "wss://ws.bgammon.org"
 
@@ -1495,6 +1495,7 @@ func (g *Game) handleEvent(e interface{}) {
 			b.advancedMovement = ev.Advanced
 			b.advancedMovementCheckbox.SetSelected(b.advancedMovement)
 		}
+		b.autoPlayCheckbox.SetSelected(ev.AutoPlay)
 		if g.needLayoutBoard {
 			g.layoutBoard()
 		}
