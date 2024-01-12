@@ -41,7 +41,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.2.3p1"
+const version = "v1.2.3p3"
 
 const DefaultServerAddress = "wss://ws.bgammon.org"
 
@@ -498,6 +498,7 @@ func setViewBoard(view bool) {
 
 		game.Board.menuGrid.SetVisible(false)
 		game.Board.settingsGrid.SetVisible(false)
+		game.Board.selectSpeed.SetMenuVisible(false)
 		game.Board.leaveGameGrid.SetVisible(false)
 
 		statusBuffer.SetRect(statusBuffer.Rect())
@@ -620,8 +621,6 @@ type Game struct {
 	scaleFactor float64
 
 	bufferWidth int
-
-	Instant bool
 
 	connectGridY            int
 	showConnectStatusBuffer bool
@@ -1082,11 +1081,7 @@ func NewGame() *Game {
 
 		searchButton := etk.NewButton(gotext.Get("Search"), g.selectHistorySearch)
 
-		itemHeight := 48
-		if defaultFontSize == extraLargeFontSize {
-			itemHeight = 72
-		}
-		g.lobby.historyList = etk.NewList(itemHeight, g.lobby.selectHistory)
+		g.lobby.historyList = etk.NewList(game.itemHeight(), g.lobby.selectHistory)
 		g.lobby.historyList.SetColumnSizes(int(float64(indentA)*1.25), int(float64(indentB)*1.25)-int(float64(indentA)*1.25), -1)
 		g.lobby.historyList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
 
@@ -1253,8 +1248,8 @@ func (g *Game) setBufferRects() {
 
 	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
-	historyContainer.SetRowSizes(g.lobby.itemHeight, 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
-	listGamesContainer.SetRowSizes(g.lobby.itemHeight, 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
+	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
+	listGamesContainer.SetRowSizes(g.itemHeight(), 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
 }
 
 func (g *Game) handleAutoRefresh() {
@@ -1444,21 +1439,14 @@ func (g *Game) handleEvent(e interface{}) {
 	case *bgammon.EventMoved:
 		lg(gotext.Get("%s moved %s", ev.Player, bgammon.FormatMoves(ev.Moves)))
 		if ev.Player == g.Client.Username && !g.Board.gameState.Spectating && !g.Board.gameState.Forced {
-			var delta int8
-			for _, move := range ev.Moves {
-				delta = move[1] - move[0]
-				break
-			}
-			if (delta < 0) == (g.Board.gameState.Variant == bgammon.VariantTabula) {
-				return
-			}
+			return
 		}
 
 		g.Board.Lock()
 		g.Unlock()
 		for _, move := range ev.Moves {
 			playSoundEffect(effectMove)
-			g.Board.movePiece(move[0], move[1])
+			g.Board.movePiece(move[0], move[1], true)
 		}
 		g.Lock()
 		if g.Board.showMoves {
@@ -1491,6 +1479,10 @@ func (g *Game) handleEvent(e interface{}) {
 	case *bgammon.EventSettings:
 		b := g.Board
 		b.Lock()
+		if ev.Speed >= bgammon.SpeedSlow && ev.Speed <= bgammon.SpeedInstant {
+			b.speed = ev.Speed
+			b.selectSpeed.SetSelectedItem(int(b.speed))
+		}
 		b.highlightAvailable = ev.Highlight
 		b.highlightCheckbox.SetSelected(b.highlightAvailable)
 		b.showPipCount = ev.Pips
@@ -2230,6 +2222,7 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					g.Board.menuGrid.SetVisible(false)
 				} else if g.Board.settingsGrid.Visible() {
 					g.Board.settingsGrid.SetVisible(false)
+					g.Board.selectSpeed.SetMenuVisible(false)
 				} else if g.Board.changePasswordGrid.Visible() {
 					g.Board.hideMenu()
 				} else if g.Board.leaveGameGrid.Visible() {
@@ -2804,6 +2797,13 @@ func acceptInput(text string) (handled bool) {
 
 	game.Client.Out <- []byte(text)
 	return true
+}
+
+func (g *Game) itemHeight() int {
+	if defaultFontSize == extraLargeFontSize {
+		return 72
+	}
+	return 48
 }
 
 func (g *Game) EnableTouchInput() {

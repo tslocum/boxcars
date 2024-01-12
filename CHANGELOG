@@ -1,6 +1,7 @@
 1.2.4:
-- Play forced moves automatically
+- Add checker animation speed setting
 - Support advanced checker movement
+- Play forced moves automatically
 
 1.2.3:
 - Fix replaying tabula games

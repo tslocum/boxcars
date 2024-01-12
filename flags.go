@@ -20,7 +20,6 @@ func parseFlags() *game.Game {
 		serverAddress string
 		locale        string
 		tv            bool
-		instant       bool
 		debug         int
 		touch         bool
 	)
@@ -28,7 +27,6 @@ func parseFlags() *game.Game {
 	flag.StringVar(&password, "password", "", "Password")
 	flag.StringVar(&serverAddress, "address", game.DefaultServerAddress, "Server address")
 	flag.StringVar(&locale, "locale", "", "Use specified locale for translations")
-	flag.BoolVar(&instant, "instant", false, "Instant checker moves (for bot versus bot matches)")
 	flag.BoolVar(&tv, "tv", false, "Watch random games continuously")
 	flag.BoolVar(&touch, "touch", false, "Force touch input related interface elements to be displayed")
 	flag.IntVar(&debug, "debug", 0, "Print debug information and serve pprof on specified port")
@@ -52,7 +50,6 @@ func parseFlags() *game.Game {
 	g.Password = password
 	g.ServerAddress = serverAddress
 	g.TV = tv
-	g.Instant = instant
 
 	if touch {
 		g.EnableTouchInput()

@@ -119,6 +119,7 @@ type board struct {
 	showMovesCheckbox        *etk.Checkbox
 	flipBoardCheckbox        *etk.Checkbox
 	advancedMovementCheckbox *etk.Checkbox
+	selectSpeed              *etk.Select
 	accountGrid              *etk.Grid
 	settingsGrid             *etk.Grid
 
@@ -146,6 +147,7 @@ type board struct {
 	lineHeight int
 	lineOffset int
 
+	speed              int8
 	highlightAvailable bool
 	showPipCount       bool
 	showMoves          bool
@@ -212,6 +214,7 @@ func NewBoard() *board {
 		chatGrid:                etk.NewGrid(),
 		floatChatGrid:           etk.NewGrid(),
 		floatInputGrid:          etk.NewGrid(),
+		speed:                   bgammon.SpeedMedium,
 		showPipCount:            true,
 		highlightAvailable:      true,
 		widget:                  NewBoardWidget(),
@@ -382,33 +385,58 @@ func NewBoard() *board {
 		}
 		advancedMovementLabel.SetVertical(messeji.AlignCenter)
 
-		accountLabel := etk.NewText(gotext.Get("Account"))
-		accountLabel.SetVertical(messeji.AlignCenter)
-
 		b.recreateAccountGrid()
 
 		checkboxGrid := etk.NewGrid()
 		checkboxGrid.SetColumnSizes(72, 20, -1)
-		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
-		checkboxGrid.AddChildAt(b.highlightCheckbox, 0, 0, 1, 1)
-		checkboxGrid.AddChildAt(highlightLabel, 2, 0, 1, 1)
-		checkboxGrid.AddChildAt(b.showPipCountCheckbox, 0, 2, 1, 1)
-		checkboxGrid.AddChildAt(pipCountLabel, 2, 2, 1, 1)
-		checkboxGrid.AddChildAt(b.showMovesCheckbox, 0, 4, 1, 1)
-		checkboxGrid.AddChildAt(movesLabel, 2, 4, 1, 1)
-		checkboxGrid.AddChildAt(b.flipBoardCheckbox, 0, 6, 1, 1)
-		checkboxGrid.AddChildAt(flipBoardLabel, 2, 6, 1, 1)
-		gridY := 8
 		if !AutoEnableTouchInput {
-			checkboxGrid.AddChildAt(b.advancedMovementCheckbox, 0, 8, 1, 1)
-			checkboxGrid.AddChildAt(advancedMovementLabel, 2, 8, 1, 1)
-			gridY += 2
+			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
+		} else {
+			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
 		}
 		{
+			accountLabel := etk.NewText(gotext.Get("Account"))
+			accountLabel.SetVertical(messeji.AlignCenter)
+
 			grid := etk.NewGrid()
 			grid.AddChildAt(accountLabel, 0, 0, 1, 1)
 			grid.AddChildAt(b.accountGrid, 1, 0, 2, 1)
-			checkboxGrid.AddChildAt(grid, 0, gridY, 3, 1)
+			checkboxGrid.AddChildAt(grid, 0, 0, 3, 1)
+		}
+		{
+			speedLabel := etk.NewText(gotext.Get("Speed"))
+			speedLabel.SetVertical(messeji.AlignCenter)
+
+			b.selectSpeed = etk.NewSelect(game.itemHeight(), b.confirmSelectSpeed)
+			b.selectSpeed.SetHighlightColor(color.RGBA{191, 156, 94, 255})
+			b.selectSpeed.AddOption(gotext.Get("Slow"))
+			b.selectSpeed.AddOption(gotext.Get("Medium"))
+			b.selectSpeed.AddOption(gotext.Get("Fast"))
+			b.selectSpeed.AddOption(gotext.Get("Instant"))
+			b.selectSpeed.SetSelectedItem(int(bgammon.SpeedMedium))
+
+			grid := etk.NewGrid()
+			grid.AddChildAt(speedLabel, 0, 0, 1, 1)
+			grid.AddChildAt(b.selectSpeed, 1, 0, 2, 1)
+			checkboxGrid.AddChildAt(grid, 0, 2, 3, 1)
+		}
+		cGrid := func(checkbox *etk.Checkbox) *etk.Grid {
+			g := etk.NewGrid()
+			g.SetColumnSizes(7, -1)
+			g.AddChildAt(checkbox, 1, 0, 1, 1)
+			return g
+		}
+		checkboxGrid.AddChildAt(cGrid(b.highlightCheckbox), 0, 4, 1, 1)
+		checkboxGrid.AddChildAt(highlightLabel, 2, 4, 1, 1)
+		checkboxGrid.AddChildAt(cGrid(b.showPipCountCheckbox), 0, 6, 1, 1)
+		checkboxGrid.AddChildAt(pipCountLabel, 2, 6, 1, 1)
+		checkboxGrid.AddChildAt(cGrid(b.showMovesCheckbox), 0, 8, 1, 1)
+		checkboxGrid.AddChildAt(movesLabel, 2, 8, 1, 1)
+		checkboxGrid.AddChildAt(cGrid(b.flipBoardCheckbox), 0, 10, 1, 1)
+		checkboxGrid.AddChildAt(flipBoardLabel, 2, 10, 1, 1)
+		if !AutoEnableTouchInput {
+			checkboxGrid.AddChildAt(cGrid(b.advancedMovementCheckbox), 0, 12, 1, 1)
+			checkboxGrid.AddChildAt(advancedMovementLabel, 2, 12, 1, 1)
 		}
 
 		gridSize := 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72
@@ -417,7 +445,7 @@ func NewBoard() *board {
 		}
 		b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
 		b.settingsGrid.SetColumnSizes(20, -1, -1, 20)
-		b.settingsGrid.SetRowSizes(72, gridSize, 20, -1)
+		b.settingsGrid.SetRowSizes(72, -1, 20, game.scale(baseButtonHeight))
 		b.settingsGrid.AddChildAt(settingsLabel, 1, 0, 2, 1)
 		b.settingsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
 		b.settingsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
@@ -545,6 +573,11 @@ func NewBoard() *board {
 		f := etk.NewFrame()
 		f.AddChild(b.menuGrid)
 		f.AddChild(b.settingsGrid)
+		children := b.selectSpeed.Children()
+		if len(children) == 0 {
+			log.Panicf("failed to find speed selection list")
+		}
+		f.AddChild(children[0])
 		f.AddChild(b.changePasswordGrid)
 		f.AddChild(b.leaveGameGrid)
 		b.frame.AddChild(f)
@@ -802,6 +835,7 @@ func (b *board) showSettings() error {
 
 func (b *board) showChangePassword() error {
 	b.settingsGrid.SetVisible(false)
+	b.selectSpeed.SetMenuVisible(false)
 	b.changePasswordGrid.SetVisible(true)
 	etk.SetFocus(b.changePasswordOld)
 	return nil
@@ -810,6 +844,7 @@ func (b *board) showChangePassword() error {
 func (b *board) hideMenu() error {
 	b.menuGrid.SetVisible(false)
 	b.settingsGrid.SetVisible(false)
+	b.selectSpeed.SetMenuVisible(false)
 	b.changePasswordGrid.SetVisible(false)
 	b.changePasswordOld.Field.SetText("")
 	b.changePasswordNew.Field.SetText("")
@@ -820,6 +855,7 @@ func (b *board) toggleMenu() error {
 	if b.menuGrid.Visible() {
 		b.menuGrid.SetVisible(false)
 		b.settingsGrid.SetVisible(false)
+		b.selectSpeed.SetMenuVisible(false)
 	} else {
 		b.menuGrid.SetVisible(true)
 	}
@@ -890,7 +926,7 @@ func (b *board) _selectUndo() {
 	b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", lastMove[1], lastMove[0]))
 
 	playSoundEffect(effectMove)
-	b.movePiece(lastMove[1], lastMove[0])
+	b.movePiece(lastMove[1], lastMove[0], false)
 	b.gameState.Moves = b.gameState.Moves[:l-1]
 }
 
@@ -912,6 +948,15 @@ func (b *board) selectResign() error {
 func (b *board) selectChangePassword() error {
 	b.Client.Out <- []byte(fmt.Sprintf("password %s %s", strings.ReplaceAll(b.changePasswordOld.Text(), " ", "_"), strings.ReplaceAll(b.changePasswordNew.Text(), " ", "_")))
 	return b.hideMenu()
+}
+
+func (b *board) confirmSelectSpeed(index int) (accept bool) {
+	if index < int(bgammon.SpeedSlow) || index > int(bgammon.SpeedInstant) {
+		return false
+	}
+	b.speed = int8(index)
+	b.Client.Out <- []byte(fmt.Sprintf("set speed %d", b.speed))
+	return true
 }
 
 func (b *board) selectReplayStart() error {
@@ -2367,6 +2412,16 @@ func (b *board) processState() {
 func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause bool) {
 	moveTime := (650 * time.Millisecond) / time.Duration(speed)
 	pauseTime := 250 * time.Millisecond
+	switch b.speed {
+	case bgammon.SpeedSlow:
+		moveTime += moveTime / 2
+	case bgammon.SpeedFast:
+		moveTime /= 2
+		pauseTime /= 2
+	case bgammon.SpeedInstant:
+		moveTime = 0
+		pauseTime = 0
+	}
 
 	b.moving = sprite
 
@@ -2384,7 +2439,7 @@ func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause
 	// Center piece in space
 	x += (w - int(b.spaceWidth)) / 2
 
-	if !game.Instant {
+	if moveTime != 0 {
 		sprite.toX = x
 		sprite.toY = y
 		sprite.toTime = moveTime
@@ -2406,7 +2461,7 @@ func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause
 	}
 	b.moving = nil
 
-	if game.Instant {
+	if pauseTime == 0 {
 		return
 	} else if pause {
 		time.Sleep(pauseTime)
@@ -2416,7 +2471,7 @@ func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause
 }
 
 // movePiece returns when finished moving the piece.
-func (b *board) movePiece(from int8, to int8) {
+func (b *board) movePiece(from int8, to int8, pause bool) {
 	pieces := b.spaceSprites[from]
 	if len(pieces) == 0 {
 		log.Printf("ERROR: NO SPRITE FOR MOVE %d/%d", from, to)
@@ -2432,13 +2487,13 @@ func (b *board) movePiece(from int8, to int8) {
 		}
 	}
 
-	b._movePiece(sprite, from, to, 1, moveAfter == nil)
+	b._movePiece(sprite, from, to, 1, pause && moveAfter == nil)
 	if moveAfter != nil {
 		bar := bgammon.SpaceBarPlayer
 		if b.gameState.Turn == b.gameState.PlayerNumber {
 			bar = bgammon.SpaceBarOpponent
 		}
-		b._movePiece(moveAfter, to, bar, 1, true)
+		b._movePiece(moveAfter, to, bar, 1, pause)
 	}
 }
 
@@ -2708,6 +2763,10 @@ func NewBoardWidget() *BoardWidget {
 }
 
 func (bw *BoardWidget) finishClick(cursor image.Point, double bool) {
+	game.Board.Lock()
+	game.Lock()
+	game.Board.Unlock()
+	defer game.Unlock()
 	if game.Board.draggingSpace == -1 || len(game.Board.gameState.Available) == 0 {
 		return
 	}
@@ -2753,6 +2812,15 @@ func (bw *BoardWidget) finishClick(cursor image.Point, double bool) {
 		if len(useMove) == 0 {
 			return
 		}
+		playSoundEffect(effectMove)
+		game.Unlock()
+		game.Board.Lock()
+		game.Board.movePiece(useMove[0], useMove[1], false)
+		game.Board.gameState.AddLocalMove([]int8{useMove[0], useMove[1]})
+		game.Board.gameState.Moves = append(game.Board.gameState.Moves, []int8{useMove[0], useMove[1]})
+		game.Board.processState()
+		game.Board.Unlock()
+		game.Lock()
 		game.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", useMove[0], useMove[1]))
 		return
 	}
@@ -2777,6 +2845,17 @@ FINDMOVE:
 	if len(useMoves) == 0 {
 		return
 	}
+	game.Unlock()
+	game.Board.Lock()
+	for _, move := range useMoves {
+		playSoundEffect(effectMove)
+		game.Board.movePiece(move[0], move[1], false)
+		game.Board.gameState.AddMoves([][]int8{{move[0], move[1]}}, true)
+		game.Board.gameState.Moves = append(game.Board.gameState.Moves, []int8{move[0], move[1]})
+		game.Board.processState()
+	}
+	game.Board.Unlock()
+	game.Lock()
 	for _, move := range useMoves {
 		game.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", move[0], move[1]))
 	}
@@ -2796,6 +2875,9 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 
 	if b.dragging == nil {
 		if b.advancedMovement && clicked {
+			if b.moving != nil {
+				return false, nil
+			}
 			const doubleClickDuration = 250 * time.Millisecond
 			space := b.spaceAt(cx, cy)
 			if space != -1 {
@@ -2806,8 +2888,6 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 					b.lastDragClick = setTime
 					go func() {
 						time.Sleep(doubleClickDuration)
-						game.Lock()
-						defer game.Unlock()
 						if !b.lastDragClick.Equal(setTime) {
 							return
 						}
@@ -2816,7 +2896,7 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 					}()
 					return true, nil
 				}
-				bw.finishClick(cursor, true)
+				go bw.finishClick(cursor, true)
 				b.lastDragClick = time.Now()
 				return true, nil
 			}

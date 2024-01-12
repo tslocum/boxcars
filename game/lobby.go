@@ -53,8 +53,6 @@ type lobby struct {
 
 	lastClick time.Time
 
-	itemHeight int
-
 	selected int
 
 	c *Client
@@ -111,14 +109,9 @@ func NewLobby() *lobby {
 		{gotext.Get("View replay")},
 	}
 
-	itemHeight := 48
-	if defaultFontSize == extraLargeFontSize {
-		itemHeight = 72
-	}
 	l := &lobby{
 		refresh:     true,
 		buttonsGrid: etk.NewGrid(),
-		itemHeight:  itemHeight,
 	}
 
 	indentA, indentB := lobbyIndentA, lobbyIndentB
@@ -126,7 +119,7 @@ func NewLobby() *lobby {
 		indentA, indentB = int(float64(indentA)*1.3), int(float64(indentB)*1.3)
 	}
 
-	matchList := etk.NewList(l.itemHeight, l.selectMatch)
+	matchList := etk.NewList(game.itemHeight(), l.selectMatch)
 	matchList.SetSelectionMode(etk.SelectRow)
 	matchList.SetColumnSizes(indentA, indentB-indentA, -1)
 	matchList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
