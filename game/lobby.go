@@ -71,13 +71,15 @@ type lobby struct {
 	joinGameLabel    *etk.Text
 	joinGamePassword *etk.Input
 
-	showHistory      bool
-	historySelected  int
-	historyLastClick time.Time
-	historyMatches   []*bgammon.HistoryMatch
-	historyUsername  *etk.Input
-	historyList      *etk.List
-
+	showHistory                         bool
+	historySelected                     int
+	historyLastClick                    time.Time
+	historyMatches                      []*bgammon.HistoryMatch
+	historyUsername                     *etk.Input
+	historyList                         *etk.List
+	historyPage                         int
+	historyPages                        int
+	historyPageLabel                    *etk.Text
 	historyRatingCasualBackgammonSingle *etk.Text
 	historyRatingCasualBackgammonMulti  *etk.Text
 	historyRatingCasualAceySingle       *etk.Text

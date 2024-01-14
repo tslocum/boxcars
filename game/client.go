@@ -15,10 +15,6 @@ import (
 	"nhooyr.io/websocket"
 )
 
-func init() {
-	Debug = 1
-}
-
 type Client struct {
 	Address       string
 	Username      string

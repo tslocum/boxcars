@@ -1130,6 +1130,13 @@ func NewGame() *Game {
 			return t
 		}
 
+		g.lobby.historyPageLabel = newLabel("...", messeji.AlignCenter)
+
+		pageControlGrid := etk.NewGrid()
+		pageControlGrid.AddChildAt(etk.NewButton("<", g.selectHistoryPrevious), 0, 0, 1, 1)
+		pageControlGrid.AddChildAt(g.lobby.historyPageLabel, 1, 0, 1, 1)
+		pageControlGrid.AddChildAt(etk.NewButton(">", g.selectHistoryNext), 2, 0, 1, 1)
+
 		historyRatingGrid := etk.NewGrid()
 		historyRatingGrid.SetRowSizes(2, -1, -1, -1)
 		historyRatingGrid.AddChildAt(historyDividerLine, 0, 0, 3, 1)
@@ -1144,9 +1151,10 @@ func NewGame() *Game {
 		historyContainer.AddChildAt(headerGrid, 0, 0, 1, 1)
 		historyContainer.AddChildAt(dividerLine, 0, 1, 1, 1)
 		historyContainer.AddChildAt(g.lobby.historyList, 0, 2, 1, 1)
-		historyContainer.AddChildAt(historyRatingGrid, 0, 3, 1, 1)
-		historyContainer.AddChildAt(statusBuffer, 0, 4, 1, 1)
-		historyContainer.AddChildAt(g.lobby.buttonsGrid, 0, 5, 1, 1)
+		historyContainer.AddChildAt(pageControlGrid, 0, 3, 1, 1)
+		historyContainer.AddChildAt(historyRatingGrid, 0, 4, 1, 1)
+		historyContainer.AddChildAt(statusBuffer, 0, 5, 1, 1)
+		historyContainer.AddChildAt(g.lobby.buttonsGrid, 0, 6, 1, 1)
 
 		historyFrame.SetPositionChildren(true)
 		historyFrame.AddChild(historyContainer)
@@ -1300,12 +1308,12 @@ func (g *Game) setBufferRects() {
 
 	historyRatingHeight := 200
 	if defaultFontSize == extraLargeFontSize {
-		historyRatingHeight = 400
+		historyRatingHeight = 250
 	}
 
 	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
-	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, historyRatingHeight, statusBufferHeight, g.lobby.buttonBarHeight)
+	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, g.lobby.buttonBarHeight, historyRatingHeight, statusBufferHeight, g.lobby.buttonBarHeight)
 	listGamesContainer.SetRowSizes(g.itemHeight(), 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
 }
 
@@ -1574,6 +1582,9 @@ func (g *Game) handleEvent(e interface{}) {
 		go game.HandleReplay(ev.Content)
 	case *bgammon.EventHistory:
 		game.lobby.historyMatches = ev.Matches
+		game.lobby.historyPage = ev.Page
+		game.lobby.historyPages = ev.Pages
+		game.lobby.historyPageLabel.SetText(fmt.Sprintf("%d/%d", ev.Page, ev.Pages))
 		game.lobby.historyRatingCasualBackgammonSingle.SetText(fmt.Sprintf("%d", ev.CasualBackgammonSingle))
 		game.lobby.historyRatingCasualBackgammonMulti.SetText(fmt.Sprintf("%d", ev.CasualBackgammonMulti))
 		game.lobby.historyRatingCasualAceySingle.SetText(fmt.Sprintf("%d", ev.CasualAceyDeuceySingle))
@@ -1582,21 +1593,24 @@ func (g *Game) handleEvent(e interface{}) {
 		game.lobby.historyRatingCasualTabulaMulti.SetText(fmt.Sprintf("%d", ev.CasualTabulaMulti))
 		list := game.lobby.historyList
 		list.Clear()
+		list.SetSelectionMode(etk.SelectRow)
 		if len(ev.Matches) == 0 {
 			scheduleFrame()
 			return
 		}
-		list.SetSelectionMode(etk.SelectRow)
+		y := list.Rows()
 		for i, match := range ev.Matches {
 			result := "W"
 			if match.Winner == 2 {
 				result = "L"
 			}
-			list.AddChildAt(newCenteredText(time.Unix(match.Timestamp, 0).Format("2006-01-02")), 0, i)
-			list.AddChildAt(newCenteredText(result), 1, i)
-			list.AddChildAt(newCenteredText(match.Opponent), 2, i)
+			list.AddChildAt(newCenteredText(time.Unix(match.Timestamp, 0).Format("2006-01-02")), 0, y+i)
+			list.AddChildAt(newCenteredText(result), 1, y+i)
+			list.AddChildAt(newCenteredText(match.Opponent), 2, y+i)
 		}
-		list.SetSelectedItem(0, 0)
+		if ev.Page == 1 {
+			list.SetSelectedItem(0, 0)
+		}
 		scheduleFrame()
 	case *bgammon.EventPing:
 		g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
@@ -2232,6 +2246,22 @@ func (g *Game) selectHistorySearch() error {
 		return nil
 	}
 	g.searchMatches(username)
+	return nil
+}
+
+func (g *Game) selectHistoryPrevious() error {
+	if g.lobby.historyUsername.Text() == "" || g.lobby.historyPage == 1 {
+		return nil
+	}
+	g.Client.Out <- []byte(fmt.Sprintf("history %s %d", g.lobby.historyUsername.Text(), g.lobby.historyPage-1))
+	return nil
+}
+
+func (g *Game) selectHistoryNext() error {
+	if g.lobby.historyUsername.Text() == "" || g.lobby.historyPage == g.lobby.historyPages {
+		return nil
+	}
+	g.Client.Out <- []byte(fmt.Sprintf("history %s %d", g.lobby.historyUsername.Text(), g.lobby.historyPage+1))
 	return nil
 }
 
