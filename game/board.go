@@ -98,6 +98,9 @@ type board struct {
 	opponentLabel *Label
 	playerLabel   *Label
 
+	opponentRatingLabel *etk.Text
+	playerRatingLabel   *etk.Text
+
 	opponentForcedLabel *etk.Text
 	playerForcedLabel   *etk.Text
 
@@ -196,6 +199,8 @@ func NewBoard() *board {
 		foundMoves:              make(map[int]bool),
 		opponentLabel:           NewLabel(colorWhite),
 		playerLabel:             NewLabel(colorBlack),
+		opponentRatingLabel:     etk.NewText(""),
+		playerRatingLabel:       etk.NewText(""),
 		opponentForcedLabel:     etk.NewText(fmt.Sprintf("=%s=", gotext.Get("Forced"))),
 		playerForcedLabel:       etk.NewText(fmt.Sprintf("=%s=", gotext.Get("Forced"))),
 		opponentMovesLabel:      etk.NewText(""),
@@ -231,10 +236,15 @@ func NewBoard() *board {
 	}
 
 	{
+		b.opponentRatingLabel.SetHorizontal(messeji.AlignCenter)
+		b.opponentRatingLabel.SetVertical(messeji.AlignStart)
+		b.opponentRatingLabel.SetScrollBarVisible(false)
+		b.opponentRatingLabel.SetFont(mediumFont, fontMutex)
+		b.playerRatingLabel.SetHorizontal(messeji.AlignCenter)
+		b.playerRatingLabel.SetVertical(messeji.AlignEnd)
+		b.playerRatingLabel.SetScrollBarVisible(false)
+		b.playerRatingLabel.SetFont(mediumFont, fontMutex)
 		padding := 15
-		if AutoEnableTouchInput {
-			padding = 30
-		}
 		b.opponentForcedLabel.SetPadding(padding)
 		b.opponentForcedLabel.SetHorizontal(messeji.AlignCenter)
 		b.opponentForcedLabel.SetVertical(messeji.AlignEnd)
@@ -263,6 +273,9 @@ func NewBoard() *board {
 
 	b.opponentPipCount.SetHorizontal(messeji.AlignEnd)
 	b.playerPipCount.SetHorizontal(messeji.AlignStart)
+
+	b.opponentRatingLabel.SetForegroundColor(color.RGBA{255, 255, 255, 255})
+	b.playerRatingLabel.SetForegroundColor(color.RGBA{0, 0, 0, 255})
 
 	b.opponentForcedLabel.SetForegroundColor(color.RGBA{255, 255, 255, 255})
 	b.playerForcedLabel.SetForegroundColor(color.RGBA{0, 0, 0, 255})
@@ -563,15 +576,16 @@ func NewBoard() *board {
 
 	{
 		f := etk.NewFrame()
+		f.AddChild(b.opponentRatingLabel)
 		f.AddChild(b.opponentForcedLabel)
 		f.AddChild(b.opponentMovesLabel)
 		f.AddChild(b.opponentPipCount)
-		f.AddChild(b.opponentLabel)
 		f.AddChild(b.opponentLabel)
 		f.AddChild(b.playerLabel)
 		f.AddChild(b.playerPipCount)
 		f.AddChild(b.playerMovesLabel)
 		f.AddChild(b.playerForcedLabel)
+		f.AddChild(b.playerRatingLabel)
 		f.AddChild(b.uiGrid)
 		b.frame.AddChild(f)
 	}
@@ -1964,6 +1978,11 @@ func (b *board) updateOpponentLabel() {
 		newRect := image.Rect(x+bounds.Dx(), y-bounds.Dy(), b.innerW/2-int(b.barWidth)/2+int(b.horizontalBorderSize), y+bounds.Dy()*2)
 		b.opponentPipCount.SetRect(newRect)
 	}
+	{
+		x, y := b.w-int(b.spaceWidth), int(b.verticalBorderSize)+int(b.spaceWidth)+int(b.overlapSize*4)
+		newRect := image.Rect(x, y, x+int(b.spaceWidth), y+200)
+		b.opponentRatingLabel.SetRect(newRect)
+	}
 
 	var moves []byte
 	if len(b.opponentMoves) != 0 {
@@ -2037,6 +2056,11 @@ func (b *board) updatePlayerLabel() {
 		if !b.playerPipCount.Rect().Eq(newRect) {
 			b.playerPipCount.SetRect(newRect)
 		}
+	}
+	{
+		x, y := b.w-int(b.spaceWidth), b.h-int(b.verticalBorderSize)-int(b.spaceWidth)-int(b.overlapSize*4)
+		newRect := image.Rect(x, y-200, x+int(b.spaceWidth), y)
+		b.playerRatingLabel.SetRect(newRect)
 	}
 
 	var moves []byte
@@ -2240,6 +2264,7 @@ func (b *board) processState() {
 			b.opponentForcedLabel.SetForegroundColor(colorBlack)
 			b.opponentPipCount.SetForegroundColor(colorBlack)
 			b.opponentMovesLabel.SetForegroundColor(colorBlack)
+			b.opponentRatingLabel.SetForegroundColor(colorBlack)
 			b.opponentLabel.lastActive = !b.opponentLabel.active
 			b.opponentLabel.updateBackground()
 		}
@@ -2249,6 +2274,7 @@ func (b *board) processState() {
 			b.playerForcedLabel.SetForegroundColor(colorWhite)
 			b.playerPipCount.SetForegroundColor(colorWhite)
 			b.playerMovesLabel.SetForegroundColor(colorWhite)
+			b.playerRatingLabel.SetForegroundColor(colorWhite)
 			b.playerLabel.lastActive = !b.opponentLabel.active
 			b.playerLabel.updateBackground()
 		}
@@ -2259,6 +2285,7 @@ func (b *board) processState() {
 			b.opponentForcedLabel.SetForegroundColor(colorWhite)
 			b.opponentPipCount.SetForegroundColor(colorWhite)
 			b.opponentMovesLabel.SetForegroundColor(colorWhite)
+			b.opponentRatingLabel.SetForegroundColor(colorWhite)
 			b.opponentLabel.lastActive = !b.opponentLabel.active
 			b.opponentLabel.updateBackground()
 		}
@@ -2268,9 +2295,18 @@ func (b *board) processState() {
 			b.playerForcedLabel.SetForegroundColor(colorBlack)
 			b.playerPipCount.SetForegroundColor(colorBlack)
 			b.playerMovesLabel.SetForegroundColor(colorBlack)
+			b.playerRatingLabel.SetForegroundColor(colorBlack)
 			b.playerLabel.lastActive = !b.opponentLabel.active
 			b.playerLabel.updateBackground()
 		}
+	}
+
+	if b.gameState.Player1.Rating != 0 && b.gameState.Player2.Rating != 0 {
+		b.opponentRatingLabel.SetText(strconv.Itoa(b.gameState.Player2.Rating))
+		b.playerRatingLabel.SetText(strconv.Itoa(b.gameState.Player1.Rating))
+	} else {
+		b.opponentRatingLabel.SetText("")
+		b.playerRatingLabel.SetText("")
 	}
 
 	b.opponentForcedLabel.SetVisible(b.gameState.Forced && b.gameState.Turn != b.gameState.PlayerNumber)

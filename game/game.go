@@ -41,7 +41,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.2.5p1"
+const version = "v1.2.6"
 
 const DefaultServerAddress = "wss://ws.bgammon.org"
 
