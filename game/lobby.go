@@ -78,6 +78,13 @@ type lobby struct {
 	historyUsername  *etk.Input
 	historyList      *etk.List
 
+	historyRatingCasualBackgammonSingle *etk.Text
+	historyRatingCasualBackgammonMulti  *etk.Text
+	historyRatingCasualAceySingle       *etk.Text
+	historyRatingCasualAceyMulti        *etk.Text
+	historyRatingCasualTabulaSingle     *etk.Text
+	historyRatingCasualTabulaMulti      *etk.Text
+
 	availableMatchesList *etk.List
 
 	historyButton      *etk.Button

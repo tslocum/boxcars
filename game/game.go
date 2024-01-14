@@ -1093,12 +1093,60 @@ func NewGame() *Game {
 		headerGrid.AddChildAt(g.lobby.historyUsername, 3, 0, 1, 1)
 		headerGrid.AddChildAt(searchButton, 4, 0, 1, 1)
 
+		newLabel := func(text string, horizontal messeji.Alignment) *etk.Text {
+			t := etk.NewText(text)
+			t.SetVertical(messeji.AlignCenter)
+			t.SetHorizontal(horizontal)
+			return t
+		}
+
+		g.lobby.historyRatingCasualBackgammonSingle = newLabel("...", messeji.AlignStart)
+		g.lobby.historyRatingCasualBackgammonMulti = newLabel("...", messeji.AlignStart)
+		g.lobby.historyRatingCasualAceySingle = newLabel("...", messeji.AlignStart)
+		g.lobby.historyRatingCasualAceyMulti = newLabel("...", messeji.AlignStart)
+		g.lobby.historyRatingCasualTabulaSingle = newLabel("...", messeji.AlignStart)
+		g.lobby.historyRatingCasualTabulaMulti = newLabel("...", messeji.AlignStart)
+
+		ratingGrid := func(singleLabel *etk.Text, multiLabel *etk.Text) *etk.Grid {
+			dividerSize := 10
+			if defaultFontSize == extraLargeFontSize {
+				dividerSize = 20
+			}
+			g := etk.NewGrid()
+			g.SetColumnSizes(-1, dividerSize, -1)
+			g.AddChildAt(newLabel(gotext.Get("Single"), messeji.AlignEnd), 0, 0, 1, 1)
+			g.AddChildAt(singleLabel, 2, 0, 1, 1)
+			g.AddChildAt(newLabel(gotext.Get("Multi"), messeji.AlignEnd), 0, 1, 1, 1)
+			g.AddChildAt(multiLabel, 2, 1, 1, 1)
+			return g
+		}
+
+		historyDividerLine := etk.NewBox()
+		historyDividerLine.SetBackground(bufferTextColor)
+
+		headerLabel := func(text string) *etk.Text {
+			t := newLabel(text, messeji.AlignCenter)
+			t.SetFont(extraLargeFont, fontMutex)
+			return t
+		}
+
+		historyRatingGrid := etk.NewGrid()
+		historyRatingGrid.SetRowSizes(2, -1, -1, -1)
+		historyRatingGrid.AddChildAt(historyDividerLine, 0, 0, 3, 1)
+		historyRatingGrid.AddChildAt(headerLabel(gotext.Get("Backgammon")), 0, 1, 1, 1)
+		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualBackgammonSingle, g.lobby.historyRatingCasualBackgammonMulti), 0, 2, 1, 2)
+		historyRatingGrid.AddChildAt(headerLabel(gotext.Get("Acey-deucey")), 1, 1, 1, 1)
+		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualAceySingle, g.lobby.historyRatingCasualAceyMulti), 1, 2, 1, 2)
+		historyRatingGrid.AddChildAt(headerLabel(gotext.Get("Tabula")), 2, 1, 1, 1)
+		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualTabulaSingle, g.lobby.historyRatingCasualTabulaMulti), 2, 2, 1, 2)
+
 		historyContainer = etk.NewGrid()
 		historyContainer.AddChildAt(headerGrid, 0, 0, 1, 1)
 		historyContainer.AddChildAt(dividerLine, 0, 1, 1, 1)
 		historyContainer.AddChildAt(g.lobby.historyList, 0, 2, 1, 1)
-		historyContainer.AddChildAt(statusBuffer, 0, 3, 1, 1)
-		historyContainer.AddChildAt(g.lobby.buttonsGrid, 0, 4, 1, 1)
+		historyContainer.AddChildAt(historyRatingGrid, 0, 3, 1, 1)
+		historyContainer.AddChildAt(statusBuffer, 0, 4, 1, 1)
+		historyContainer.AddChildAt(g.lobby.buttonsGrid, 0, 5, 1, 1)
 
 		historyFrame.SetPositionChildren(true)
 		historyFrame.AddChild(historyContainer)
@@ -1139,7 +1187,7 @@ func NewGame() *Game {
 		headerGrid.AddChildAt(ratingLabel, 1, 0, 1, 1)
 		headerGrid.AddChildAt(pointsLabel, 2, 0, 1, 1)
 		headerGrid.AddChildAt(nameLabel, 3, 0, 1, 1)
-		headerGrid.AddChildAt(g.lobby.historyButton, 3, 0, 1, 1)
+		headerGrid.AddChildAt(g.lobby.historyButton, 4, 0, 1, 1)
 
 		listGamesContainer = etk.NewGrid()
 		listGamesContainer.AddChildAt(headerGrid, 0, 0, 1, 1)
@@ -1250,9 +1298,14 @@ func (g *Game) setRoot(w etk.Widget) {
 func (g *Game) setBufferRects() {
 	statusBufferHeight := g.scale(75)
 
+	historyRatingHeight := 200
+	if defaultFontSize == extraLargeFontSize {
+		historyRatingHeight = 400
+	}
+
 	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
-	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
+	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, historyRatingHeight, statusBufferHeight, g.lobby.buttonBarHeight)
 	listGamesContainer.SetRowSizes(g.itemHeight(), 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
 }
 
@@ -1521,6 +1574,12 @@ func (g *Game) handleEvent(e interface{}) {
 		go game.HandleReplay(ev.Content)
 	case *bgammon.EventHistory:
 		game.lobby.historyMatches = ev.Matches
+		game.lobby.historyRatingCasualBackgammonSingle.SetText(fmt.Sprintf("%d", ev.CasualBackgammonSingle))
+		game.lobby.historyRatingCasualBackgammonMulti.SetText(fmt.Sprintf("%d", ev.CasualBackgammonMulti))
+		game.lobby.historyRatingCasualAceySingle.SetText(fmt.Sprintf("%d", ev.CasualAceyDeuceySingle))
+		game.lobby.historyRatingCasualAceyMulti.SetText(fmt.Sprintf("%d", ev.CasualAceyDeuceyMulti))
+		game.lobby.historyRatingCasualTabulaSingle.SetText(fmt.Sprintf("%d", ev.CasualTabulaSingle))
+		game.lobby.historyRatingCasualTabulaMulti.SetText(fmt.Sprintf("%d", ev.CasualTabulaMulti))
 		list := game.lobby.historyList
 		list.Clear()
 		if len(ev.Matches) == 0 {
