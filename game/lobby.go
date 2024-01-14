@@ -121,7 +121,7 @@ func NewLobby() *lobby {
 
 	matchList := etk.NewList(game.itemHeight(), l.selectMatch)
 	matchList.SetSelectionMode(etk.SelectRow)
-	matchList.SetColumnSizes(indentA, indentB-indentA, -1)
+	matchList.SetColumnSizes(indentA, indentB-indentA, indentB-indentA, -1)
 	matchList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
 	matchList.AddChildAt(newCenteredText(gotext.Get("Loading...")), 0, 0)
 	l.availableMatchesList = matchList
@@ -191,7 +191,7 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 
 	_, lastSelection := l.availableMatchesList.SelectedItem()
 
-	var status string
+	var status, rating string
 	l.availableMatchesList.Clear()
 	for i, entry := range l.games {
 		if entry.Password {
@@ -201,9 +201,15 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 		} else {
 			status = gotext.Get("Available")
 		}
+		if entry.Rating == 0 {
+			rating = gotext.Get("None")
+		} else {
+			rating = fmt.Sprintf("%d", entry.Rating)
+		}
 		l.availableMatchesList.AddChildAt(newLabel(status), 0, i)
-		l.availableMatchesList.AddChildAt(newLabel(fmt.Sprintf("%d", entry.Points)), 1, i)
-		l.availableMatchesList.AddChildAt(newLabel(entry.Name), 2, i)
+		l.availableMatchesList.AddChildAt(newLabel(rating), 1, i)
+		l.availableMatchesList.AddChildAt(newLabel(fmt.Sprintf("%d", entry.Points)), 2, i)
+		l.availableMatchesList.AddChildAt(newLabel(entry.Name), 3, i)
 	}
 
 	if lastSelection >= 0 && lastSelection < len(l.games) {

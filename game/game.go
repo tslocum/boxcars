@@ -41,7 +41,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.2.5"
+const version = "v1.2.5p1"
 
 const DefaultServerAddress = "wss://ws.bgammon.org"
 
@@ -1115,6 +1115,9 @@ func NewGame() *Game {
 		statusLabel := newCenteredText(gotext.Get("Status"))
 		statusLabel.SetFollow(false)
 		statusLabel.SetScrollBarVisible(false)
+		ratingLabel := newCenteredText(gotext.Get("Rating"))
+		ratingLabel.SetFollow(false)
+		ratingLabel.SetScrollBarVisible(false)
 		pointsLabel := newCenteredText(gotext.Get("Points"))
 		pointsLabel.SetFollow(false)
 		pointsLabel.SetScrollBarVisible(false)
@@ -1131,10 +1134,11 @@ func NewGame() *Game {
 		g.lobby.historyButton.SetVisible(false)
 
 		headerGrid := etk.NewGrid()
-		headerGrid.SetColumnSizes(indentA, indentB-indentA, -1, 300)
+		headerGrid.SetColumnSizes(indentA, indentB-indentA, indentB-indentA, -1, 300)
 		headerGrid.AddChildAt(statusLabel, 0, 0, 1, 1)
-		headerGrid.AddChildAt(pointsLabel, 1, 0, 1, 1)
-		headerGrid.AddChildAt(nameLabel, 2, 0, 1, 1)
+		headerGrid.AddChildAt(ratingLabel, 1, 0, 1, 1)
+		headerGrid.AddChildAt(pointsLabel, 2, 0, 1, 1)
+		headerGrid.AddChildAt(nameLabel, 3, 0, 1, 1)
 		headerGrid.AddChildAt(g.lobby.historyButton, 3, 0, 1, 1)
 
 		listGamesContainer = etk.NewGrid()

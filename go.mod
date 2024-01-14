@@ -3,7 +3,7 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240113211439-3b818ab272bd
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240114000531-eb958e27e786
 	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240111193502-f01ac821f8ba
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240112010933-fb51eb32adda
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240108183445-695ea428ae21
