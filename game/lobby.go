@@ -10,7 +10,7 @@ import (
 
 	"code.rocket9labs.com/tslocum/bgammon"
 	"code.rocket9labs.com/tslocum/etk"
-	"code.rocketnine.space/tslocum/messeji"
+	"code.rocket9labs.com/tslocum/etk/messeji"
 	"github.com/leonelquinteros/gotext"
 )
 

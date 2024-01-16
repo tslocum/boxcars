@@ -41,6 +41,9 @@ msgstr "Aso-duo"
 msgid "Advanced movement"
 msgstr ""
 
+msgid "Auto-play forced moves"
+msgstr ""
+
 msgid "Available"
 msgstr "Disponebla"
 
@@ -193,6 +196,9 @@ msgstr ""
 msgid "No"
 msgstr "Ne"
 
+msgid "None"
+msgstr ""
+
 msgid "OK"
 msgstr "Bone"
 
@@ -223,6 +229,9 @@ msgstr "Poentoj"
 
 msgid "Private"
 msgstr "Privata"
+
+msgid "Rating"
+msgstr ""
 
 msgid "Read error"
 msgstr ""

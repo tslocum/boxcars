@@ -18,7 +18,7 @@ Download Boxcars via [Google Play](https://play.google.com/store/apps/details?id
 
 ## Screenshot
 
-[![Screenshot](https://code.rocketnine.space/tslocum/boxcars/raw/branch/main/screenshot.png)](https://code.rocketnine.space/tslocum/boxcars/src/branch/main/screenshot.png)
+[![Screenshot](https://code.rocket9labs.com/tslocum/boxcars/raw/branch/main/screenshot.png)](https://code.rocket9labs.com/tslocum/boxcars/src/branch/main/screenshot.png)
 
 ## Build
 
@@ -41,8 +41,7 @@ Please share issues and suggestions [here](https://code.rocket9labs.com/tslocum/
 ## Dependencies
 
 - [ebitengine](https://github.com/hajimehoshi/ebiten) - Game engine
-- [etk](https://code.rocket9labs.com/tslocum/etk) - Layout widgets
-- [messeji](https://code.rocket9labs.com/tslocum/messeji) - Text display and input widgets
+- [etk](https://code.rocket9labs.com/tslocum/etk) - User interface tool kit
 - [draw2d](https://github.com/llgcode/draw2d) - Shape drawing
 - [resize](https://github.com/nfnt/resize) - Image resizing
 - [tabula](https://code.rocket9labs.com/tslocum/tabula) - Backgammon AI

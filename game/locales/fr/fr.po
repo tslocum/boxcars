@@ -41,6 +41,9 @@ msgstr ""
 msgid "Advanced movement"
 msgstr ""
 
+msgid "Auto-play forced moves"
+msgstr ""
+
 msgid "Available"
 msgstr ""
 
@@ -193,6 +196,9 @@ msgstr ""
 msgid "No"
 msgstr "Non"
 
+msgid "None"
+msgstr ""
+
 msgid "OK"
 msgstr "OK"
 
@@ -221,6 +227,9 @@ msgstr "Points"
 
 msgid "Private"
 msgstr "Privée"
+
+msgid "Rating"
+msgstr ""
 
 msgid "Read error"
 msgstr ""

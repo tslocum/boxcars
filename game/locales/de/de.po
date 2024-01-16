@@ -41,6 +41,9 @@ msgstr "Acey Deucey"
 msgid "Advanced movement"
 msgstr ""
 
+msgid "Auto-play forced moves"
+msgstr ""
+
 msgid "Available"
 msgstr "Verfügbar"
 
@@ -199,6 +202,9 @@ msgstr "Neu"
 msgid "No"
 msgstr "Nein"
 
+msgid "None"
+msgstr ""
+
 msgid "OK"
 msgstr "Ok"
 
@@ -229,6 +235,9 @@ msgstr "Punkte"
 
 msgid "Private"
 msgstr "Privat"
+
+msgid "Rating"
+msgstr ""
 
 msgid "Read error"
 msgstr "Lesefehler"

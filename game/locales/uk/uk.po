@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-01-08 15:06+0000\n"
+"PO-Revision-Date: 2024-01-16 21:06+0000\n"
 "Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
@@ -22,10 +22,10 @@ msgid "%s left the match."
 msgstr "%s покидає кімнату."
 
 msgid "%s moved %s"
-msgstr ""
+msgstr "%s робить хід %s"
 
 msgid "%s rolled %s"
-msgstr ""
+msgstr "%s кидає %s"
 
 msgid "%s wins!"
 msgstr "%s перемагає!"
@@ -40,10 +40,13 @@ msgid "Acey-deucey"
 msgstr "Ейсі-дусі"
 
 msgid "Advanced movement"
-msgstr ""
+msgstr "Просунуті рухи"
+
+msgid "Auto-play forced moves"
+msgstr "Автоматичні примусові ходи"
 
 msgid "Available"
-msgstr "Гру не почато"
+msgstr "Не почато"
 
 msgid "Bearing Off"
 msgstr "Викидання"
@@ -84,6 +87,8 @@ msgid ""
 "Create a match if you would like to play against someone else. Backgammon "
 "and several of its variants are supported."
 msgstr ""
+"Створіть кімнату, якщо хочете зіграти ще з кимось. Підтримуються нарди та "
+"кілька їх варіантів."
 
 msgid "Create match"
 msgstr "Створити кімнату"
@@ -92,7 +97,7 @@ msgid "Create new match"
 msgstr "Нова кімната"
 
 msgid "Current"
-msgstr "Гра в процесі"
+msgstr "У процесі"
 
 msgid "Date"
 msgstr "Дата"
@@ -102,8 +107,8 @@ msgstr "Подвоєння"
 
 msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
 msgstr ""
-"Натисніть по шашці двічі щоби викинути її з дошки. Викиньте всі 15 шашок "
-"щоби перемогти."
+"Натисніть по шашці двічі, щоб викинути її з дошки. Викиньте всі 15 шашок, "
+"щоб перемогти."
 
 msgid "Download replay"
 msgstr "Завантажити повтор"
@@ -133,13 +138,13 @@ msgid "Failed to submit moves: %s"
 msgstr "Помилка підтвердження ходів: %s"
 
 msgid "Fast"
-msgstr ""
+msgstr "Швидко"
 
 msgid "Flip board"
 msgstr "Розвернути дошку"
 
 msgid "Forced"
-msgstr ""
+msgstr "Примусовий"
 
 msgid "Good Luck, Have Fun"
 msgstr "Щасти вам, розважайтеся"
@@ -154,7 +159,7 @@ msgid "History"
 msgstr "Історія"
 
 msgid "Instant"
-msgstr ""
+msgstr "Моментально"
 
 msgid "Join match"
 msgstr "Увійти в кімнату"
@@ -169,7 +174,7 @@ msgid "Leave match?"
 msgstr "Покинути кімнату?"
 
 msgid "Left match"
-msgstr "Покинуто кімнату"
+msgstr "Вийшов"
 
 msgid "Legal moves: %s"
 msgstr "Доступні ходи: %s"
@@ -187,7 +192,7 @@ msgid "Matches List"
 msgstr "Список кімнат"
 
 msgid "Medium"
-msgstr ""
+msgstr "Звичайно"
 
 msgid "Name"
 msgstr "Назва"
@@ -197,6 +202,9 @@ msgstr "Новий"
 
 msgid "No"
 msgstr "Ні"
+
+msgid "None"
+msgstr "-"
 
 msgid "OK"
 msgstr "Готово"
@@ -229,6 +237,9 @@ msgstr "Бали"
 msgid "Private"
 msgstr "Приватна"
 
+msgid "Rating"
+msgstr "Рейтинг"
+
 msgid "Read error"
 msgstr "Помилка читання"
 
@@ -257,7 +268,7 @@ msgid "Result"
 msgstr "Результат"
 
 msgid "Return"
-msgstr "Повернутися"
+msgstr "Назад"
 
 msgid "Roll"
 msgstr "Кинути"
@@ -272,7 +283,7 @@ msgid "Server"
 msgstr "Сервер"
 
 msgid "Settings"
-msgstr "Налаштування"
+msgstr "Параметри"
 
 msgid "Show Keyboard"
 msgstr "Показати клавіатуру"
@@ -281,16 +292,16 @@ msgid "Show moves"
 msgstr "Показувати ходи"
 
 msgid "Show pip count"
-msgstr "Показувати кількість пунктів"
+msgstr "Показувати к-сть пунктів"
 
 msgid "Slow"
-msgstr ""
+msgstr "Повільно"
 
 msgid "Speed"
-msgstr ""
+msgstr "Швидкість"
 
 msgid "Started"
-msgstr "Гру почато"
+msgstr "Почато"
 
 msgid "Status"
 msgstr "Статус"
@@ -299,18 +310,22 @@ msgid "Submit"
 msgstr "Підтвердити"
 
 msgid "Tabula"
-msgstr ""
+msgstr "Табула"
 
 msgid ""
 "This concludes the tutorial. To share feedback and chat with other players "
 "visit %s"
 msgstr ""
+"На цьому посібник завершено. Для зворотнього зв'язку та спілкування з іншими "
+"гравцями, відвідайте %s"
 
 msgid ""
 "This screen lists the matches that are currently available. A few bots are "
 "always available to play against. You can also spectate ongoing public "
 "matches."
 msgstr ""
+"На цьому екрані відображено список доступних кімнат. Декілька ботів завжди "
+"доступні для гри. Ви також можете спостерігати публічні ігри."
 
 msgid "To download this replay visit"
 msgstr "Щоб завантажити цей повтор, відвідайте"
@@ -319,20 +334,20 @@ msgid ""
 "To log in as a guest, enter a username (if you want) and do not enter a "
 "password."
 msgstr ""
-"Щоби увійти як гість, введіть ім'я користувача (за бажанням), та не вводьте "
+"Щоб увійти як гість, введіть ім'я користувача (за бажанням), та не вводьте "
 "пароль."
 
 msgid "Tutorial"
-msgstr "Навчальний посібник"
+msgstr "Посібник"
 
 msgid "Type %s to offer a rematch."
 msgstr "Введіть %s, щоб запропонувати реванш."
 
 msgid "Undo"
-msgstr "Скасувати"
+msgstr "Скасув. хід"
 
 msgid "Username"
-msgstr "Ім'я користувача"
+msgstr "Логін"
 
 msgid "Variant"
 msgstr "Варіант"
