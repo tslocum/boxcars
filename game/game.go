@@ -983,9 +983,17 @@ func NewGame() *Game {
 		tabulaGrid.AddChildAt(g.lobby.createGameTabulaCheckbox, 0, 0, 1, 1)
 		tabulaGrid.AddChildAt(tabulaLabel, 2, 0, 1, 1)
 
-		variantGrid := etk.NewGrid()
-		variantGrid.AddChildAt(aceyDeuceyGrid, 0, 0, 1, 1)
-		variantGrid.AddChildAt(tabulaGrid, 1, 0, 1, 1)
+		variantPadding := 20
+		variantWidth := 400
+		if AutoEnableTouchInput {
+			variantPadding = 30
+			variantWidth = 500
+		}
+		variantFlex := etk.NewFlex()
+		variantFlex.SetGaps(0, variantPadding)
+		variantFlex.SetChildSize(variantWidth, fieldHeight)
+		variantFlex.AddChild(aceyDeuceyGrid)
+		variantFlex.AddChild(tabulaGrid)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
@@ -1001,7 +1009,7 @@ func NewGame() *Game {
 		grid.AddChildAt(passwordLabel, 1, 3, 1, 1)
 		grid.AddChildAt(g.lobby.createGamePassword, 2, 3, 1, 1)
 		grid.AddChildAt(variantLabel, 1, 4, 1, 1)
-		grid.AddChildAt(variantGrid, 2, 4, 1, 1)
+		grid.AddChildAt(variantFlex, 2, 4, 1, 1)
 		grid.AddChildAt(etk.NewBox(), 0, 5, 1, 1)
 		createGameGrid = grid
 
