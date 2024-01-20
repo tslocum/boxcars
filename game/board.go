@@ -1269,7 +1269,7 @@ func (b *board) toggleAdvancedMovementCheckbox() error {
 func (b *board) newSprite(white bool) *Sprite {
 	s := &Sprite{}
 	s.colorWhite = white
-	s.w, s.h = imgCheckerLight.Bounds().Dx(), imgCheckerLight.Bounds().Dy()
+	s.w, s.h = imgCheckerTop.Bounds().Dx(), imgCheckerTop.Bounds().Dy()
 	return s
 }
 
@@ -1464,6 +1464,46 @@ func (b *board) updateBackgroundImage() {
 	}
 }
 
+func (b *board) drawChecker(target *ebiten.Image, checker *ebiten.Image, x float64, y float64, white bool, side bool) {
+	// Draw shadow.
+	if !side {
+		op := &ebiten.DrawImageOptions{}
+		op.Filter = ebiten.FilterLinear
+		op.GeoM.Translate(x, y)
+		op.ColorScale.Scale(0, 0, 0, 1)
+		target.DrawImage(checker, op)
+	}
+
+	// Draw checker.
+
+	checkerScale := 0.94
+
+	height := b.spaceWidth
+	if side {
+		height = 80
+	}
+
+	op := &ebiten.DrawImageOptions{}
+	op.Filter = ebiten.FilterLinear
+	op.GeoM.Translate(-b.spaceWidth/2, -height/2)
+	op.GeoM.Scale(checkerScale, checkerScale)
+	op.GeoM.Translate((b.spaceWidth/2)+x, (height/2)+y)
+
+	c := lightCheckerColor
+	if !white {
+		c = darkCheckerColor
+	}
+	op.ColorScale.Scale(0, 0, 0, 1)
+	r := float32(c.R) / 0xff
+	g := float32(c.G) / 0xff
+	bl := float32(c.B) / 0xff
+	op.ColorScale.SetR(r)
+	op.ColorScale.SetG(g)
+	op.ColorScale.SetB(bl)
+
+	target.DrawImage(checker, op)
+}
+
 func (b *board) drawSprite(target *ebiten.Image, sprite *Sprite) {
 	x, y := float64(sprite.x), float64(sprite.y)
 	if sprite == b.dragging {
@@ -1507,39 +1547,7 @@ func (b *board) drawSprite(target *ebiten.Image, sprite *Sprite) {
 		// Schedule another frame
 		scheduleFrame()
 	}
-
-	// Draw shadow.
-	{
-		op := &ebiten.DrawImageOptions{}
-		op.Filter = ebiten.FilterLinear
-		op.GeoM.Translate(x, y)
-		op.ColorScale.Scale(0, 0, 0, 1)
-		target.DrawImage(imgCheckerLight, op)
-	}
-
-	// Draw checker.
-
-	checkerScale := 0.94
-
-	op := &ebiten.DrawImageOptions{}
-	op.Filter = ebiten.FilterLinear
-	op.GeoM.Translate(-b.spaceWidth/2, -b.spaceWidth/2)
-	op.GeoM.Scale(checkerScale, checkerScale)
-	op.GeoM.Translate((b.spaceWidth/2)+x, (b.spaceWidth/2)+y)
-
-	c := lightCheckerColor
-	if !sprite.colorWhite {
-		c = darkCheckerColor
-	}
-	op.ColorScale.Scale(0, 0, 0, 1)
-	r := float32(c.R) / 0xff
-	g := float32(c.G) / 0xff
-	bl := float32(c.B) / 0xff
-	op.ColorScale.SetR(r)
-	op.ColorScale.SetG(g)
-	op.ColorScale.SetB(bl)
-
-	target.DrawImage(imgCheckerLight, op)
+	b.drawChecker(target, imgCheckerTop, x, y, sprite.colorWhite, false)
 }
 
 func (b *board) innerBoardCenter(right bool) int {
@@ -1557,6 +1565,9 @@ func (b *board) Draw(screen *ebiten.Image) {
 	}
 
 	for space := int8(0); space < bgammon.BoardSpaces; space++ {
+		if space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent {
+			continue
+		}
 		var numPieces int8
 		for i, sprite := range b.spaceSprites[space] {
 			if sprite == b.dragging || sprite == b.moving {
@@ -1600,6 +1611,21 @@ func (b *board) Draw(screen *ebiten.Image) {
 			op.GeoM.Translate(float64(x), float64(y))
 			screen.DrawImage(overlayImage, op)
 		}
+	}
+
+	r := b.spaceRects[bgammon.SpaceHomePlayer]
+	checkerY := float64(b.y+int(b.verticalBorderSize)+r[1]+r[3]) + 3
+	checkerHeight := (b.spaceWidth + b.overlapSize*4) / 15
+	checkers := len(b.spaceSprites[bgammon.SpaceHomePlayer])
+	for i := 0; i < checkers; i++ {
+		b.drawChecker(screen, imgCheckerSide, float64(b.x+int(b.horizontalBorderSize)+r[0]), float64(checkerY-checkerHeight*float64(i+1)), b.flipBoard, true)
+	}
+
+	r = b.spaceRects[bgammon.SpaceHomeOpponent]
+	checkerY = float64(b.y+int(b.verticalBorderSize)+int(b.spaceWidth)+int(b.overlapSize*4)) + 1
+	checkers = len(b.spaceSprites[bgammon.SpaceHomeOpponent])
+	for i := 0; i < checkers; i++ {
+		b.drawChecker(screen, imgCheckerSide, float64(b.x+int(b.horizontalBorderSize)+r[0]), float64(checkerY-checkerHeight*float64(i+1)), !b.flipBoard, true)
 	}
 
 	b.stateLock.Lock()
@@ -1836,7 +1862,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	for i := 0; i < b.Sprites.num; i++ {
 		s := b.Sprites.sprites[i]
-		s.w, s.h = imgCheckerLight.Bounds().Dx(), imgCheckerLight.Bounds().Dy()
+		s.w, s.h = imgCheckerTop.Bounds().Dx(), imgCheckerTop.Bounds().Dy()
 	}
 
 	b.setSpaceRects()
@@ -2250,6 +2276,10 @@ func (b *board) processState() {
 	b.stateLock.Lock()
 	defer b.stateLock.Unlock()
 
+	if b.dragging != nil {
+		return
+	}
+
 	if b.lastPlayerNumber != b.gameState.PlayerNumber || b.lastVariant != b.gameState.Variant {
 		b.setSpaceRects()
 		b.updateBackgroundImage()
@@ -2540,6 +2570,13 @@ func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause
 
 	space := to // Immediately go to target space
 
+	for i, s := range b.spaceSprites[from] {
+		if s == sprite {
+			b.spaceSprites[from] = append(b.spaceSprites[from][:i], b.spaceSprites[from][i+1:]...)
+			break
+		}
+	}
+
 	stack := len(b.spaceSprites[space])
 	if stack == 1 && sprite.colorWhite != b.spaceSprites[space][0].colorWhite {
 		stack = 0 // Hit
@@ -2566,12 +2603,6 @@ func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause
 	sprite.toStart = time.Time{}
 
 	b.spaceSprites[to] = append(b.spaceSprites[to], sprite)
-	for i, s := range b.spaceSprites[from] {
-		if s == sprite {
-			b.spaceSprites[from] = append(b.spaceSprites[from][:i], b.spaceSprites[from][i+1:]...)
-			break
-		}
-	}
 	b.moving = nil
 
 	if pauseTime == 0 {
@@ -2621,6 +2652,16 @@ func (b *board) playerTurn() bool {
 
 func (b *board) startDrag(s *Sprite, space int8, click bool) {
 	b.dragging = s
+
+	if space >= 0 && space < bgammon.BoardSpaces {
+		for i, sprite := range b.spaceSprites[space] {
+			if s == sprite {
+				b.spaceSprites[space] = append(b.spaceSprites[space][:i], b.spaceSprites[space][i+1:]...)
+				break
+			}
+		}
+	}
+
 	b.draggingSpace = space
 	b.draggingClick = click
 	b.lastDragClick = time.Now()
@@ -2679,45 +2720,37 @@ func (b *board) finishDrag(x int, y int, click bool) {
 
 		var processed bool
 		if index >= 0 && b.Client != nil {
-		ADDPREMOVE:
-			for sp, pieces := range b.spaceSprites {
-				space := int8(sp)
-				for _, piece := range pieces {
-					if piece == dropped {
-						if space != index {
-							playSoundEffect(effectMove)
-							b.gameState.AddLocalMove([]int8{space, index})
-							b.processState()
-							scheduleFrame()
-							processed = true
-							b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
-						} else if time.Since(b.lastDragClick) < 500*time.Millisecond && b.gameState.MayBearOff(b.gameState.PlayerNumber, true) {
-							homeStart, homeEnd := bgammon.HomeRange(b.gameState.PlayerNumber, b.gameState.Variant)
-							if homeEnd < homeStart {
-								homeStart, homeEnd = homeEnd, homeStart
-							}
-							if index >= homeStart && index <= homeEnd {
-								b.Client.Out <- []byte(fmt.Sprintf("mv %d/off", index))
-							}
-						} else if time.Since(b.lastDragClick) < 500*time.Millisecond && space == bgammon.SpaceHomePlayer && !b.gameState.Player1.Entered {
-							var found bool
-							for _, m := range b.gameState.Available {
-								if m[0] == bgammon.SpaceHomePlayer && bgammon.SpaceDiff(m[0], m[1], b.gameState.Variant) == b.gameState.Roll1 {
-									b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
-									found = true
-									break
-								}
-							}
-							if !found {
-								for _, m := range b.gameState.Available {
-									if m[0] == bgammon.SpaceHomePlayer {
-										b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
-										break
-									}
-								}
-							}
+			space := b.draggingSpace
+			if space != index {
+				playSoundEffect(effectMove)
+				b.gameState.AddLocalMove([]int8{space, index})
+				b.processState()
+				scheduleFrame()
+				processed = true
+				b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
+			} else if time.Since(b.lastDragClick) < 500*time.Millisecond && b.gameState.MayBearOff(b.gameState.PlayerNumber, true) {
+				homeStart, homeEnd := bgammon.HomeRange(b.gameState.PlayerNumber, b.gameState.Variant)
+				if homeEnd < homeStart {
+					homeStart, homeEnd = homeEnd, homeStart
+				}
+				if index >= homeStart && index <= homeEnd {
+					b.Client.Out <- []byte(fmt.Sprintf("mv %d/off", index))
+				}
+			} else if time.Since(b.lastDragClick) < 500*time.Millisecond && space == bgammon.SpaceHomePlayer && !b.gameState.Player1.Entered {
+				var found bool
+				for _, m := range b.gameState.Available {
+					if m[0] == bgammon.SpaceHomePlayer && bgammon.SpaceDiff(m[0], m[1], b.gameState.Variant) == b.gameState.Roll1 {
+						b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
+						found = true
+						break
+					}
+				}
+				if !found {
+					for _, m := range b.gameState.Available {
+						if m[0] == bgammon.SpaceHomePlayer {
+							b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
+							break
 						}
-						break ADDPREMOVE
 					}
 				}
 			}

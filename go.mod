@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240117214045-3607efee4129
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240118194149-d51931e431f7
-	code.rocket9labs.com/tslocum/etk v0.0.0-20240118083053-9eecc7a44b04
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240120044556-60982417c592
+	code.rocket9labs.com/tslocum/etk v0.0.0-20240119041154-d2c44cc232f6
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240118055336-21a3dea3f702
 	github.com/hajimehoshi/ebiten/v2 v2.6.3
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351
@@ -54,7 +54,7 @@ require (
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.20.2 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/exp/shiny v0.0.0-20240112132812-db7319d0e0e3 // indirect
+	golang.org/x/exp/shiny v0.0.0-20240119083558-1b970713d09a // indirect
 	golang.org/x/mobile v0.0.0-20240112133503-c713f31d574b // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect

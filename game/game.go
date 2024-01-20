@@ -57,8 +57,8 @@ var assetFS embed.FS
 var debugExtra []byte
 
 var (
-	imgCheckerLight *ebiten.Image
-	//imgCheckerDark  *ebiten.Image
+	imgCheckerTop  *ebiten.Image
+	imgCheckerSide *ebiten.Image
 
 	imgDice  *ebiten.Image
 	imgDice1 *ebiten.Image
@@ -223,9 +223,8 @@ func loadImageAssets(width int) {
 	}
 	loadedCheckerWidth = width
 
-	imgCheckerLight = loadAsset("asset/image/checker_white.png", width)
-	//imgCheckerDark = loadAsset("asset/image/checker_white.png", width)
-	//imgCheckerDark = loadAsset("assets/checker_black.png", width)
+	imgCheckerTop = loadAsset("asset/image/checker_top.png", width)
+	imgCheckerSide = loadAsset("asset/image/checker_side.png", width)
 
 	resizeDice := func(img image.Image) *ebiten.Image {
 		if game == nil {
