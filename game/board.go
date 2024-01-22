@@ -172,11 +172,15 @@ var (
 )
 
 func NewBoard() *board {
+	var extraBorder float64
+	if AutoEnableTouchInput {
+		extraBorder = float64(etk.Scale(5))
+	}
 	b := &board{
 		barWidth:             100,
 		triangleOffset:       float64(50),
-		horizontalBorderSize: 20,
-		verticalBorderSize:   float64(baseBoardVerticalSize),
+		horizontalBorderSize: 20 + extraBorder,
+		verticalBorderSize:   float64(baseBoardVerticalSize) + extraBorder,
 		overlapSize:          97,
 		Sprites: &Sprites{
 			sprites: make([]*Sprite, 30),
@@ -333,7 +337,7 @@ func NewBoard() *board {
 
 		b.changePasswordGrid.SetBackground(color.RGBA{40, 24, 9, 255})
 		b.changePasswordGrid.SetColumnSizes(20, -1, -1, 20)
-		b.changePasswordGrid.SetRowSizes(72, fieldHeight+20+fieldHeight, -1, game.scale(baseButtonHeight))
+		b.changePasswordGrid.SetRowSizes(72, fieldHeight+20+fieldHeight, -1, etk.Scale(baseButtonHeight))
 		b.changePasswordGrid.AddChildAt(headerLabel, 1, 0, 2, 1)
 		b.changePasswordGrid.AddChildAt(fieldGrid, 1, 1, 2, 1)
 		b.changePasswordGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
@@ -493,7 +497,7 @@ func NewBoard() *board {
 		}
 		b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
 		b.settingsGrid.SetColumnSizes(20, -1, -1, 20)
-		b.settingsGrid.SetRowSizes(72, -1, 20, game.scale(baseButtonHeight))
+		b.settingsGrid.SetRowSizes(72, -1, 20, etk.Scale(baseButtonHeight))
 		b.settingsGrid.AddChildAt(settingsLabel, 1, 0, 2, 1)
 		b.settingsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
 		b.settingsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
@@ -626,20 +630,12 @@ func (b *board) fontUpdated() {
 	b.lineOffset = m.Ascent.Round()
 	fontMutex.Unlock()
 
-	bufferFont := b.fontFace
-	if game.scaleFactor <= 1 {
-		switch b.fontFace {
-		case largeFont:
-			bufferFont = mediumFont
-		case mediumFont:
-			bufferFont = smallFont
-		}
-	}
+	bufferFont := smallFont
 	statusBuffer.SetFont(bufferFont, fontMutex)
 	gameBuffer.SetFont(bufferFont, fontMutex)
 	inputBuffer.Field.SetFont(bufferFont, fontMutex)
 
-	if game.TouchInput {
+	if AutoEnableTouchInput {
 		b.showMenuButton.Label.SetFont(largeFont, fontMutex)
 	} else {
 		b.showMenuButton.Label.SetFont(smallFont, fontMutex)
@@ -648,7 +644,7 @@ func (b *board) fontUpdated() {
 	b.timerLabel.SetFont(b.fontFace, fontMutex)
 	b.clockLabel.SetFont(b.fontFace, fontMutex)
 
-	if game.TouchInput {
+	if AutoEnableTouchInput {
 		b.opponentForcedLabel.SetFont(largeFont, fontMutex)
 		b.playerForcedLabel.SetFont(largeFont, fontMutex)
 	} else {
@@ -659,8 +655,13 @@ func (b *board) fontUpdated() {
 	b.opponentMovesLabel.SetFont(bufferFont, fontMutex)
 	b.playerMovesLabel.SetFont(bufferFont, fontMutex)
 
-	b.opponentPipCount.SetFont(bufferFont, fontMutex)
-	b.playerPipCount.SetFont(bufferFont, fontMutex)
+	if AutoEnableTouchInput {
+		b.opponentPipCount.SetFont(extraSmallFont, fontMutex)
+		b.playerPipCount.SetFont(extraSmallFont, fontMutex)
+	} else {
+		b.opponentPipCount.SetFont(bufferFont, fontMutex)
+		b.playerPipCount.SetFont(bufferFont, fontMutex)
+	}
 }
 
 func (b *board) recreateUIGrid() {
@@ -675,15 +676,11 @@ func (b *board) recreateUIGrid() {
 		gridY += 2
 	}
 	if game.replay {
-		f := smallFont
-		if defaultFontSize == extraLargeFontSize {
-			f = mediumFont
-		}
 		summary1 := etk.NewText("")
-		summary1.SetFont(f, fontMutex)
+		summary1.SetFont(smallFont, fontMutex)
 		summary1.Write(game.replaySummary1)
 		summary2 := etk.NewText("")
-		summary2.SetFont(f, fontMutex)
+		summary2.SetFont(smallFont, fontMutex)
 		summary2.Write(game.replaySummary2)
 		subGrid := etk.NewGrid()
 		subGrid.SetBackground(bufferBackgroundColor)
@@ -691,7 +688,7 @@ func (b *board) recreateUIGrid() {
 		subGrid.AddChildAt(summary1, 1, 0, 1, 1)
 
 		g := etk.NewGrid()
-		g.SetRowSizes(game.scale(baseButtonHeight), int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), lobbyStatusBufferHeight*2)
+		g.SetRowSizes(etk.Scale(baseButtonHeight), int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), lobbyStatusBufferHeight*2)
 		g.AddChildAt(b.replayGrid, 0, 0, 1, 1)
 		g.AddChildAt(subGrid, 0, 2, 1, 1)
 		g.AddChildAt(statusBuffer, 0, 4, 1, 1)
@@ -733,14 +730,14 @@ func (b *board) showButtonGrid(buttonGrid *etk.Grid) {
 
 func (b *board) recreateButtonGrid() {
 	buttonGrid := func(grid *etk.Grid, reverse bool, widgets ...etk.Widget) *etk.Grid {
-		w := game.scale(250)
+		w := etk.Scale(250)
 		if w > b.innerW/4 {
 			w = b.innerW / 4
 		}
 		if w > b.innerH/4 {
 			w = b.innerH / 4
 		}
-		h := game.scale(125)
+		h := etk.Scale(125)
 		if h > b.innerW/8 {
 			h = b.innerW / 8
 		}
@@ -1791,10 +1788,7 @@ func (b *board) setRect(x, y, w, h int) {
 	b.updateBackgroundImage()
 	b.processState()
 
-	matchStatus := 36
-	if game.scaleFactor >= 1.25 || AutoEnableTouchInput {
-		matchStatus *= 2
-	}
+	matchStatus := etk.Scale(36)
 	if AutoEnableTouchInput {
 		b.uiGrid.SetRowSizes(int(b.verticalBorderSize/2), matchStatus, int(b.verticalBorderSize/2), fieldHeight, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), -1)
 	} else {
@@ -1802,11 +1796,11 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 
 	{
-		dialogWidth := game.scale(620)
+		dialogWidth := etk.Scale(620)
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := game.scale(100)
+		dialogHeight := etk.Scale(100)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
@@ -1816,11 +1810,11 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 
 	{
-		dialogWidth := game.scale(620)
+		dialogWidth := etk.Scale(620)
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + game.scale(baseButtonHeight)
+		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + etk.Scale(baseButtonHeight)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
@@ -1832,11 +1826,11 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 
 	{
-		dialogWidth := game.scale(400)
+		dialogWidth := etk.Scale(400)
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := game.scale(100)
+		dialogHeight := etk.Scale(100)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
@@ -1850,7 +1844,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.recreateButtonGrid()
 
-	b.menuGrid.SetColumnSizes(-1, game.scale(10), -1, game.scale(10), -1)
+	b.menuGrid.SetColumnSizes(-1, etk.Scale(10), -1, etk.Scale(10), -1)
 
 	var padding int
 	if b.w >= 600 {
@@ -2619,7 +2613,7 @@ func (b *board) finishDrag(x int, y int, click bool) {
 
 		if !b.draggingClick && index == b.draggingSpace && !b.lastDragClick.IsZero() && time.Since(b.lastDragClick) < 500*time.Millisecond {
 			b.startDrag(dropped, index, true)
-			if game.TouchInput {
+			if AutoEnableTouchInput {
 				r := b.spaceRects[index]
 				offset := int(b.spaceWidth) + int(b.overlapSize)*4
 				if !b.bottomRow(index) {

@@ -17,7 +17,6 @@ const (
 	ShowServerSettings   = false
 	APPNAME              = "boxcars"
 	fieldHeight          = 50
-	defaultFontSize      = largeFontSize
 )
 
 func DefaultLocale() string {

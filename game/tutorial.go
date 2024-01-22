@@ -102,13 +102,13 @@ func (w *tutorialWidget) setPage(page int) {
 	}
 	message = title + "\n\n" + message
 
-	w.grid.SetColumnSizes(-1, -1, -1, -1)
+	w.grid.SetColumnSizes(-1, -1, -1, -1, -1, -1)
 	w.grid.SetRowSizes(-1, -1, -1, -1)
-	w.grid.AddChildAt(w.newTutorialBox(), 0, 0, 4, 1)
+	w.grid.AddChildAt(w.newTutorialBox(), 0, 0, 6, 1)
 	w.grid.AddChildAt(w.newTutorialBox(), 0, 1, 1, 2)
-	w.grid.AddChildAt(w.dialogText(message), 1, 1, 2, 2)
-	w.grid.AddChildAt(w.newTutorialBox(), 3, 1, 1, 2)
-	w.grid.AddChildAt(w.newTutorialBox(), 0, 3, 4, 1)
+	w.grid.AddChildAt(w.dialogText(message), 1, 1, 4, 2)
+	w.grid.AddChildAt(w.newTutorialBox(), 5, 1, 1, 2)
+	w.grid.AddChildAt(w.newTutorialBox(), 0, 3, 6, 1)
 }
 
 type tutorialDialog struct {

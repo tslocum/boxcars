@@ -31,19 +31,22 @@ const (
 	lobbyButtonHistoryView
 )
 
-const (
+var (
 	lobbyIndentA = 200
 	lobbyIndentB = 350
 )
 
-type lobbyButton struct {
-	label string
+func init() {
+	if AutoEnableTouchInput {
+		lobbyIndentA, lobbyIndentB = lobbyIndentA/3, lobbyIndentB/3
+	}
 }
 
-var mainButtons []*lobbyButton
-var createButtons []*lobbyButton
-var cancelJoinButtons []*lobbyButton
-var historyButtons []*lobbyButton
+var mainButtons []string
+var mainShortButtons []string
+var createButtons []string
+var cancelJoinButtons []string
+var historyButtons []string
 
 type lobby struct {
 	buttonBarHeight int
@@ -94,26 +97,32 @@ type lobby struct {
 }
 
 func NewLobby() *lobby {
-	mainButtons = []*lobbyButton{
-		{gotext.Get("Refresh matches")},
-		{gotext.Get("Create match")},
-		{gotext.Get("Join match")},
+	mainButtons = []string{
+		gotext.Get("Refresh matches"),
+		gotext.Get("Create match"),
+		gotext.Get("Join match"),
 	}
 
-	createButtons = []*lobbyButton{
-		{gotext.Get("Cancel")},
-		{gotext.Get("Create match")},
+	mainShortButtons = []string{
+		gotext.Get("Refresh"),
+		gotext.Get("Create"),
+		gotext.Get("Join"),
 	}
 
-	cancelJoinButtons = []*lobbyButton{
-		{gotext.Get("Cancel")},
-		{gotext.Get("Join match")},
+	createButtons = []string{
+		gotext.Get("Cancel"),
+		gotext.Get("Create match"),
 	}
 
-	historyButtons = []*lobbyButton{
-		{gotext.Get("Return")},
-		{gotext.Get("Download replay")},
-		{gotext.Get("View replay")},
+	cancelJoinButtons = []string{
+		gotext.Get("Cancel"),
+		gotext.Get("Join match"),
+	}
+
+	historyButtons = []string{
+		gotext.Get("Return"),
+		gotext.Get("Download replay"),
+		gotext.Get("View replay"),
 	}
 
 	l := &lobby{
@@ -121,16 +130,18 @@ func NewLobby() *lobby {
 		buttonsGrid: etk.NewGrid(),
 	}
 
-	indentA, indentB := lobbyIndentA, lobbyIndentB
-	if defaultFontSize == extraLargeFontSize {
-		indentA, indentB = int(float64(indentA)*1.3), int(float64(indentB)*1.3)
+	loadingText := newCenteredText(gotext.Get("Loading..."))
+	if AutoEnableTouchInput {
+		loadingText.SetFont(mediumFont, fontMutex)
 	}
+
+	indentA, indentB := etk.Scale(lobbyIndentA), etk.Scale(lobbyIndentB)
 
 	matchList := etk.NewList(game.itemHeight(), l.selectMatch)
 	matchList.SetSelectionMode(etk.SelectRow)
 	matchList.SetColumnSizes(indentA, indentB-indentA, indentB-indentA, -1)
 	matchList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
-	matchList.AddChildAt(newCenteredText(gotext.Get("Loading...")), 0, 0)
+	matchList.AddChildAt(loadingText, 0, 0)
 	l.availableMatchesList = matchList
 	return l
 }
@@ -178,6 +189,9 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 		txt.SetScrollBarVisible(false)
 		txt.SetWordWrap(false)
 		txt.SetVertical(messeji.AlignCenter)
+		if AutoEnableTouchInput {
+			txt.SetFont(mediumFont, fontMutex)
+		}
 		return txt
 	}
 
@@ -198,10 +212,14 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 		} else {
 			rating = fmt.Sprintf("%d", entry.Rating)
 		}
+		nameLabel := newLabel(entry.Name)
+		if AutoEnableTouchInput {
+			nameLabel.SetWordWrap(true)
+		}
 		l.availableMatchesList.AddChildAt(newLabel(status), 0, i)
 		l.availableMatchesList.AddChildAt(newLabel(rating), 1, i)
 		l.availableMatchesList.AddChildAt(newLabel(fmt.Sprintf("%d", entry.Points)), 2, i)
-		l.availableMatchesList.AddChildAt(newLabel(entry.Name), 3, i)
+		l.availableMatchesList.AddChildAt(nameLabel, 3, i)
 	}
 
 	if lastSelection >= 0 && lastSelection < len(l.games) {
@@ -214,13 +232,15 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 	}
 }
 
-func (l *lobby) getButtons() []*lobbyButton {
+func (l *lobby) getButtons() []string {
 	if l.showCreateGame {
 		return createButtons
 	} else if l.showJoinGame {
 		return cancelJoinButtons
 	} else if l.showHistory {
 		return historyButtons
+	} else if AutoEnableTouchInput && game.portraitView() {
+		return mainShortButtons
 	}
 	return mainButtons
 }
@@ -350,8 +370,8 @@ func (l *lobby) rebuildButtonsGrid() {
 	r := l.buttonsGrid.Rect()
 	l.buttonsGrid.Clear()
 
-	for i, btn := range l.getButtons() {
-		l.buttonsGrid.AddChildAt(etk.NewButton(btn.label, l.selectButton(i)), i, 0, 1, 1)
+	for i, label := range l.getButtons() {
+		l.buttonsGrid.AddChildAt(etk.NewButton(label, l.selectButton(i)), i, 0, 1, 1)
 	}
 
 	l.buttonsGrid.SetRect(r)

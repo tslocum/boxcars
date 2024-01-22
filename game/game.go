@@ -67,10 +67,11 @@ var (
 	imgDice5 *ebiten.Image
 	imgDice6 *ebiten.Image
 
-	smallFont      font.Face
-	mediumFont     font.Face
-	largeFont      font.Face
-	extraLargeFont font.Face
+	extraSmallFont  font.Face
+	smallFont       font.Face
+	mediumFont      font.Face
+	mediumLargeFont font.Face
+	largeFont       font.Face
 
 	fontMutex = &sync.Mutex{}
 )
@@ -90,10 +91,11 @@ const (
 )
 
 const (
-	smallFontSize      = 20
-	mediumFontSize     = 24
-	largeFontSize      = 36
-	extraLargeFontSize = 52
+	extraSmallFontSize  = 14
+	smallFontSize       = 20
+	mediumFontSize      = 24
+	mediumLargeFontSize = 32
+	largeFontSize       = 36
 )
 
 var (
@@ -127,8 +129,6 @@ var (
 	joinGameContainer   *etk.Grid
 	historyContainer    *etk.Grid
 	listGamesContainer  *etk.Grid
-
-	tutorialFrame *etk.Frame
 
 	connectFrame    *etk.Frame
 	createGameFrame *etk.Frame
@@ -173,46 +173,6 @@ func lg(s string) {
 	scheduleFrame()
 }
 
-func init() {
-	gotext.SetDomain("boxcars")
-
-	initializeFonts()
-
-	loadAudioAssets()
-
-	if AutoEnableTouchInput {
-		etk.Bindings.ConfirmRune = 199
-		etk.Bindings.BackRune = 231
-	}
-
-	if defaultFontSize == extraLargeFontSize {
-		etk.Style.TextFont = extraLargeFont
-	} else {
-		etk.Style.TextFont = largeFont
-	}
-	etk.Style.TextFontMutex = fontMutex
-
-	etk.Style.TextColorLight = triangleA
-	etk.Style.TextColorDark = triangleA
-	etk.Style.InputBgColor = color.RGBA{40, 24, 9, 255}
-
-	etk.Style.ScrollAreaColor = color.RGBA{26, 15, 6, 255}
-	etk.Style.ScrollHandleColor = color.RGBA{180, 154, 108, 255}
-
-	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
-	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
-
-	statusBuffer.SetForegroundColor(bufferTextColor)
-	statusBuffer.SetBackgroundColor(bufferBackgroundColor)
-
-	gameBuffer.SetForegroundColor(bufferTextColor)
-	gameBuffer.SetBackgroundColor(bufferBackgroundColor)
-
-	inputBuffer.Field.SetForegroundColor(bufferTextColor)
-	inputBuffer.Field.SetBackgroundColor(bufferBackgroundColor)
-	inputBuffer.Field.SetSuffix("")
-}
-
 var loadedCheckerWidth = -1
 
 func loadImageAssets(width int) {
@@ -229,7 +189,7 @@ func loadImageAssets(width int) {
 			panic("nil game")
 		}
 
-		maxSize := game.scale(100)
+		maxSize := etk.Scale(100)
 		if maxSize > game.screenW/10 {
 			maxSize = game.screenW / 10
 		}
@@ -237,7 +197,7 @@ func loadImageAssets(width int) {
 			maxSize = game.screenH / 10
 		}
 
-		diceSize = game.scale(width)
+		diceSize = etk.Scale(width)
 		if diceSize > maxSize {
 			diceSize = maxSize
 		}
@@ -387,8 +347,21 @@ func initializeFonts() {
 	}
 
 	const dpi = 72
+	s := etk.ScaleFactor()
+	if AutoEnableTouchInput {
+		s /= 2
+	}
+
+	extraSmallFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    extraSmallFontSize * s,
+		DPI:     dpi,
+		Hinting: font.HintingFull,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 	smallFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    smallFontSize,
+		Size:    smallFontSize * s,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
 	})
@@ -396,7 +369,15 @@ func initializeFonts() {
 		log.Fatal(err)
 	}
 	mediumFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    mediumFontSize,
+		Size:    mediumFontSize * s,
+		DPI:     dpi,
+		Hinting: font.HintingFull,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	mediumLargeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    mediumLargeFontSize * s,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
 	})
@@ -404,15 +385,7 @@ func initializeFonts() {
 		log.Fatal(err)
 	}
 	largeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    largeFontSize,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	extraLargeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    extraLargeFontSize,
+		Size:    largeFontSize * s,
 		DPI:     dpi,
 		Hinting: font.HintingFull,
 	})
@@ -597,7 +570,6 @@ type Game struct {
 	pressedRunes []rune
 
 	cursorX, cursorY int
-	TouchInput       bool
 
 	rootWidget etk.Widget
 
@@ -606,8 +578,6 @@ type Game struct {
 	lastRefresh time.Time
 
 	forceLayout bool
-
-	scaleFactor float64
 
 	bufferWidth int
 
@@ -618,13 +588,10 @@ type Game struct {
 	needLayoutLobby   bool
 	needLayoutBoard   bool
 
-	loadedConnect bool
-	loadedLobby   bool
-	loadedBoard   bool
-
 	LoadReplay []byte
 
-	loaded bool
+	initialized bool
+	loaded      bool
 
 	showRegister bool
 	showReset    bool
@@ -651,31 +618,62 @@ func NewGame() *Game {
 	g := &Game{
 		runeBuffer: make([]rune, 24),
 
-		TouchInput: AutoEnableTouchInput,
-
 		tutorialFrame: etk.NewFrame(),
 
-		debugImg:    ebiten.NewImage(200, 200),
-		volume:      1,
-		scaleFactor: 1,
+		debugImg: ebiten.NewImage(200, 200),
+		volume:   1,
 
 		Mutex: &sync.Mutex{},
 	}
 	g.tutorialFrame.SetPositionChildren(true)
 	game = g
 
+	return g
+}
+
+func (g *Game) initialize() {
+	gotext.SetDomain("boxcars")
+
+	initializeFonts()
+	loadAudioAssets()
 	loadImageAssets(0)
+
+	if AutoEnableTouchInput {
+		etk.Bindings.ConfirmRune = 199
+		etk.Bindings.BackRune = 231
+	}
+
+	etk.Style.TextFont = largeFont
+	etk.Style.TextFontMutex = fontMutex
+
+	etk.Style.TextColorLight = triangleA
+	etk.Style.TextColorDark = triangleA
+	etk.Style.InputBgColor = color.RGBA{40, 24, 9, 255}
+
+	etk.Style.ScrollAreaColor = color.RGBA{26, 15, 6, 255}
+	etk.Style.ScrollHandleColor = color.RGBA{180, 154, 108, 255}
+
+	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
+	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
+
+	statusBuffer.SetForegroundColor(bufferTextColor)
+	statusBuffer.SetBackgroundColor(bufferBackgroundColor)
+
+	gameBuffer.SetForegroundColor(bufferTextColor)
+	gameBuffer.SetBackgroundColor(bufferBackgroundColor)
+
+	inputBuffer.Field.SetForegroundColor(bufferTextColor)
+	inputBuffer.Field.SetBackgroundColor(bufferBackgroundColor)
+	inputBuffer.Field.SetSuffix("")
 
 	g.Board = NewBoard()
 	g.lobby = NewLobby()
 
-	xPadding := 10
-	yPadding := 20
-	labelWidth := 200
-	if defaultFontSize == extraLargeFontSize {
-		xPadding = 15
-		yPadding = 30
-		labelWidth = 260
+	xPadding := etk.Scale(10)
+	yPadding := etk.Scale(20)
+	labelWidth := etk.Scale(200)
+	if AutoEnableTouchInput {
+		labelWidth /= 2
 	}
 
 	connectAddress := game.ServerAddress
@@ -818,6 +816,10 @@ func NewGame() *Game {
 		nameLabel := newCenteredText(gotext.Get("Username"))
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
+		if AutoEnableTouchInput {
+			headerLabel.SetFont(mediumLargeFont, fontMutex)
+			headerLabel.SetHorizontal(messeji.AlignCenter)
+		}
 
 		infoLabel := etk.NewText(gotext.Get("To log in as a guest, enter a username (if you want) and do not enter a password."))
 
@@ -1048,10 +1050,10 @@ func NewGame() *Game {
 		opponentLabel := newCenteredText(gotext.Get("Opponent"))
 		opponentLabel.SetFollow(false)
 		opponentLabel.SetScrollBarVisible(false)
-
-		indentA, indentB := lobbyIndentA, lobbyIndentB
-		if defaultFontSize == extraLargeFontSize {
-			indentA, indentB = int(float64(indentA)*1.3), int(float64(indentB)*1.3)
+		if AutoEnableTouchInput {
+			dateLabel.SetFont(mediumFont, fontMutex)
+			resultLabel.SetFont(mediumFont, fontMutex)
+			opponentLabel.SetFont(mediumFont, fontMutex)
 		}
 
 		g.lobby.historyUsername = etk.NewInput("", "", func(text string) (handled bool) {
@@ -1063,7 +1065,13 @@ func NewGame() *Game {
 
 		searchButton := etk.NewButton(gotext.Get("Search"), g.selectHistorySearch)
 
-		g.lobby.historyList = etk.NewList(game.itemHeight(), g.lobby.selectHistory)
+		indentA, indentB := etk.Scale(lobbyIndentA), etk.Scale(lobbyIndentB)
+
+		historyItemHeight := game.itemHeight()
+		if AutoEnableTouchInput {
+			historyItemHeight /= 2
+		}
+		g.lobby.historyList = etk.NewList(historyItemHeight, g.lobby.selectHistory)
 		g.lobby.historyList.SetColumnSizes(int(float64(indentA)*1.25), int(float64(indentB)*1.25)-int(float64(indentA)*1.25), -1)
 		g.lobby.historyList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
 
@@ -1090,10 +1098,7 @@ func NewGame() *Game {
 		g.lobby.historyRatingCasualTabulaMulti = newLabel("...", messeji.AlignStart)
 
 		ratingGrid := func(singleLabel *etk.Text, multiLabel *etk.Text) *etk.Grid {
-			dividerSize := 10
-			if defaultFontSize == extraLargeFontSize {
-				dividerSize = 20
-			}
+			const dividerSize = 10
 			g := etk.NewGrid()
 			g.SetColumnSizes(-1, dividerSize, -1)
 			g.AddChildAt(newLabel(gotext.Get("Single"), messeji.AlignEnd), 0, 0, 1, 1)
@@ -1106,12 +1111,6 @@ func NewGame() *Game {
 		historyDividerLine := etk.NewBox()
 		historyDividerLine.SetBackground(bufferTextColor)
 
-		headerLabel := func(text string) *etk.Text {
-			t := newLabel(text, messeji.AlignCenter)
-			t.SetFont(extraLargeFont, fontMutex)
-			return t
-		}
-
 		g.lobby.historyPageLabel = newLabel("...", messeji.AlignCenter)
 
 		pageControlGrid := etk.NewGrid()
@@ -1122,11 +1121,11 @@ func NewGame() *Game {
 		historyRatingGrid := etk.NewGrid()
 		historyRatingGrid.SetRowSizes(2, -1, -1, -1)
 		historyRatingGrid.AddChildAt(historyDividerLine, 0, 0, 3, 1)
-		historyRatingGrid.AddChildAt(headerLabel(gotext.Get("Backgammon")), 0, 1, 1, 1)
+		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Backgammon"), messeji.AlignCenter), 0, 1, 1, 1)
 		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualBackgammonSingle, g.lobby.historyRatingCasualBackgammonMulti), 0, 2, 1, 2)
-		historyRatingGrid.AddChildAt(headerLabel(gotext.Get("Acey-deucey")), 1, 1, 1, 1)
+		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Acey-deucey"), messeji.AlignCenter), 1, 1, 1, 1)
 		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualAceySingle, g.lobby.historyRatingCasualAceyMulti), 1, 2, 1, 2)
-		historyRatingGrid.AddChildAt(headerLabel(gotext.Get("Tabula")), 2, 1, 1, 1)
+		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Tabula"), messeji.AlignCenter), 2, 1, 1, 1)
 		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualTabulaSingle, g.lobby.historyRatingCasualTabulaMulti), 2, 2, 1, 2)
 
 		historyContainer = etk.NewGrid()
@@ -1162,14 +1161,17 @@ func NewGame() *Game {
 		nameLabel := newCenteredText(gotext.Get("Match Name"))
 		nameLabel.SetFollow(false)
 		nameLabel.SetScrollBarVisible(false)
-
-		indentA, indentB := lobbyIndentA, lobbyIndentB
-		if defaultFontSize == extraLargeFontSize {
-			indentA, indentB = int(float64(indentA)*1.3), int(float64(indentB)*1.3)
+		if AutoEnableTouchInput {
+			statusLabel.SetFont(mediumFont, fontMutex)
+			ratingLabel.SetFont(mediumFont, fontMutex)
+			pointsLabel.SetFont(mediumFont, fontMutex)
+			nameLabel.SetFont(mediumFont, fontMutex)
 		}
 
 		g.lobby.historyButton = etk.NewButton(gotext.Get("History"), game.selectHistory)
 		g.lobby.historyButton.SetVisible(false)
+
+		indentA, indentB := etk.Scale(lobbyIndentA), etk.Scale(lobbyIndentB)
 
 		headerGrid := etk.NewGrid()
 		headerGrid.SetColumnSizes(indentA, indentB-indentA, indentB-indentA, -1, 300)
@@ -1197,6 +1199,21 @@ func NewGame() *Game {
 		g.keyboardHint.SetVertical(messeji.AlignCenter)
 	}
 
+	statusBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	gameBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	g.lobby.availableMatchesList.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	g.lobby.historyList.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+
+	{
+		scrollBarWidth := etk.Scale(32)
+		statusBuffer.SetScrollBarWidth(scrollBarWidth)
+		gameBuffer.SetScrollBarWidth(scrollBarWidth)
+		inputBuffer.Field.SetScrollBarWidth(scrollBarWidth)
+		g.lobby.availableMatchesList.SetScrollBarWidth(scrollBarWidth)
+		g.lobby.historyList.SetScrollBarWidth(scrollBarWidth)
+	}
+
 	g.needLayoutConnect = true
 	g.needLayoutLobby = true
 	g.needLayoutBoard = true
@@ -1215,7 +1232,6 @@ func NewGame() *Game {
 	go g.handleUpdateTimeLabels()
 
 	scheduleFrame()
-	return g
 }
 
 func (g *Game) playOffline() {
@@ -1292,17 +1308,17 @@ func (g *Game) setRoot(w etk.Widget) {
 }
 
 func (g *Game) setBufferRects() {
-	statusBufferHeight := g.scale(75)
-
-	historyRatingHeight := 200
-	if defaultFontSize == extraLargeFontSize {
-		historyRatingHeight = 250
-	}
+	statusBufferHeight := etk.Scale(75)
+	historyRatingHeight := etk.Scale(200)
 
 	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, g.lobby.buttonBarHeight, historyRatingHeight, statusBufferHeight, g.lobby.buttonBarHeight)
-	listGamesContainer.SetRowSizes(g.itemHeight(), 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
+	listHeaderHeight := g.itemHeight()
+	if AutoEnableTouchInput {
+		listHeaderHeight /= 2
+	}
+	listGamesContainer.SetRowSizes(listHeaderHeight, 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
 }
 
 func (g *Game) handleAutoRefresh() {
@@ -1592,9 +1608,17 @@ func (g *Game) handleEvent(e interface{}) {
 			if match.Winner == 2 {
 				result = "L"
 			}
-			list.AddChildAt(newCenteredText(time.Unix(match.Timestamp, 0).Format("2006-01-02")), 0, y+i)
-			list.AddChildAt(newCenteredText(result), 1, y+i)
-			list.AddChildAt(newCenteredText(match.Opponent), 2, y+i)
+			dateLabel := newCenteredText(time.Unix(match.Timestamp, 0).Format("2006-01-02"))
+			resultLabel := newCenteredText(result)
+			opponentLabel := newCenteredText(match.Opponent)
+			if AutoEnableTouchInput {
+				dateLabel.SetFont(mediumFont, fontMutex)
+				resultLabel.SetFont(mediumFont, fontMutex)
+				opponentLabel.SetFont(mediumFont, fontMutex)
+			}
+			list.AddChildAt(dateLabel, 0, y+i)
+			list.AddChildAt(resultLabel, 1, y+i)
+			list.AddChildAt(opponentLabel, 2, y+i)
 		}
 		if ev.Page == 1 {
 			list.SetSelectedItem(0, 0)
@@ -2202,9 +2226,14 @@ func (g *Game) selectConnect() error {
 }
 
 func (g *Game) searchMatches(username string) {
+	loadingText := newCenteredText(gotext.Get("Loading..."))
+	if AutoEnableTouchInput {
+		loadingText.SetFont(mediumFont, fontMutex)
+	}
+
 	g.lobby.historyList.Clear()
 	g.lobby.historyList.SetSelectionMode(etk.SelectNone)
-	g.lobby.historyList.AddChildAt(newCenteredText(gotext.Get("Loading...")), 0, 0)
+	g.lobby.historyList.AddChildAt(loadingText, 0, 0)
 	g.Client.Out <- []byte(fmt.Sprintf("history %s", username))
 }
 
@@ -2248,7 +2277,6 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 		return nil
 	} else if AutoEnableTouchInput {
 		scheduleFrame()
-		log.Println("SCHEDULE FRAME ON KEYS")
 	}
 
 	if !g.loggedIn {
@@ -2439,7 +2467,6 @@ func (g *Game) Update() error {
 
 	g.pressedKeys = inpututil.AppendPressedKeys(g.pressedKeys[:0])
 	if len(g.pressedKeys) > 0 {
-		log.Printf("PRESSED %+v", g.pressedKeys)
 		scheduleFrame()
 	}
 
@@ -2472,7 +2499,6 @@ func (g *Game) Update() error {
 	if cx == 0 && cy == 0 {
 		g.touchIDs = inpututil.AppendJustPressedTouchIDs(g.touchIDs[:0])
 		for _, id := range g.touchIDs {
-			g.EnableTouchInput()
 			cx, cy = ebiten.TouchPosition(id)
 			if cx != 0 || cy != 0 {
 				if g.handleTouch(image.Point{cx, cy}) {
@@ -2493,15 +2519,7 @@ func (g *Game) Update() error {
 	if AutoEnableTouchInput {
 		g.pressedRunes = ebiten.AppendInputChars(g.pressedRunes[:0])
 		if len(g.pressedRunes) != 0 {
-			log.Printf("PRESSED RUNES %+v", g.pressedRunes)
 			scheduleFrame()
-		}
-	}
-
-	if !g.TouchInput {
-		g.touchIDs = inpututil.AppendJustPressedTouchIDs(g.touchIDs[:0])
-		if len(g.touchIDs) > 0 {
-			g.EnableTouchInput()
 		}
 	}
 
@@ -2622,8 +2640,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			g.spinnerIndex = 0
 		}
 
-		if g.scaleFactor != 1.0 {
-			g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f\n", g.scaleFactor)))
+		scale := etk.ScaleFactor()
+		if scale != 1.0 {
+			g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f\n", scale)))
 		}
 
 		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %c %0.0f", spinner[g.spinnerIndex], ebiten.ActualFPS())))
@@ -2648,44 +2667,32 @@ func (g *Game) portraitView() bool {
 	return g.screenH-g.screenW >= 100
 }
 
-func (g *Game) scale(v int) int {
-	return int(float64(v) * g.scaleFactor)
-}
-
 func (g *Game) layoutConnect() {
 	g.needLayoutConnect = false
 
-	infoHeight := 108
-	if defaultFontSize == extraLargeFontSize {
-		infoHeight = 108 * 2
+	headerHeight := etk.Scale(60)
+	infoHeight := etk.Scale(108)
+	if AutoEnableTouchInput {
+		headerHeight = etk.Scale(20)
 	}
 
 	if ShowServerSettings {
-		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, g.scale(baseButtonHeight), g.scale(baseButtonHeight), infoHeight)
-		registerGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, fieldHeight, g.scale(baseButtonHeight), infoHeight)
-		resetGrid.SetRowSizes(60, fieldHeight, fieldHeight, g.scale(baseButtonHeight), infoHeight)
+		connectGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), etk.Scale(baseButtonHeight), infoHeight)
+		registerGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
+		resetGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
 	} else {
-		connectGrid.SetRowSizes(60, fieldHeight, fieldHeight, g.scale(baseButtonHeight), g.scale(baseButtonHeight), infoHeight)
-		registerGrid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, g.scale(baseButtonHeight), infoHeight)
-		resetGrid.SetRowSizes(60, fieldHeight, g.scale(baseButtonHeight), infoHeight)
-	}
-
-	if !g.loadedConnect {
-		updateAllButtons(connectGrid)
-		g.loadedConnect = true
+		connectGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), etk.Scale(baseButtonHeight), infoHeight)
+		registerGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
+		resetGrid.SetRowSizes(headerHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
 	}
 }
 
 func (g *Game) layoutLobby() {
 	g.needLayoutLobby = false
 
-	g.lobby.buttonBarHeight = g.scale(baseButtonHeight)
+	g.lobby.buttonBarHeight = etk.Scale(baseButtonHeight)
+	g.lobby.rebuildButtonsGrid()
 	g.setBufferRects()
-
-	if !g.loadedLobby {
-		updateAllButtons(game.lobby.buttonsGrid)
-		g.loadedLobby = true
-	}
 }
 
 func (g *Game) layoutBoard() {
@@ -2719,12 +2726,6 @@ func (g *Game) layoutBoard() {
 	g.setBufferRects()
 
 	g.Board.widget.SetRect(image.Rect(0, 0, g.screenW, g.screenH))
-
-	if !g.loadedBoard {
-		updateAllButtons(game.Board.menuGrid)
-		updateAllButtons(game.Board.leaveGameGrid)
-		g.loadedBoard = true
-	}
 }
 
 func (g *Game) bufferPadding() int {
@@ -2741,8 +2742,14 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.Lock()
 	defer g.Unlock()
 
-	s := ebiten.DeviceScaleFactor()
-	outsideWidth, outsideHeight = int(float64(outsideWidth)*s), int(float64(outsideHeight)*s)
+	if !g.initialized {
+		g.initialize()
+		g.initialized = true
+	}
+
+	originalWidth, originalHeight := outsideWidth, outsideHeight
+
+	outsideWidth, outsideHeight = etk.Scale(outsideWidth), etk.Scale(outsideHeight)
 	if outsideWidth < minWidth {
 		outsideWidth = minWidth
 	}
@@ -2755,36 +2762,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.forceLayout = false
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
-	g.scaleFactor = s
 	scheduleFrame()
-
-	b := g.Board
-	if s >= 1.25 {
-		lobbyStatusBufferHeight = int(50 * s)
-		g.Board.verticalBorderSize = baseBoardVerticalSize * 1.5
-		if b.fontFace != largeFont {
-			b.fontFace = largeFont
-			b.fontUpdated()
-		}
-	} else {
-		if b.fontFace != mediumFont {
-			b.fontFace = mediumFont
-			b.fontUpdated()
-		}
-	}
-
-	statusBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
-	gameBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
-	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
-	g.lobby.availableMatchesList.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
-	g.lobby.historyList.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
-
-	{
-		scrollBarWidth := g.scale(32)
-		statusBuffer.SetScrollBarWidth(scrollBarWidth)
-		gameBuffer.SetScrollBarWidth(scrollBarWidth)
-		inputBuffer.Field.SetScrollBarWidth(scrollBarWidth)
-	}
 
 	fontMutex.Lock()
 	g.bufferWidth = etk.BoundString(g.Board.fontFace, strings.Repeat("A", bufferCharacterWidth)).Dx()
@@ -2793,7 +2771,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
 
-	etk.Layout(g.screenW, g.screenH)
+	etk.Layout(originalWidth, originalHeight)
 
 	g.needLayoutConnect = true
 	g.needLayoutLobby = true
@@ -2859,27 +2837,7 @@ func acceptInput(text string) (handled bool) {
 }
 
 func (g *Game) itemHeight() int {
-	if defaultFontSize == extraLargeFontSize {
-		return 72
-	}
-	return 48
-}
-
-func (g *Game) EnableTouchInput() {
-	if g.TouchInput {
-		return
-	}
-	g.TouchInput = true
-
-	// Update layout.
-	g.forceLayout = true
-
-	b := g.Board
-	b.matchStatusGrid.Clear()
-	b.matchStatusGrid.AddChildAt(b.timerLabel, 0, 0, 1, 1)
-	b.matchStatusGrid.AddChildAt(b.clockLabel, 1, 0, 1, 1)
-
-	b.fontUpdated()
+	return etk.Scale(48)
 }
 
 func (g *Game) toggleProfiling() error {
@@ -3071,27 +3029,7 @@ func newCenteredText(text string) *etk.Text {
 
 func centerInput(input *etk.Input) {
 	input.Field.SetVertical(messeji.AlignCenter)
-	paddingSize := 5
-	if defaultFontSize == extraLargeFontSize {
-		paddingSize = 20
-	}
-	input.Field.SetPadding(paddingSize)
-}
-
-func updateAllButtons(w etk.Widget) {
-	for _, c := range w.Children() {
-		updateAllButtons(c)
-	}
-
-	f := largeFont
-	if defaultFontSize == extraLargeFontSize {
-		f = extraLargeFont
-	}
-
-	btn, ok := w.(*etk.Button)
-	if ok && (defaultFontSize == extraLargeFontSize || btn != game.Board.showMenuButton) {
-		btn.Label.SetFont(f, fontMutex)
-	}
+	input.Field.SetPadding(etk.Scale(5))
 }
 
 // Short description.

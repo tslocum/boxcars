@@ -24,7 +24,6 @@ const (
 	ShowServerSettings   = true
 	APPNAME              = "boxcars-android"
 	fieldHeight          = 100
-	defaultFontSize      = extraLargeFontSize
 )
 
 func init() {

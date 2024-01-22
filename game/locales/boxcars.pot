@@ -70,6 +70,9 @@ msgstr ""
 msgid "Connecting..."
 msgstr ""
 
+msgid "Create"
+msgstr ""
+
 msgid "Create Match"
 msgstr ""
 
@@ -140,6 +143,9 @@ msgid "History"
 msgstr ""
 
 msgid "Instant"
+msgstr ""
+
+msgid "Join"
 msgstr ""
 
 msgid "Join match"
@@ -230,6 +236,9 @@ msgid "Read error"
 msgstr ""
 
 msgid "Reconnecting"
+msgstr ""
+
+msgid "Refresh"
 msgstr ""
 
 msgid "Refresh matches"
