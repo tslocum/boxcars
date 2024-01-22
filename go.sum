@@ -2,10 +2,10 @@ code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b h1:Y0a14Kf/h
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b/go.mod h1:tS60/VNAJphKvDBkSLQhKALa15msIAuWWfEKNc4oFZc=
 code.rocket9labs.com/tslocum/bgammon v0.0.0-20240117214045-3607efee4129 h1:wguf0figCFqnSxAK8wAznDor28ZEkElA2ShoZmqLRHg=
 code.rocket9labs.com/tslocum/bgammon v0.0.0-20240117214045-3607efee4129/go.mod h1:LAki3jpHOsr4fwaK0xC9tkg+wgu/9ZNEqqx1zE3/HP4=
-code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240120044556-60982417c592 h1:vLCTYMZfu6otPNNQG/vgFibct+p1fsKGxk1eCddRAi4=
-code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240120044556-60982417c592/go.mod h1:w6xR2lWW3xUo7KlCOaJ+Jbs29AfQVRQEJ2W1vb0IuOo=
-code.rocket9labs.com/tslocum/etk v0.0.0-20240119041154-d2c44cc232f6 h1:uXG3IWWGkMG/mDjk1YsWJfQMbssYh3weoGuz1knFSuE=
-code.rocket9labs.com/tslocum/etk v0.0.0-20240119041154-d2c44cc232f6/go.mod h1:+mJqiyL/Ne30kcpnaQ1+XjYxI3PZA7HfWY0ReHeSMEA=
+code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240120074310-6968c426a4e1 h1:FsUNZJjzoYixG36Hxf0eYov0no6GGWjEVdmvGWjol7Y=
+code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240120074310-6968c426a4e1/go.mod h1:w6xR2lWW3xUo7KlCOaJ+Jbs29AfQVRQEJ2W1vb0IuOo=
+code.rocket9labs.com/tslocum/etk v0.0.0-20240122001849-b8e1658b3f49 h1:OcdDIzebupJx2uj6lKw6uip537C+RTa39RBpsvOErPc=
+code.rocket9labs.com/tslocum/etk v0.0.0-20240122001849-b8e1658b3f49/go.mod h1:2IXUt2b3de6r0IX5W5uR1vvTw1Z+JcX/ATC1woaaW2E=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240118055336-21a3dea3f702 h1:NGZILSBynzLZF84WKZyAuoWsZFq37uvEcP2dFvPsY/8=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240118055336-21a3dea3f702/go.mod h1:WEJXESKXqrMFLAArikQ79lpRibNeeE1C0VruxXYMF5M=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
@@ -33,8 +33,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/ebitengine/oto/v3 v3.1.0 h1:9tChG6rizyeR2w3vsygTTTVVJ9QMMyu00m2yBOCch6U=
 github.com/ebitengine/oto/v3 v3.1.0/go.mod h1:IK1QTnlfZK2GIB6ziyECm433hAdTaPpOsGMLhEyEGTg=
-github.com/ebitengine/purego v0.5.1 h1:hNunhThpOf1vzKl49v6YxIsXLhl92vbBEv1/2Ez3ZrY=
-github.com/ebitengine/purego v0.5.1/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
+github.com/ebitengine/purego v0.5.2 h1:r2MQEtkGzZ4LRtFZVAg5bjYKnUbxxloaeuGxH0t7qfs=
+github.com/ebitengine/purego v0.5.2/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
 github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385/go.mod h1:0vRUJqYpeSZifjYj7uP3BG/gKcuzL9xWVV/Y+cK33KM=
 github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df/go.mod h1:GJr+FCSXshIwgHBtLglIg9M2l2kQSi6QjVAngtzI08Y=
 github.com/gobwas/httphead v0.1.0 h1:exrUm0f4YX0L7EBwZHuCF4GDp8aJfVeBrlLQrs6NqWU=

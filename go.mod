@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240117214045-3607efee4129
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240120044556-60982417c592
-	code.rocket9labs.com/tslocum/etk v0.0.0-20240119041154-d2c44cc232f6
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240120074310-6968c426a4e1
+	code.rocket9labs.com/tslocum/etk v0.0.0-20240122001849-b8e1658b3f49
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240118055336-21a3dea3f702
 	github.com/hajimehoshi/ebiten/v2 v2.6.3
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351
@@ -25,7 +25,7 @@ require (
 	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/ebitengine/oto/v3 v3.1.0 // indirect
-	github.com/ebitengine/purego v0.5.1 // indirect
+	github.com/ebitengine/purego v0.5.2 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.3.2 // indirect

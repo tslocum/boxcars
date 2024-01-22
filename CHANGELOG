@@ -1,5 +1,6 @@
 1.2.7:
 - Draw checkers in home spaces sideways
+- Use device on-screen keyboard on Android
 
 1.2.6:
 - Add rating column to list of matches

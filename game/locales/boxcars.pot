@@ -43,6 +43,9 @@ msgstr ""
 msgid "Available"
 msgstr ""
 
+msgid "Backgammon"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -130,9 +133,6 @@ msgstr ""
 msgid "Good Luck, Have Fun"
 msgstr ""
 
-msgid "Hide Keyboard"
-msgstr ""
-
 msgid "Highlight legal moves"
 msgstr ""
 
@@ -166,6 +166,9 @@ msgstr ""
 msgid "Logged in as guest"
 msgstr ""
 
+msgid "Long press back to exit the application."
+msgstr ""
+
 msgid "Match Name"
 msgstr ""
 
@@ -173,6 +176,9 @@ msgid "Matches List"
 msgstr ""
 
 msgid "Medium"
+msgstr ""
+
+msgid "Multi"
 msgstr ""
 
 msgid "Name"
@@ -209,6 +215,9 @@ msgid "Please enter a valid email address, or it will not be possible to reset y
 msgstr ""
 
 msgid "Points"
+msgstr ""
+
+msgid "Press back to toggle the keyboard."
 msgstr ""
 
 msgid "Private"
@@ -262,13 +271,13 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-msgid "Show Keyboard"
-msgstr ""
-
 msgid "Show moves"
 msgstr ""
 
 msgid "Show pip count"
+msgstr ""
+
+msgid "Single"
 msgstr ""
 
 msgid "Slow"
@@ -287,6 +296,9 @@ msgid "Submit"
 msgstr ""
 
 msgid "Tabula"
+msgstr ""
+
+msgid "Tap to dismiss this pop-up."
 msgstr ""
 
 msgid "This concludes the tutorial. To share feedback and chat with other players visit %s"

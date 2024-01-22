@@ -89,10 +89,8 @@ type lobby struct {
 
 	availableMatchesList *etk.List
 
-	historyButton      *etk.Button
-	showKeyboardButton *etk.Button
-	buttonsGrid        *etk.Grid
-	frame              *etk.Frame
+	historyButton *etk.Button
+	buttonsGrid   *etk.Grid
 }
 
 func NewLobby() *lobby {
@@ -134,22 +132,7 @@ func NewLobby() *lobby {
 	matchList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
 	matchList.AddChildAt(newCenteredText(gotext.Get("Loading...")), 0, 0)
 	l.availableMatchesList = matchList
-
-	l.showKeyboardButton = etk.NewButton(gotext.Get("Show Keyboard"), l.toggleKeyboard)
-	l.frame = etk.NewFrame()
-	l.frame.AddChild(l.showKeyboardButton)
 	return l
-}
-
-func (l *lobby) toggleKeyboard() error {
-	if game.keyboard.Visible() {
-		game.keyboard.SetVisible(false)
-		l.showKeyboardButton.Label.SetText(gotext.Get("Show Keyboard"))
-	} else {
-		game.keyboard.SetVisible(true)
-		l.showKeyboardButton.Label.SetText(gotext.Get("Hide Keyboard"))
-	}
-	return nil
 }
 
 func (l *lobby) toggleVariantAcey() error {
