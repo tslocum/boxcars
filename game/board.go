@@ -1323,7 +1323,7 @@ func (b *board) updateBackgroundImage() {
 		gc.Close()
 		gc.Stroke()
 	}
-	// Home space divider.
+	// Home space center divider.
 	extraSpace := b.h - int(b.verticalBorderSize)*2 - int(b.overlapSize*10) - 4
 	if extraSpace > 0 {
 		edgeStart := b.horizontalBorderSize + float64(b.innerW) + b.horizontalBorderSize
@@ -1346,8 +1346,45 @@ func (b *board) updateBackgroundImage() {
 		gc.LineTo(edgeEnd, divEnd)
 		gc.Stroke()
 	}
+	// Home space partitions.
+	{
+		dividerHeight := float64(etk.Scale(15))
+		r := b.spaceRects[bgammon.SpaceHomePlayer]
+		checkerY := float64(b.y+int(b.verticalBorderSize)+r[1]+r[3]) + 3
+		checkerHeight := (b.spaceWidth + b.overlapSize*4 - dividerHeight*2) / 15
+		for i := 0; i < 2; i++ {
+			if i == 1 {
+				checkerY = float64(b.y+int(b.verticalBorderSize)) + 1
+				dividerHeight *= -1
+				checkerHeight *= -1
+			}
+			for j := 0; j < 2; j++ {
+				x1, y1 := b.horizontalBorderSize+float64(b.innerW)+b.horizontalBorderSize-1, checkerY-checkerHeight*5
+				x2, y2 := x1+b.spaceWidth+1, y1-dividerHeight
+				if j == 1 {
+					y1, y2 = y1-checkerHeight*5-dividerHeight, y2-checkerHeight*5-dividerHeight
+				}
+
+				gc.MoveTo(x1, y1)
+				gc.LineTo(x2, y1)
+				gc.LineTo(x2, y2)
+				gc.LineTo(x1, y2)
+				gc.Close()
+				gc.SetFillColor(frameColor)
+				gc.Fill()
+
+				gc.MoveTo(x1, y1)
+				gc.LineTo(x2, y1)
+				gc.Stroke()
+
+				gc.MoveTo(x1, y2)
+				gc.LineTo(x2, y2)
+				gc.Stroke()
+			}
+		}
+	}
+	// Bottom.
 	if b.h < game.screenH {
-		// Bottom.
 		gc.MoveTo(0, float64(b.h))
 		gc.LineTo(float64(b.w), float64(b.h))
 		gc.Stroke()
@@ -1532,19 +1569,38 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 	}
 
+	dividerHeight := float64(etk.Scale(15))
+
 	r := b.spaceRects[bgammon.SpaceHomePlayer]
 	checkerY := float64(b.y+int(b.verticalBorderSize)+r[1]+r[3]) + 3
-	checkerHeight := (b.spaceWidth + b.overlapSize*4) / 15
+	checkerHeight := (b.spaceWidth + b.overlapSize*4 - dividerHeight*2) / 15
 	checkers := len(b.spaceSprites[bgammon.SpaceHomePlayer])
+	var checkerOffset float64
 	for i := 0; i < checkers; i++ {
-		b.drawChecker(screen, imgCheckerSide, float64(b.x+int(b.horizontalBorderSize)+r[0]), float64(checkerY-checkerHeight*float64(i+1)), b.flipBoard, true)
+		checkerOffset = 0
+		if i >= 10 {
+			checkerOffset = dividerHeight * 2
+		} else if i >= 5 {
+			checkerOffset = dividerHeight
+		} else {
+			checkerOffset = 0
+		}
+		b.drawChecker(screen, imgCheckerSide, float64(b.x+int(b.horizontalBorderSize)+r[0]+1), checkerY-checkerHeight*float64(i+1)-checkerOffset, b.flipBoard, true)
 	}
 
 	r = b.spaceRects[bgammon.SpaceHomeOpponent]
-	checkerY = float64(b.y+int(b.verticalBorderSize)+int(b.spaceWidth)+int(b.overlapSize*4)) + 1
+	checkerY = float64(b.y+int(b.verticalBorderSize)) + 1
 	checkers = len(b.spaceSprites[bgammon.SpaceHomeOpponent])
 	for i := 0; i < checkers; i++ {
-		b.drawChecker(screen, imgCheckerSide, float64(b.x+int(b.horizontalBorderSize)+r[0]), float64(checkerY-checkerHeight*float64(i+1)), !b.flipBoard, true)
+		checkerOffset = 0
+		if i >= 10 {
+			checkerOffset = dividerHeight * 2
+		} else if i >= 5 {
+			checkerOffset = dividerHeight
+		} else {
+			checkerOffset = 0
+		}
+		b.drawChecker(screen, imgCheckerSide, float64(b.x+int(b.horizontalBorderSize)+r[0]+1), float64(checkerY+checkerHeight*float64(i)+checkerOffset), !b.flipBoard, true)
 	}
 
 	b.stateLock.Lock()
