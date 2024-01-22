@@ -47,6 +47,9 @@ msgstr ""
 msgid "Available"
 msgstr "Verfügbar"
 
+msgid "Backgammon"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr "Abtragen"
 
@@ -78,6 +81,9 @@ msgstr "Verbinden"
 
 msgid "Connecting..."
 msgstr "Verbinde..."
+
+msgid "Create"
+msgstr ""
 
 msgid "Create Match"
 msgstr "Spiel erstellen"
@@ -148,9 +154,6 @@ msgstr ""
 msgid "Good Luck, Have Fun"
 msgstr "Viel Glück und Spaß"
 
-msgid "Hide Keyboard"
-msgstr "Tastatur verstecken"
-
 msgid "Highlight legal moves"
 msgstr "Erlaubte Züge hervorheben"
 
@@ -158,6 +161,9 @@ msgid "History"
 msgstr "Verlauf"
 
 msgid "Instant"
+msgstr ""
+
+msgid "Join"
 msgstr ""
 
 msgid "Join match"
@@ -184,6 +190,9 @@ msgstr "Laden..."
 msgid "Logged in as guest"
 msgstr "Als Gast eingeloggt"
 
+msgid "Long press back to exit the application."
+msgstr ""
+
 msgid "Match Name"
 msgstr "Spiel Name"
 
@@ -191,6 +200,9 @@ msgid "Matches List"
 msgstr "Spiel Liste"
 
 msgid "Medium"
+msgstr ""
+
+msgid "Multi"
 msgstr ""
 
 msgid "Name"
@@ -233,6 +245,9 @@ msgstr ""
 msgid "Points"
 msgstr "Punkte"
 
+msgid "Press back to toggle the keyboard."
+msgstr ""
+
 msgid "Private"
 msgstr "Privat"
 
@@ -244,6 +259,9 @@ msgstr "Lesefehler"
 
 msgid "Reconnecting"
 msgstr "Wiederverbinden"
+
+msgid "Refresh"
+msgstr ""
 
 msgid "Refresh matches"
 msgstr "Spielliste aktualisieren"
@@ -284,14 +302,14 @@ msgstr "Server"
 msgid "Settings"
 msgstr "Einstellungen"
 
-msgid "Show Keyboard"
-msgstr "Tastatur anzeigen"
-
 msgid "Show moves"
 msgstr "Züge anzeigen"
 
 msgid "Show pip count"
 msgstr "Pip count anzeigen"
+
+msgid "Single"
+msgstr ""
 
 msgid "Slow"
 msgstr ""
@@ -310,6 +328,9 @@ msgstr "Bestätigen"
 
 msgid "Tabula"
 msgstr "Tabula"
+
+msgid "Tap to dismiss this pop-up."
+msgstr ""
 
 msgid ""
 "This concludes the tutorial. To share feedback and chat with other players "
@@ -391,9 +412,3 @@ msgstr "Du musst vielleicht deinen Client updaten."
 
 msgid "from %s to %s"
 msgstr "von %s nach %s"
-
-#~ msgid "%s moved %s."
-#~ msgstr "%s zog %s."
-
-#~ msgid "%s rolled %s."
-#~ msgstr "%s würfelte %s."

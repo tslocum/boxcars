@@ -47,6 +47,9 @@ msgstr ""
 msgid "Available"
 msgstr "Disponível"
 
+msgid "Backgammon"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -78,6 +81,9 @@ msgstr "Conectar"
 
 msgid "Connecting..."
 msgstr "Conectando..."
+
+msgid "Create"
+msgstr ""
 
 msgid "Create Match"
 msgstr "Criar Partida"
@@ -144,9 +150,6 @@ msgstr ""
 msgid "Good Luck, Have Fun"
 msgstr "Boa Sorte, Divirta-se"
 
-msgid "Hide Keyboard"
-msgstr "Ocultar teclado"
-
 msgid "Highlight legal moves"
 msgstr ""
 
@@ -154,6 +157,9 @@ msgid "History"
 msgstr "Histórico"
 
 msgid "Instant"
+msgstr ""
+
+msgid "Join"
 msgstr ""
 
 msgid "Join match"
@@ -180,6 +186,9 @@ msgstr "Carregando..."
 msgid "Logged in as guest"
 msgstr "Conectado(a) como convidado(a)"
 
+msgid "Long press back to exit the application."
+msgstr ""
+
 msgid "Match Name"
 msgstr "Nome da Partida"
 
@@ -187,6 +196,9 @@ msgid "Matches List"
 msgstr "Lista de Partidas"
 
 msgid "Medium"
+msgstr ""
+
+msgid "Multi"
 msgstr ""
 
 msgid "Name"
@@ -229,6 +241,9 @@ msgstr ""
 msgid "Points"
 msgstr "Pontos"
 
+msgid "Press back to toggle the keyboard."
+msgstr ""
+
 msgid "Private"
 msgstr "Privado"
 
@@ -240,6 +255,9 @@ msgstr "Ler erro"
 
 msgid "Reconnecting"
 msgstr "Reconectando"
+
+msgid "Refresh"
+msgstr ""
 
 msgid "Refresh matches"
 msgstr "Atualizar partidas"
@@ -280,13 +298,13 @@ msgstr "Servidor"
 msgid "Settings"
 msgstr "Configurações"
 
-msgid "Show Keyboard"
-msgstr "Exibir teclado"
-
 msgid "Show moves"
 msgstr "Exibir movimentos"
 
 msgid "Show pip count"
+msgstr ""
+
+msgid "Single"
 msgstr ""
 
 msgid "Slow"
@@ -306,6 +324,9 @@ msgstr "Enviar"
 
 msgid "Tabula"
 msgstr "Tabula"
+
+msgid "Tap to dismiss this pop-up."
+msgstr ""
 
 msgid ""
 "This concludes the tutorial. To share feedback and chat with other players "

@@ -47,6 +47,9 @@ msgstr ""
 msgid "Available"
 msgstr ""
 
+msgid "Backgammon"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -76,6 +79,9 @@ msgstr "Connexion"
 
 msgid "Connecting..."
 msgstr "Connexion…"
+
+msgid "Create"
+msgstr "Créer une partie"
 
 msgid "Create Match"
 msgstr ""
@@ -142,9 +148,6 @@ msgstr ""
 msgid "Good Luck, Have Fun"
 msgstr ""
 
-msgid "Hide Keyboard"
-msgstr "Masquer le clavier"
-
 msgid "Highlight legal moves"
 msgstr ""
 
@@ -152,6 +155,9 @@ msgid "History"
 msgstr ""
 
 msgid "Instant"
+msgstr ""
+
+msgid "Join"
 msgstr ""
 
 msgid "Join match"
@@ -178,6 +184,9 @@ msgstr ""
 msgid "Logged in as guest"
 msgstr ""
 
+msgid "Long press back to exit the application."
+msgstr ""
+
 msgid "Match Name"
 msgstr ""
 
@@ -185,6 +194,9 @@ msgid "Matches List"
 msgstr ""
 
 msgid "Medium"
+msgstr ""
+
+msgid "Multi"
 msgstr ""
 
 msgid "Name"
@@ -225,6 +237,9 @@ msgstr ""
 msgid "Points"
 msgstr "Points"
 
+msgid "Press back to toggle the keyboard."
+msgstr ""
+
 msgid "Private"
 msgstr "Privée"
 
@@ -236,6 +251,9 @@ msgstr ""
 
 msgid "Reconnecting"
 msgstr ""
+
+msgid "Refresh"
+msgstr "Actualiser"
 
 msgid "Refresh matches"
 msgstr ""
@@ -276,13 +294,13 @@ msgstr "Serveur"
 msgid "Settings"
 msgstr "Réglages"
 
-msgid "Show Keyboard"
-msgstr "Afficher le clavier"
-
 msgid "Show moves"
 msgstr ""
 
 msgid "Show pip count"
+msgstr ""
+
+msgid "Single"
 msgstr ""
 
 msgid "Slow"
@@ -301,6 +319,9 @@ msgid "Submit"
 msgstr ""
 
 msgid "Tabula"
+msgstr ""
+
+msgid "Tap to dismiss this pop-up."
 msgstr ""
 
 msgid ""
@@ -373,27 +394,3 @@ msgstr "Vous devez peut-être mettre à jour votre client."
 
 msgid "from %s to %s"
 msgstr ""
-
-#~ msgid "%s moved %s."
-#~ msgstr "%s a déplacé %s."
-
-#~ msgid "%s rolled %s."
-#~ msgstr "%s a lancé %s."
-
-#~ msgid "Create"
-#~ msgstr "Créer une partie"
-
-#~ msgid "No matches available. Please create one."
-#~ msgstr "Aucune partie disponible. Veuillez en créer une."
-
-#~ msgid "Refresh"
-#~ msgstr "Actualiser"
-
-#~ msgid "Full"
-#~ msgstr "Plein"
-
-#~ msgid "Open"
-#~ msgstr "Ouvrir"
-
-#~ msgid "Welcome to %s"
-#~ msgstr "Bienvenue dans %s"

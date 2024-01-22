@@ -47,6 +47,9 @@ msgstr ""
 msgid "Available"
 msgstr ""
 
+msgid "Backgammon"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -76,6 +79,9 @@ msgstr "Kapcsolódás"
 
 msgid "Connecting..."
 msgstr "Kapcsolódás..."
+
+msgid "Create"
+msgstr "Létrehozás"
 
 msgid "Create Match"
 msgstr ""
@@ -142,9 +148,6 @@ msgstr ""
 msgid "Good Luck, Have Fun"
 msgstr ""
 
-msgid "Hide Keyboard"
-msgstr "Billentyűzet elrejtése"
-
 msgid "Highlight legal moves"
 msgstr "Szabályos lépések kiemelése"
 
@@ -153,6 +156,9 @@ msgstr ""
 
 msgid "Instant"
 msgstr ""
+
+msgid "Join"
+msgstr "Csatlakozás"
 
 msgid "Join match"
 msgstr "Csatlakozás a játékhoz"
@@ -178,6 +184,9 @@ msgstr ""
 msgid "Logged in as guest"
 msgstr ""
 
+msgid "Long press back to exit the application."
+msgstr ""
+
 msgid "Match Name"
 msgstr ""
 
@@ -185,6 +194,9 @@ msgid "Matches List"
 msgstr ""
 
 msgid "Medium"
+msgstr ""
+
+msgid "Multi"
 msgstr ""
 
 msgid "Name"
@@ -225,6 +237,9 @@ msgstr ""
 msgid "Points"
 msgstr "Pontok"
 
+msgid "Press back to toggle the keyboard."
+msgstr ""
+
 msgid "Private"
 msgstr "Privát"
 
@@ -236,6 +251,9 @@ msgstr ""
 
 msgid "Reconnecting"
 msgstr ""
+
+msgid "Refresh"
+msgstr "Frissítés"
 
 msgid "Refresh matches"
 msgstr ""
@@ -276,13 +294,13 @@ msgstr "Szerver"
 msgid "Settings"
 msgstr "Beállítások"
 
-msgid "Show Keyboard"
-msgstr "Billentyűzet megjelenítése"
-
 msgid "Show moves"
 msgstr ""
 
 msgid "Show pip count"
+msgstr ""
+
+msgid "Single"
 msgstr ""
 
 msgid "Slow"
@@ -301,6 +319,9 @@ msgid "Submit"
 msgstr ""
 
 msgid "Tabula"
+msgstr ""
+
+msgid "Tap to dismiss this pop-up."
 msgstr ""
 
 msgid ""
@@ -373,33 +394,3 @@ msgstr "A kliens frissítése szükséges."
 
 msgid "from %s to %s"
 msgstr ""
-
-#~ msgid "%s moved %s."
-#~ msgstr "%s lépett: %s."
-
-#~ msgid "%s rolled %s."
-#~ msgstr "%s dobott: %s."
-
-#~ msgid "Create"
-#~ msgstr "Létrehozás"
-
-#~ msgid "Join"
-#~ msgstr "Csatlakozás"
-
-#~ msgid "No matches available. Please create one."
-#~ msgstr "Játék nem elérhető. Hozzon létre egyet."
-
-#~ msgid "Refresh"
-#~ msgstr "Frissítés"
-
-#~ msgid "Drag here to bear off"
-#~ msgstr "Húzza ide a bábú kiviteléhez"
-
-#~ msgid "Full"
-#~ msgstr "Megtelt"
-
-#~ msgid "Open"
-#~ msgstr "Nyílt"
-
-#~ msgid "Welcome to %s"
-#~ msgstr "Üdvözli a %s"

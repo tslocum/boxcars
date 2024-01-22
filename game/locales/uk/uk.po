@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-01-19 19:00+0000\n"
+"PO-Revision-Date: 2024-01-22 19:36+0000\n"
 "Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
@@ -48,6 +48,9 @@ msgstr "Автоматичні примусові ходи"
 msgid "Available"
 msgstr "Не почато"
 
+msgid "Backgammon"
+msgstr "Нарди"
+
 msgid "Bearing Off"
 msgstr "Викидання"
 
@@ -79,6 +82,9 @@ msgstr "Приєднатися"
 
 msgid "Connecting..."
 msgstr "Приєднання..."
+
+msgid "Create"
+msgstr "Створити"
 
 msgid "Create Match"
 msgstr "Створення кімнати"
@@ -117,7 +123,7 @@ msgid "Downloaded replay"
 msgstr "Завантажений повтор"
 
 msgid "Email"
-msgstr "Електронна поштова скринька"
+msgstr "Пошта"
 
 msgid "Failed to download replay: %s"
 msgstr "Помилка завантаження повтору: %s"
@@ -149,9 +155,6 @@ msgstr "Примусовий"
 msgid "Good Luck, Have Fun"
 msgstr "Щасти вам, розважайтеся"
 
-msgid "Hide Keyboard"
-msgstr "Приховати клавіатуру"
-
 msgid "Highlight legal moves"
 msgstr "Підсвічувати можливі ходи"
 
@@ -160,6 +163,9 @@ msgstr "Історія"
 
 msgid "Instant"
 msgstr "Моментально"
+
+msgid "Join"
+msgstr "Приєднатися"
 
 msgid "Join match"
 msgstr "Увійти в кімнату"
@@ -174,7 +180,7 @@ msgid "Leave match?"
 msgstr "Покинути кімнату?"
 
 msgid "Left match"
-msgstr "Вийшов"
+msgstr "Покинуто"
 
 msgid "Legal moves: %s"
 msgstr "Доступні ходи: %s"
@@ -185,6 +191,9 @@ msgstr "Завантаження..."
 msgid "Logged in as guest"
 msgstr "Ви увійшли як гість"
 
+msgid "Long press back to exit the application."
+msgstr "Затисніть \"Назад\", щоб вийти із застосунку."
+
 msgid "Match Name"
 msgstr "Назва кімнати"
 
@@ -193,6 +202,9 @@ msgstr "Список кімнат"
 
 msgid "Medium"
 msgstr "Звичайно"
+
+msgid "Multi"
+msgstr "Багатоочковий"
 
 msgid "Name"
 msgstr "Назва"
@@ -234,6 +246,9 @@ msgstr ""
 msgid "Points"
 msgstr "Бали"
 
+msgid "Press back to toggle the keyboard."
+msgstr "Натисніть \"Назад\", щоб перемкнути клавіатуру."
+
 msgid "Private"
 msgstr "Приватна"
 
@@ -245,6 +260,9 @@ msgstr "Помилка читання"
 
 msgid "Reconnecting"
 msgstr "Переприєднання"
+
+msgid "Refresh"
+msgstr "Оновити"
 
 msgid "Refresh matches"
 msgstr "Оновити"
@@ -285,14 +303,14 @@ msgstr "Сервер"
 msgid "Settings"
 msgstr "Параметри"
 
-msgid "Show Keyboard"
-msgstr "Показати клавіатуру"
-
 msgid "Show moves"
 msgstr "Показувати ходи"
 
 msgid "Show pip count"
 msgstr "Показувати к-сть пунктів"
+
+msgid "Single"
+msgstr "Одноочковий"
 
 msgid "Slow"
 msgstr "Повільно"
@@ -311,6 +329,9 @@ msgstr "Підтвердити"
 
 msgid "Tabula"
 msgstr "Табула"
+
+msgid "Tap to dismiss this pop-up."
+msgstr "Натисніть, щоб закрити це вікно."
 
 msgid ""
 "This concludes the tutorial. To share feedback and chat with other players "
@@ -333,7 +354,8 @@ msgstr "Щоб завантажити цей повтор, відвідайте"
 msgid ""
 "To log in as a guest, enter a username (if you want) and do not enter a "
 "password."
-msgstr "Щоб увійти як гість, введіть логін (за бажанням), та не вводьте пароль."
+msgstr ""
+"Щоб увійти як гість, введіть логін (за бажанням), та не вводьте пароль."
 
 msgid "Tutorial"
 msgstr "Посібник"
@@ -389,30 +411,3 @@ msgstr "Можливо, потрібно оновити клієнт."
 
 msgid "from %s to %s"
 msgstr "з %s до %s"
-
-#~ msgid "%s moved %s."
-#~ msgstr "%s робить хід %s."
-
-#~ msgid "%s rolled %s."
-#~ msgstr "%s викидає %s."
-
-#~ msgid ""
-#~ "This screen lists the matches that are currently available. A few bots "
-#~ "are always available to play against."
-#~ msgstr ""
-#~ "На цьому екрані відображено список доступних кімнат. Декілька ботів "
-#~ "завжди доступні для гри."
-
-#~ msgid ""
-#~ "Create a match if you would like to play against someone else. Backgammon "
-#~ "and acey-deucey games are supported."
-#~ msgstr ""
-#~ "Створіть кімнату, якщо ви хочете зіграти проти когось, окрім ботів. "
-#~ "Підтримуються звичайні нарди та ейсі-дусі."
-
-#~ msgid ""
-#~ "This concludes the tutorial. Join the community via Matrix/Discord/IRC at "
-#~ "%s"
-#~ msgstr ""
-#~ "На цьому посібник завершено. Доєднайтеся до спільноти у Matrix, Discord "
-#~ "чи IRC на сайті %s"

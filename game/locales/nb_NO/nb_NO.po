@@ -47,6 +47,9 @@ msgstr ""
 msgid "Available"
 msgstr ""
 
+msgid "Backgammon"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -74,6 +77,10 @@ msgstr "Koble til"
 
 msgid "Connecting..."
 msgstr "Kobler til …"
+
+#, fuzzy
+msgid "Create"
+msgstr "Opprett spill"
 
 msgid "Create Match"
 msgstr ""
@@ -144,9 +151,6 @@ msgstr ""
 msgid "Good Luck, Have Fun"
 msgstr ""
 
-msgid "Hide Keyboard"
-msgstr "Skjul tastatur"
-
 msgid "Highlight legal moves"
 msgstr ""
 
@@ -154,6 +158,9 @@ msgid "History"
 msgstr ""
 
 msgid "Instant"
+msgstr ""
+
+msgid "Join"
 msgstr ""
 
 msgid "Join match"
@@ -181,6 +188,9 @@ msgstr ""
 msgid "Logged in as guest"
 msgstr ""
 
+msgid "Long press back to exit the application."
+msgstr ""
+
 msgid "Match Name"
 msgstr ""
 
@@ -188,6 +198,9 @@ msgid "Matches List"
 msgstr ""
 
 msgid "Medium"
+msgstr ""
+
+msgid "Multi"
 msgstr ""
 
 msgid "Name"
@@ -228,6 +241,9 @@ msgstr ""
 msgid "Points"
 msgstr "Poeng"
 
+msgid "Press back to toggle the keyboard."
+msgstr ""
+
 msgid "Private"
 msgstr ""
 
@@ -238,6 +254,9 @@ msgid "Read error"
 msgstr ""
 
 msgid "Reconnecting"
+msgstr ""
+
+msgid "Refresh"
 msgstr ""
 
 msgid "Refresh matches"
@@ -279,13 +298,13 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-msgid "Show Keyboard"
-msgstr "Vis tastatur"
-
 msgid "Show moves"
 msgstr ""
 
 msgid "Show pip count"
+msgstr ""
+
+msgid "Single"
 msgstr ""
 
 msgid "Slow"
@@ -304,6 +323,9 @@ msgid "Submit"
 msgstr ""
 
 msgid "Tabula"
+msgstr ""
+
+msgid "Tap to dismiss this pop-up."
 msgstr ""
 
 msgid ""
@@ -376,22 +398,3 @@ msgstr "Det kan hende du må installere en nyere versjon av programmet."
 
 msgid "from %s to %s"
 msgstr ""
-
-#~ msgid "%s moved %s."
-#~ msgstr "%s flyttet %s."
-
-#~ msgid "%s rolled %s."
-#~ msgstr "%s rullet %s."
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Opprett spill"
-
-#~ msgid "No matches available. Please create one."
-#~ msgstr "Ingen spill tilgjengelig. Opprett ett."
-
-#~ msgid "Reset"
-#~ msgstr "Tilbakestill"
-
-#~ msgid "Leave Match"
-#~ msgstr "Forlat spillet"

@@ -43,6 +43,9 @@ msgstr ""
 msgid "Available"
 msgstr ""
 
+msgid "Backgammon"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -69,6 +72,9 @@ msgid "Connect"
 msgstr ""
 
 msgid "Connecting..."
+msgstr ""
+
+msgid "Create"
 msgstr ""
 
 msgid "Create Match"
@@ -136,9 +142,6 @@ msgstr ""
 msgid "Good Luck, Have Fun"
 msgstr ""
 
-msgid "Hide Keyboard"
-msgstr ""
-
 msgid "Highlight legal moves"
 msgstr ""
 
@@ -146,6 +149,9 @@ msgid "History"
 msgstr ""
 
 msgid "Instant"
+msgstr ""
+
+msgid "Join"
 msgstr ""
 
 msgid "Join match"
@@ -172,6 +178,9 @@ msgstr ""
 msgid "Logged in as guest"
 msgstr ""
 
+msgid "Long press back to exit the application."
+msgstr ""
+
 msgid "Match Name"
 msgstr ""
 
@@ -179,6 +188,9 @@ msgid "Matches List"
 msgstr ""
 
 msgid "Medium"
+msgstr ""
+
+msgid "Multi"
 msgstr ""
 
 msgid "Name"
@@ -219,6 +231,9 @@ msgstr ""
 msgid "Points"
 msgstr ""
 
+msgid "Press back to toggle the keyboard."
+msgstr ""
+
 msgid "Private"
 msgstr ""
 
@@ -229,6 +244,9 @@ msgid "Read error"
 msgstr ""
 
 msgid "Reconnecting"
+msgstr ""
+
+msgid "Refresh"
 msgstr ""
 
 msgid "Refresh matches"
@@ -270,13 +288,13 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-msgid "Show Keyboard"
-msgstr ""
-
 msgid "Show moves"
 msgstr ""
 
 msgid "Show pip count"
+msgstr ""
+
+msgid "Single"
 msgstr ""
 
 msgid "Slow"
@@ -295,6 +313,9 @@ msgid "Submit"
 msgstr ""
 
 msgid "Tabula"
+msgstr ""
+
+msgid "Tap to dismiss this pop-up."
 msgstr ""
 
 msgid ""

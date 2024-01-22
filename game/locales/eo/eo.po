@@ -47,6 +47,9 @@ msgstr ""
 msgid "Available"
 msgstr "Disponebla"
 
+msgid "Backgammon"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -76,6 +79,9 @@ msgstr "Konekti"
 
 msgid "Connecting..."
 msgstr "Konektante…"
+
+msgid "Create"
+msgstr "Krei"
 
 msgid "Create Match"
 msgstr ""
@@ -142,9 +148,6 @@ msgstr ""
 msgid "Good Luck, Have Fun"
 msgstr ""
 
-msgid "Hide Keyboard"
-msgstr "Kaŝi klavaron"
-
 msgid "Highlight legal moves"
 msgstr "Reliefigi eblajn movojn"
 
@@ -153,6 +156,9 @@ msgstr ""
 
 msgid "Instant"
 msgstr ""
+
+msgid "Join"
+msgstr "Aligî"
 
 msgid "Join match"
 msgstr "Aliĝi partion"
@@ -178,6 +184,9 @@ msgstr ""
 msgid "Logged in as guest"
 msgstr ""
 
+msgid "Long press back to exit the application."
+msgstr ""
+
 msgid "Match Name"
 msgstr ""
 
@@ -185,6 +194,9 @@ msgid "Matches List"
 msgstr ""
 
 msgid "Medium"
+msgstr ""
+
+msgid "Multi"
 msgstr ""
 
 msgid "Name"
@@ -227,6 +239,9 @@ msgstr ""
 msgid "Points"
 msgstr "Poentoj"
 
+msgid "Press back to toggle the keyboard."
+msgstr ""
+
 msgid "Private"
 msgstr "Privata"
 
@@ -238,6 +253,9 @@ msgstr ""
 
 msgid "Reconnecting"
 msgstr ""
+
+msgid "Refresh"
+msgstr "Refreŝigi"
 
 msgid "Refresh matches"
 msgstr ""
@@ -278,14 +296,14 @@ msgstr "Servilo"
 msgid "Settings"
 msgstr "Agordoj"
 
-msgid "Show Keyboard"
-msgstr "Montri klavaron"
-
 msgid "Show moves"
 msgstr "Montri movojn"
 
 msgid "Show pip count"
 msgstr "Montri nombron de fakoj"
+
+msgid "Single"
+msgstr ""
 
 msgid "Slow"
 msgstr ""
@@ -303,6 +321,9 @@ msgid "Submit"
 msgstr "Submeti"
 
 msgid "Tabula"
+msgstr ""
+
+msgid "Tap to dismiss this pop-up."
 msgstr ""
 
 msgid ""
@@ -375,21 +396,3 @@ msgstr "Vi eble devas ĝisdatigi vian programon."
 
 msgid "from %s to %s"
 msgstr ""
-
-#~ msgid "%s moved %s."
-#~ msgstr "%s movis %s."
-
-#~ msgid "%s rolled %s."
-#~ msgstr "Ĵetrezulto de %s estis %s."
-
-#~ msgid "Create"
-#~ msgstr "Krei"
-
-#~ msgid "Join"
-#~ msgstr "Aligî"
-
-#~ msgid "No matches available. Please create one."
-#~ msgstr "Neniu aliĝebla partio. Bonvolu krei partion."
-
-#~ msgid "Refresh"
-#~ msgstr "Refreŝigi"

@@ -47,6 +47,9 @@ msgstr ""
 msgid "Available"
 msgstr "Disponibile"
 
+msgid "Backgammon"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr "Levata"
 
@@ -78,6 +81,9 @@ msgstr "Connettiti"
 
 msgid "Connecting..."
 msgstr "Connessione..."
+
+msgid "Create"
+msgstr ""
 
 msgid "Create Match"
 msgstr "Crea una partita"
@@ -148,9 +154,6 @@ msgstr ""
 msgid "Good Luck, Have Fun"
 msgstr "In bocca al lupo, buon divertimento!"
 
-msgid "Hide Keyboard"
-msgstr "Nascondi tastiera"
-
 msgid "Highlight legal moves"
 msgstr "Mosse legali in evidenza"
 
@@ -158,6 +161,9 @@ msgid "History"
 msgstr "Registro"
 
 msgid "Instant"
+msgstr ""
+
+msgid "Join"
 msgstr ""
 
 msgid "Join match"
@@ -184,6 +190,9 @@ msgstr "Caricamento…"
 msgid "Logged in as guest"
 msgstr "Connesso come ospite"
 
+msgid "Long press back to exit the application."
+msgstr ""
+
 msgid "Match Name"
 msgstr "Nome della partita"
 
@@ -191,6 +200,9 @@ msgid "Matches List"
 msgstr "Lista delle partite"
 
 msgid "Medium"
+msgstr ""
+
+msgid "Multi"
 msgstr ""
 
 msgid "Name"
@@ -233,6 +245,9 @@ msgstr ""
 msgid "Points"
 msgstr "Punti"
 
+msgid "Press back to toggle the keyboard."
+msgstr ""
+
 msgid "Private"
 msgstr "Privato"
 
@@ -244,6 +259,9 @@ msgstr "Errore in lettura"
 
 msgid "Reconnecting"
 msgstr "Riconnessione"
+
+msgid "Refresh"
+msgstr ""
 
 msgid "Refresh matches"
 msgstr "Aggiorna partite"
@@ -284,14 +302,14 @@ msgstr "Server"
 msgid "Settings"
 msgstr "Impostazioni"
 
-msgid "Show Keyboard"
-msgstr "Mostra tastiera"
-
 msgid "Show moves"
 msgstr "Mostra mosse"
 
 msgid "Show pip count"
 msgstr "Mostra punteggio"
+
+msgid "Single"
+msgstr ""
 
 msgid "Slow"
 msgstr ""
@@ -310,6 +328,9 @@ msgstr "Invia"
 
 msgid "Tabula"
 msgstr "Tabula"
+
+msgid "Tap to dismiss this pop-up."
+msgstr ""
 
 msgid ""
 "This concludes the tutorial. To share feedback and chat with other players "
@@ -386,16 +407,3 @@ msgstr "Potresti dover aggiornare il programma."
 
 msgid "from %s to %s"
 msgstr "da %s a %s"
-
-#~ msgid "%s moved %s."
-#~ msgstr "%s ha mosso %s."
-
-#~ msgid "%s rolled %s."
-#~ msgstr "%s ha tirato %s."
-
-#~ msgid ""
-#~ "This screen lists the matches that are currently available. A few bots "
-#~ "are always available to play against."
-#~ msgstr ""
-#~ "Questa schermata è l’elenco delle partite disponibili. Un paio di "
-#~ "programmisono sempre disponibili per giocarci."

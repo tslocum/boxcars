@@ -48,6 +48,9 @@ msgstr ""
 msgid "Available"
 msgstr ""
 
+msgid "Backgammon"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -75,6 +78,10 @@ msgstr "Połącz"
 
 msgid "Connecting..."
 msgstr "Łączenie..."
+
+#, fuzzy
+msgid "Create"
+msgstr "Stwórz mecz"
 
 msgid "Create Match"
 msgstr ""
@@ -141,9 +148,6 @@ msgstr ""
 msgid "Good Luck, Have Fun"
 msgstr ""
 
-msgid "Hide Keyboard"
-msgstr "Ukryj klawiaturę"
-
 msgid "Highlight legal moves"
 msgstr ""
 
@@ -151,6 +155,9 @@ msgid "History"
 msgstr ""
 
 msgid "Instant"
+msgstr ""
+
+msgid "Join"
 msgstr ""
 
 msgid "Join match"
@@ -177,6 +184,9 @@ msgstr ""
 msgid "Logged in as guest"
 msgstr ""
 
+msgid "Long press back to exit the application."
+msgstr ""
+
 msgid "Match Name"
 msgstr ""
 
@@ -184,6 +194,9 @@ msgid "Matches List"
 msgstr ""
 
 msgid "Medium"
+msgstr ""
+
+msgid "Multi"
 msgstr ""
 
 msgid "Name"
@@ -224,6 +237,9 @@ msgstr ""
 msgid "Points"
 msgstr "Punkty"
 
+msgid "Press back to toggle the keyboard."
+msgstr ""
+
 msgid "Private"
 msgstr ""
 
@@ -234,6 +250,9 @@ msgid "Read error"
 msgstr ""
 
 msgid "Reconnecting"
+msgstr ""
+
+msgid "Refresh"
 msgstr ""
 
 msgid "Refresh matches"
@@ -275,13 +294,13 @@ msgstr "Serwer"
 msgid "Settings"
 msgstr ""
 
-msgid "Show Keyboard"
-msgstr "Pokaż klawiaturę"
-
 msgid "Show moves"
 msgstr ""
 
 msgid "Show pip count"
+msgstr ""
+
+msgid "Single"
 msgstr ""
 
 msgid "Slow"
@@ -300,6 +319,9 @@ msgid "Submit"
 msgstr ""
 
 msgid "Tabula"
+msgstr ""
+
+msgid "Tap to dismiss this pop-up."
 msgstr ""
 
 msgid ""
@@ -372,22 +394,3 @@ msgstr "Konieczna może być aktualizacja twojego klienta."
 
 msgid "from %s to %s"
 msgstr ""
-
-#~ msgid "%s moved %s."
-#~ msgstr "%s poruszył/a %s."
-
-#~ msgid "%s rolled %s."
-#~ msgstr "%s wyrzucił/a %s."
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "Stwórz mecz"
-
-#~ msgid "No matches available. Please create one."
-#~ msgstr "Brak dostępnych meczów. Utwórz mecz."
-
-#~ msgid "Drag here to bear off"
-#~ msgstr "Przeciągnij tutaj, aby wystartować"
-
-#~ msgid "Welcome to %s"
-#~ msgstr "Witamy w %s"
