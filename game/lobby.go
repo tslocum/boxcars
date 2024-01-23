@@ -10,7 +10,6 @@ import (
 
 	"code.rocket9labs.com/tslocum/bgammon"
 	"code.rocket9labs.com/tslocum/etk"
-	"code.rocket9labs.com/tslocum/etk/messeji"
 	"github.com/leonelquinteros/gotext"
 )
 
@@ -188,7 +187,7 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 		txt.SetFollow(false)
 		txt.SetScrollBarVisible(false)
 		txt.SetWordWrap(false)
-		txt.SetVertical(messeji.AlignCenter)
+		txt.SetVertical(etk.AlignCenter)
 		if AutoEnableTouchInput {
 			txt.SetFont(mediumFont, fontMutex)
 		}
@@ -273,8 +272,8 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 			switch buttonIndex {
 			case lobbyButtonCreateCancel:
 				game.lobby.showCreateGame = false
-				game.lobby.createGameName.Field.SetText("")
-				game.lobby.createGamePassword.Field.SetText("")
+				game.lobby.createGameName.SetText("")
+				game.lobby.createGamePassword.SetText("")
 				l.rebuildButtonsGrid()
 				game.setRoot(listGamesFrame)
 			case lobbyButtonCreateConfirm:
@@ -338,9 +337,9 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 			} else {
 				namePlural += "'s"
 			}
-			l.createGameName.Field.SetText(namePlural + " match")
-			l.createGamePoints.Field.SetText("1")
-			l.createGamePassword.Field.SetText("")
+			l.createGameName.SetText(namePlural + " match")
+			l.createGamePoints.SetText("1")
+			l.createGamePassword.SetText("")
 			l.rebuildButtonsGrid()
 			scheduleFrame()
 		case lobbyButtonJoin:
@@ -353,7 +352,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				game.setRoot(joinGameFrame)
 				etk.SetFocus(l.joinGamePassword)
 				l.joinGameLabel.SetText(gotext.Get("Join match: %s", l.games[l.selected].Name))
-				l.joinGamePassword.Field.SetText("")
+				l.joinGamePassword.SetText("")
 				l.joinGameID = l.games[l.selected].ID
 				l.rebuildButtonsGrid()
 			} else {
@@ -390,7 +389,7 @@ func (l *lobby) selectMatch(index int) bool {
 				game.setRoot(joinGameFrame)
 				etk.SetFocus(l.joinGamePassword)
 				l.joinGameLabel.SetText(gotext.Get("Join match: %s", entry.Name))
-				l.joinGamePassword.Field.SetText("")
+				l.joinGamePassword.SetText("")
 				l.joinGameID = entry.ID
 				l.rebuildButtonsGrid()
 			} else {

@@ -25,7 +25,6 @@ import (
 	"code.rocket9labs.com/tslocum/bgammon-tabula-bot/bot"
 	"code.rocket9labs.com/tslocum/bgammon/pkg/server"
 	"code.rocket9labs.com/tslocum/etk"
-	"code.rocket9labs.com/tslocum/etk/messeji"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
@@ -104,9 +103,9 @@ var (
 )
 
 var (
-	statusBuffer = etk.NewText("")
-	gameBuffer   = etk.NewText("")
-	inputBuffer  = etk.NewInput("", "", acceptInput)
+	statusBuffer *etk.Text
+	gameBuffer   *etk.Text
+	inputBuffer  *etk.Input
 
 	statusLogged bool
 	gameLogged   bool
@@ -436,8 +435,8 @@ func setViewBoard(view bool) {
 		// Exit dialogs.
 		game.lobby.showJoinGame = false
 		game.lobby.showCreateGame = false
-		game.lobby.createGameName.Field.SetText("")
-		game.lobby.createGamePassword.Field.SetText("")
+		game.lobby.createGameName.SetText("")
+		game.lobby.createGamePassword.SetText("")
 		game.lobby.rebuildButtonsGrid()
 
 		etk.SetRoot(game.Board.frame)
@@ -659,15 +658,22 @@ func (g *Game) initialize() {
 	etk.Style.BorderColorLeft = color.RGBA{233, 207, 170, 255}
 	etk.Style.BorderColorTop = color.RGBA{233, 207, 170, 255}
 
-	statusBuffer.SetForegroundColor(bufferTextColor)
-	statusBuffer.SetBackgroundColor(bufferBackgroundColor)
+	etk.Style.ScrollBorderColorLeft = color.RGBA{210, 182, 135, 255}
+	etk.Style.ScrollBorderColorTop = color.RGBA{210, 182, 135, 255}
 
-	gameBuffer.SetForegroundColor(bufferTextColor)
-	gameBuffer.SetBackgroundColor(bufferBackgroundColor)
+	statusBuffer = etk.NewText("")
+	gameBuffer = etk.NewText("")
+	inputBuffer = etk.NewInput("", acceptInput)
 
-	inputBuffer.Field.SetForegroundColor(bufferTextColor)
-	inputBuffer.Field.SetBackgroundColor(bufferBackgroundColor)
-	inputBuffer.Field.SetSuffix("")
+	statusBuffer.SetForeground(bufferTextColor)
+	statusBuffer.SetBackground(bufferBackgroundColor)
+
+	gameBuffer.SetForeground(bufferTextColor)
+	gameBuffer.SetBackground(bufferBackgroundColor)
+
+	inputBuffer.SetForeground(bufferTextColor)
+	inputBuffer.SetBackground(bufferBackgroundColor)
+	inputBuffer.SetSuffix("")
 
 	g.Board = NewBoard()
 	g.lobby = NewLobby()
@@ -683,7 +689,7 @@ func (g *Game) initialize() {
 	if connectAddress == "" {
 		connectAddress = DefaultServerAddress
 	}
-	g.connectServer = etk.NewInput("", connectAddress, func(text string) (handled bool) {
+	g.connectServer = etk.NewInput(connectAddress, func(text string) (handled bool) {
 		g.selectConnect()
 		return false
 	})
@@ -695,19 +701,19 @@ func (g *Game) initialize() {
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
 
-		g.registerEmail = etk.NewInput("", "", func(text string) (handled bool) {
+		g.registerEmail = etk.NewInput("", func(text string) (handled bool) {
 			g.selectConfirmRegister()
 			return false
 		})
 		centerInput(g.registerEmail)
 
-		g.registerUsername = etk.NewInput("", "", func(text string) (handled bool) {
+		g.registerUsername = etk.NewInput("", func(text string) (handled bool) {
 			g.selectConfirmRegister()
 			return false
 		})
 		centerInput(g.registerUsername)
 
-		g.registerPassword = etk.NewInput("", "", func(text string) (handled bool) {
+		g.registerPassword = etk.NewInput("", func(text string) (handled bool) {
 			g.selectConfirmRegister()
 			return false
 		})
@@ -726,8 +732,8 @@ func (g *Game) initialize() {
 		infoLabel := etk.NewText(gotext.Get("Please enter a valid email address, or it will not be possible to reset your password."))
 
 		footerLabel := etk.NewText("Boxcars " + version)
-		footerLabel.SetHorizontal(messeji.AlignEnd)
-		footerLabel.SetVertical(messeji.AlignEnd)
+		footerLabel.SetHorizontal(etk.AlignEnd)
+		footerLabel.SetVertical(etk.AlignEnd)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
@@ -765,7 +771,7 @@ func (g *Game) initialize() {
 		emailLabel := newCenteredText(gotext.Get("Email"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
 
-		g.resetEmail = etk.NewInput("", "", func(text string) (handled bool) {
+		g.resetEmail = etk.NewInput("", func(text string) (handled bool) {
 			g.selectConfirmReset()
 			return false
 		})
@@ -784,8 +790,8 @@ func (g *Game) initialize() {
 		g.resetInfo = etk.NewText("")
 
 		footerLabel := etk.NewText("Boxcars " + version)
-		footerLabel.SetHorizontal(messeji.AlignEnd)
-		footerLabel.SetVertical(messeji.AlignEnd)
+		footerLabel.SetHorizontal(etk.AlignEnd)
+		footerLabel.SetVertical(etk.AlignEnd)
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
@@ -821,22 +827,22 @@ func (g *Game) initialize() {
 		serverLabel := newCenteredText(gotext.Get("Server"))
 		if AutoEnableTouchInput {
 			headerLabel.SetFont(mediumLargeFont, fontMutex)
-			headerLabel.SetHorizontal(messeji.AlignCenter)
+			headerLabel.SetHorizontal(etk.AlignCenter)
 		}
 
 		infoLabel := etk.NewText(gotext.Get("To log in as a guest, enter a username (if you want) and do not enter a password."))
 
 		footerLabel := etk.NewText("Boxcars " + version)
-		footerLabel.SetHorizontal(messeji.AlignEnd)
-		footerLabel.SetVertical(messeji.AlignEnd)
+		footerLabel.SetHorizontal(etk.AlignEnd)
+		footerLabel.SetVertical(etk.AlignEnd)
 
-		g.connectUsername = etk.NewInput("", "", func(text string) (handled bool) {
+		g.connectUsername = etk.NewInput("", func(text string) (handled bool) {
 			g.selectConnect()
 			return false
 		})
 		centerInput(g.connectUsername)
 
-		g.connectPassword = etk.NewInput("", "", func(text string) (handled bool) {
+		g.connectPassword = etk.NewInput("", func(text string) (handled bool) {
 			g.selectConnect()
 			return false
 		})
@@ -904,19 +910,19 @@ func (g *Game) initialize() {
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		variantLabel := newCenteredText(gotext.Get("Variant"))
 
-		g.lobby.createGameName = etk.NewInput("", "", func(text string) (handled bool) {
+		g.lobby.createGameName = etk.NewInput("", func(text string) (handled bool) {
 			g.lobby.confirmCreateGame()
 			return false
 		})
 		centerInput(g.lobby.createGameName)
 
-		g.lobby.createGamePoints = etk.NewInput("", "", func(text string) (handled bool) {
+		g.lobby.createGamePoints = etk.NewInput("", func(text string) (handled bool) {
 			g.lobby.confirmCreateGame()
 			return false
 		})
 		centerInput(g.lobby.createGamePoints)
 
-		g.lobby.createGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
+		g.lobby.createGamePassword = etk.NewInput("", func(text string) (handled bool) {
 			g.lobby.confirmCreateGame()
 			return false
 		})
@@ -934,7 +940,7 @@ func (g *Game) initialize() {
 				g.lobby.toggleVariantAcey()
 			},
 		}
-		aceyDeuceyLabel.SetVertical(messeji.AlignCenter)
+		aceyDeuceyLabel.SetVertical(etk.AlignCenter)
 
 		aceyDeuceyGrid := etk.NewGrid()
 		aceyDeuceyGrid.SetColumnSizes(fieldHeight, xPadding, -1)
@@ -954,7 +960,7 @@ func (g *Game) initialize() {
 				g.lobby.toggleVariantTabula()
 			},
 		}
-		tabulaLabel.SetVertical(messeji.AlignCenter)
+		tabulaLabel.SetVertical(etk.AlignCenter)
 
 		tabulaGrid := etk.NewGrid()
 		tabulaGrid.SetColumnSizes(fieldHeight, xPadding, -1)
@@ -1008,7 +1014,7 @@ func (g *Game) initialize() {
 
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 
-		g.lobby.joinGamePassword = etk.NewInput("", "", func(text string) (handled bool) {
+		g.lobby.joinGamePassword = etk.NewInput("", func(text string) (handled bool) {
 			g.lobby.confirmJoinGame()
 			return false
 		})
@@ -1059,12 +1065,12 @@ func (g *Game) initialize() {
 			opponentLabel.SetFont(mediumFont, fontMutex)
 		}
 
-		g.lobby.historyUsername = etk.NewInput("", "", func(text string) (handled bool) {
+		g.lobby.historyUsername = etk.NewInput("", func(text string) (handled bool) {
 			g.selectHistorySearch()
 			return false
 		})
 		centerInput(g.lobby.historyUsername)
-		g.lobby.historyUsername.Field.SetScrollBarVisible(false)
+		g.lobby.historyUsername.SetScrollBarVisible(false)
 
 		searchButton := etk.NewButton(gotext.Get("Search"), g.selectHistorySearch)
 
@@ -1086,27 +1092,27 @@ func (g *Game) initialize() {
 		headerGrid.AddChildAt(g.lobby.historyUsername, 3, 0, 1, 1)
 		headerGrid.AddChildAt(searchButton, 4, 0, 1, 1)
 
-		newLabel := func(text string, horizontal messeji.Alignment) *etk.Text {
+		newLabel := func(text string, horizontal etk.Alignment) *etk.Text {
 			t := etk.NewText(text)
-			t.SetVertical(messeji.AlignCenter)
+			t.SetVertical(etk.AlignCenter)
 			t.SetHorizontal(horizontal)
 			return t
 		}
 
-		g.lobby.historyRatingCasualBackgammonSingle = newLabel("...", messeji.AlignStart)
-		g.lobby.historyRatingCasualBackgammonMulti = newLabel("...", messeji.AlignStart)
-		g.lobby.historyRatingCasualAceySingle = newLabel("...", messeji.AlignStart)
-		g.lobby.historyRatingCasualAceyMulti = newLabel("...", messeji.AlignStart)
-		g.lobby.historyRatingCasualTabulaSingle = newLabel("...", messeji.AlignStart)
-		g.lobby.historyRatingCasualTabulaMulti = newLabel("...", messeji.AlignStart)
+		g.lobby.historyRatingCasualBackgammonSingle = newLabel("...", etk.AlignStart)
+		g.lobby.historyRatingCasualBackgammonMulti = newLabel("...", etk.AlignStart)
+		g.lobby.historyRatingCasualAceySingle = newLabel("...", etk.AlignStart)
+		g.lobby.historyRatingCasualAceyMulti = newLabel("...", etk.AlignStart)
+		g.lobby.historyRatingCasualTabulaSingle = newLabel("...", etk.AlignStart)
+		g.lobby.historyRatingCasualTabulaMulti = newLabel("...", etk.AlignStart)
 
 		ratingGrid := func(singleLabel *etk.Text, multiLabel *etk.Text) *etk.Grid {
 			const dividerSize = 10
 			g := etk.NewGrid()
 			g.SetColumnSizes(-1, dividerSize, -1)
-			g.AddChildAt(newLabel(gotext.Get("Single"), messeji.AlignEnd), 0, 0, 1, 1)
+			g.AddChildAt(newLabel(gotext.Get("Single"), etk.AlignEnd), 0, 0, 1, 1)
 			g.AddChildAt(singleLabel, 2, 0, 1, 1)
-			g.AddChildAt(newLabel(gotext.Get("Multi"), messeji.AlignEnd), 0, 1, 1, 1)
+			g.AddChildAt(newLabel(gotext.Get("Multi"), etk.AlignEnd), 0, 1, 1, 1)
 			g.AddChildAt(multiLabel, 2, 1, 1, 1)
 			return g
 		}
@@ -1114,7 +1120,7 @@ func (g *Game) initialize() {
 		historyDividerLine := etk.NewBox()
 		historyDividerLine.SetBackground(bufferTextColor)
 
-		g.lobby.historyPageLabel = newLabel("...", messeji.AlignCenter)
+		g.lobby.historyPageLabel = newLabel("...", etk.AlignCenter)
 
 		pageControlGrid := etk.NewGrid()
 		pageControlGrid.AddChildAt(etk.NewButton("<", g.selectHistoryPrevious), 0, 0, 1, 1)
@@ -1124,11 +1130,11 @@ func (g *Game) initialize() {
 		historyRatingGrid := etk.NewGrid()
 		historyRatingGrid.SetRowSizes(2, -1, -1, -1)
 		historyRatingGrid.AddChildAt(historyDividerLine, 0, 0, 3, 1)
-		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Backgammon"), messeji.AlignCenter), 0, 1, 1, 1)
+		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Backgammon"), etk.AlignCenter), 0, 1, 1, 1)
 		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualBackgammonSingle, g.lobby.historyRatingCasualBackgammonMulti), 0, 2, 1, 2)
-		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Acey-deucey"), messeji.AlignCenter), 1, 1, 1, 1)
+		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Acey-deucey"), etk.AlignCenter), 1, 1, 1, 1)
 		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualAceySingle, g.lobby.historyRatingCasualAceyMulti), 1, 2, 1, 2)
-		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Tabula"), messeji.AlignCenter), 2, 1, 1, 1)
+		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Tabula"), etk.AlignCenter), 2, 1, 1, 1)
 		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualTabulaSingle, g.lobby.historyRatingCasualTabulaMulti), 2, 2, 1, 2)
 
 		historyContainer = etk.NewGrid()
@@ -1198,13 +1204,13 @@ func (g *Game) initialize() {
 
 	if AutoEnableTouchInput {
 		g.keyboardHint = etk.NewText(gotext.Get("Press back to toggle the keyboard.") + "\n\n" + gotext.Get("Long press back to exit the application.") + "\n\n" + gotext.Get("Tap to dismiss this pop-up."))
-		g.keyboardHint.SetHorizontal(messeji.AlignCenter)
-		g.keyboardHint.SetVertical(messeji.AlignCenter)
+		g.keyboardHint.SetHorizontal(etk.AlignCenter)
+		g.keyboardHint.SetVertical(etk.AlignCenter)
 	}
 
 	statusBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	gameBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
-	inputBuffer.Field.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	inputBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	g.lobby.availableMatchesList.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	g.lobby.historyList.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 
@@ -1212,7 +1218,7 @@ func (g *Game) initialize() {
 		scrollBarWidth := etk.Scale(32)
 		statusBuffer.SetScrollBarWidth(scrollBarWidth)
 		gameBuffer.SetScrollBarWidth(scrollBarWidth)
-		inputBuffer.Field.SetScrollBarWidth(scrollBarWidth)
+		inputBuffer.SetScrollBarWidth(scrollBarWidth)
 		g.lobby.availableMatchesList.SetScrollBarWidth(scrollBarWidth)
 		g.lobby.historyList.SetScrollBarWidth(scrollBarWidth)
 	}
@@ -1225,7 +1231,7 @@ func (g *Game) initialize() {
 
 	username := loadUsername()
 	if username != "" {
-		g.connectUsername.Field.SetText(username)
+		g.connectUsername.SetText(username)
 		etk.SetFocus(g.connectPassword)
 	} else {
 		etk.SetFocus(g.connectUsername)
@@ -2163,8 +2169,8 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 
 func (g *Game) selectRegister() error {
 	g.showRegister = true
-	g.registerUsername.Field.SetText(g.connectUsername.Text())
-	g.registerPassword.Field.SetText(g.connectPassword.Text())
+	g.registerUsername.SetText(g.connectUsername.Text())
+	g.registerPassword.SetText(g.connectPassword.Text())
 	g.setRoot(registerGrid)
 	etk.SetFocus(g.registerEmail)
 	return nil
@@ -2243,7 +2249,7 @@ func (g *Game) searchMatches(username string) {
 func (g *Game) selectHistory() error {
 	g.lobby.showHistory = true
 	g.setRoot(historyFrame)
-	g.lobby.historyUsername.Field.SetText(g.Client.Username)
+	g.lobby.historyUsername.SetText(g.Client.Username)
 	g.searchMatches(g.Client.Username)
 	etk.SetFocus(g.lobby.historyUsername)
 	g.lobby.rebuildButtonsGrid()
@@ -2556,7 +2562,7 @@ func (g *Game) Update() error {
 			if g.lobby.showCreateGame {
 				pointsText := g.lobby.createGamePoints.Text()
 				if pointsText != "" {
-					g.lobby.createGamePoints.Field.SetText(strings.Join(onlyNumbers.FindAllString(pointsText, -1), ""))
+					g.lobby.createGamePoints.SetText(strings.Join(onlyNumbers.FindAllString(pointsText, -1), ""))
 				}
 			}
 		}
@@ -2790,7 +2796,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	padding := g.bufferPadding()
 	statusBuffer.SetPadding(padding)
 	gameBuffer.SetPadding(padding)
-	inputBuffer.Field.SetPadding(padding)
+	inputBuffer.SetPadding(padding)
 
 	old := viewBoard
 	viewBoard = !old
@@ -3026,13 +3032,13 @@ func (t *ClickableText) HandleMouse(cursor image.Point, pressed bool, clicked bo
 
 func newCenteredText(text string) *etk.Text {
 	t := etk.NewText(text)
-	t.SetVertical(messeji.AlignCenter)
+	t.SetVertical(etk.AlignCenter)
 	return t
 }
 
 func centerInput(input *etk.Input) {
-	input.Field.SetVertical(messeji.AlignCenter)
-	input.Field.SetPadding(etk.Scale(5))
+	input.SetVertical(etk.AlignCenter)
+	input.SetPadding(etk.Scale(5))
 }
 
 // Short description.

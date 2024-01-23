@@ -17,7 +17,6 @@ import (
 	"code.rocket9labs.com/tslocum/bgammon"
 	"code.rocket9labs.com/tslocum/bgammon-tabula-bot/bot"
 	"code.rocket9labs.com/tslocum/etk"
-	"code.rocket9labs.com/tslocum/etk/messeji"
 	"code.rocket9labs.com/tslocum/tabula"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -230,29 +229,29 @@ func NewBoard() *board {
 	}
 
 	{
-		b.opponentRatingLabel.SetHorizontal(messeji.AlignCenter)
-		b.opponentRatingLabel.SetVertical(messeji.AlignStart)
+		b.opponentRatingLabel.SetHorizontal(etk.AlignCenter)
+		b.opponentRatingLabel.SetVertical(etk.AlignStart)
 		b.opponentRatingLabel.SetScrollBarVisible(false)
 		b.opponentRatingLabel.SetFont(mediumFont, fontMutex)
-		b.playerRatingLabel.SetHorizontal(messeji.AlignCenter)
-		b.playerRatingLabel.SetVertical(messeji.AlignEnd)
+		b.playerRatingLabel.SetHorizontal(etk.AlignCenter)
+		b.playerRatingLabel.SetVertical(etk.AlignEnd)
 		b.playerRatingLabel.SetScrollBarVisible(false)
 		b.playerRatingLabel.SetFont(mediumFont, fontMutex)
 		padding := 15
 		b.opponentForcedLabel.SetPadding(padding)
-		b.opponentForcedLabel.SetHorizontal(messeji.AlignCenter)
-		b.opponentForcedLabel.SetVertical(messeji.AlignEnd)
+		b.opponentForcedLabel.SetHorizontal(etk.AlignCenter)
+		b.opponentForcedLabel.SetVertical(etk.AlignEnd)
 		b.opponentForcedLabel.SetScrollBarVisible(false)
 		b.opponentForcedLabel.SetVisible(false)
 		b.playerForcedLabel.SetPadding(padding)
-		b.playerForcedLabel.SetHorizontal(messeji.AlignCenter)
-		b.playerForcedLabel.SetVertical(messeji.AlignEnd)
+		b.playerForcedLabel.SetHorizontal(etk.AlignCenter)
+		b.playerForcedLabel.SetVertical(etk.AlignEnd)
 		b.playerForcedLabel.SetScrollBarVisible(false)
 		b.playerForcedLabel.SetVisible(false)
 	}
 
 	centerText := func(t *etk.Text) {
-		t.SetVertical(messeji.AlignCenter)
+		t.SetVertical(etk.AlignCenter)
 		t.SetScrollBarVisible(false)
 	}
 
@@ -262,23 +261,23 @@ func NewBoard() *board {
 	centerText(b.opponentPipCount)
 	centerText(b.playerPipCount)
 
-	b.opponentMovesLabel.SetHorizontal(messeji.AlignStart)
-	b.playerMovesLabel.SetHorizontal(messeji.AlignEnd)
+	b.opponentMovesLabel.SetHorizontal(etk.AlignStart)
+	b.playerMovesLabel.SetHorizontal(etk.AlignEnd)
 
-	b.opponentPipCount.SetHorizontal(messeji.AlignEnd)
-	b.playerPipCount.SetHorizontal(messeji.AlignStart)
+	b.opponentPipCount.SetHorizontal(etk.AlignEnd)
+	b.playerPipCount.SetHorizontal(etk.AlignStart)
 
-	b.opponentRatingLabel.SetForegroundColor(color.RGBA{255, 255, 255, 255})
-	b.playerRatingLabel.SetForegroundColor(color.RGBA{0, 0, 0, 255})
+	b.opponentRatingLabel.SetForeground(color.RGBA{255, 255, 255, 255})
+	b.playerRatingLabel.SetForeground(color.RGBA{0, 0, 0, 255})
 
-	b.opponentForcedLabel.SetForegroundColor(color.RGBA{255, 255, 255, 255})
-	b.playerForcedLabel.SetForegroundColor(color.RGBA{0, 0, 0, 255})
+	b.opponentForcedLabel.SetForeground(color.RGBA{255, 255, 255, 255})
+	b.playerForcedLabel.SetForeground(color.RGBA{0, 0, 0, 255})
 
-	b.opponentMovesLabel.SetForegroundColor(color.RGBA{255, 255, 255, 255})
-	b.playerMovesLabel.SetForegroundColor(color.RGBA{0, 0, 0, 255})
+	b.opponentMovesLabel.SetForeground(color.RGBA{255, 255, 255, 255})
+	b.playerMovesLabel.SetForeground(color.RGBA{0, 0, 0, 255})
 
-	b.opponentPipCount.SetForegroundColor(color.RGBA{255, 255, 255, 255})
-	b.playerPipCount.SetForegroundColor(color.RGBA{0, 0, 0, 255})
+	b.opponentPipCount.SetForeground(color.RGBA{255, 255, 255, 255})
+	b.playerPipCount.SetForeground(color.RGBA{0, 0, 0, 255})
 
 	b.recreateButtonGrid()
 
@@ -293,7 +292,7 @@ func NewBoard() *board {
 
 	{
 		headerLabel := etk.NewText(gotext.Get("Change password"))
-		headerLabel.SetHorizontal(messeji.AlignCenter)
+		headerLabel.SetHorizontal(etk.AlignCenter)
 
 		oldLabel := &ClickableText{
 			Text: etk.NewText(gotext.Get("Current")),
@@ -302,13 +301,13 @@ func NewBoard() *board {
 				b.toggleHighlightCheckbox()
 			},
 		}
-		oldLabel.SetVertical(messeji.AlignCenter)
+		oldLabel.SetVertical(etk.AlignCenter)
 
-		b.changePasswordOld = etk.NewInput("", "", func(text string) (handled bool) {
+		b.changePasswordOld = etk.NewInput("", func(text string) (handled bool) {
 			b.selectChangePassword()
 			return false
 		})
-		b.changePasswordOld.Field.SetBackgroundColor(frameColor)
+		b.changePasswordOld.SetBackground(frameColor)
 		centerInput(b.changePasswordOld)
 
 		newLabel := &ClickableText{
@@ -318,13 +317,13 @@ func NewBoard() *board {
 				b.togglePipCountCheckbox()
 			},
 		}
-		newLabel.SetVertical(messeji.AlignCenter)
+		newLabel.SetVertical(etk.AlignCenter)
 
-		b.changePasswordNew = etk.NewInput("", "", func(text string) (handled bool) {
+		b.changePasswordNew = etk.NewInput("", func(text string) (handled bool) {
 			b.selectChangePassword()
 			return false
 		})
-		b.changePasswordNew.Field.SetBackgroundColor(frameColor)
+		b.changePasswordNew.SetBackground(frameColor)
 		centerInput(b.changePasswordNew)
 
 		fieldGrid := etk.NewGrid()
@@ -348,7 +347,7 @@ func NewBoard() *board {
 
 	{
 		settingsLabel := etk.NewText(gotext.Get("Settings"))
-		settingsLabel.SetHorizontal(messeji.AlignCenter)
+		settingsLabel.SetHorizontal(etk.AlignCenter)
 
 		b.highlightCheckbox = etk.NewCheckbox(b.toggleHighlightCheckbox)
 		b.highlightCheckbox.SetBorderColor(triangleA)
@@ -362,7 +361,7 @@ func NewBoard() *board {
 				b.toggleHighlightCheckbox()
 			},
 		}
-		highlightLabel.SetVertical(messeji.AlignCenter)
+		highlightLabel.SetVertical(etk.AlignCenter)
 
 		b.showPipCountCheckbox = etk.NewCheckbox(b.togglePipCountCheckbox)
 		b.showPipCountCheckbox.SetBorderColor(triangleA)
@@ -376,7 +375,7 @@ func NewBoard() *board {
 				b.togglePipCountCheckbox()
 			},
 		}
-		pipCountLabel.SetVertical(messeji.AlignCenter)
+		pipCountLabel.SetVertical(etk.AlignCenter)
 
 		b.showMovesCheckbox = etk.NewCheckbox(b.toggleMovesCheckbox)
 		b.showMovesCheckbox.SetBorderColor(triangleA)
@@ -390,7 +389,7 @@ func NewBoard() *board {
 				b.toggleMovesCheckbox()
 			},
 		}
-		movesLabel.SetVertical(messeji.AlignCenter)
+		movesLabel.SetVertical(etk.AlignCenter)
 
 		b.flipBoardCheckbox = etk.NewCheckbox(b.toggleFlipBoardCheckbox)
 		b.flipBoardCheckbox.SetBorderColor(triangleA)
@@ -404,7 +403,7 @@ func NewBoard() *board {
 				b.toggleFlipBoardCheckbox()
 			},
 		}
-		flipBoardLabel.SetVertical(messeji.AlignCenter)
+		flipBoardLabel.SetVertical(etk.AlignCenter)
 
 		b.advancedMovementCheckbox = etk.NewCheckbox(b.toggleAdvancedMovementCheckbox)
 		b.advancedMovementCheckbox.SetBorderColor(triangleA)
@@ -418,7 +417,7 @@ func NewBoard() *board {
 				b.toggleAdvancedMovementCheckbox()
 			},
 		}
-		advancedMovementLabel.SetVertical(messeji.AlignCenter)
+		advancedMovementLabel.SetVertical(etk.AlignCenter)
 
 		b.autoPlayCheckbox = etk.NewCheckbox(b.toggleAutoPlayCheckbox)
 		b.autoPlayCheckbox.SetBorderColor(triangleA)
@@ -431,7 +430,7 @@ func NewBoard() *board {
 				b.toggleAutoPlayCheckbox()
 			},
 		}
-		autoPlayLabel.SetVertical(messeji.AlignCenter)
+		autoPlayLabel.SetVertical(etk.AlignCenter)
 
 		b.recreateAccountGrid()
 
@@ -444,7 +443,7 @@ func NewBoard() *board {
 		}
 		{
 			accountLabel := etk.NewText(gotext.Get("Account"))
-			accountLabel.SetVertical(messeji.AlignCenter)
+			accountLabel.SetVertical(etk.AlignCenter)
 
 			grid := etk.NewGrid()
 			grid.AddChildAt(accountLabel, 0, 0, 1, 1)
@@ -453,7 +452,7 @@ func NewBoard() *board {
 		}
 		{
 			speedLabel := etk.NewText(gotext.Get("Speed"))
-			speedLabel.SetVertical(messeji.AlignCenter)
+			speedLabel.SetVertical(etk.AlignCenter)
 
 			b.selectSpeed = etk.NewSelect(game.itemHeight(), b.confirmSelectSpeed)
 			b.selectSpeed.SetHighlightColor(color.RGBA{191, 156, 94, 255})
@@ -507,8 +506,8 @@ func NewBoard() *board {
 
 	{
 		leaveGameLabel := etk.NewText(gotext.Get("Leave match?"))
-		leaveGameLabel.SetHorizontal(messeji.AlignCenter)
-		leaveGameLabel.SetVertical(messeji.AlignCenter)
+		leaveGameLabel.SetHorizontal(etk.AlignCenter)
+		leaveGameLabel.SetVertical(etk.AlignCenter)
 
 		b.leaveGameGrid = etk.NewGrid()
 		b.leaveGameGrid.SetBackground(color.RGBA{40, 24, 9, 255})
@@ -523,19 +522,19 @@ func NewBoard() *board {
 	b.inputGrid.AddChildAt(inputBuffer, 0, 0, 1, 1)
 
 	timerLabel := etk.NewText("0:00")
-	timerLabel.SetForegroundColor(triangleA)
+	timerLabel.SetForeground(triangleA)
 	timerLabel.SetScrollBarVisible(false)
 	timerLabel.SetSingleLine(true)
-	timerLabel.TextField.SetHorizontal(messeji.AlignCenter)
-	timerLabel.TextField.SetVertical(messeji.AlignCenter)
+	timerLabel.SetHorizontal(etk.AlignCenter)
+	timerLabel.SetVertical(etk.AlignCenter)
 	b.timerLabel = timerLabel
 
 	clockLabel := etk.NewText("12:00")
-	clockLabel.SetForegroundColor(triangleA)
+	clockLabel.SetForeground(triangleA)
 	clockLabel.SetScrollBarVisible(false)
 	clockLabel.SetSingleLine(true)
-	clockLabel.TextField.SetHorizontal(messeji.AlignCenter)
-	clockLabel.TextField.SetVertical(messeji.AlignCenter)
+	clockLabel.SetHorizontal(etk.AlignCenter)
+	clockLabel.SetVertical(etk.AlignCenter)
 	b.clockLabel = clockLabel
 
 	b.showMenuButton = etk.NewButton("Menu", b.toggleMenu)
@@ -633,12 +632,12 @@ func (b *board) fontUpdated() {
 	bufferFont := smallFont
 	statusBuffer.SetFont(bufferFont, fontMutex)
 	gameBuffer.SetFont(bufferFont, fontMutex)
-	inputBuffer.Field.SetFont(bufferFont, fontMutex)
+	inputBuffer.SetFont(bufferFont, fontMutex)
 
 	if AutoEnableTouchInput {
-		b.showMenuButton.Label.SetFont(largeFont, fontMutex)
+		b.showMenuButton.SetFont(largeFont, fontMutex)
 	} else {
-		b.showMenuButton.Label.SetFont(smallFont, fontMutex)
+		b.showMenuButton.SetFont(smallFont, fontMutex)
 	}
 
 	b.timerLabel.SetFont(b.fontFace, fontMutex)
@@ -796,7 +795,7 @@ func (b *board) recreateAccountGrid() {
 	if b.Client == nil || (game.Password == "" && b.Client.Password == "") {
 		guestLabel := etk.NewText(gotext.Get("Logged in as guest"))
 		guestLabel.SetFont(mediumFont, fontMutex)
-		guestLabel.SetVertical(messeji.AlignCenter)
+		guestLabel.SetVertical(etk.AlignCenter)
 		w = guestLabel
 	} else {
 		changePasswordButton := etk.NewButton(gotext.Get("Change password"), b.showChangePassword)
@@ -819,7 +818,7 @@ func (b *board) confirmLeaveGame() error {
 		b.Client.Events <- ev
 		if !b.replayAuto.IsZero() {
 			b.replayAuto = time.Time{}
-			b.replayPauseButton.Label.SetText("|>")
+			b.replayPauseButton.SetText("|>")
 		}
 		b.recreateUIGrid()
 	} else {
@@ -853,8 +852,8 @@ func (b *board) hideMenu() error {
 	b.settingsGrid.SetVisible(false)
 	b.selectSpeed.SetMenuVisible(false)
 	b.changePasswordGrid.SetVisible(false)
-	b.changePasswordOld.Field.SetText("")
-	b.changePasswordNew.Field.SetText("")
+	b.changePasswordOld.SetText("")
+	b.changePasswordNew.SetText("")
 	return nil
 }
 
@@ -952,7 +951,7 @@ func (b *board) selectReplayStart() error {
 
 	if !b.replayAuto.IsZero() {
 		b.replayAuto = time.Time{}
-		b.replayPauseButton.Label.SetText("|>")
+		b.replayPauseButton.SetText("|>")
 	}
 
 	b.playerRoll1, b.playerRoll2, b.playerRoll3 = 0, 0, 0
@@ -968,7 +967,7 @@ func (b *board) selectReplayJumpBack() error {
 
 	if !b.replayAuto.IsZero() {
 		b.replayAuto = time.Time{}
-		b.replayPauseButton.Label.SetText("|>")
+		b.replayPauseButton.SetText("|>")
 	}
 
 	b.playerRoll1, b.playerRoll2, b.playerRoll3 = 0, 0, 0
@@ -989,7 +988,7 @@ func (b *board) selectReplayStepBack() error {
 
 	if !b.replayAuto.IsZero() {
 		b.replayAuto = time.Time{}
-		b.replayPauseButton.Label.SetText("|>")
+		b.replayPauseButton.SetText("|>")
 	}
 
 	// TODO Stepping back moves checkers backwards.
@@ -1010,13 +1009,13 @@ func (b *board) selectReplayPause() error {
 		return nil
 	} else if !b.replayAuto.IsZero() {
 		b.replayAuto = time.Time{}
-		b.replayPauseButton.Label.SetText("|>")
+		b.replayPauseButton.SetText("|>")
 		return nil
 	} else if game.replayFrame >= len(game.replayFrames)-1 {
 		return nil
 	}
 	b.replayAuto = time.Now()
-	b.replayPauseButton.Label.SetText("| |")
+	b.replayPauseButton.SetText("| |")
 	autoStart := b.replayAuto
 	go func() {
 		t := time.NewTicker(3 * time.Second)
@@ -1040,7 +1039,7 @@ func (b *board) selectReplayPause() error {
 			if replayFrame >= len(game.replayFrames)-1 {
 				time.Sleep(2 * time.Second)
 				b.replayAuto = time.Time{}
-				b.replayPauseButton.Label.SetText("|>")
+				b.replayPauseButton.SetText("|>")
 				scheduleFrame()
 				return
 			}
@@ -1061,7 +1060,7 @@ func (b *board) selectReplayStepForward() error {
 
 	if !b.replayAuto.IsZero() {
 		b.replayAuto = time.Time{}
-		b.replayPauseButton.Label.SetText("|>")
+		b.replayPauseButton.SetText("|>")
 	}
 
 	frame := game.replayFrames[game.replayFrame]
@@ -1090,7 +1089,7 @@ func (b *board) selectReplayJumpForward() error {
 
 	if !b.replayAuto.IsZero() {
 		b.replayAuto = time.Time{}
-		b.replayPauseButton.Label.SetText("|>")
+		b.replayPauseButton.SetText("|>")
 	}
 
 	replayFrame := game.replayFrame
@@ -1109,7 +1108,7 @@ func (b *board) selectReplayEnd() error {
 
 	if !b.replayAuto.IsZero() {
 		b.replayAuto = time.Time{}
-		b.replayPauseButton.Label.SetText("|>")
+		b.replayPauseButton.SetText("|>")
 	}
 
 	b.playerRoll1, b.playerRoll2, b.playerRoll3 = 0, 0, 0
@@ -1939,7 +1938,7 @@ func (b *board) updateOpponentLabel() {
 	}
 
 	label.active = b.gameState.Turn == player.Number
-	label.Text.TextField.SetForegroundColor(label.activeColor)
+	label.Text.SetForeground(label.activeColor)
 
 	fontMutex.Lock()
 	bounds := etk.BoundString(largeFont, text)
@@ -2017,7 +2016,7 @@ func (b *board) updatePlayerLabel() {
 	}
 
 	label.active = b.gameState.Turn == player.Number
-	label.Text.TextField.SetForegroundColor(label.activeColor)
+	label.Text.SetForeground(label.activeColor)
 
 	fontMutex.Lock()
 	bounds := etk.BoundString(largeFont, text)
@@ -2259,42 +2258,42 @@ func (b *board) processState() {
 	if b.flipBoard || b.gameState.PlayerNumber == 2 {
 		if b.opponentLabel.activeColor != colorBlack {
 			b.opponentLabel.activeColor = colorBlack
-			b.opponentLabel.SetForegroundColor(colorBlack)
-			b.opponentForcedLabel.SetForegroundColor(colorBlack)
-			b.opponentPipCount.SetForegroundColor(colorBlack)
-			b.opponentMovesLabel.SetForegroundColor(colorBlack)
-			b.opponentRatingLabel.SetForegroundColor(colorBlack)
+			b.opponentLabel.SetForeground(colorBlack)
+			b.opponentForcedLabel.SetForeground(colorBlack)
+			b.opponentPipCount.SetForeground(colorBlack)
+			b.opponentMovesLabel.SetForeground(colorBlack)
+			b.opponentRatingLabel.SetForeground(colorBlack)
 			b.opponentLabel.lastActive = !b.opponentLabel.active
 			b.opponentLabel.updateBackground()
 		}
 		if b.playerLabel.activeColor != colorWhite {
 			b.playerLabel.activeColor = colorWhite
-			b.playerLabel.SetForegroundColor(colorWhite)
-			b.playerForcedLabel.SetForegroundColor(colorWhite)
-			b.playerPipCount.SetForegroundColor(colorWhite)
-			b.playerMovesLabel.SetForegroundColor(colorWhite)
-			b.playerRatingLabel.SetForegroundColor(colorWhite)
+			b.playerLabel.SetForeground(colorWhite)
+			b.playerForcedLabel.SetForeground(colorWhite)
+			b.playerPipCount.SetForeground(colorWhite)
+			b.playerMovesLabel.SetForeground(colorWhite)
+			b.playerRatingLabel.SetForeground(colorWhite)
 			b.playerLabel.lastActive = !b.opponentLabel.active
 			b.playerLabel.updateBackground()
 		}
 	} else {
 		if b.opponentLabel.activeColor != colorWhite {
 			b.opponentLabel.activeColor = colorWhite
-			b.opponentLabel.SetForegroundColor(colorWhite)
-			b.opponentForcedLabel.SetForegroundColor(colorWhite)
-			b.opponentPipCount.SetForegroundColor(colorWhite)
-			b.opponentMovesLabel.SetForegroundColor(colorWhite)
-			b.opponentRatingLabel.SetForegroundColor(colorWhite)
+			b.opponentLabel.SetForeground(colorWhite)
+			b.opponentForcedLabel.SetForeground(colorWhite)
+			b.opponentPipCount.SetForeground(colorWhite)
+			b.opponentMovesLabel.SetForeground(colorWhite)
+			b.opponentRatingLabel.SetForeground(colorWhite)
 			b.opponentLabel.lastActive = !b.opponentLabel.active
 			b.opponentLabel.updateBackground()
 		}
 		if b.playerLabel.activeColor != colorBlack {
 			b.playerLabel.activeColor = colorBlack
-			b.playerLabel.SetForegroundColor(colorBlack)
-			b.playerForcedLabel.SetForegroundColor(colorBlack)
-			b.playerPipCount.SetForegroundColor(colorBlack)
-			b.playerMovesLabel.SetForegroundColor(colorBlack)
-			b.playerRatingLabel.SetForegroundColor(colorBlack)
+			b.playerLabel.SetForeground(colorBlack)
+			b.playerForcedLabel.SetForeground(colorBlack)
+			b.playerPipCount.SetForeground(colorBlack)
+			b.playerMovesLabel.SetForeground(colorBlack)
+			b.playerRatingLabel.SetForeground(colorBlack)
 			b.playerLabel.lastActive = !b.opponentLabel.active
 			b.playerLabel.updateBackground()
 		}
@@ -2762,16 +2761,16 @@ func NewLabel(c color.RGBA) *Label {
 		activeColor: c,
 	}
 	l.Text.SetFont(largeFont, fontMutex)
-	l.Text.SetForegroundColor(c)
+	l.Text.SetForeground(c)
 	l.Text.SetScrollBarVisible(false)
 	l.Text.SetSingleLine(true)
-	l.Text.SetHorizontal(messeji.AlignCenter)
-	l.Text.SetVertical(messeji.AlignCenter)
+	l.Text.SetHorizontal(etk.AlignCenter)
+	l.Text.SetVertical(etk.AlignCenter)
 	return l
 }
 
 func (l *Label) updateBackground() {
-	if l.TextField.Text() == "" {
+	if l.Text.Text() == "" {
 		l.bg = nil
 		return
 	}
@@ -2817,10 +2816,10 @@ func (l *Label) SetActive(active bool) {
 
 func (l *Label) SetText(t string) {
 	r := l.Rect()
-	if r.Empty() || l.TextField.Text() == t {
+	if r.Empty() || l.Text.Text() == t {
 		return
 	}
-	l.TextField.SetText(t)
+	l.Text.SetText(t)
 	l.updateBackground()
 }
 

@@ -5,7 +5,7 @@ go 1.17
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240122202937-5aa42bb888a4
 	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240120074310-6968c426a4e1
-	code.rocket9labs.com/tslocum/etk v0.0.0-20240123090706-fe95e8209c03
+	code.rocket9labs.com/tslocum/etk v0.0.0-20240123205209-266e1368de64
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240118055336-21a3dea3f702
 	github.com/hajimehoshi/ebiten/v2 v2.6.4
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351
@@ -30,7 +30,7 @@ require (
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.3.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/google/uuid v1.5.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect

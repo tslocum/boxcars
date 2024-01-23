@@ -41,7 +41,7 @@ func (w *tutorialWidget) hide() {
 func (w *tutorialWidget) dialogText(message string) *tutorialDialog {
 	t := etk.NewText(message)
 	t.SetPadding(10)
-	t.SetBackgroundColor(bufferBackgroundColor)
+	t.SetBackground(bufferBackgroundColor)
 	return &tutorialDialog{
 		Text: t,
 		handler: func() {
@@ -117,7 +117,13 @@ type tutorialDialog struct {
 }
 
 func (d *tutorialDialog) Draw(screen *ebiten.Image) error {
-	screen.SubImage(d.Text.Rect().Inset(-2)).(*ebiten.Image).Fill(color.RGBA{0, 0, 0, 255})
+	r := d.Rect()
+	borderColor := color.RGBA{0, 0, 0, 255}
+	const borderSize = 2
+	screen.SubImage(image.Rect(r.Min.X, r.Min.Y-borderSize, r.Min.X-borderSize, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
+	screen.SubImage(image.Rect(r.Min.X-borderSize, r.Min.Y, r.Max.X+borderSize, r.Min.Y-borderSize)).(*ebiten.Image).Fill(borderColor)
+	screen.SubImage(image.Rect(r.Max.X+borderSize, r.Min.Y, r.Max.X, r.Max.Y+borderSize)).(*ebiten.Image).Fill(borderColor)
+	screen.SubImage(image.Rect(r.Min.X-borderSize, r.Max.Y+borderSize, r.Max.X, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
 	return d.Text.Draw(screen)
 }
 
