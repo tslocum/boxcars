@@ -656,6 +656,9 @@ func (g *Game) initialize() {
 	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
 	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
 
+	etk.Style.BorderColorLeft = color.RGBA{233, 207, 170, 255}
+	etk.Style.BorderColorTop = color.RGBA{233, 207, 170, 255}
+
 	statusBuffer.SetForegroundColor(bufferTextColor)
 	statusBuffer.SetBackgroundColor(bufferBackgroundColor)
 
