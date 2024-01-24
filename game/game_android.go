@@ -23,7 +23,6 @@ const (
 	AutoEnableTouchInput = true
 	ShowServerSettings   = true
 	APPNAME              = "boxcars-android"
-	fieldHeight          = 100
 )
 
 func init() {

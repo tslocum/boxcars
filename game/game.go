@@ -494,6 +494,8 @@ type Sprites struct {
 	num     int
 }
 
+var fieldHeight int
+
 var spinner = []byte(`-\|/`)
 
 var viewBoard bool // View board or lobby
@@ -676,6 +678,8 @@ func (g *Game) initialize() {
 	inputBuffer.SetForeground(bufferTextColor)
 	inputBuffer.SetBackground(bufferBackgroundColor)
 	inputBuffer.SetSuffix("")
+
+	fieldHeight = etk.Scale(50)
 
 	g.Board = NewBoard()
 	g.lobby = NewLobby()

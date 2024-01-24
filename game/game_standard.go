@@ -20,7 +20,6 @@ const (
 	AutoEnableTouchInput = false
 	ShowServerSettings   = false
 	APPNAME              = "boxcars"
-	fieldHeight          = 50
 )
 
 func DefaultLocale() string {
