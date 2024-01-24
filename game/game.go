@@ -640,6 +640,8 @@ func (g *Game) initialize() {
 	if AutoEnableTouchInput {
 		etk.Bindings.ConfirmRune = 199
 		etk.Bindings.BackRune = 231
+
+		etk.Style.BorderSize /= 2
 	}
 
 	etk.Style.TextFont = largeFont

@@ -538,6 +538,9 @@ func NewBoard() *board {
 	b.clockLabel = clockLabel
 
 	b.showMenuButton = etk.NewButton("Menu", b.toggleMenu)
+	if !AutoEnableTouchInput {
+		b.showMenuButton.SetBorderSize(etk.Scale(etk.Style.BorderSize / 2))
+	}
 
 	b.matchStatusGrid = etk.NewGrid()
 	b.matchStatusGrid.SetColumnSizes(int(b.verticalBorderSize/4), -1, -1, -1, int(b.verticalBorderSize/4))

@@ -3,10 +3,10 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240122202937-5aa42bb888a4
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240120074310-6968c426a4e1
-	code.rocket9labs.com/tslocum/etk v0.0.0-20240123205209-266e1368de64
-	code.rocket9labs.com/tslocum/tabula v0.0.0-20240118055336-21a3dea3f702
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240123212017-683010813ed3
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240124065706-7b67c39b4d3d
+	code.rocket9labs.com/tslocum/etk v0.0.0-20240124075725-7b0c2c44dccd
+	code.rocket9labs.com/tslocum/tabula v0.0.0-20240124065607-37b7f72a0ff2
 	github.com/hajimehoshi/ebiten/v2 v2.6.4
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351
 	github.com/llgcode/draw2d v0.0.0-20231212091825-f55e0c776b44
