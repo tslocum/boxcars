@@ -28,6 +28,14 @@ func focused() bool {
 	return true
 }
 
+func userConfigDir() string {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return ""
+	}
+	return path.Join(configDir, "boxcars")
+}
+
 func loadUsername() string {
 	configDir := userConfigDir()
 	if configDir == "" {
@@ -47,14 +55,6 @@ func saveUsername(username string) {
 	}
 	_ = os.MkdirAll(filepath.Dir(configDir), 0700)
 	_ = os.WriteFile(path.Join(configDir, "config"), []byte(username), 0600)
-}
-
-func userConfigDir() string {
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return ""
-	}
-	return path.Join(configDir, "boxcars")
 }
 
 func saveReplay(id int, content []byte) error {

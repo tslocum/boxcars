@@ -39,7 +39,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.2.7"
+const version = "v1.2.8"
 
 const DefaultServerAddress = "wss://ws.bgammon.org"
 
@@ -591,6 +591,8 @@ type Game struct {
 
 	LoadReplay []byte
 
+	savedUsername string
+
 	initialized bool
 	loaded      bool
 
@@ -623,6 +625,8 @@ func NewGame() *Game {
 
 		debugImg: ebiten.NewImage(200, 200),
 		volume:   1,
+
+		savedUsername: loadUsername(),
 
 		Mutex: &sync.Mutex{},
 	}
@@ -681,7 +685,7 @@ func (g *Game) initialize() {
 
 	fieldHeight = etk.Scale(50)
 	if AutoEnableTouchInput {
-		fieldHeight /= 2
+		fieldHeight = etk.Scale(32)
 	}
 
 	g.Board = NewBoard()
@@ -691,6 +695,8 @@ func (g *Game) initialize() {
 	yPadding := etk.Scale(20)
 	labelWidth := etk.Scale(200)
 	if AutoEnableTouchInput {
+		xPadding = 0
+		yPadding /= 2
 		labelWidth /= 2
 	}
 
@@ -765,7 +771,7 @@ func (g *Game) initialize() {
 		}
 		{
 			subGrid := etk.NewGrid()
-			subGrid.SetColumnSizes(-1, xPadding*2, -1)
+			subGrid.SetColumnSizes(-1, yPadding, -1)
 			subGrid.AddChildAt(cancelButton, 0, 0, 1, 1)
 			subGrid.AddChildAt(submitButton, 2, 0, 1, 1)
 			grid.AddChildAt(subGrid, 1, y, 3, 1)
@@ -819,7 +825,7 @@ func (g *Game) initialize() {
 		}
 		{
 			subGrid := etk.NewGrid()
-			subGrid.SetColumnSizes(-1, xPadding*2, -1)
+			subGrid.SetColumnSizes(-1, yPadding, -1)
 			subGrid.AddChildAt(cancelButton, 0, 0, 1, 1)
 			subGrid.AddChildAt(submitButton, 2, 0, 1, 1)
 			grid.AddChildAt(subGrid, 1, y, 3, 1)
@@ -890,16 +896,16 @@ func (g *Game) initialize() {
 		}
 		{
 			subGrid := etk.NewGrid()
-			subGrid.SetColumnSizes(-1, xPadding*2, -1)
-			subGrid.SetRowSizes(-1, xPadding*2, -1)
+			subGrid.SetColumnSizes(-1, yPadding, -1)
+			subGrid.SetRowSizes(-1, yPadding, -1)
 			subGrid.AddChildAt(connectButton, 0, 0, 1, 1)
 			subGrid.AddChildAt(registerButton, 2, 0, 1, 1)
 			grid.AddChildAt(subGrid, 1, g.connectGridY, 3, 1)
 		}
 		{
 			subGrid := etk.NewGrid()
-			subGrid.SetColumnSizes(-1, xPadding*2, -1)
-			subGrid.SetRowSizes(-1, xPadding*2, -1)
+			subGrid.SetColumnSizes(-1, yPadding, -1)
+			subGrid.SetRowSizes(-1, yPadding, -1)
 			subGrid.AddChildAt(resetButton, 0, 0, 1, 1)
 			subGrid.AddChildAt(offlineButton, 2, 0, 1, 1)
 			grid.AddChildAt(subGrid, 1, g.connectGridY+1, 3, 1)
@@ -1374,7 +1380,7 @@ func (g *Game) handleEvent(e interface{}) {
 		}
 		l(fmt.Sprintf("*** Welcome, %s. There %s %d client%s playing %d match%s.", ev.PlayerName, areIs, ev.Clients, clientsPlural, ev.Games, matchesPlural))
 
-		if strings.HasPrefix(g.Client.Username, "Guest_") {
+		if strings.HasPrefix(g.Client.Username, "Guest_") && g.savedUsername == "" {
 			g.tutorialFrame.AddChild(NewTutorialWidget())
 		}
 	case *bgammon.EventHelp:

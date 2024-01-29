@@ -10,7 +10,7 @@ Visit https://play.bgammon.org
 
 ### Desktop
 
-Download Boxcars at https://bgammon.org/download
+Download Boxcars at https://bgammon.org/boxcars
 
 ### Android
 

@@ -35,6 +35,7 @@ func (w *tutorialWidget) hide() {
 	game.setRoot(listGamesFrame)
 	setViewBoard(false)
 	game.Board.gameState.PlayerNumber = 0
+	game.savedUsername = "a"
 	w.grid.Clear()
 }
 
