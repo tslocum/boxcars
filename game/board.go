@@ -1798,7 +1798,7 @@ func (b *board) drawDraggedCheckers(screen *ebiten.Image) {
 }
 
 func (b *board) setRect(x, y, w, h int) {
-	if OptimizeSetRect && b.x == x && b.y == y && b.w == w && b.h == h {
+	if b.x == x && b.y == y && b.w == w && b.h == h {
 		b.recreateButtonGrid()
 		return
 	}
@@ -2955,13 +2955,28 @@ func (bw *BoardWidget) finishClick(cursor image.Point, double bool) {
 FINDMOVE:
 	for _, move := range game.Board.gameState.Available {
 		expanded := expandMoves([][]int8{{move[0], space}})
+		gc := game.Board.gameState.Game.Copy(true)
 		for _, m := range expanded {
+			var found bool
+			for _, m2 := range gc.LegalMoves(false) {
+				if m2[0] == m[0] && m2[1] == m[1] {
+					found = true
+					break
+				}
+			}
+			if !found {
+				continue FINDMOVE
+			}
 			diff := bgammon.SpaceDiff(m[0], m[1], game.Board.gameState.Variant)
 			haveRoll := game.Board.gameState.Game.HaveDiceRoll(m[0], m[1]) > 0
 			if !haveRoll && (m[1] == bgammon.SpaceHomePlayer || m[1] == bgammon.SpaceHomeOpponent) {
 				haveRoll = game.Board.gameState.Game.HaveBearOffDiceRoll(diff) > 0
 			}
 			if !haveRoll {
+				continue FINDMOVE
+			}
+			ok, _ := gc.AddMoves([][]int8{m}, false)
+			if !ok {
 				continue FINDMOVE
 			}
 		}

@@ -18,8 +18,6 @@ import (
 )
 
 const (
-	OptimizeDraw         = true
-	OptimizeSetRect      = true
 	AutoEnableTouchInput = true
 	ShowServerSettings   = true
 	APPNAME              = "boxcars-android"

@@ -11,8 +11,6 @@ import (
 )
 
 const (
-	OptimizeDraw         = true
-	OptimizeSetRect      = true
 	AutoEnableTouchInput = false
 	ShowServerSettings   = false
 	APPNAME              = "boxcars"

@@ -2610,16 +2610,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.layoutBoard()
 	}
 
-	if OptimizeDraw {
-		gameUpdateLock.Lock()
-		if drawScreen <= 0 {
-			gameUpdateLock.Unlock()
-			return
-		} else if updatedGame {
-			drawScreen -= 1
-		}
+	gameUpdateLock.Lock()
+	if drawScreen <= 0 {
 		gameUpdateLock.Unlock()
+		return
+	} else if updatedGame {
+		drawScreen -= 1
 	}
+	gameUpdateLock.Unlock()
 
 	if !viewBoard {
 		screen.Fill(frameColor)
