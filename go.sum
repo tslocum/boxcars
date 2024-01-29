@@ -1,11 +1,11 @@
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b h1:Y0a14Kf/hSYepSmp4ZfDeE4CZZGBGBS97CNjCbKJm0c=
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b/go.mod h1:tS60/VNAJphKvDBkSLQhKALa15msIAuWWfEKNc4oFZc=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20240123212017-683010813ed3 h1:IR8aUjzzuHqqgYjmE+E1XjcWFTs+/gb3Qt5M3Ak4QoU=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20240123212017-683010813ed3/go.mod h1:wdACnDzDFRQ9PNApepoFOzMbIJvwLpBiWD7S68RzKtI=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20240129035636-da833ac5c9f1 h1:Y723uf0k6OlDCsQly70wx1O4MAmgpNzIXK4S/Ij53Dw=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20240129035636-da833ac5c9f1/go.mod h1:RHdn3gly2SF45Z/pHo1KZf12oc4Uu4XL7Gn7oe+h4/I=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240124065706-7b67c39b4d3d h1:ri8Oqo+nhPZ1/715SLBjqVcGysJe/BkBB7nsQrK5xm4=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240124065706-7b67c39b4d3d/go.mod h1:fcuzpHuCmd+F5D0x8/bI3qPK8FxwIsUthGd9T9dgfww=
-code.rocket9labs.com/tslocum/etk v0.0.0-20240124075725-7b0c2c44dccd h1:jwRwDCB7+7jOmwxbnncQhWbkI6MS7jiYi/ju+a6AuR0=
-code.rocket9labs.com/tslocum/etk v0.0.0-20240124075725-7b0c2c44dccd/go.mod h1:ASh8zNLAGPPSy9dor0eDrZaUsFVe81VNSa4S9FK0o7k=
+code.rocket9labs.com/tslocum/etk v0.0.0-20240125080601-7251bcc19b77 h1:L2kn87EeDcfUIcL695YVfy989W6Pfwmi52ZrgNV3jds=
+code.rocket9labs.com/tslocum/etk v0.0.0-20240125080601-7251bcc19b77/go.mod h1:ASh8zNLAGPPSy9dor0eDrZaUsFVe81VNSa4S9FK0o7k=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240124065607-37b7f72a0ff2 h1:3HFETIxHndLuzmYkYe0OLX9DNhOf6DcNwAR3n8Gw/Nk=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240124065607-37b7f72a0ff2/go.mod h1:WEJXESKXqrMFLAArikQ79lpRibNeeE1C0VruxXYMF5M=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
@@ -106,8 +106,8 @@ github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
-github.com/rivo/uniseg v0.4.4 h1:8TfxU8dW6PdqD27gjM8MVNuicgxIjxpm4K7x4jp8sis=
-github.com/rivo/uniseg v0.4.4/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
+github.com/rivo/uniseg v0.4.6 h1:Sovz9sDSwbOz9tgUy8JpT+KgCkPYJEN/oYzlJiYTNLg=
+github.com/rivo/uniseg v0.4.6/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=

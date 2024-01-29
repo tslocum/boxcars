@@ -3,9 +3,9 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240123212017-683010813ed3
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240129035636-da833ac5c9f1
 	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240124065706-7b67c39b4d3d
-	code.rocket9labs.com/tslocum/etk v0.0.0-20240124075725-7b0c2c44dccd
+	code.rocket9labs.com/tslocum/etk v0.0.0-20240125080601-7251bcc19b77
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240124065607-37b7f72a0ff2
 	github.com/hajimehoshi/ebiten/v2 v2.6.4
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351
@@ -48,7 +48,7 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
-	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/rivo/uniseg v0.4.6 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/vanng822/css v1.0.1 // indirect

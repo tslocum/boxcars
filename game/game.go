@@ -680,6 +680,9 @@ func (g *Game) initialize() {
 	inputBuffer.SetSuffix("")
 
 	fieldHeight = etk.Scale(50)
+	if AutoEnableTouchInput {
+		fieldHeight /= 2
+	}
 
 	g.Board = NewBoard()
 	g.lobby = NewLobby()

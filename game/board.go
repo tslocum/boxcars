@@ -1587,10 +1587,9 @@ func (b *board) Draw(screen *ebiten.Image) {
 		} else {
 			checkerOffset = 0
 		}
-		b.drawChecker(screen, imgCheckerSide, float64(b.x+int(b.horizontalBorderSize)+r[0]+1), checkerY-checkerHeight*float64(i+1)-checkerOffset, b.flipBoard, true)
+		b.drawChecker(screen, imgCheckerSide, float64(b.x+b.w)-b.spaceWidth, checkerY-checkerHeight*float64(i+1)-checkerOffset, b.flipBoard, true)
 	}
 
-	r = b.spaceRects[bgammon.SpaceHomeOpponent]
 	checkerY = float64(b.y+int(b.verticalBorderSize)) + 1
 	checkers = len(b.spaceSprites[bgammon.SpaceHomeOpponent])
 	for i := 0; i < checkers; i++ {
@@ -1602,7 +1601,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		} else {
 			checkerOffset = 0
 		}
-		b.drawChecker(screen, imgCheckerSide, float64(b.x+int(b.horizontalBorderSize)+r[0]+1), float64(checkerY+checkerHeight*float64(i)+checkerOffset), !b.flipBoard, true)
+		b.drawChecker(screen, imgCheckerSide, float64(b.x+b.w)-b.spaceWidth, float64(checkerY+checkerHeight*float64(i)+checkerOffset), !b.flipBoard, true)
 	}
 
 	b.stateLock.Lock()
@@ -2215,24 +2214,34 @@ func (b *board) stackSpaceRect(space int8, stack int8) (x, y, w, h int) {
 
 	// Stack pieces
 	var o int
-	osize := float64(stack)
-	if stack > 4 {
-		osize = 3.5
-	}
-	if b.bottomRow(space) {
-		osize += 1.0
-	}
-	o = int(osize * float64(b.overlapSize))
-	padding := int(b.spaceWidth - b.overlapSize)
-	if b.bottomRow(space) {
-		o += padding
+	if space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent {
+		if space == bgammon.SpaceHomeOpponent && stack > 0 {
+			stack -= 1
+			if stack > 0 {
+				stack -= 1
+			}
+		}
+		o = (h / 15) * int(stack)
 	} else {
-		o -= padding - 3
+		osize := float64(stack)
+		if stack > 4 {
+			osize = 3.5
+		}
+		if b.bottomRow(space) {
+			osize += 1.0
+		}
+		o = int(osize * float64(b.overlapSize))
+		padding := int(b.spaceWidth - b.overlapSize)
+		if b.bottomRow(space) {
+			o += padding
+		} else {
+			o -= padding - 3
+		}
 	}
 	if !b.bottomRow(space) {
 		y += o
 	} else {
-		y = y + (h - o)
+		y += h - o
 	}
 
 	w, h = int(b.spaceWidth), int(b.spaceWidth)
