@@ -39,20 +39,20 @@ import (
 	"golang.org/x/text/language"
 )
 
-const version = "v1.2.8"
+const (
+	version              = "v1.2.9"
+	baseButtonHeight     = 54
+	MaxDebug             = 2
+	DefaultServerAddress = "wss://ws.bgammon.org"
+)
 
-const DefaultServerAddress = "wss://ws.bgammon.org"
-
-const MaxDebug = 2
-
-const baseButtonHeight = 54
-
-var onlyNumbers = regexp.MustCompile(`[0-9]+`)
+var (
+	anyNumbers  = regexp.MustCompile(`[0-9]+`)
+	onlyNumbers = regexp.MustCompile(`^[0-9]+$`)
+)
 
 //go:embed asset locales
 var assetFS embed.FS
-
-var debugExtra []byte
 
 var (
 	imgCheckerTop  *ebiten.Image
@@ -1366,6 +1366,12 @@ func (g *Game) handleEvent(e interface{}) {
 		g.Client.Username = ev.PlayerName
 		g.register = false
 
+		username := ev.PlayerName
+		if strings.HasPrefix(username, "Guest_") && !onlyNumbers.MatchString(username[6:]) {
+			username = username[6:]
+		}
+		go saveUsername(username)
+
 		areIs := "are"
 		if ev.Clients == 1 {
 			areIs = "is"
@@ -2143,9 +2149,7 @@ func (g *Game) Connect() {
 		}
 	}()
 
-	username := g.Username
 	go c.Connect()
-	go saveUsername(username)
 
 	// TODO
 
@@ -2577,7 +2581,7 @@ func (g *Game) Update() error {
 			if g.lobby.showCreateGame {
 				pointsText := g.lobby.createGamePoints.Text()
 				if pointsText != "" {
-					g.lobby.createGamePoints.SetText(strings.Join(onlyNumbers.FindAllString(pointsText, -1), ""))
+					g.lobby.createGamePoints.SetText(strings.Join(anyNumbers.FindAllString(pointsText, -1), ""))
 				}
 			}
 		}
@@ -2668,11 +2672,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		}
 
 		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %c %0.0f", spinner[g.spinnerIndex], ebiten.ActualFPS())))
-
-		if debugExtra != nil {
-			g.drawBuffer.WriteRune('\n')
-			g.drawBuffer.Write(debugExtra)
-		}
 
 		g.debugImg.Clear()
 
