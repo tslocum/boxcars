@@ -18,13 +18,14 @@ import (
 )
 
 const (
-	AutoEnableTouchInput = true
-	ShowServerSettings   = true
-	APPNAME              = "boxcars-android"
+	AppName            = "boxcars-android"
+	ShowServerSettings = true
 )
 
 func init() {
 	log.SetOutput(os.Stdout)
+
+	AutoEnableTouchInput = true
 
 	// Detect timezone.
 	out, err := exec.Command("/system/bin/getprop", "persist.sys.timezone").Output()
@@ -82,4 +83,8 @@ func saveReplay(id int, content []byte) error {
 	}
 	l(fmt.Sprintf("*** %s https://bgammon.org/match/%d", gotext.Get("To download this replay visit"), id))
 	return nil
+}
+
+func showKeyboard() {
+	game.keyboardHintVisible = true
 }

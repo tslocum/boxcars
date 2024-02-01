@@ -5,16 +5,34 @@ package game
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"syscall/js"
 
 	"github.com/leonelquinteros/gotext"
 )
 
 const (
-	AutoEnableTouchInput = false
-	ShowServerSettings   = false
-	APPNAME              = "boxcars"
+	AppName            = "boxcars"
+	ShowServerSettings = false
 )
+
+func init() {
+	userAgentData := js.Global().Get("navigator").Get("userAgentData")
+	if !userAgentData.IsUndefined() {
+		mobile := userAgentData.Get("mobile")
+		if !mobile.IsUndefined() && mobile.Bool() {
+			AutoEnableTouchInput = true
+			return
+		}
+	}
+	userAgent := js.Global().Get("navigator").Get("userAgent").String()
+	for _, system := range []string{"Android", "iPhone", "iPad", "iPod"} {
+		if strings.Contains(userAgent, system) {
+			AutoEnableTouchInput = true
+			return
+		}
+	}
+}
 
 func DefaultLocale() string {
 	return js.Global().Get("navigator").Get("language").String()
@@ -50,4 +68,12 @@ func saveReplay(id int, content []byte) error {
 	}
 	l(fmt.Sprintf("*** %s https://bgammon.org/match/%d", gotext.Get("To download this replay visit"), id))
 	return nil
+}
+
+func showKeyboard() {
+	virtualKeyboard := js.Global().Get("navigator").Get("virtualKeyboard")
+	if virtualKeyboard.IsUndefined() {
+		return
+	}
+	virtualKeyboard.Call("show")
 }

@@ -15,9 +15,8 @@ import (
 )
 
 const (
-	AutoEnableTouchInput = false
-	ShowServerSettings   = false
-	APPNAME              = "boxcars"
+	AppName            = "boxcars"
+	ShowServerSettings = false
 )
 
 func DefaultLocale() string {
@@ -98,4 +97,8 @@ func saveReplay(id int, content []byte) error {
 	}
 	l(fmt.Sprintf("*** %s: %s", gotext.Get("Downloaded replay"), filePath))
 	return nil
+}
+
+func showKeyboard() {
+	// Do not show the virtual keyboard on desktop platforms.
 }

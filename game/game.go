@@ -46,6 +46,8 @@ const (
 	DefaultServerAddress = "wss://ws.bgammon.org"
 )
 
+var AutoEnableTouchInput bool
+
 var (
 	anyNumbers  = regexp.MustCompile(`[0-9]+`)
 	onlyNumbers = regexp.MustCompile(`^[0-9]+$`)
@@ -2453,7 +2455,7 @@ func (g *Game) handleTouch(p image.Point) bool {
 	}
 	switch w.(type) {
 	case *etk.Input:
-		g.keyboardHintVisible = true
+		showKeyboard()
 	}
 	return false
 }
@@ -2524,16 +2526,15 @@ func (g *Game) Update() error {
 	}
 
 	// Handle touch input.
-	if cx == 0 && cy == 0 {
-		g.touchIDs = inpututil.AppendJustPressedTouchIDs(g.touchIDs[:0])
-		for _, id := range g.touchIDs {
-			cx, cy = ebiten.TouchPosition(id)
-			if cx != 0 || cy != 0 {
-				if g.handleTouch(image.Point{cx, cy}) {
-					return nil
-				}
-				break
+	g.touchIDs = inpututil.AppendJustPressedTouchIDs(g.touchIDs[:0])
+	for _, id := range g.touchIDs {
+		tx, ty := ebiten.TouchPosition(id)
+		if tx != 0 || ty != 0 {
+			cx, cy = tx, ty
+			if g.handleTouch(image.Point{cx, cy}) {
+				return nil
 			}
+			break
 		}
 	}
 
