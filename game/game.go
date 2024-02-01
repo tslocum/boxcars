@@ -594,6 +594,7 @@ type Game struct {
 	LoadReplay []byte
 
 	savedUsername string
+	savedPassword string
 
 	initialized bool
 	loaded      bool
@@ -628,10 +629,9 @@ func NewGame() *Game {
 		debugImg: ebiten.NewImage(200, 200),
 		volume:   1,
 
-		savedUsername: loadUsername(),
-
 		Mutex: &sync.Mutex{},
 	}
+	g.savedUsername, g.savedPassword = loadCredentials()
 	g.tutorialFrame.SetPositionChildren(true)
 	game = g
 
@@ -1246,9 +1246,10 @@ func (g *Game) initialize() {
 
 	g.setRoot(connectFrame)
 
-	username := loadUsername()
+	username, password := loadCredentials()
 	if username != "" {
 		g.connectUsername.SetText(username)
+		g.connectPassword.SetText(password)
 		etk.SetFocus(g.connectPassword)
 	} else {
 		etk.SetFocus(g.connectUsername)
@@ -1372,7 +1373,11 @@ func (g *Game) handleEvent(e interface{}) {
 		if strings.HasPrefix(username, "Guest_") && !onlyNumbers.MatchString(username[6:]) {
 			username = username[6:]
 		}
-		go saveUsername(username)
+		password := g.connectPassword.Text()
+		if password == "" {
+			password = g.registerPassword.Text()
+		}
+		go saveCredentials(username, password)
 
 		areIs := "are"
 		if ev.Clients == 1 {

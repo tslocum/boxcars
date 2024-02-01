@@ -35,25 +35,38 @@ func userConfigDir() string {
 	return path.Join(configDir, "boxcars")
 }
 
-func loadUsername() string {
+func loadCredentials() (string, string) {
 	configDir := userConfigDir()
 	if configDir == "" {
-		return ""
+		return "", ""
 	}
-	buf, err := os.ReadFile(path.Join(configDir, "config"))
+	f, err := os.Open(path.Join(configDir, "config"))
 	if err != nil {
-		return ""
+		return "", ""
 	}
-	return string(bytes.TrimSpace(buf))
+
+	var i int
+	var username, password string
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		switch i {
+		case 0:
+			username = scanner.Text()
+		case 1:
+			password = scanner.Text()
+		}
+		i++
+	}
+	return username, password
 }
 
-func saveUsername(username string) {
+func saveCredentials(username string, password string) {
 	configDir := userConfigDir()
 	if configDir == "" {
 		return
 	}
 	_ = os.MkdirAll(filepath.Dir(configDir), 0700)
-	_ = os.WriteFile(path.Join(configDir, "config"), []byte(username), 0600)
+	_ = os.WriteFile(path.Join(configDir, "config"), []byte(username+"\n"+password), 0600)
 }
 
 func saveReplay(id int, content []byte) error {

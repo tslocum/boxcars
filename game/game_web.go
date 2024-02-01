@@ -44,22 +44,28 @@ func focused() bool {
 	return hasFocus.Truthy()
 }
 
-func loadUsername() string {
+func loadCredentials() (string, string) {
 	document := js.Global().Get("document")
 	header := http.Header{}
 	header.Add("Cookie", document.Get("cookie").String())
 	request := http.Request{Header: header}
+
+	var username, password string
 	for _, cookie := range request.Cookies() {
-		if cookie.Name == "boxcars_username" {
-			return cookie.Value
+		switch cookie.Name {
+		case "boxcars_username":
+			username = cookie.Value
+		case "boxcars_password":
+			password = cookie.Value
 		}
 	}
-	return ""
+	return username, password
 }
 
-func saveUsername(username string) {
+func saveCredentials(username string, password string) {
 	document := js.Global().Get("document")
 	document.Set("cookie", fmt.Sprintf("boxcars_username=%s; path=/", username))
+	document.Set("cookie", fmt.Sprintf("boxcars_password=%s; path=/", password))
 }
 
 func saveReplay(id int, content []byte) error {
