@@ -1246,10 +1246,9 @@ func (g *Game) initialize() {
 
 	g.setRoot(connectFrame)
 
-	username, password := loadCredentials()
-	if username != "" {
-		g.connectUsername.SetText(username)
-		g.connectPassword.SetText(password)
+	if g.savedUsername != "" {
+		g.connectUsername.SetText(g.savedUsername)
+		g.connectPassword.SetText(g.savedPassword)
 		etk.SetFocus(g.connectPassword)
 	} else {
 		etk.SetFocus(g.connectUsername)
@@ -2607,7 +2606,7 @@ func (g *Game) drawKeyboardHint(screen *ebiten.Image) {
 		return
 	}
 	r := image.Rect(0, 0, g.screenW, g.screenH/3)
-	screen.SubImage(r).(*ebiten.Image).Fill(frameColor)
+	screen.SubImage(r).(*ebiten.Image).Fill(hintColor)
 	screen.SubImage(image.Rect(0, g.screenH/3, g.screenW, g.screenH/3+4)).(*ebiten.Image).Fill(borderColor)
 	g.keyboardHint.SetRect(r)
 	g.keyboardHint.Draw(screen)
