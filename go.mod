@@ -3,10 +3,10 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240131193008-9ab14ddb5a94
-	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240131193028-17e83ec680d3
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240207225023-eacc21fcf3e4
+	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240207200143-c6c7c8fc77ff
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240129045146-b1b41487c2ec
-	code.rocket9labs.com/tslocum/tabula v0.0.0-20240131192843-6dafbdfa2aaa
+	code.rocket9labs.com/tslocum/tabula v0.0.0-20240207195947-691c7a5d5265
 	github.com/hajimehoshi/ebiten/v2 v2.6.5
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351
 	github.com/llgcode/draw2d v0.0.0-20231212091825-f55e0c776b44
@@ -25,7 +25,7 @@ require (
 	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/ebitengine/oto/v3 v3.1.0 // indirect
-	github.com/ebitengine/purego v0.5.2 // indirect
+	github.com/ebitengine/purego v0.6.0 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.3.2 // indirect
@@ -37,7 +37,7 @@ require (
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
-	github.com/jackc/pgx/v5 v5.5.2 // indirect
+	github.com/jackc/pgx/v5 v5.5.3 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/jfreymuth/oggvorbis v1.0.5 // indirect
@@ -48,15 +48,15 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
-	github.com/rivo/uniseg v0.4.6 // indirect
+	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.20.2 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/exp/shiny v0.0.0-20240119083558-1b970713d09a // indirect
+	golang.org/x/crypto v0.19.0 // indirect
+	golang.org/x/exp/shiny v0.0.0-20240205201215-2c58cdc269a3 // indirect
 	golang.org/x/mobile v0.0.0-20240112133503-c713f31d574b // indirect
-	golang.org/x/net v0.20.0 // indirect
+	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
 )

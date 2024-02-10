@@ -40,7 +40,7 @@ import (
 )
 
 const (
-	version              = "v1.2.9"
+	version              = "v1.2.9p1"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -149,6 +149,10 @@ var (
 	SoundJoinLeave                                 []byte
 	SoundSay                                       []byte
 )
+
+func init() {
+	gotext.SetDomain("boxcars")
+}
 
 func l(s string) {
 	m := time.Now().Format("3:04") + " " + s
@@ -639,8 +643,6 @@ func NewGame() *Game {
 }
 
 func (g *Game) initialize() {
-	gotext.SetDomain("boxcars")
-
 	initializeFonts()
 	loadAudioAssets()
 	loadImageAssets(0)
@@ -2560,11 +2562,11 @@ func (g *Game) Update() error {
 		scheduleFrame()
 	}
 
+	err = etk.Update()
+	if err != nil {
+		return err
+	}
 	if !g.loggedIn {
-		err = etk.Update()
-		if err != nil {
-			return err
-		}
 		return nil
 	}
 
@@ -2592,11 +2594,6 @@ func (g *Game) Update() error {
 		}
 	} else {
 		g.Board.Update()
-	}
-
-	err = etk.Update()
-	if err != nil {
-		return err
 	}
 	return nil
 }
