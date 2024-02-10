@@ -5,7 +5,7 @@ go 1.17
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240207225023-eacc21fcf3e4
 	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240207200143-c6c7c8fc77ff
-	code.rocket9labs.com/tslocum/etk v0.0.0-20240129045146-b1b41487c2ec
+	code.rocket9labs.com/tslocum/etk v0.0.0-20240210204358-7e5208a9f68c
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240207195947-691c7a5d5265
 	github.com/hajimehoshi/ebiten/v2 v2.6.5
 	github.com/leonelquinteros/gotext v1.5.3-0.20231003122255-12a99145a351

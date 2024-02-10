@@ -40,7 +40,7 @@ import (
 )
 
 const (
-	version              = "v1.2.9p1"
+	version              = "v1.3.0"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -737,6 +737,7 @@ func (g *Game) initialize() {
 			return false
 		})
 		centerInput(g.registerPassword)
+		g.registerPassword.SetMask('*')
 
 		cancelButton := etk.NewButton(gotext.Get("Cancel"), func() error {
 			g.selectCancel()
@@ -866,6 +867,7 @@ func (g *Game) initialize() {
 			return false
 		})
 		centerInput(g.connectPassword)
+		g.connectPassword.SetMask('*')
 
 		connectButton := etk.NewButton(gotext.Get("Connect"), func() error {
 			g.selectConnect()
@@ -946,6 +948,7 @@ func (g *Game) initialize() {
 			return false
 		})
 		centerInput(g.lobby.createGamePassword)
+		g.lobby.createGamePassword.SetMask('*')
 
 		g.lobby.createGameAceyCheckbox = etk.NewCheckbox(g.lobby.toggleVariantAcey)
 		g.lobby.createGameAceyCheckbox.SetBorderColor(triangleA)
@@ -1038,6 +1041,7 @@ func (g *Game) initialize() {
 			return false
 		})
 		centerInput(g.lobby.joinGamePassword)
+		g.lobby.joinGamePassword.SetMask('*')
 
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))

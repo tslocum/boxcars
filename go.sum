@@ -4,8 +4,8 @@ code.rocket9labs.com/tslocum/bgammon v0.0.0-20240207225023-eacc21fcf3e4 h1:STSsD
 code.rocket9labs.com/tslocum/bgammon v0.0.0-20240207225023-eacc21fcf3e4/go.mod h1:Ilb6S0QWLRDqT6q8J2UA4vp1+NQdBZZQvbIrCjXsQ90=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240207200143-c6c7c8fc77ff h1:AVOfWaNp0AMq5BwDlPSfTHGtP3dJU5PPg/2hiH2QGhc=
 code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240207200143-c6c7c8fc77ff/go.mod h1:uqJkislWmUDlsbIqBUiFyD5Eu6Q/sp1+t8LOtZoeMjw=
-code.rocket9labs.com/tslocum/etk v0.0.0-20240129045146-b1b41487c2ec h1:x7E1xswSuaVl02KOq77iH+uBRSUtAGJZN3IxA1rW0UA=
-code.rocket9labs.com/tslocum/etk v0.0.0-20240129045146-b1b41487c2ec/go.mod h1:ASh8zNLAGPPSy9dor0eDrZaUsFVe81VNSa4S9FK0o7k=
+code.rocket9labs.com/tslocum/etk v0.0.0-20240210204358-7e5208a9f68c h1:UpY33v9vqPQH+gbTuUp8+62JonNGEXD4IbWRFc1Zi4E=
+code.rocket9labs.com/tslocum/etk v0.0.0-20240210204358-7e5208a9f68c/go.mod h1:5QTZCaXXVJFnfugsRmvlulEnjTI9oZA+z+ihGZRvu1Q=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240207195947-691c7a5d5265 h1:B9R/SFVUAOut2o8rD7bc1fsa92eQdDKzxBFj7oxhDEc=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240207195947-691c7a5d5265/go.mod h1:WEJXESKXqrMFLAArikQ79lpRibNeeE1C0VruxXYMF5M=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
