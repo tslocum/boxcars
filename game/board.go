@@ -126,6 +126,7 @@ type board struct {
 	showPipCountCheckbox     *etk.Checkbox
 	showMovesCheckbox        *etk.Checkbox
 	flipBoardCheckbox        *etk.Checkbox
+	traditionalCheckbox      *etk.Checkbox
 	advancedMovementCheckbox *etk.Checkbox
 	autoPlayCheckbox         *etk.Checkbox
 	selectSpeed              *etk.Select
@@ -154,6 +155,7 @@ type board struct {
 	showPipCount       bool
 	showMoves          bool
 	flipBoard          bool
+	traditional        bool
 	advancedMovement   bool
 
 	widget *BoardWidget
@@ -408,6 +410,20 @@ func NewBoard() *board {
 		}
 		flipBoardLabel.SetVertical(etk.AlignCenter)
 
+		b.traditionalCheckbox = etk.NewCheckbox(b.toggleTraditionalCheckbox)
+		b.traditionalCheckbox.SetBorderColor(triangleA)
+		b.traditionalCheckbox.SetCheckColor(triangleA)
+		b.traditionalCheckbox.SetSelected(b.traditional)
+
+		traditionalLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Flip opp. space numbers")),
+			onSelected: func() {
+				b.traditionalCheckbox.SetSelected(!b.traditionalCheckbox.Selected())
+				b.toggleTraditionalCheckbox()
+			},
+		}
+		traditionalLabel.SetVertical(etk.AlignCenter)
+
 		b.advancedMovementCheckbox = etk.NewCheckbox(b.toggleAdvancedMovementCheckbox)
 		b.advancedMovementCheckbox.SetBorderColor(triangleA)
 		b.advancedMovementCheckbox.SetCheckColor(triangleA)
@@ -440,9 +456,9 @@ func NewBoard() *board {
 		checkboxGrid := etk.NewGrid()
 		checkboxGrid.SetColumnSizes(72, 20, -1)
 		if !AutoEnableTouchInput {
-			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
+			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
 		} else {
-			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
+			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
 		}
 		{
 			accountLabel := etk.NewText(gotext.Get("Account"))
@@ -484,7 +500,9 @@ func NewBoard() *board {
 		checkboxGrid.AddChildAt(movesLabel, 2, 8, 1, 1)
 		checkboxGrid.AddChildAt(cGrid(b.flipBoardCheckbox), 0, 10, 1, 1)
 		checkboxGrid.AddChildAt(flipBoardLabel, 2, 10, 1, 1)
-		gridY := 12
+		checkboxGrid.AddChildAt(cGrid(b.traditionalCheckbox), 0, 12, 1, 1)
+		checkboxGrid.AddChildAt(traditionalLabel, 2, 12, 1, 1)
+		gridY := 14
 		if !AutoEnableTouchInput {
 			checkboxGrid.AddChildAt(cGrid(b.advancedMovementCheckbox), 0, gridY, 1, 1)
 			checkboxGrid.AddChildAt(advancedMovementLabel, 2, gridY, 1, 1)
@@ -493,7 +511,7 @@ func NewBoard() *board {
 		checkboxGrid.AddChildAt(cGrid(b.autoPlayCheckbox), 0, gridY, 1, 1)
 		checkboxGrid.AddChildAt(autoPlayLabel, 2, gridY, 1, 1)
 
-		gridSize := 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72
+		gridSize := 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72
 		if !AutoEnableTouchInput {
 			gridSize += 20 + 72
 		}
@@ -1176,6 +1194,17 @@ func (b *board) toggleFlipBoardCheckbox() error {
 	}
 	b.Client.Out <- []byte(fmt.Sprintf("set flip %d", flipBoard))
 	b.Client.Out <- []byte("board")
+	return nil
+}
+
+func (b *board) toggleTraditionalCheckbox() error {
+	b.traditional = b.traditionalCheckbox.Selected()
+
+	traditional := 0
+	if b.traditional {
+		traditional = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set traditional %d", traditional))
 	return nil
 }
 
@@ -2419,7 +2448,11 @@ func (b *board) processState() {
 	if b.showMoves && b.gameState.Turn == 1 {
 		b.playerMoves = expandMoves(b.gameState.Moves)
 	} else if b.showMoves && b.gameState.Turn == 2 {
-		b.opponentMoves = expandMoves(b.gameState.Moves)
+		moves := b.gameState.Moves
+		if b.gameState.Turn == 2 && b.traditional {
+			moves = bgammon.FlipMoves(moves, 2, b.gameState.Variant)
+		}
+		b.opponentMoves = expandMoves(moves)
 	} else {
 		b.playerMoves, b.opponentMoves = nil, nil
 	}

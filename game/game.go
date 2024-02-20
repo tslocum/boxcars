@@ -40,7 +40,7 @@ import (
 )
 
 const (
-	version              = "v1.3.0"
+	version              = "v1.3.0p1"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -1592,7 +1592,11 @@ func (g *Game) handleEvent(e interface{}) {
 	case *bgammon.EventFailedRoll:
 		l(fmt.Sprintf("*** %s: %s", gotext.Get("Failed to roll"), ev.Reason))
 	case *bgammon.EventMoved:
-		lg(gotext.Get("%s moved %s", ev.Player, bgammon.FormatMoves(ev.Moves)))
+		moves := ev.Moves
+		if g.Board.gameState.Turn == 2 && game.Board.traditional {
+			moves = bgammon.FlipMoves(moves, 2, g.Board.gameState.Variant)
+		}
+		lg(gotext.Get("%s moved %s", ev.Player, bgammon.FormatMoves(moves)))
 		if ev.Player == g.Client.Username && !g.Board.gameState.Spectating && !g.Board.gameState.Forced {
 			return
 		}
@@ -1605,10 +1609,14 @@ func (g *Game) handleEvent(e interface{}) {
 		}
 		g.Lock()
 		if g.Board.showMoves {
+			moves := g.Board.gameState.Moves
+			if g.Board.gameState.Turn == 2 && game.Board.traditional {
+				moves = bgammon.FlipMoves(moves, 2, g.Board.gameState.Variant)
+			}
 			if g.Board.gameState.Turn == 1 {
-				g.Board.playerMoves = expandMoves(g.Board.gameState.Moves)
+				g.Board.playerMoves = expandMoves(moves)
 			} else if g.Board.gameState.Turn == 2 {
-				g.Board.opponentMoves = expandMoves(g.Board.gameState.Moves)
+				g.Board.opponentMoves = expandMoves(moves)
 			}
 		}
 		g.Board.Unlock()

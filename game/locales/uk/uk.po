@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-01-22 19:36+0000\n"
-"Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
+"PO-Revision-Date: 2024-02-15 17:02+0000\n"
+"Last-Translator: Сергій <sergiy.goncharuk.1@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
 "Language: uk\n"
@@ -165,7 +165,7 @@ msgid "Instant"
 msgstr "Моментально"
 
 msgid "Join"
-msgstr "Приєднатися"
+msgstr "Увійти"
 
 msgid "Join match"
 msgstr "Увійти в кімнату"

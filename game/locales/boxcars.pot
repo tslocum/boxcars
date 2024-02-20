@@ -130,6 +130,9 @@ msgstr ""
 msgid "Flip board"
 msgstr ""
 
+msgid "Flip opp. space numbers"
+msgstr ""
+
 msgid "Forced"
 msgstr ""
 
