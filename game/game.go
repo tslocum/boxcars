@@ -68,6 +68,14 @@ var (
 	imgDice5 *ebiten.Image
 	imgDice6 *ebiten.Image
 
+	imgCubes   *ebiten.Image
+	imgCubes2  *ebiten.Image
+	imgCubes4  *ebiten.Image
+	imgCubes8  *ebiten.Image
+	imgCubes16 *ebiten.Image
+	imgCubes32 *ebiten.Image
+	imgCubes64 *ebiten.Image
+
 	extraSmallFont  font.Face
 	smallFont       font.Face
 	mediumFont      font.Face
@@ -178,7 +186,11 @@ func lg(s string) {
 	scheduleFrame()
 }
 
-var loadedCheckerWidth = -1
+var (
+	loadedCheckerWidth = -1
+	diceImageSize      = 0.0
+	cubesImageSize     = 0.0
+)
 
 func loadImageAssets(width int) {
 	if width == loadedCheckerWidth {
@@ -189,7 +201,7 @@ func loadImageAssets(width int) {
 	imgCheckerTop = loadAsset("asset/image/checker_top.png", width)
 	imgCheckerSide = loadAsset("asset/image/checker_side.png", width)
 
-	resizeDice := func(img image.Image) *ebiten.Image {
+	resizeDice := func(img image.Image, scale float64) *ebiten.Image {
 		if game == nil {
 			panic("nil game")
 		}
@@ -206,17 +218,29 @@ func loadImageAssets(width int) {
 		if diceSize > maxSize {
 			diceSize = maxSize
 		}
-		return ebiten.NewImageFromImage(resize.Resize(uint(diceSize), 0, img, resize.Lanczos3))
+		if scale == 1 {
+			diceImageSize = float64(diceSize)
+		} else {
+			cubesImageSize = float64(diceSize) * scale
+		}
+		return ebiten.NewImageFromImage(resize.Resize(uint(float64(diceSize)*scale), 0, img, resize.Lanczos3))
 	}
 
 	const size = 184
 	imgDice = ebiten.NewImageFromImage(loadImage("asset/image/dice.png"))
-	imgDice1 = resizeDice(imgDice.SubImage(image.Rect(0, 0, size*1, size*1)))
-	imgDice2 = resizeDice(imgDice.SubImage(image.Rect(size*1, 0, size*2, size*1)))
-	imgDice3 = resizeDice(imgDice.SubImage(image.Rect(size*2, 0, size*3, size*1)))
-	imgDice4 = resizeDice(imgDice.SubImage(image.Rect(0, size*1, size*1, size*2)))
-	imgDice5 = resizeDice(imgDice.SubImage(image.Rect(size*1, size*1, size*2, size*2)))
-	imgDice6 = resizeDice(imgDice.SubImage(image.Rect(size*2, size*1, size*3, size*2)))
+	imgDice1 = resizeDice(imgDice.SubImage(image.Rect(0, 0, size*1, size*1)), 1)
+	imgDice2 = resizeDice(imgDice.SubImage(image.Rect(size*1, 0, size*2, size*1)), 1)
+	imgDice3 = resizeDice(imgDice.SubImage(image.Rect(size*2, 0, size*3, size*1)), 1)
+	imgDice4 = resizeDice(imgDice.SubImage(image.Rect(0, size*1, size*1, size*2)), 1)
+	imgDice5 = resizeDice(imgDice.SubImage(image.Rect(size*1, size*1, size*2, size*2)), 1)
+	imgDice6 = resizeDice(imgDice.SubImage(image.Rect(size*2, size*1, size*3, size*2)), 1)
+	imgCubes = ebiten.NewImageFromImage(loadImage("asset/image/cubes.png"))
+	imgCubes2 = resizeDice(imgCubes.SubImage(image.Rect(0, 0, size*1, size*1)), 0.6)
+	imgCubes4 = resizeDice(imgCubes.SubImage(image.Rect(size*1, 0, size*2, size*1)), 0.6)
+	imgCubes8 = resizeDice(imgCubes.SubImage(image.Rect(size*2, 0, size*3, size*1)), 0.6)
+	imgCubes16 = resizeDice(imgCubes.SubImage(image.Rect(0, size*1, size*1, size*2)), 0.6)
+	imgCubes32 = resizeDice(imgCubes.SubImage(image.Rect(size*1, size*1, size*2, size*2)), 0.6)
+	imgCubes64 = resizeDice(imgCubes.SubImage(image.Rect(size*2, size*1, size*3, size*2)), 0.6)
 }
 
 func loadAudioAssets() {
@@ -416,6 +440,23 @@ func diceImage(roll int8) *ebiten.Image {
 	default:
 		log.Panicf("unknown dice roll: %d", roll)
 		return nil
+	}
+}
+
+func cubeImage(value int8) *ebiten.Image {
+	switch value {
+	case 2:
+		return imgCubes2
+	case 4:
+		return imgCubes4
+	case 8:
+		return imgCubes8
+	case 16:
+		return imgCubes16
+	case 32:
+		return imgCubes32
+	default:
+		return imgCubes64
 	}
 }
 
@@ -1427,6 +1468,9 @@ func (g *Game) handleEvent(e interface{}) {
 		g.Board.availableStale = false
 		g.Board.playerMoves = nil
 		g.Board.opponentMoves = nil
+		if g.needLayoutBoard {
+			g.layoutBoard()
+		}
 		g.Board.processState()
 		g.Board.Unlock()
 		setViewBoard(true)
@@ -2591,8 +2635,9 @@ func (g *Game) Update() error {
 
 			if g.lobby.showCreateGame {
 				pointsText := g.lobby.createGamePoints.Text()
-				if pointsText != "" {
-					g.lobby.createGamePoints.SetText(strings.Join(anyNumbers.FindAllString(pointsText, -1), ""))
+				strippedText := strings.Join(anyNumbers.FindAllString(pointsText, -1), "")
+				if pointsText != strippedText {
+					g.lobby.createGamePoints.SetText(strippedText)
 				}
 			}
 		}

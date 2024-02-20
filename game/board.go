@@ -59,6 +59,9 @@ type board struct {
 	overlapSize          float64
 
 	lastPlayerNumber int8
+	lastPoints       int8
+	lastDoubleValue  int8
+	lastDoublePlayer int8
 	lastVariant      int8
 
 	gameState *bgammon.GameState
@@ -1393,6 +1396,22 @@ func (b *board) updateBackgroundImage() {
 	}
 	b.backgroundImage.DrawImage(ebiten.NewImageFromImage(b.baseImage), nil)
 
+	// Doubling cube.
+	if b.gameState.Points > 1 {
+		var cubeY float64
+		switch b.gameState.DoublePlayer {
+		case 1:
+			cubeY = float64(b.h) - b.verticalBorderSize - b.overlapSize*5 - 2 - float64(etk.Scale(mediumFontSize)) - 2 - cubesImageSize
+		case 2:
+			cubeY = b.verticalBorderSize + b.overlapSize*5 + 2 + float64(etk.Scale(mediumFontSize)) + 2
+		default:
+			cubeY = float64(b.h)/2 - cubesImageSize/2
+		}
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(b.w)-b.spaceWidth/2-float64(cubesImageSize)/2-1, cubeY)
+		b.backgroundImage.DrawImage(cubeImage(b.gameState.DoubleValue), op)
+	}
+
 	// Draw space numbers.
 	fontMutex.Lock()
 	defer fontMutex.Unlock()
@@ -2263,9 +2282,14 @@ func (b *board) processState() {
 	if b.lastPlayerNumber != b.gameState.PlayerNumber || b.lastVariant != b.gameState.Variant {
 		b.setSpaceRects()
 		b.updateBackgroundImage()
+	} else if b.lastPoints != b.gameState.Points || b.lastDoublePlayer != b.gameState.DoublePlayer || b.lastDoubleValue != b.gameState.DoubleValue {
+		b.updateBackgroundImage()
 	}
 	b.lastPlayerNumber = b.gameState.PlayerNumber
 	b.lastVariant = b.gameState.Variant
+	b.lastPoints = b.gameState.Points
+	b.lastDoublePlayer = b.gameState.DoublePlayer
+	b.lastDoubleValue = b.gameState.DoubleValue
 
 	if b.flipBoard || b.gameState.PlayerNumber == 2 {
 		if b.opponentLabel.activeColor != colorBlack {
