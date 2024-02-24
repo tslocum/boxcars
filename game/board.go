@@ -558,7 +558,7 @@ func NewBoard() *board {
 	clockLabel.SetVertical(etk.AlignCenter)
 	b.clockLabel = clockLabel
 
-	b.showMenuButton = etk.NewButton("Menu", b.toggleMenu)
+	b.showMenuButton = etk.NewButton(gotext.Get("Menu"), b.toggleMenu)
 	if !AutoEnableTouchInput {
 		b.showMenuButton.SetBorderSize(etk.Scale(etk.Style.BorderSize / 2))
 	}
