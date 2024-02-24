@@ -148,6 +148,9 @@ msgstr ""
 msgid "Flip board"
 msgstr "Gira tavoliere"
 
+msgid "Flip opp. space numbers"
+msgstr ""
+
 msgid "Forced"
 msgstr ""
 
@@ -200,6 +203,9 @@ msgid "Matches List"
 msgstr "Lista delle partite"
 
 msgid "Medium"
+msgstr ""
+
+msgid "Menu"
 msgstr ""
 
 msgid "Multi"

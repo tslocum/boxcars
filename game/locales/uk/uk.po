@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-02-15 17:02+0000\n"
-"Last-Translator: Сергій <sergiy.goncharuk.1@gmail.com>\n"
+"PO-Revision-Date: 2024-02-24 17:52+0000\n"
+"Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
 "Language: uk\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.5-dev\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Вільні Онлайн Нарди"
@@ -34,7 +34,7 @@ msgid "Accept"
 msgstr "Прийняти"
 
 msgid "Account"
-msgstr "Обл. запис"
+msgstr "Акаунт"
 
 msgid "Acey-deucey"
 msgstr "Ейсі-дусі"
@@ -149,6 +149,9 @@ msgstr "Швидко"
 msgid "Flip board"
 msgstr "Розвернути дошку"
 
+msgid "Flip opp. space numbers"
+msgstr "Перевертати числа противника"
+
 msgid "Forced"
 msgstr "Примусовий"
 
@@ -202,6 +205,9 @@ msgstr "Список кімнат"
 
 msgid "Medium"
 msgstr "Звичайно"
+
+msgid "Menu"
+msgstr "Меню"
 
 msgid "Multi"
 msgstr "Багатоочковий"

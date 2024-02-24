@@ -144,6 +144,9 @@ msgstr ""
 msgid "Flip board"
 msgstr "Inverter placar"
 
+msgid "Flip opp. space numbers"
+msgstr ""
+
 msgid "Forced"
 msgstr ""
 
@@ -196,6 +199,9 @@ msgid "Matches List"
 msgstr "Lista de Partidas"
 
 msgid "Medium"
+msgstr ""
+
+msgid "Menu"
 msgstr ""
 
 msgid "Multi"

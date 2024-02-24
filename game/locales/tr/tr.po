@@ -151,6 +151,9 @@ msgstr "Hızlı"
 msgid "Flip board"
 msgstr "Tahtayı çevir"
 
+msgid "Flip opp. space numbers"
+msgstr ""
+
 msgid "Forced"
 msgstr "Zorunlu hamle"
 
@@ -206,6 +209,9 @@ msgstr "Oyun Listesi"
 
 msgid "Medium"
 msgstr "Orta"
+
+msgid "Menu"
+msgstr ""
 
 msgid "Multi"
 msgstr "Çoklu"
