@@ -1,0 +1,374 @@
+msgid ""
+msgstr ""
+"Language: th\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: xgotext\n"
+
+msgid "%s - Free Online Backgammon"
+msgstr ""
+
+msgid "%s joined the match."
+msgstr ""
+
+msgid "%s left the match."
+msgstr ""
+
+msgid "%s moved %s"
+msgstr ""
+
+msgid "%s rolled %s"
+msgstr ""
+
+msgid "%s wins!"
+msgstr ""
+
+msgid "Accept"
+msgstr ""
+
+msgid "Account"
+msgstr ""
+
+msgid "Acey-deucey"
+msgstr ""
+
+msgid "Advanced movement"
+msgstr ""
+
+msgid "Auto-play forced moves"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Backgammon"
+msgstr ""
+
+msgid "Bearing Off"
+msgstr ""
+
+msgid "Board"
+msgstr ""
+
+msgid "Boxcars is a client for playing backgammon via bgammon.org, a free and open source backgammon service."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Change password"
+msgstr ""
+
+msgid "Check your email for a link to reset your password. Be sure to check your spam folder."
+msgstr ""
+
+msgid "Connect"
+msgstr ""
+
+msgid "Connecting..."
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+msgid "Create Match"
+msgstr ""
+
+msgid "Create a match if you would like to play against someone else. Backgammon and several of its variants are supported."
+msgstr ""
+
+msgid "Create match"
+msgstr ""
+
+msgid "Create new match"
+msgstr ""
+
+msgid "Current"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Double"
+msgstr ""
+
+msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
+msgstr ""
+
+msgid "Download replay"
+msgstr ""
+
+msgid "Downloaded replay"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "Failed to download replay: %s"
+msgstr ""
+
+msgid "Failed to join match: %s"
+msgstr ""
+
+msgid "Failed to leave match: %s"
+msgstr ""
+
+msgid "Failed to move checker%s: %s"
+msgstr ""
+
+msgid "Failed to roll"
+msgstr ""
+
+msgid "Failed to submit moves: %s"
+msgstr ""
+
+msgid "Fast"
+msgstr ""
+
+msgid "Flip board"
+msgstr ""
+
+msgid "Flip opp. space numbers"
+msgstr ""
+
+msgid "Forced"
+msgstr ""
+
+msgid "Good Luck, Have Fun"
+msgstr ""
+
+msgid "Highlight legal moves"
+msgstr ""
+
+msgid "History"
+msgstr ""
+
+msgid "Instant"
+msgstr ""
+
+msgid "Join"
+msgstr ""
+
+msgid "Join match"
+msgstr ""
+
+msgid "Join match: %s"
+msgstr ""
+
+msgid "Leave"
+msgstr ""
+
+msgid "Leave match?"
+msgstr ""
+
+msgid "Left match"
+msgstr ""
+
+msgid "Legal moves: %s"
+msgstr ""
+
+msgid "Loading..."
+msgstr ""
+
+msgid "Logged in as guest"
+msgstr ""
+
+msgid "Long press back to exit the application."
+msgstr ""
+
+msgid "Match Name"
+msgstr ""
+
+msgid "Matches List"
+msgstr ""
+
+msgid "Medium"
+msgstr ""
+
+msgid "Menu"
+msgstr ""
+
+msgid "Multi"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "New"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Opponent"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Play Offline"
+msgstr ""
+
+msgid "Play backgammon online via bgammon.org"
+msgstr ""
+
+msgid "Playing offline."
+msgstr ""
+
+msgid "Please enter a valid email address, or it will not be possible to reset your password."
+msgstr ""
+
+msgid "Points"
+msgstr ""
+
+msgid "Press back to toggle the keyboard."
+msgstr ""
+
+msgid "Private"
+msgstr ""
+
+msgid "Rating"
+msgstr ""
+
+msgid "Read error"
+msgstr ""
+
+msgid "Reconnecting"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "Refresh matches"
+msgstr ""
+
+msgid "Register"
+msgstr ""
+
+msgid "Replay download already in progress."
+msgstr ""
+
+msgid "Replaying %s vs. %s"
+msgstr ""
+
+msgid "Reset Password"
+msgstr ""
+
+msgid "Resign"
+msgstr ""
+
+msgid "Result"
+msgstr ""
+
+msgid "Return"
+msgstr ""
+
+msgid "Roll"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "Sending password reset request"
+msgstr ""
+
+msgid "Server"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Show moves"
+msgstr ""
+
+msgid "Show pip count"
+msgstr ""
+
+msgid "Single"
+msgstr ""
+
+msgid "Slow"
+msgstr ""
+
+msgid "Speed"
+msgstr ""
+
+msgid "Started"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Submit"
+msgstr ""
+
+msgid "Tabula"
+msgstr ""
+
+msgid "Tap to dismiss this pop-up."
+msgstr ""
+
+msgid "This concludes the tutorial. To share feedback and chat with other players visit %s"
+msgstr ""
+
+msgid "This screen lists the matches that are currently available. A few bots are always available to play against. You can also spectate ongoing public matches."
+msgstr ""
+
+msgid "To download this replay visit"
+msgstr ""
+
+msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
+msgstr ""
+
+msgid "Tutorial"
+msgstr ""
+
+msgid "Type %s to offer a rematch."
+msgstr ""
+
+msgid "Undo"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "Variant"
+msgstr ""
+
+msgid "View replay"
+msgstr ""
+
+msgid "Waiting"
+msgstr ""
+
+msgid "Warning: Received unknown event: %+v"
+msgstr ""
+
+msgid "Warning: Received unrecognized event from server."
+msgstr ""
+
+msgid "Welcome to the guided tutorial. Click anywhere outside of this message box to close the tutorial. Click anywhere inside of this message box to view the next page."
+msgstr ""
+
+msgid "Write error"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "You have the black checkers. You can move a checker by either clicking it or dragging it."
+msgstr ""
+
+msgid "You may need to upgrade your client."
+msgstr ""
+
+msgid "from %s to %s"
+msgstr ""

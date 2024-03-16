@@ -1654,6 +1654,8 @@ func (g *Game) handleEvent(e interface{}) {
 		b.showMovesCheckbox.SetSelected(b.showMoves)
 		b.flipBoard = ev.Flip
 		b.flipBoardCheckbox.SetSelected(b.flipBoard)
+		b.traditional = ev.Traditional
+		b.traditionalCheckbox.SetSelected(b.traditional)
 		if !AutoEnableTouchInput {
 			b.advancedMovement = ev.Advanced
 			b.advancedMovementCheckbox.SetSelected(b.advancedMovement)

@@ -3,7 +3,7 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.17
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240220213331-09878764aaa3
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240315051044-3412f3125003
 	code.rocket9labs.com/tslocum/bgammon-tabula-bot v0.0.0-20240220233735-ac7ec51d806c
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240220192047-d17310185c80
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240207195947-691c7a5d5265
@@ -21,11 +21,11 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
-	github.com/PuerkitoBio/goquery v1.8.1 // indirect
+	github.com/PuerkitoBio/goquery v1.9.1 // indirect
 	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
-	github.com/ebitengine/oto/v3 v3.1.0 // indirect
-	github.com/ebitengine/purego v0.6.0 // indirect
+	github.com/ebitengine/oto/v3 v3.1.1 // indirect
+	github.com/ebitengine/purego v0.6.1 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.3.2 // indirect
@@ -37,7 +37,7 @@ require (
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
-	github.com/jackc/pgx/v5 v5.5.3 // indirect
+	github.com/jackc/pgx/v5 v5.5.5 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/jfreymuth/oggvorbis v1.0.5 // indirect
@@ -53,10 +53,10 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.20.2 // indirect
-	golang.org/x/crypto v0.19.0 // indirect
-	golang.org/x/exp/shiny v0.0.0-20240213143201-ec583247a57a // indirect
+	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/exp/shiny v0.0.0-20240314144324-c7f7c6466f7f // indirect
 	golang.org/x/mobile v0.0.0-20240213143359-d1f7d3436075 // indirect
-	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 )
