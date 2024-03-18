@@ -40,13 +40,15 @@ import (
 )
 
 const (
-	version              = "v1.3.1"
+	version              = "v1.3.2"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
 )
 
 var AutoEnableTouchInput bool
+
+var AppLanguage = "en"
 
 var (
 	anyNumbers  = regexp.MustCompile(`[0-9]+`)
@@ -3086,8 +3088,9 @@ func LoadLocale(forceLanguage *language.Tag) error {
 
 	po := gotext.NewPo()
 	po.Parse(b)
-
 	gotext.GetStorage().AddTranslator("boxcars", po)
+
+	AppLanguage = useLanguageName
 	return nil
 }
 

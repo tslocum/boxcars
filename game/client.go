@@ -57,13 +57,13 @@ func (c *Client) logIn() []byte {
 	} else if game.register {
 		c.Username = game.Username
 		c.Password = game.Password
-		return []byte(fmt.Sprintf("rj %s %s %s %s\nlist\n", AppName, game.Email, game.Username, game.Password))
+		return []byte(fmt.Sprintf("rj %s/%s %s %s %s\nlist\n", AppName, AppLanguage, game.Email, game.Username, game.Password))
 	}
 	loginInfo := strings.ReplaceAll(c.Username, " ", "_")
 	if c.Username != "" && c.Password != "" {
 		loginInfo = fmt.Sprintf("%s %s", strings.ReplaceAll(c.Username, " ", "_"), strings.ReplaceAll(c.Password, " ", "_"))
 	}
-	return []byte(fmt.Sprintf("lj %s %s\nlist\n", AppName, loginInfo))
+	return []byte(fmt.Sprintf("lj %s/%s %s\nlist\n", AppName, AppLanguage, loginInfo))
 }
 
 func (c *Client) LoggedIn() bool {

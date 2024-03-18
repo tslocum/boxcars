@@ -32,7 +32,7 @@ Run `~/go/bin/boxcars` to play.
 
 ## Translate
 
-Translation is handled [online](https://hosted.weblate.org/projects/bgammon/boxcars/).
+Translation is handled [online](https://hosted.weblate.org/projects/bgammon/).
 
 ## Support
 
