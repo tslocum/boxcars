@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-11-03 10:42+0000\n"
-"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
+"PO-Revision-Date: 2024-04-01 23:02+0000\n"
+"Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/nb_NO/>\n"
 "Language: nb_NO\n"
@@ -9,10 +9,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.2-dev\n"
+"X-Generator: Weblate 5.5-dev\n"
 
 msgid "%s - Free Online Backgammon"
-msgstr ""
+msgstr "%s — Gratis nettbasert backgammon"
 
 msgid "%s joined the match."
 msgstr "%s tok del i spillet."
@@ -20,11 +20,12 @@ msgstr "%s tok del i spillet."
 msgid "%s left the match."
 msgstr "%s forlot spillet."
 
+#, fuzzy
 msgid "%s moved %s"
-msgstr ""
+msgstr "%s flyttet til %s"
 
 msgid "%s rolled %s"
-msgstr ""
+msgstr "%s rullet %s"
 
 msgid "%s wins!"
 msgstr "%s vant."
@@ -33,44 +34,50 @@ msgid "Accept"
 msgstr "Godta"
 
 msgid "Account"
-msgstr ""
+msgstr "Konto"
 
 msgid "Acey-deucey"
-msgstr ""
+msgstr "Acey-deucey"
 
 msgid "Advanced movement"
-msgstr ""
+msgstr "Avansert flytting"
 
 msgid "Auto-play forced moves"
-msgstr ""
+msgstr "Auto-spill tvungne trekk"
 
 msgid "Available"
-msgstr ""
+msgstr "Tilgjengelig"
 
 msgid "Backgammon"
-msgstr ""
+msgstr "Backgammon"
 
+#, fuzzy
 msgid "Bearing Off"
-msgstr ""
+msgstr "Fjerning avslått"
 
 msgid "Board"
-msgstr ""
+msgstr "Brett"
 
+#, fuzzy
 msgid ""
 "Boxcars is a client for playing backgammon via bgammon.org, a free and open "
 "source backgammon service."
 msgstr ""
+"Boxcars er en klient for å spille backgammon via bgammon.org, en gratis og "
+"fri backgammontjeneste."
 
 msgid "Cancel"
-msgstr ""
+msgstr "Avbryt"
 
 msgid "Change password"
-msgstr ""
+msgstr "Endre passord"
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
 "spam folder."
 msgstr ""
+"Sjekk innboksen i e-posten din for å tilbakestille passordet. Sjekk "
+"søppelposten også."
 
 msgid "Connect"
 msgstr "Koble til"
@@ -83,42 +90,48 @@ msgid "Create"
 msgstr "Opprett spill"
 
 msgid "Create Match"
-msgstr ""
+msgstr "Opprett spill"
 
 msgid ""
 "Create a match if you would like to play against someone else. Backgammon "
 "and several of its variants are supported."
 msgstr ""
+"Opprett et spill hvis du vil spille mot andre. Backgammon og flere av "
+"variantene støttes."
 
 msgid "Create match"
 msgstr "Opprett spill"
 
 msgid "Create new match"
-msgstr ""
+msgstr "Opprett nytt spill"
 
 msgid "Current"
-msgstr ""
+msgstr "Nåværende"
 
 msgid "Date"
-msgstr ""
+msgstr "Dato"
 
 msgid "Double"
 msgstr "Dobling"
 
+#, fuzzy
 msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
 msgstr ""
+"Dobbeltklikk på en brikke for å fjerne den. Fjern alle 15 brikker for å "
+"vinne."
 
 msgid "Download replay"
-msgstr ""
+msgstr "Last ned opptak"
 
 msgid "Downloaded replay"
-msgstr ""
+msgstr "Laster ned opptak"
 
 msgid "Email"
-msgstr ""
+msgstr "E-post"
 
+#, fuzzy
 msgid "Failed to download replay: %s"
-msgstr ""
+msgstr "Klarte ikke å laste ned opptak: %s"
 
 #, fuzzy
 msgid "Failed to join match: %s"
@@ -132,39 +145,42 @@ msgstr "Klarte ikke å forlate spill: %s"
 msgid "Failed to move checker%s: %s"
 msgstr "Klarte ikke å flytte brikke%s: %s"
 
+#, fuzzy
 msgid "Failed to roll"
-msgstr ""
+msgstr "Klarte ikke å kaste terning"
 
 #, fuzzy
 msgid "Failed to submit moves: %s"
 msgstr "Klarte ikke å sende inn trekk: %s"
 
 msgid "Fast"
-msgstr ""
+msgstr "Hurtig"
 
+#, fuzzy
 msgid "Flip board"
-msgstr ""
+msgstr "Vend spillet"
 
 msgid "Flip opp. space numbers"
 msgstr ""
 
 msgid "Forced"
-msgstr ""
+msgstr "Påtvunget"
 
 msgid "Good Luck, Have Fun"
-msgstr ""
+msgstr "Lykke til. Kos deg."
 
 msgid "Highlight legal moves"
-msgstr ""
+msgstr "Framhev lovlige trekk"
 
 msgid "History"
-msgstr ""
+msgstr "Historikk"
 
+#, fuzzy
 msgid "Instant"
-msgstr ""
+msgstr "Umiddelbart"
 
 msgid "Join"
-msgstr ""
+msgstr "Ta del"
 
 msgid "Join match"
 msgstr "Ta del i spill"
@@ -180,173 +196,185 @@ msgid "Leave match?"
 msgstr "Forlat spillet?"
 
 msgid "Left match"
-msgstr ""
+msgstr "Forlot spillet"
 
 msgid "Legal moves: %s"
 msgstr "Lovlige trekk: %s"
 
 msgid "Loading..."
-msgstr ""
+msgstr "Laster inn …"
 
 msgid "Logged in as guest"
-msgstr ""
+msgstr "Innlogget som gjest"
 
 msgid "Long press back to exit the application."
-msgstr ""
+msgstr "Lang-trykk for å avslutte programmet."
 
 msgid "Match Name"
-msgstr ""
+msgstr "Spillnavn"
 
 msgid "Matches List"
-msgstr ""
+msgstr "Spill-liste"
 
 msgid "Medium"
-msgstr ""
+msgstr "Middels"
 
 msgid "Menu"
-msgstr ""
+msgstr "Meny"
 
+#, fuzzy
 msgid "Multi"
-msgstr ""
+msgstr "Flerspiller"
 
 msgid "Name"
 msgstr "Navn"
 
+#, fuzzy
 msgid "New"
-msgstr ""
+msgstr "Nytt"
 
 msgid "No"
 msgstr "Nei"
 
 msgid "None"
-msgstr ""
+msgstr "Ingen"
 
 msgid "OK"
 msgstr "OK"
 
 msgid "Opponent"
-msgstr ""
+msgstr "Motstander"
 
 msgid "Password"
 msgstr "Passord"
 
 msgid "Play Offline"
-msgstr ""
+msgstr "Spill frakoblet"
 
 msgid "Play backgammon online via bgammon.org"
-msgstr ""
+msgstr "Spill backgammon på nett via bgammon.org"
 
 msgid "Playing offline."
-msgstr ""
+msgstr "Spiller frakoblet."
 
 msgid ""
 "Please enter a valid email address, or it will not be possible to reset your "
 "password."
 msgstr ""
+"Skriv inn en gyldig e-postadresse for å kunne tilbakestille passordet ditt."
 
 msgid "Points"
 msgstr "Poeng"
 
+#, fuzzy
 msgid "Press back to toggle the keyboard."
-msgstr ""
+msgstr "Trykk tilbake for å slå av/på tastatur."
 
 msgid "Private"
-msgstr ""
+msgstr "Privat"
 
 msgid "Rating"
-msgstr ""
+msgstr "Vurdering"
 
 msgid "Read error"
-msgstr ""
+msgstr "Lesefeil"
 
+#, fuzzy
 msgid "Reconnecting"
-msgstr ""
+msgstr "Kobler til igjen …"
 
 msgid "Refresh"
-msgstr ""
+msgstr "Gjenoppfrisk"
 
 msgid "Refresh matches"
-msgstr ""
+msgstr "Gjenoppfrisk spill"
 
 msgid "Register"
-msgstr ""
+msgstr "Registrering"
 
 msgid "Replay download already in progress."
-msgstr ""
+msgstr "Nedlasting av spill allerede underveis."
 
 msgid "Replaying %s vs. %s"
-msgstr ""
+msgstr "Spiller av %s mot %s."
 
 msgid "Reset Password"
-msgstr ""
+msgstr "Tilbakestill passord"
 
 msgid "Resign"
 msgstr "Gi opp"
 
 msgid "Result"
-msgstr ""
+msgstr "Resultat"
 
 msgid "Return"
-msgstr ""
+msgstr "Tilbake"
 
 msgid "Roll"
 msgstr "Kast terninger"
 
 msgid "Search"
-msgstr ""
+msgstr "Søk"
 
 msgid "Sending password reset request"
-msgstr ""
+msgstr "Sender forespørsel om passordendring"
 
 msgid "Server"
-msgstr ""
+msgstr "Tjener"
 
 msgid "Settings"
-msgstr ""
+msgstr "Innstillinger"
 
 msgid "Show moves"
-msgstr ""
+msgstr "Vis trekk."
 
+#, fuzzy
 msgid "Show pip count"
-msgstr ""
+msgstr "Vis pip-antall"
 
+#, fuzzy
 msgid "Single"
-msgstr ""
+msgstr "Enkeltspiller"
 
+#, fuzzy
 msgid "Slow"
-msgstr ""
+msgstr "Tregt"
 
 msgid "Speed"
-msgstr ""
+msgstr "Hastighet"
 
 msgid "Started"
-msgstr ""
+msgstr "Startet"
 
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 msgid "Submit"
-msgstr ""
+msgstr "Send inn"
 
 msgid "Tabula"
 msgstr ""
 
 msgid "Tap to dismiss this pop-up."
-msgstr ""
+msgstr "Trykk for å forkaste dette oppsprettet."
 
 msgid ""
 "This concludes the tutorial. To share feedback and chat with other players "
 "visit %s"
 msgstr ""
+"Veiledningen er over. Del tilbakemeldinger og sludre med andre spillere på "
+"%s."
 
 msgid ""
 "This screen lists the matches that are currently available. A few bots are "
 "always available to play against. You can also spectate ongoing public "
 "matches."
 msgstr ""
+"Her har du tilgjengelige spill. Du kan alltids spille med noen av "
+"maskinspillerene. Du kan også bivåne pågående offentlige spill."
 
 msgid "To download this replay visit"
-msgstr ""
+msgstr "Last ned dette spillet ved å besøke"
 
 #, fuzzy
 msgid ""
@@ -355,52 +383,57 @@ msgid ""
 msgstr "Kun angi brukernavn (uten passord) hvis du vil logge inn som gjest."
 
 msgid "Tutorial"
-msgstr ""
+msgstr "Veiledning"
 
 msgid "Type %s to offer a rematch."
-msgstr ""
+msgstr "Skriv «%s» for å tilby omkamp."
 
 msgid "Undo"
-msgstr ""
+msgstr "Angre"
 
 msgid "Username"
 msgstr "Brukernavn"
 
 msgid "Variant"
-msgstr ""
+msgstr "Variant"
 
 msgid "View replay"
-msgstr ""
+msgstr "Vis opptak"
 
 msgid "Waiting"
-msgstr ""
+msgstr "Venter"
 
 msgid "Warning: Received unknown event: %+v"
 msgstr "Advarsel: Mottok ukjent begivenhet: %s+v"
 
 msgid "Warning: Received unrecognized event from server."
-msgstr ""
+msgstr "Advarsel: Mottok ugjenkjennbar begivenhet fra tjeneren."
 
 msgid ""
 "Welcome to the guided tutorial. Click anywhere outside of this message box "
 "to close the tutorial. Click anywhere inside of this message box to view the "
 "next page."
 msgstr ""
+"Velkommen til veiledingen. Klikk utenfor meldingen for å lukke veiledningen. "
+"Klikk i meldingen for å vise neste side."
 
 msgid "Write error"
-msgstr ""
+msgstr "Skrivefeil"
 
 msgid "Yes"
 msgstr "Ja"
 
+#, fuzzy
 msgid ""
 "You have the black checkers. You can move a checker by either clicking it or "
 "dragging it."
 msgstr ""
+"Du har de svarte brikkene. Du kan flytte en brikke ved å klikke eller dra "
+"den."
 
 #, fuzzy
 msgid "You may need to upgrade your client."
 msgstr "Det kan hende du må installere en nyere versjon av programmet."
 
 msgid "from %s to %s"
-msgstr ""
+msgstr "fra %s til %s"

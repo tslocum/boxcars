@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-02-24 17:52+0000\n"
+"PO-Revision-Date: 2024-03-23 21:01+0000\n"
 "Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
@@ -16,10 +16,10 @@ msgid "%s - Free Online Backgammon"
 msgstr "%s - Вільні Онлайн Нарди"
 
 msgid "%s joined the match."
-msgstr "%s заходить у кімнату."
+msgstr "%s приєднується."
 
 msgid "%s left the match."
-msgstr "%s покидає кімнату."
+msgstr "%s від'єднується."
 
 msgid "%s moved %s"
 msgstr "%s робить хід %s"
@@ -87,20 +87,20 @@ msgid "Create"
 msgstr "Створити"
 
 msgid "Create Match"
-msgstr "Створення кімнати"
+msgstr "Створення матчу"
 
 msgid ""
 "Create a match if you would like to play against someone else. Backgammon "
 "and several of its variants are supported."
 msgstr ""
-"Створіть кімнату, якщо хочете зіграти ще з кимось. Підтримуються нарди та "
+"Створіть матч, якщо хочете зіграти ще з кимось. Підтримуються нарди та "
 "кілька їх варіантів."
 
 msgid "Create match"
-msgstr "Створити кімнату"
+msgstr "Створити матч"
 
 msgid "Create new match"
-msgstr "Нова кімната"
+msgstr "Новий матч"
 
 msgid "Current"
 msgstr "У процесі"
@@ -109,7 +109,7 @@ msgid "Date"
 msgstr "Дата"
 
 msgid "Double"
-msgstr "Подвоєння"
+msgstr "Подвоїти"
 
 msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
 msgstr ""
@@ -129,10 +129,10 @@ msgid "Failed to download replay: %s"
 msgstr "Помилка завантаження повтору: %s"
 
 msgid "Failed to join match: %s"
-msgstr "Помилка входу у кімнату: %s"
+msgstr "Помилка приєднання: %s"
 
 msgid "Failed to leave match: %s"
-msgstr "Помилка виходу з кімнати: %s"
+msgstr "Помилка від'єднання: %s"
 
 msgid "Failed to move checker%s: %s"
 msgstr "Помилка пересування шашки%s: %s"
@@ -171,16 +171,16 @@ msgid "Join"
 msgstr "Увійти"
 
 msgid "Join match"
-msgstr "Увійти в кімнату"
+msgstr "Приєднатися до матчу"
 
 msgid "Join match: %s"
-msgstr "Вхід: %s"
+msgstr "Приєднано до матчу: %s"
 
 msgid "Leave"
 msgstr "Покинути"
 
 msgid "Leave match?"
-msgstr "Покинути кімнату?"
+msgstr "Дійсно покинути?"
 
 msgid "Left match"
 msgstr "Покинуто"
@@ -198,10 +198,10 @@ msgid "Long press back to exit the application."
 msgstr "Затисніть \"Назад\", щоб вийти із застосунку."
 
 msgid "Match Name"
-msgstr "Назва кімнати"
+msgstr "Назва матчу"
 
 msgid "Matches List"
-msgstr "Список кімнат"
+msgstr "Список матчів"
 
 msgid "Medium"
 msgstr "Звичайно"
@@ -271,7 +271,7 @@ msgid "Refresh"
 msgstr "Оновити"
 
 msgid "Refresh matches"
-msgstr "Оновити"
+msgstr "Оновити список"
 
 msgid "Register"
 msgstr "Зареєструватися"
@@ -351,7 +351,7 @@ msgid ""
 "always available to play against. You can also spectate ongoing public "
 "matches."
 msgstr ""
-"На цьому екрані відображено список доступних кімнат. Декілька ботів завжди "
+"На цьому екрані відображено список доступних матчів. Декілька ботів завжди "
 "доступні для гри. Ви також можете спостерігати публічні ігри."
 
 msgid "To download this replay visit"
