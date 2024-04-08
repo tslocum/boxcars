@@ -115,3 +115,7 @@ func saveReplay(id int, content []byte) error {
 func showKeyboard() {
 	// Do not show the virtual keyboard on desktop platforms.
 }
+
+func hideKeyboard() {
+	// Do not show the virtual keyboard on desktop platforms.
+}

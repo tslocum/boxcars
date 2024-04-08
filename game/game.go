@@ -1310,6 +1310,7 @@ func (g *Game) initialize() {
 }
 
 func (g *Game) playOffline() {
+	hideKeyboard()
 	if g.loggedIn {
 		return
 	}
@@ -2279,6 +2280,7 @@ func (g *Game) selectCancel() error {
 }
 
 func (g *Game) selectConfirmRegister() error {
+	hideKeyboard()
 	g.Email = g.registerEmail.Text()
 	g.Username = g.registerUsername.Text()
 	g.Password = g.registerPassword.Text()
@@ -2291,6 +2293,7 @@ func (g *Game) selectConfirmRegister() error {
 }
 
 func (g *Game) selectConfirmReset() error {
+	hideKeyboard()
 	if g.resetInProgress {
 		return nil
 	}
@@ -2312,6 +2315,7 @@ func (g *Game) selectConfirmReset() error {
 }
 
 func (g *Game) selectConnect() error {
+	hideKeyboard()
 	g.Username = g.connectUsername.Text()
 	g.Password = g.connectPassword.Text()
 	if ShowServerSettings {
@@ -2322,6 +2326,7 @@ func (g *Game) selectConnect() error {
 }
 
 func (g *Game) searchMatches(username string) {
+	hideKeyboard()
 	loadingText := newCenteredText(gotext.Get("Loading..."))
 	if AutoEnableTouchInput {
 		loadingText.SetFont(mediumFont, fontMutex)
@@ -2334,6 +2339,7 @@ func (g *Game) searchMatches(username string) {
 }
 
 func (g *Game) selectHistory() error {
+	hideKeyboard()
 	g.lobby.showHistory = true
 	g.setRoot(historyFrame)
 	g.lobby.historyUsername.SetText(g.Client.Username)
@@ -2344,6 +2350,7 @@ func (g *Game) selectHistory() error {
 }
 
 func (g *Game) selectHistorySearch() error {
+	hideKeyboard()
 	username := g.lobby.historyUsername.Text()
 	if strings.TrimSpace(username) == "" {
 		return nil
@@ -2353,6 +2360,7 @@ func (g *Game) selectHistorySearch() error {
 }
 
 func (g *Game) selectHistoryPrevious() error {
+	hideKeyboard()
 	if g.lobby.historyUsername.Text() == "" || g.lobby.historyPage == 1 {
 		return nil
 	}
@@ -2361,6 +2369,7 @@ func (g *Game) selectHistoryPrevious() error {
 }
 
 func (g *Game) selectHistoryNext() error {
+	hideKeyboard()
 	if g.lobby.historyUsername.Text() == "" || g.lobby.historyPage == g.lobby.historyPages {
 		return nil
 	}
@@ -2917,6 +2926,7 @@ func acceptInput(text string) (handled bool) {
 	}
 
 	game.Client.Out <- []byte(text)
+	hideKeyboard()
 	return true
 }
 

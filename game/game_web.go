@@ -83,3 +83,11 @@ func showKeyboard() {
 	}
 	virtualKeyboard.Call("show")
 }
+
+func hideKeyboard() {
+	virtualKeyboard := js.Global().Get("navigator").Get("virtualKeyboard")
+	if virtualKeyboard.IsUndefined() {
+		return
+	}
+	virtualKeyboard.Call("hide")
+}

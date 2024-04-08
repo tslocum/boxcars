@@ -245,6 +245,7 @@ func (l *lobby) getButtons() []string {
 }
 
 func (l *lobby) confirmCreateGame() {
+	hideKeyboard()
 	typeAndPassword := "public"
 	if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
 		typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
@@ -263,6 +264,7 @@ func (l *lobby) confirmCreateGame() {
 }
 
 func (l *lobby) confirmJoinGame() {
+	hideKeyboard()
 	l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
 }
 

@@ -127,3 +127,10 @@ func showKeyboard() {
 	}
 	keyboardConn.Write([]byte("1\n"))
 }
+
+func hideKeyboard() {
+	if keyboardConn == nil {
+		return
+	}
+	keyboardConn.Write([]byte("0\n"))
+}
