@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"path"
@@ -22,10 +23,31 @@ const (
 	ShowServerSettings = true
 )
 
+var keyboardConn net.Conn
+
 func init() {
 	log.SetOutput(os.Stdout)
 
 	AutoEnableTouchInput = true
+
+	t := time.Now()
+	for i := 0; i < 12; i++ {
+		if i > 0 && time.Since(t) < 2*time.Second {
+			i = 0
+		}
+		port := 1337
+		if i > 0 {
+			port = 1337 + port - 1
+		}
+		var err error
+		keyboardConn, err = net.Dial("tcp", fmt.Sprintf("localhost:%d", port))
+		if err == nil {
+			scanner := bufio.NewScanner(keyboardConn)
+			if scanner.Scan() && scanner.Text() == "boxcars" {
+				break
+			}
+		}
+	}
 
 	// Detect timezone.
 	out, err := exec.Command("/system/bin/getprop", "persist.sys.timezone").Output()
@@ -99,5 +121,9 @@ func saveReplay(id int, content []byte) error {
 }
 
 func showKeyboard() {
-	game.keyboardHintVisible = true
+	if keyboardConn == nil {
+		game.keyboardHintVisible = true
+		return
+	}
+	keyboardConn.Write([]byte("1\n"))
 }
