@@ -377,6 +377,18 @@ msgid ""
 "next page."
 msgstr ""
 
+msgid "Welcome, %s. There are %d clients playing %d matches."
+msgstr ""
+
+msgid "Welcome, %s. There are %d clients playing 1 match."
+msgstr ""
+
+msgid "Welcome, %s. There is 1 client playing %d matches."
+msgstr ""
+
+msgid "Welcome, %s. There is 1 client playing 1 match."
+msgstr ""
+
 msgid "Write error"
 msgstr ""
 

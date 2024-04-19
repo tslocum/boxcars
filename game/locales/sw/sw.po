@@ -52,7 +52,9 @@ msgstr ""
 msgid "Board"
 msgstr ""
 
-msgid "Boxcars is a client for playing backgammon via bgammon.org, a free and open source backgammon service."
+msgid ""
+"Boxcars is a client for playing backgammon via bgammon.org, a free and open "
+"source backgammon service."
 msgstr ""
 
 msgid "Cancel"
@@ -61,7 +63,9 @@ msgstr ""
 msgid "Change password"
 msgstr ""
 
-msgid "Check your email for a link to reset your password. Be sure to check your spam folder."
+msgid ""
+"Check your email for a link to reset your password. Be sure to check your "
+"spam folder."
 msgstr ""
 
 msgid "Connect"
@@ -76,7 +80,9 @@ msgstr ""
 msgid "Create Match"
 msgstr ""
 
-msgid "Create a match if you would like to play against someone else. Backgammon and several of its variants are supported."
+msgid ""
+"Create a match if you would like to play against someone else. Backgammon "
+"and several of its variants are supported."
 msgstr ""
 
 msgid "Create match"
@@ -223,7 +229,9 @@ msgstr ""
 msgid "Playing offline."
 msgstr ""
 
-msgid "Please enter a valid email address, or it will not be possible to reset your password."
+msgid ""
+"Please enter a valid email address, or it will not be possible to reset your "
+"password."
 msgstr ""
 
 msgid "Points"
@@ -316,16 +324,23 @@ msgstr ""
 msgid "Tap to dismiss this pop-up."
 msgstr ""
 
-msgid "This concludes the tutorial. To share feedback and chat with other players visit %s"
+msgid ""
+"This concludes the tutorial. To share feedback and chat with other players "
+"visit %s"
 msgstr ""
 
-msgid "This screen lists the matches that are currently available. A few bots are always available to play against. You can also spectate ongoing public matches."
+msgid ""
+"This screen lists the matches that are currently available. A few bots are "
+"always available to play against. You can also spectate ongoing public "
+"matches."
 msgstr ""
 
 msgid "To download this replay visit"
 msgstr ""
 
-msgid "To log in as a guest, enter a username (if you want) and do not enter a password."
+msgid ""
+"To log in as a guest, enter a username (if you want) and do not enter a "
+"password."
 msgstr ""
 
 msgid "Tutorial"
@@ -355,7 +370,22 @@ msgstr ""
 msgid "Warning: Received unrecognized event from server."
 msgstr ""
 
-msgid "Welcome to the guided tutorial. Click anywhere outside of this message box to close the tutorial. Click anywhere inside of this message box to view the next page."
+msgid ""
+"Welcome to the guided tutorial. Click anywhere outside of this message box "
+"to close the tutorial. Click anywhere inside of this message box to view the "
+"next page."
+msgstr ""
+
+msgid "Welcome, %s. There are %d clients playing %d matches."
+msgstr ""
+
+msgid "Welcome, %s. There are %d clients playing 1 match."
+msgstr ""
+
+msgid "Welcome, %s. There is 1 client playing %d matches."
+msgstr ""
+
+msgid "Welcome, %s. There is 1 client playing 1 match."
 msgstr ""
 
 msgid "Write error"
@@ -364,7 +394,9 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-msgid "You have the black checkers. You can move a checker by either clicking it or dragging it."
+msgid ""
+"You have the black checkers. You can move a checker by either clicking it or "
+"dragging it."
 msgstr ""
 
 msgid "You may need to upgrade your client."

@@ -1428,19 +1428,17 @@ func (g *Game) handleEvent(e interface{}) {
 		}
 		go saveCredentials(username, password)
 
-		areIs := "are"
-		if ev.Clients == 1 {
-			areIs = "is"
+		var msg string
+		if ev.Clients == 1 && ev.Games == 1 {
+			msg = gotext.Get("Welcome, %s. There is 1 client playing 1 match.", ev.PlayerName)
+		} else if ev.Clients == 1 {
+			msg = gotext.Get("Welcome, %s. There is 1 client playing %d matches.", ev.PlayerName, ev.Games)
+		} else if ev.Games == 1 {
+			msg = gotext.Get("Welcome, %s. There are %d clients playing 1 match.", ev.PlayerName, ev.Clients)
+		} else {
+			msg = gotext.Get("Welcome, %s. There are %d clients playing %d matches.", ev.PlayerName, ev.Clients, ev.Games)
 		}
-		clientsPlural := "s"
-		if ev.Clients == 1 {
-			clientsPlural = ""
-		}
-		matchesPlural := "es"
-		if ev.Games == 1 {
-			matchesPlural = ""
-		}
-		l(fmt.Sprintf("*** Welcome, %s. There %s %d client%s playing %d match%s.", ev.PlayerName, areIs, ev.Clients, clientsPlural, ev.Games, matchesPlural))
+		l(fmt.Sprintf("*** " + msg))
 
 		if strings.HasPrefix(g.Client.Username, "Guest_") && g.savedUsername == "" {
 			g.tutorialFrame.AddChild(NewTutorialWidget())
