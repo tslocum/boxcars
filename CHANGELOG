@@ -1,3 +1,6 @@
+1.3.4:
+- Fix resetting password
+
 1.3.3:
 - Display on-screen keyboard when input field is selected on Android
 

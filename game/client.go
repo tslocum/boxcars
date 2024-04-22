@@ -44,6 +44,10 @@ func (c *Client) Connect() {
 	}
 	c.connecting = true
 
+	if c.Address == "" {
+		c.Address = DefaultServerAddress
+	}
+
 	if strings.HasPrefix(c.Address, "ws://") || strings.HasPrefix(c.Address, "wss://") {
 		c.connectWebSocket()
 		return
