@@ -585,6 +585,8 @@ func NewBoard() *board {
 
 	b.frame.SetPositionChildren(true)
 
+	b.frame.AddChild(NewBoardMovingWidget())
+
 	{
 		f := etk.NewFrame()
 		f.AddChild(b.opponentRatingLabel)
@@ -619,6 +621,8 @@ func NewBoard() *board {
 	b.frame.AddChild(b.buttonsGrid)
 
 	b.frame.AddChild(etk.NewFrame(b.selectRollGrid))
+
+	b.frame.AddChild(NewBoardDraggedWidget())
 
 	{
 		f := etk.NewFrame()
@@ -1832,15 +1836,6 @@ func (b *board) Draw(screen *ebiten.Image) {
 	// Draw sidebar border.
 	if !game.portraitView() && b.h < game.screenH {
 		screen.SubImage(image.Rect(b.w-1, 0, b.w, game.screenH)).(*ebiten.Image).Fill(color.RGBA{0, 0, 0, 255})
-	}
-}
-
-func (b *board) drawDraggedCheckers(screen *ebiten.Image) {
-	if b.moving != nil {
-		b.drawSprite(screen, b.moving)
-	}
-	if b.dragging != nil {
-		b.drawSprite(screen, b.dragging)
 	}
 }
 
@@ -3119,6 +3114,42 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		sprite.y = y - (sprite.h / 2)
 	}
 	return handled, nil
+}
+
+type BoardMovingWidget struct {
+	*etk.Box
+}
+
+func NewBoardMovingWidget() *BoardMovingWidget {
+	return &BoardMovingWidget{
+		Box: etk.NewBox(),
+	}
+}
+
+func (w *BoardMovingWidget) Draw(screen *ebiten.Image) error {
+	b := game.Board
+	if b.moving != nil {
+		b.drawSprite(screen, b.moving)
+	}
+	return nil
+}
+
+type BoardDraggedWidget struct {
+	*etk.Box
+}
+
+func NewBoardDraggedWidget() *BoardDraggedWidget {
+	return &BoardDraggedWidget{
+		Box: etk.NewBox(),
+	}
+}
+
+func (w *BoardDraggedWidget) Draw(screen *ebiten.Image) error {
+	b := game.Board
+	if b.dragging != nil {
+		b.drawSprite(screen, b.dragging)
+	}
+	return nil
 }
 
 func expandMoves(moves [][]int8) [][]int8 {

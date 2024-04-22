@@ -2732,8 +2732,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		log.Fatal(err)
 	}
 
-	g.Board.drawDraggedCheckers(screen)
-
 	g.drawKeyboardHint(screen)
 
 	if Debug > 0 {
