@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
-	"code.rocket9labs.com/tslocum/bgammon-tabula-bot/bot"
 	"code.rocket9labs.com/tslocum/etk"
 	"code.rocket9labs.com/tslocum/tabula"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -2464,7 +2463,7 @@ func (b *board) processState() {
 		return
 	}
 
-	tabulaBoard := bot.TabulaBoard(b.gameState.Game.Board)
+	tabulaBoard := TabulaBoard(b.gameState.Game, b.gameState.Game.Board)
 	tabulaBoard[tabula.SpaceRoll1], tabulaBoard[tabula.SpaceRoll2], tabulaBoard[tabula.SpaceRoll3], tabulaBoard[tabula.SpaceRoll4] = int8(b.gameState.Game.Roll1), int8(b.gameState.Game.Roll2), 0, 0
 	if b.gameState.Variant == bgammon.VariantTabula {
 		tabulaBoard[tabula.SpaceRoll3] = int8(b.gameState.Game.Roll3)
@@ -3146,6 +3145,26 @@ func expandMoves(moves [][]int8) [][]int8 {
 		newMoves = append(newMoves, expandedMoves...)
 	}
 	return newMoves
+}
+
+func TabulaBoard(g *bgammon.Game, b []int8) tabula.Board {
+	var roll1, roll2, roll3, roll4 int8
+	roll1, roll2 = int8(g.Roll1), int8(g.Roll2)
+	if g.Variant == bgammon.VariantTabula {
+		roll3 = int8(g.Roll3)
+	} else if roll1 == roll2 {
+		roll3, roll4 = int8(g.Roll1), int8(g.Roll2)
+	}
+	entered1, entered2 := int8(1), int8(1)
+	if g.Variant != bgammon.VariantBackgammon {
+		if !g.Player1.Entered {
+			entered1 = 0
+		}
+		if !g.Player2.Entered {
+			entered2 = 0
+		}
+	}
+	return tabula.Board{b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13], b[14], b[15], b[16], b[17], b[18], b[19], b[20], b[21], b[22], b[23], b[24], b[25], b[26], b[27], roll1, roll2, roll3, roll4, entered1, entered2, g.Variant}
 }
 
 func romanNumerals(i int) string {

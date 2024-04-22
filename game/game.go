@@ -22,9 +22,10 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
-	"code.rocket9labs.com/tslocum/bgammon-tabula-bot/bot"
+	"code.rocket9labs.com/tslocum/bgammon-bei-bot/bot"
 	"code.rocket9labs.com/tslocum/bgammon/pkg/server"
 	"code.rocket9labs.com/tslocum/etk"
+	"code.rocket9labs.com/tslocum/tabula"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
@@ -1315,20 +1316,27 @@ func (g *Game) playOffline() {
 		return
 	}
 
-	// Start the local server.
+	// Start the local BEI server.
+	beiServer := &tabula.BEIServer{}
+	beiConns := beiServer.ListenLocal()
+
+	// Connect to the local BEI server.
+	beiClient := bot.NewLocalBEIClient(<-beiConns, false)
+
+	// Start the local bgammon server.
 	server := server.NewServer("", "", "", "", "", false, true, false)
-	conns := server.ListenLocal()
+	serverConns := server.ListenLocal()
 
 	// Connect the bots.
-	go bot.NewLocalClient(<-conns, "", "BOT_tabula", "", 1, bgammon.VariantBackgammon, false, 0)
-	go bot.NewLocalClient(<-conns, "", "BOT_tabula_acey", "", 1, bgammon.VariantAceyDeucey, false, 0)
-	go bot.NewLocalClient(<-conns, "", "BOT_tabula_tabula", "", 1, bgammon.VariantTabula, false, 0)
+	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula", "", 1, bgammon.VariantBackgammon, beiClient)
+	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula_acey", "", 1, bgammon.VariantAceyDeucey, beiClient)
+	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula_tabula", "", 1, bgammon.VariantTabula, beiClient)
 
 	// Wait for the bots to finish creating matches.
 	time.Sleep(250 * time.Millisecond)
 
 	// Connect the player.
-	go g.ConnectLocal(<-conns)
+	go g.ConnectLocal(<-serverConns)
 }
 
 func (g *Game) handleUpdateTimeLabels() {
