@@ -131,7 +131,7 @@ func NewLobby() *lobby {
 
 	loadingText := newCenteredText(gotext.Get("Loading..."))
 	if AutoEnableTouchInput {
-		loadingText.SetFont(mediumFont, fontMutex)
+		loadingText.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 	}
 
 	indentA, indentB := etk.Scale(lobbyIndentA), etk.Scale(lobbyIndentB)
@@ -189,7 +189,7 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 		txt.SetWordWrap(false)
 		txt.SetVertical(etk.AlignCenter)
 		if AutoEnableTouchInput {
-			txt.SetFont(mediumFont, fontMutex)
+			txt.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		}
 		return txt
 	}

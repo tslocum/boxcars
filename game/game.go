@@ -35,7 +35,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leonelquinteros/gotext"
 	"github.com/nfnt/resize"
-	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/text/language"
 )
@@ -78,12 +77,6 @@ var (
 	imgCubes16 *ebiten.Image
 	imgCubes32 *ebiten.Image
 	imgCubes64 *ebiten.Image
-
-	extraSmallFont  font.Face
-	smallFont       font.Face
-	mediumFont      font.Face
-	mediumLargeFont font.Face
-	largeFont       font.Face
 
 	fontMutex = &sync.Mutex{}
 )
@@ -372,60 +365,6 @@ func LoadOGG(context *audio.Context, p string) *audio.Player {
 	return player
 }
 
-func initializeFonts() {
-	tt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	const dpi = 72
-	s := etk.ScaleFactor()
-	if AutoEnableTouchInput {
-		s /= 2
-	}
-
-	extraSmallFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    extraSmallFontSize * s,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	smallFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    smallFontSize * s,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	mediumFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    mediumFontSize * s,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	mediumLargeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    mediumLargeFontSize * s,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	largeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    largeFontSize * s,
-		DPI:     dpi,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func diceImage(roll int8) *ebiten.Image {
 	switch roll {
 	case 1:
@@ -687,9 +626,15 @@ func NewGame() *Game {
 }
 
 func (g *Game) initialize() {
-	initializeFonts()
 	loadAudioAssets()
 	loadImageAssets(0)
+
+	fnt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	etk.Style.TextFont = fnt
+	etk.Style.TextSize = largeFontSize
 
 	if AutoEnableTouchInput {
 		etk.Bindings.ConfirmRune = 199
@@ -697,9 +642,6 @@ func (g *Game) initialize() {
 
 		etk.Style.BorderSize /= 2
 	}
-
-	etk.Style.TextFont = largeFont
-	etk.Style.TextFontMutex = fontMutex
 
 	etk.Style.TextColorLight = triangleA
 	etk.Style.TextColorDark = triangleA
@@ -890,7 +832,7 @@ func (g *Game) initialize() {
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
 		if AutoEnableTouchInput {
-			headerLabel.SetFont(mediumLargeFont, fontMutex)
+			headerLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumLargeFontSize))
 			headerLabel.SetHorizontal(etk.AlignCenter)
 		}
 
@@ -1127,9 +1069,9 @@ func (g *Game) initialize() {
 		opponentLabel.SetFollow(false)
 		opponentLabel.SetScrollBarVisible(false)
 		if AutoEnableTouchInput {
-			dateLabel.SetFont(mediumFont, fontMutex)
-			resultLabel.SetFont(mediumFont, fontMutex)
-			opponentLabel.SetFont(mediumFont, fontMutex)
+			dateLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+			resultLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+			opponentLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		}
 
 		g.lobby.historyUsername = etk.NewInput("", func(text string) (handled bool) {
@@ -1238,10 +1180,10 @@ func (g *Game) initialize() {
 		nameLabel.SetFollow(false)
 		nameLabel.SetScrollBarVisible(false)
 		if AutoEnableTouchInput {
-			statusLabel.SetFont(mediumFont, fontMutex)
-			ratingLabel.SetFont(mediumFont, fontMutex)
-			pointsLabel.SetFont(mediumFont, fontMutex)
-			nameLabel.SetFont(mediumFont, fontMutex)
+			statusLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+			ratingLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+			pointsLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+			nameLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		}
 
 		g.lobby.historyButton = etk.NewButton(gotext.Get("History"), game.selectHistory)
@@ -1718,9 +1660,9 @@ func (g *Game) handleEvent(e interface{}) {
 			resultLabel := newCenteredText(result)
 			opponentLabel := newCenteredText(match.Opponent)
 			if AutoEnableTouchInput {
-				dateLabel.SetFont(mediumFont, fontMutex)
-				resultLabel.SetFont(mediumFont, fontMutex)
-				opponentLabel.SetFont(mediumFont, fontMutex)
+				dateLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+				resultLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+				opponentLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 			}
 			list.AddChildAt(dateLabel, 0, y+i)
 			list.AddChildAt(resultLabel, 1, y+i)
@@ -2338,7 +2280,7 @@ func (g *Game) searchMatches(username string) {
 	hideKeyboard()
 	loadingText := newCenteredText(gotext.Get("Loading..."))
 	if AutoEnableTouchInput {
-		loadingText.SetFont(mediumFont, fontMutex)
+		loadingText.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 	}
 
 	g.lobby.historyList.Clear()
@@ -2865,7 +2807,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	scheduleFrame()
 
 	fontMutex.Lock()
-	g.bufferWidth = etk.BoundString(g.Board.fontFace, strings.Repeat("A", bufferCharacterWidth)).Dx()
+	g.bufferWidth = etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(g.Board.fontSize)), strings.Repeat("A", bufferCharacterWidth)).Dx()
 	fontMutex.Unlock()
 	if g.bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		g.bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)

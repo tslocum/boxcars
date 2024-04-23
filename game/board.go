@@ -22,7 +22,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/leonelquinteros/gotext"
 	"github.com/llgcode/draw2d/draw2dimg"
-	"golang.org/x/image/font"
 )
 
 type board struct {
@@ -147,7 +146,7 @@ type board struct {
 	leaveGameGrid         *etk.Grid
 	confirmLeaveGameFrame *etk.Frame
 
-	fontFace   font.Face
+	fontSize   int
 	lineHeight int
 	lineOffset int
 
@@ -228,7 +227,7 @@ func NewBoard() *board {
 		showPipCount:            true,
 		highlightAvailable:      true,
 		widget:                  NewBoardWidget(),
-		fontFace:                mediumFont,
+		fontSize:                mediumFontSize,
 		repositionLock:          &sync.Mutex{},
 		stateLock:               &sync.Mutex{},
 		Mutex:                   &sync.Mutex{},
@@ -238,11 +237,11 @@ func NewBoard() *board {
 		b.opponentRatingLabel.SetHorizontal(etk.AlignCenter)
 		b.opponentRatingLabel.SetVertical(etk.AlignStart)
 		b.opponentRatingLabel.SetScrollBarVisible(false)
-		b.opponentRatingLabel.SetFont(mediumFont, fontMutex)
+		b.opponentRatingLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		b.playerRatingLabel.SetHorizontal(etk.AlignCenter)
 		b.playerRatingLabel.SetVertical(etk.AlignEnd)
 		b.playerRatingLabel.SetScrollBarVisible(false)
-		b.playerRatingLabel.SetFont(mediumFont, fontMutex)
+		b.playerRatingLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		padding := 15
 		b.opponentForcedLabel.SetPadding(padding)
 		b.opponentForcedLabel.SetHorizontal(etk.AlignCenter)
@@ -657,42 +656,42 @@ func NewBoard() *board {
 
 func (b *board) fontUpdated() {
 	fontMutex.Lock()
-	m := b.fontFace.Metrics()
+	m := etk.FontFace(etk.Style.TextFont, etk.Scale(b.fontSize)).Metrics()
 	b.lineHeight = m.Height.Round()
 	b.lineOffset = m.Ascent.Round()
 	fontMutex.Unlock()
 
-	bufferFont := smallFont
-	statusBuffer.SetFont(bufferFont, fontMutex)
-	gameBuffer.SetFont(bufferFont, fontMutex)
-	inputBuffer.SetFont(bufferFont, fontMutex)
+	bufferFontSize := etk.Scale(smallFontSize)
+	statusBuffer.SetFont(etk.Style.TextFont, bufferFontSize)
+	gameBuffer.SetFont(etk.Style.TextFont, bufferFontSize)
+	inputBuffer.SetFont(etk.Style.TextFont, bufferFontSize)
 
 	if AutoEnableTouchInput {
-		b.showMenuButton.SetFont(largeFont, fontMutex)
+		b.showMenuButton.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
 	} else {
-		b.showMenuButton.SetFont(smallFont, fontMutex)
+		b.showMenuButton.SetFont(etk.Style.TextFont, etk.Scale(smallFontSize))
 	}
 
-	b.timerLabel.SetFont(b.fontFace, fontMutex)
-	b.clockLabel.SetFont(b.fontFace, fontMutex)
+	b.timerLabel.SetFont(etk.Style.TextFont, etk.Scale(b.fontSize))
+	b.clockLabel.SetFont(etk.Style.TextFont, etk.Scale(b.fontSize))
 
 	if AutoEnableTouchInput {
-		b.opponentForcedLabel.SetFont(largeFont, fontMutex)
-		b.playerForcedLabel.SetFont(largeFont, fontMutex)
+		b.opponentForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
+		b.playerForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
 	} else {
-		b.opponentForcedLabel.SetFont(mediumFont, fontMutex)
-		b.playerForcedLabel.SetFont(mediumFont, fontMutex)
+		b.opponentForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
+		b.playerForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
 	}
 
-	b.opponentMovesLabel.SetFont(bufferFont, fontMutex)
-	b.playerMovesLabel.SetFont(bufferFont, fontMutex)
+	b.opponentMovesLabel.SetFont(etk.Style.TextFont, bufferFontSize)
+	b.playerMovesLabel.SetFont(etk.Style.TextFont, bufferFontSize)
 
 	if AutoEnableTouchInput {
-		b.opponentPipCount.SetFont(extraSmallFont, fontMutex)
-		b.playerPipCount.SetFont(extraSmallFont, fontMutex)
+		b.opponentPipCount.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
+		b.playerPipCount.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
 	} else {
-		b.opponentPipCount.SetFont(bufferFont, fontMutex)
-		b.playerPipCount.SetFont(bufferFont, fontMutex)
+		b.opponentPipCount.SetFont(etk.Style.TextFont, bufferFontSize)
+		b.playerPipCount.SetFont(etk.Style.TextFont, bufferFontSize)
 	}
 }
 
@@ -709,10 +708,10 @@ func (b *board) recreateUIGrid() {
 	}
 	if game.replay {
 		summary1 := etk.NewText("")
-		summary1.SetFont(smallFont, fontMutex)
+		summary1.SetFont(etk.Style.TextFont, etk.Scale(smallFontSize))
 		summary1.Write(game.replaySummary1)
 		summary2 := etk.NewText("")
-		summary2.SetFont(smallFont, fontMutex)
+		summary2.SetFont(etk.Style.TextFont, etk.Scale(smallFontSize))
 		summary2.Write(game.replaySummary2)
 		subGrid := etk.NewGrid()
 		subGrid.SetBackground(bufferBackgroundColor)
@@ -827,7 +826,7 @@ func (b *board) recreateAccountGrid() {
 	var w etk.Widget
 	if b.Client == nil || (game.Password == "" && b.Client.Password == "") {
 		guestLabel := etk.NewText(gotext.Get("Logged in as guest"))
-		guestLabel.SetFont(mediumFont, fontMutex)
+		guestLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		guestLabel.SetVertical(etk.AlignCenter)
 		w = guestLabel
 	} else {
@@ -1460,6 +1459,8 @@ func (b *board) updateBackgroundImage() {
 	fontMutex.Lock()
 	defer fontMutex.Unlock()
 
+	ff := etk.FontFace(etk.Style.TextFont, etk.Scale(b.fontSize))
+
 	spaceLabelColor := color.RGBA{121, 96, 60, 255}
 	for space, r := range b.spaceRects {
 		if space < 1 || space > 24 {
@@ -1472,7 +1473,7 @@ func (b *board) updateBackgroundImage() {
 		if b.gameState.Variant == bgammon.VariantTabula {
 			sp = romanNumerals(space)
 		}
-		bounds := etk.BoundString(b.fontFace, sp)
+		bounds := etk.BoundString(ff, sp)
 		x := r[0] + r[2]/2 + int(b.horizontalBorderSize) - bounds.Dx()/2 - 2
 		if space == 1 || space > 9 {
 			x -= 2
@@ -1481,7 +1482,7 @@ func (b *board) updateBackgroundImage() {
 		if b.bottomRow(int8(space)) {
 			y = b.h - int(b.verticalBorderSize)
 		}
-		text.Draw(b.backgroundImage, sp, b.fontFace, x, y+(int(b.verticalBorderSize)-b.lineHeight)/2+b.lineOffset, spaceLabelColor)
+		text.Draw(b.backgroundImage, sp, ff, x, y+(int(b.verticalBorderSize)-b.lineHeight)/2+b.lineOffset, spaceLabelColor)
 	}
 }
 
@@ -1585,6 +1586,8 @@ func (b *board) Draw(screen *ebiten.Image) {
 		screen.DrawImage(b.backgroundImage, op)
 	}
 
+	ff := etk.FontFace(etk.Style.TextFont, etk.Scale(b.fontSize))
+
 	for space := int8(0); space < bgammon.BoardSpaces; space++ {
 		if space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent {
 			continue
@@ -1618,9 +1621,9 @@ func (b *board) Draw(screen *ebiten.Image) {
 			}
 
 			fontMutex.Lock()
-			bounds := etk.BoundString(b.fontFace, overlayText)
+			bounds := etk.BoundString(ff, overlayText)
 			overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-			text.Draw(overlayImage, overlayText, b.fontFace, 0, bounds.Dy(), labelColor)
+			text.Draw(overlayImage, overlayText, ff, 0, bounds.Dy(), labelColor)
 			fontMutex.Unlock()
 
 			x, y, w, h := b.stackSpaceRect(space, numPieces-1)
@@ -1957,11 +1960,11 @@ func (b *board) setRect(x, y, w, h int) {
 	rematchHeight := rematchWidth / 2
 	b.rematchButton.SetRect(image.Rect(int(b.horizontalBorderSize)+b.innerW/2-rematchWidth/2, int(b.verticalBorderSize*2), int(b.horizontalBorderSize)+b.innerW/2+rematchWidth/2, int(b.verticalBorderSize*2)+rematchHeight))
 	if rematchWidth >= etk.Scale(160) {
-		b.rematchButton.SetFont(largeFont, fontMutex)
+		b.rematchButton.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
 	} else if rematchWidth >= etk.Scale(140) {
-		b.rematchButton.SetFont(mediumFont, fontMutex)
+		b.rematchButton.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 	} else {
-		b.rematchButton.SetFont(smallFont, fontMutex)
+		b.rematchButton.SetFont(etk.Style.TextFont, etk.Scale(smallFontSize))
 	}
 
 	b.updateOpponentLabel()
@@ -2011,7 +2014,7 @@ func (b *board) updateOpponentLabel() {
 	label.Text.SetForeground(label.activeColor)
 
 	fontMutex.Lock()
-	bounds := etk.BoundString(largeFont, text)
+	bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), text)
 	fontMutex.Unlock()
 
 	padding := 13
@@ -2089,7 +2092,7 @@ func (b *board) updatePlayerLabel() {
 	label.Text.SetForeground(label.activeColor)
 
 	fontMutex.Lock()
-	bounds := etk.BoundString(largeFont, text)
+	bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), text)
 	defer fontMutex.Unlock()
 
 	padding := 13
@@ -2851,7 +2854,7 @@ func NewLabel(c color.RGBA) *Label {
 		Text:        etk.NewText(""),
 		activeColor: c,
 	}
-	l.Text.SetFont(largeFont, fontMutex)
+	l.Text.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
 	l.Text.SetForeground(c)
 	l.Text.SetScrollBarVisible(false)
 	l.Text.SetSingleLine(true)
