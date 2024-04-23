@@ -111,6 +111,8 @@ type board struct {
 	opponentPipCount *etk.Text
 	playerPipCount   *etk.Text
 
+	rematchButton *etk.Button
+
 	timerLabel     *etk.Text
 	clockLabel     *etk.Text
 	showMenuButton *etk.Button
@@ -350,6 +352,9 @@ func NewBoard() *board {
 	}
 
 	{
+		b.rematchButton = etk.NewButton(gotext.Get("Rematch"), b.selectRematch)
+		b.rematchButton.SetVisible(false)
+
 		settingsLabel := etk.NewText(gotext.Get("Settings"))
 		settingsLabel.SetHorizontal(etk.AlignCenter)
 
@@ -600,6 +605,7 @@ func NewBoard() *board {
 		f.AddChild(b.playerForcedLabel)
 		f.AddChild(b.playerRatingLabel)
 		f.AddChild(b.uiGrid)
+		f.AddChild(b.rematchButton)
 		b.frame.AddChild(f)
 	}
 
@@ -954,6 +960,12 @@ func (b *board) selectDouble() error {
 
 func (b *board) selectResign() error {
 	b.Client.Out <- []byte("resign")
+	return nil
+}
+
+func (b *board) selectRematch() error {
+	b.Client.Out <- []byte("rematch")
+	b.rematchButton.SetVisible(false)
 	return nil
 }
 
@@ -1936,6 +1948,20 @@ func (b *board) setRect(x, y, w, h int) {
 
 		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(b.verticalBorderSize)
 		b.leaveGameGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+	}
+
+	rematchWidth := b.innerW / 6
+	if rematchWidth < etk.Scale(100) {
+		rematchWidth = etk.Scale(100)
+	}
+	rematchHeight := rematchWidth / 2
+	b.rematchButton.SetRect(image.Rect(int(b.horizontalBorderSize)+b.innerW/2-rematchWidth/2, int(b.verticalBorderSize*2), int(b.horizontalBorderSize)+b.innerW/2+rematchWidth/2, int(b.verticalBorderSize*2)+rematchHeight))
+	if rematchWidth >= etk.Scale(160) {
+		b.rematchButton.SetFont(largeFont, fontMutex)
+	} else if rematchWidth >= etk.Scale(140) {
+		b.rematchButton.SetFont(mediumFont, fontMutex)
+	} else {
+		b.rematchButton.SetFont(smallFont, fontMutex)
 	}
 
 	b.updateOpponentLabel()

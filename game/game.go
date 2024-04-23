@@ -1487,6 +1487,7 @@ func (g *Game) handleEvent(e interface{}) {
 		if ev.Player == g.Client.Username {
 			gameBuffer.SetText("")
 			gameLogged = false
+			g.Board.rematchButton.SetVisible(false)
 		} else {
 			lg(gotext.Get("%s joined the match.", ev.Player))
 			playSoundEffect(effectJoinLeave)
@@ -1645,7 +1646,7 @@ func (g *Game) handleEvent(e interface{}) {
 		g.Board.Lock()
 		lg(gotext.Get("%s wins!", ev.Player))
 		if (g.Board.gameState.Player1.Points >= g.Board.gameState.Points || g.Board.gameState.Player2.Points >= g.Board.gameState.Points) && !g.Board.gameState.Spectating {
-			lg(gotext.Get("Type %s to offer a rematch.", "/rematch"))
+			g.Board.rematchButton.SetVisible(true)
 		}
 		g.Board.Unlock()
 	case *bgammon.EventSettings:
@@ -2088,6 +2089,8 @@ func (g *Game) HandleReplay(replay []byte) {
 	g.replayFrames = g.replayFrames[:0]
 	g.replayData = replay
 	g.Unlock()
+
+	g.Board.rematchButton.SetVisible(false)
 
 	if !g.loggedIn {
 		go g.playOffline()
