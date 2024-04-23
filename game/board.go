@@ -2779,12 +2779,14 @@ func (b *board) finishDrag(x int, y int, click bool) {
 		if index >= 0 && b.Client != nil {
 			space := b.draggingSpace
 			if space != index {
-				playSoundEffect(effectMove)
-				b.gameState.AddLocalMove([]int8{space, index})
-				b.processState()
-				scheduleFrame()
-				processed = true
-				b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
+				ok, _ := b.gameState.AddMoves([][]int8{{space, index}}, true)
+				if ok {
+					playSoundEffect(effectMove)
+					b.processState()
+					scheduleFrame()
+					processed = true
+					b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
+				}
 			} else if time.Since(b.lastDragClick) < 500*time.Millisecond && b.gameState.MayBearOff(b.gameState.PlayerNumber, true) {
 				homeStart, homeEnd := bgammon.HomeRange(b.gameState.PlayerNumber, b.gameState.Variant)
 				if homeEnd < homeStart {
