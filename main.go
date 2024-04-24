@@ -42,7 +42,11 @@ func main() {
 		g.Exit()
 	}()
 
-	if err := ebiten.RunGame(g); err != nil {
+	op := &ebiten.RunGameOptions{
+		X11ClassName:    "boxcars",
+		X11InstanceName: "boxcars",
+	}
+	if err := ebiten.RunGameWithOptions(g, op); err != nil {
 		log.Fatal(err)
 	}
 }

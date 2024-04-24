@@ -253,6 +253,9 @@ msgstr ""
 msgid "Register"
 msgstr ""
 
+msgid "Rematch"
+msgstr ""
+
 msgid "Replay download already in progress."
 msgstr ""
 
@@ -329,9 +332,6 @@ msgid "To log in as a guest, enter a username (if you want) and do not enter a p
 msgstr ""
 
 msgid "Tutorial"
-msgstr ""
-
-msgid "Type %s to offer a rematch."
 msgstr ""
 
 msgid "Undo"

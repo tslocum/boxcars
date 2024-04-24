@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-01-01 01:08+0000\n"
+"PO-Revision-Date: 2024-04-22 21:07+0000\n"
 "Last-Translator: phlostically <phlostically@mailinator.com>\n"
 "Language-Team: Esperanto <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/eo/>\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.5-dev\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Libera Interreta triktrako"
@@ -33,28 +33,28 @@ msgid "Accept"
 msgstr "Akcepti"
 
 msgid "Account"
-msgstr ""
+msgstr "Kvanto"
 
 msgid "Acey-deucey"
 msgstr "Aso-duo"
 
 msgid "Advanced movement"
-msgstr ""
+msgstr "Malsimpla movo"
 
 msgid "Auto-play forced moves"
-msgstr ""
+msgstr "Aŭtomate ludi devigajn movojn"
 
 msgid "Available"
 msgstr "Disponebla"
 
 msgid "Backgammon"
-msgstr ""
+msgstr "Triktrako"
 
 msgid "Bearing Off"
 msgstr ""
 
 msgid "Board"
-msgstr ""
+msgstr "Tabulo"
 
 msgid ""
 "Boxcars is a client for playing backgammon via bgammon.org, a free and open "
@@ -67,7 +67,7 @@ msgid "Cancel"
 msgstr "Nuligi"
 
 msgid "Change password"
-msgstr ""
+msgstr "Ŝanĝi pasvorton"
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -84,7 +84,7 @@ msgid "Create"
 msgstr "Krei"
 
 msgid "Create Match"
-msgstr ""
+msgstr "Krei partion"
 
 msgid ""
 "Create a match if you would like to play against someone else. Backgammon "
@@ -95,13 +95,13 @@ msgid "Create match"
 msgstr "Krei partion"
 
 msgid "Create new match"
-msgstr ""
+msgstr "Krei novan partion"
 
 msgid "Current"
-msgstr ""
+msgstr "Aktuala"
 
 msgid "Date"
-msgstr ""
+msgstr "Dato"
 
 msgid "Double"
 msgstr "Duobla"
@@ -137,28 +137,28 @@ msgid "Failed to submit moves: %s"
 msgstr "Malsukcesis submeti movon: %s"
 
 msgid "Fast"
-msgstr ""
+msgstr "Rapida"
 
 msgid "Flip board"
-msgstr ""
+msgstr "Turni tabulon"
 
 msgid "Flip opp. space numbers"
 msgstr ""
 
 msgid "Forced"
-msgstr ""
+msgstr "Deviga"
 
 msgid "Good Luck, Have Fun"
-msgstr ""
+msgstr "Bonan ŝancon, ĝuu"
 
 msgid "Highlight legal moves"
 msgstr "Reliefigi eblajn movojn"
 
 msgid "History"
-msgstr ""
+msgstr "Historio"
 
 msgid "Instant"
-msgstr ""
+msgstr "Tuja"
 
 msgid "Join"
 msgstr "Aligî"
@@ -176,31 +176,31 @@ msgid "Leave match?"
 msgstr "Ĉu forlasi partion?"
 
 msgid "Left match"
-msgstr ""
+msgstr "Forlasis partion"
 
 msgid "Legal moves: %s"
 msgstr "Eblaj movoj: %s"
 
 msgid "Loading..."
-msgstr ""
+msgstr "Ŝargante…"
 
 msgid "Logged in as guest"
-msgstr ""
+msgstr "Salutinta kiel gasto"
 
 msgid "Long press back to exit the application."
 msgstr ""
 
 msgid "Match Name"
-msgstr ""
+msgstr "Nomo de partio"
 
 msgid "Matches List"
-msgstr ""
+msgstr "Listo de partioj"
 
 msgid "Medium"
-msgstr ""
+msgstr "Mezrapida"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menuo"
 
 msgid "Multi"
 msgstr ""
@@ -209,19 +209,19 @@ msgid "Name"
 msgstr "Nomo"
 
 msgid "New"
-msgstr ""
+msgstr "Nova"
 
 msgid "No"
 msgstr "Ne"
 
 msgid "None"
-msgstr ""
+msgstr "Nenio"
 
 msgid "OK"
 msgstr "Bone"
 
 msgid "Opponent"
-msgstr ""
+msgstr "Kontraŭulo"
 
 msgid "Password"
 msgstr "Pasvorto"
@@ -252,19 +252,19 @@ msgid "Private"
 msgstr "Privata"
 
 msgid "Rating"
-msgstr ""
+msgstr "Takso"
 
 msgid "Read error"
-msgstr ""
+msgstr "Lega eraro"
 
 msgid "Reconnecting"
-msgstr ""
+msgstr "Rekonektante"
 
 msgid "Refresh"
 msgstr "Refreŝigi"
 
 msgid "Refresh matches"
-msgstr ""
+msgstr "Refreŝigi liston de partioj"
 
 msgid "Register"
 msgstr "Registri"
@@ -276,13 +276,13 @@ msgid "Replaying %s vs. %s"
 msgstr ""
 
 msgid "Reset Password"
-msgstr ""
+msgstr "Restarigi pasvorton"
 
 msgid "Resign"
 msgstr "Rezigni"
 
 msgid "Result"
-msgstr ""
+msgstr "Rezulto"
 
 msgid "Return"
 msgstr "Reen"
@@ -291,7 +291,7 @@ msgid "Roll"
 msgstr "Ĵeti ĵetkubon"
 
 msgid "Search"
-msgstr ""
+msgstr "Serĉi"
 
 msgid "Sending password reset request"
 msgstr ""
@@ -312,10 +312,10 @@ msgid "Single"
 msgstr ""
 
 msgid "Slow"
-msgstr ""
+msgstr "Malrapida"
 
 msgid "Speed"
-msgstr ""
+msgstr "Rapido"
 
 msgid "Started"
 msgstr "Komencita"
@@ -372,7 +372,7 @@ msgid "View replay"
 msgstr ""
 
 msgid "Waiting"
-msgstr ""
+msgstr "Atendante"
 
 msgid "Warning: Received unknown event: %+v"
 msgstr "Averto: ricevis nekonatan eventon: %+v"
@@ -387,19 +387,19 @@ msgid ""
 msgstr ""
 
 msgid "Welcome, %s. There are %d clients playing %d matches."
-msgstr ""
+msgstr "Bonvenon, %s. Jen %d klientoj en %d partioj."
 
 msgid "Welcome, %s. There are %d clients playing 1 match."
-msgstr ""
+msgstr "Bonvenon, %s. Jen %d klientoj en 1 partio."
 
 msgid "Welcome, %s. There is 1 client playing %d matches."
-msgstr ""
+msgstr "Bonvenon, %s. Jen 1 kliento en %d partioj."
 
 msgid "Welcome, %s. There is 1 client playing 1 match."
-msgstr ""
+msgstr "Bonvenon, %s. Jen 1 kliento en 1 partio."
 
 msgid "Write error"
-msgstr ""
+msgstr "Skriba eraro"
 
 msgid "Yes"
 msgstr "Jes"
