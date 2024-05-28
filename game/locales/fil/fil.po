@@ -262,6 +262,9 @@ msgstr ""
 msgid "Register"
 msgstr ""
 
+msgid "Rematch"
+msgstr ""
+
 msgid "Replay download already in progress."
 msgstr ""
 
@@ -345,9 +348,6 @@ msgid ""
 msgstr ""
 
 msgid "Tutorial"
-msgstr ""
-
-msgid "Type %s to offer a rematch."
 msgstr ""
 
 msgid "Undo"

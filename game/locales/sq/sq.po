@@ -275,6 +275,9 @@ msgstr "Rifresko lojrat"
 msgid "Register"
 msgstr "Regjistrohu"
 
+msgid "Rematch"
+msgstr ""
+
 msgid "Replay download already in progress."
 msgstr "Ngarkimi i rishikimit është në progres."
 
@@ -365,9 +368,6 @@ msgstr ""
 msgid "Tutorial"
 msgstr "Mësim"
 
-msgid "Type %s to offer a rematch."
-msgstr "Shkruaj %s për të ofruar një riluajtje."
-
 msgid "Undo"
 msgstr "Zhbëj"
 
@@ -426,3 +426,6 @@ msgstr "Të vynë për ta përmirësuar klientin."
 
 msgid "from %s to %s"
 msgstr "prej %s në %s"
+
+#~ msgid "Type %s to offer a rematch."
+#~ msgstr "Shkruaj %s për të ofruar një riluajtje."

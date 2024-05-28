@@ -267,6 +267,9 @@ msgstr ""
 msgid "Register"
 msgstr ""
 
+msgid "Rematch"
+msgstr ""
+
 msgid "Replay download already in progress."
 msgstr ""
 
@@ -354,9 +357,6 @@ msgstr ""
 msgid "Tutorial"
 msgstr ""
 
-msgid "Type %s to offer a rematch."
-msgstr "Gépelje be, hogy %s, visszavágó felajánlásához."
-
 msgid "Undo"
 msgstr "Visszavonás"
 
@@ -412,3 +412,6 @@ msgstr "A kliens frissítése szükséges."
 
 msgid "from %s to %s"
 msgstr ""
+
+#~ msgid "Type %s to offer a rematch."
+#~ msgstr "Gépelje be, hogy %s, visszavágó felajánlásához."

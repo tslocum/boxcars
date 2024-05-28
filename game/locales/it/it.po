@@ -275,6 +275,9 @@ msgstr "Aggiorna partite"
 msgid "Register"
 msgstr "Registrati"
 
+msgid "Rematch"
+msgstr ""
+
 msgid "Replay download already in progress."
 msgstr "Scaricamento della partita già in corso."
 
@@ -364,9 +367,6 @@ msgstr ""
 msgid "Tutorial"
 msgstr "Guida per iniziare"
 
-msgid "Type %s to offer a rematch."
-msgstr "Scrivi %s per offrire una rivincita."
-
 msgid "Undo"
 msgstr "Annulla"
 
@@ -425,3 +425,6 @@ msgstr "Potresti dover aggiornare il programma."
 
 msgid "from %s to %s"
 msgstr "da %s a %s"
+
+#~ msgid "Type %s to offer a rematch."
+#~ msgstr "Scrivi %s per offrire una rivincita."

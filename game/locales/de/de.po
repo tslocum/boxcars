@@ -275,6 +275,9 @@ msgstr "Spielliste aktualisieren"
 msgid "Register"
 msgstr "Registrieren"
 
+msgid "Rematch"
+msgstr ""
+
 msgid "Replay download already in progress."
 msgstr "Replay wird bereits heruntergeladen."
 
@@ -367,9 +370,6 @@ msgstr ""
 msgid "Tutorial"
 msgstr "Tutorial"
 
-msgid "Type %s to offer a rematch."
-msgstr "Gib %s ein um eine Revanche anzubieten."
-
 msgid "Undo"
 msgstr "Rückgangig machen"
 
@@ -430,3 +430,6 @@ msgstr "Du musst vielleicht deinen Client updaten."
 
 msgid "from %s to %s"
 msgstr "von %s nach %s"
+
+#~ msgid "Type %s to offer a rematch."
+#~ msgstr "Gib %s ein um eine Revanche anzubieten."

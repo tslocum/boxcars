@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-03-23 21:01+0000\n"
+"PO-Revision-Date: 2024-05-21 11:01+0000\n"
 "Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Weblate 5.5-dev\n"
+"X-Generator: Weblate 5.6-dev\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Вільні Онлайн Нарди"
@@ -276,6 +276,9 @@ msgstr "Оновити список"
 msgid "Register"
 msgstr "Зареєструватися"
 
+msgid "Rematch"
+msgstr "Рематч"
+
 msgid "Replay download already in progress."
 msgstr "Завантаження повтору в процесі."
 
@@ -366,9 +369,6 @@ msgstr ""
 msgid "Tutorial"
 msgstr "Посібник"
 
-msgid "Type %s to offer a rematch."
-msgstr "Введіть %s, щоб запропонувати реванш."
-
 msgid "Undo"
 msgstr "Скасув. хід"
 
@@ -429,3 +429,6 @@ msgstr "Можливо, потрібно оновити клієнт."
 
 msgid "from %s to %s"
 msgstr "з %s до %s"
+
+#~ msgid "Type %s to offer a rematch."
+#~ msgstr "Введіть %s, щоб запропонувати реванш."

@@ -280,6 +280,9 @@ msgstr "Oyunları yenile"
 msgid "Register"
 msgstr "Kaydol"
 
+msgid "Rematch"
+msgstr ""
+
 msgid "Replay download already in progress."
 msgstr "Yeniden oynatma indiriliyor."
 
@@ -374,9 +377,6 @@ msgstr ""
 msgid "Tutorial"
 msgstr "Öğretici"
 
-msgid "Type %s to offer a rematch."
-msgstr "Rövanş teklif etmek için %s yazın."
-
 msgid "Undo"
 msgstr "Geri al"
 
@@ -438,3 +438,6 @@ msgstr "İstemcinizi yükseltmeniz gerekebilir."
 #, fuzzy
 msgid "from %s to %s"
 msgstr "%s'ten 5s'e"
+
+#~ msgid "Type %s to offer a rematch."
+#~ msgstr "Rövanş teklif etmek için %s yazın."

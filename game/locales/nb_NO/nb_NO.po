@@ -292,6 +292,9 @@ msgstr "Gjenoppfrisk spill"
 msgid "Register"
 msgstr "Registrering"
 
+msgid "Rematch"
+msgstr ""
+
 msgid "Replay download already in progress."
 msgstr "Nedlasting av spill allerede underveis."
 
@@ -385,9 +388,6 @@ msgstr "Kun angi brukernavn (uten passord) hvis du vil logge inn som gjest."
 msgid "Tutorial"
 msgstr "Veiledning"
 
-msgid "Type %s to offer a rematch."
-msgstr "Skriv «%s» for å tilby omkamp."
-
 msgid "Undo"
 msgstr "Angre"
 
@@ -449,3 +449,6 @@ msgstr "Det kan hende du må installere en nyere versjon av programmet."
 
 msgid "from %s to %s"
 msgstr "fra %s til %s"
+
+#~ msgid "Type %s to offer a rematch."
+#~ msgstr "Skriv «%s» for å tilby omkamp."

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-04-22 21:07+0000\n"
+"PO-Revision-Date: 2024-05-13 00:01+0000\n"
 "Last-Translator: phlostically <phlostically@mailinator.com>\n"
 "Language-Team: Esperanto <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/eo/>\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.5-dev\n"
+"X-Generator: Weblate 5.5.4\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Libera Interreta triktrako"
@@ -269,6 +269,9 @@ msgstr "Refreŝigi liston de partioj"
 msgid "Register"
 msgstr "Registri"
 
+msgid "Rematch"
+msgstr ""
+
 msgid "Replay download already in progress."
 msgstr ""
 
@@ -356,9 +359,6 @@ msgstr ""
 msgid "Tutorial"
 msgstr ""
 
-msgid "Type %s to offer a rematch."
-msgstr "Tajpu %s por proponi repartion."
-
 msgid "Undo"
 msgstr "Malfari"
 
@@ -369,7 +369,7 @@ msgid "Variant"
 msgstr "Varianto"
 
 msgid "View replay"
-msgstr ""
+msgstr "Spekti reludon"
 
 msgid "Waiting"
 msgstr "Atendante"
@@ -413,4 +413,7 @@ msgid "You may need to upgrade your client."
 msgstr "Vi eble devas ĝisdatigi vian programon."
 
 msgid "from %s to %s"
-msgstr ""
+msgstr "de %s al %s"
+
+#~ msgid "Type %s to offer a rematch."
+#~ msgstr "Tajpu %s por proponi repartion."
