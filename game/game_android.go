@@ -121,16 +121,11 @@ func saveReplay(id int, content []byte) error {
 }
 
 func showKeyboard() {
-	if keyboardConn == nil {
-		game.keyboardHintVisible = true
-		return
-	}
-	keyboardConn.Write([]byte("1\n"))
+	game.keyboard.SetVisible(true)
+	scheduleFrame()
 }
 
 func hideKeyboard() {
-	if keyboardConn == nil {
-		return
-	}
-	keyboardConn.Write([]byte("0\n"))
+	game.keyboard.SetVisible(false)
+	scheduleFrame()
 }

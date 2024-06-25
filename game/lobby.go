@@ -62,22 +62,22 @@ type lobby struct {
 	refresh bool
 
 	showCreateGame           bool
-	createGameName           *etk.Input
-	createGamePoints         *etk.Input
-	createGamePassword       *etk.Input
+	createGameName           *Input
+	createGamePoints         *Input
+	createGamePassword       *Input
 	createGameAceyCheckbox   *etk.Checkbox
 	createGameTabulaCheckbox *etk.Checkbox
 
 	showJoinGame     bool
 	joinGameID       int
 	joinGameLabel    *etk.Text
-	joinGamePassword *etk.Input
+	joinGamePassword *Input
 
 	showHistory                         bool
 	historySelected                     int
 	historyLastClick                    time.Time
 	historyMatches                      []*bgammon.HistoryMatch
-	historyUsername                     *etk.Input
+	historyUsername                     *Input
 	historyList                         *etk.List
 	historyPage                         int
 	historyPages                        int
@@ -245,7 +245,7 @@ func (l *lobby) getButtons() []string {
 }
 
 func (l *lobby) confirmCreateGame() {
-	hideKeyboard()
+	go hideKeyboard()
 	typeAndPassword := "public"
 	if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
 		typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
@@ -264,7 +264,7 @@ func (l *lobby) confirmCreateGame() {
 }
 
 func (l *lobby) confirmJoinGame() {
-	hideKeyboard()
+	go hideKeyboard()
 	l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
 }
 

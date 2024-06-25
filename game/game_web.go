@@ -81,7 +81,8 @@ func showKeyboard() {
 	if virtualKeyboard.IsUndefined() {
 		return
 	}
-	virtualKeyboard.Call("show")
+	game.keyboard.SetVisible(true)
+	scheduleFrame()
 }
 
 func hideKeyboard() {
@@ -89,5 +90,6 @@ func hideKeyboard() {
 	if virtualKeyboard.IsUndefined() {
 		return
 	}
-	virtualKeyboard.Call("hide")
+	game.keyboard.SetVisible(false)
+	scheduleFrame()
 }

@@ -25,6 +25,7 @@ import (
 	"code.rocket9labs.com/tslocum/bgammon-bei-bot/bot"
 	"code.rocket9labs.com/tslocum/bgammon/pkg/server"
 	"code.rocket9labs.com/tslocum/etk"
+	"code.rocket9labs.com/tslocum/etk/kibodo"
 	"code.rocket9labs.com/tslocum/tabula"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
@@ -40,7 +41,7 @@ import (
 )
 
 const (
-	version              = "v1.3.4p1"
+	version              = "v1.3.5"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -95,7 +96,7 @@ const (
 	minHeight = 240
 )
 
-const (
+var (
 	extraSmallFontSize  = 14
 	smallFontSize       = 20
 	mediumFontSize      = 24
@@ -111,7 +112,7 @@ var (
 var (
 	statusBuffer *etk.Text
 	gameBuffer   *etk.Text
-	inputBuffer  *etk.Input
+	inputBuffer  *Input
 
 	statusLogged bool
 	gameLogged   bool
@@ -135,6 +136,7 @@ var (
 	historyContainer    *etk.Grid
 	listGamesContainer  *etk.Grid
 
+	displayFrame    *etk.Frame
 	connectFrame    *etk.Frame
 	createGameFrame *etk.Frame
 	joinGameFrame   *etk.Frame
@@ -403,6 +405,11 @@ func cubeImage(value int8) *ebiten.Image {
 }
 
 func setViewBoard(view bool) {
+	if view != viewBoard {
+		go hideKeyboard()
+		inputBuffer.SetText("")
+	}
+
 	var refreshLobby bool
 	if !view && viewBoard != view {
 		refreshLobby = true
@@ -428,7 +435,7 @@ func setViewBoard(view bool) {
 		game.lobby.createGamePassword.SetText("")
 		game.lobby.rebuildButtonsGrid()
 
-		etk.SetRoot(game.Board.frame)
+		game.setRoot(game.Board.frame)
 		etk.SetFocus(inputBuffer)
 
 		game.Board.uiGrid.SetRect(game.Board.uiGrid.Rect())
@@ -530,9 +537,8 @@ type Game struct {
 
 	lobby *lobby
 
-	keyboardHint          *etk.Text
-	keyboardHintVisible   bool
-	keyboardHintDismissed bool
+	keyboard      *etk.Keyboard
+	keyboardFrame *etk.Frame
 
 	volume float64 // Volume range is 0-1.
 
@@ -542,15 +548,15 @@ type Game struct {
 
 	cpuProfile *os.File
 
-	connectUsername *etk.Input
-	connectPassword *etk.Input
-	connectServer   *etk.Input
+	connectUsername *Input
+	connectPassword *Input
+	connectServer   *Input
 
-	registerEmail    *etk.Input
-	registerUsername *etk.Input
-	registerPassword *etk.Input
+	registerEmail    *Input
+	registerUsername *Input
+	registerPassword *Input
 
-	resetEmail      *etk.Input
+	resetEmail      *Input
 	resetInfo       *etk.Text
 	resetInProgress bool
 
@@ -609,6 +615,9 @@ func NewGame() *Game {
 	ebiten.SetWindowClosingHandled(true)
 
 	g := &Game{
+		keyboard:      etk.NewKeyboard(),
+		keyboardFrame: etk.NewFrame(),
+
 		runeBuffer: make([]rune, 24),
 
 		tutorialFrame: etk.NewFrame(),
@@ -618,6 +627,13 @@ func NewGame() *Game {
 
 		Mutex: &sync.Mutex{},
 	}
+	g.keyboard.SetScheduleFrameFunc(scheduleFrame)
+	g.keyboard.SetKeys(kibodo.KeysMobileQWERTY)
+	g.keyboard.SetExtendedKeys(kibodo.KeysMobileSymbols)
+	if !AutoEnableTouchInput {
+		g.keyboard.SetVisible(false)
+	}
+	g.keyboardFrame.AddChild(g.keyboard)
 	g.savedUsername, g.savedPassword = loadCredentials()
 	g.tutorialFrame.SetPositionChildren(true)
 	game = g
@@ -629,19 +645,26 @@ func (g *Game) initialize() {
 	loadAudioAssets()
 	loadImageAssets(0)
 
-	fnt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
-	if err != nil {
-		log.Fatal(err)
-	}
-	etk.Style.TextFont = fnt
-	etk.Style.TextSize = largeFontSize
-
 	if AutoEnableTouchInput {
 		etk.Bindings.ConfirmRune = 199
 		etk.Bindings.BackRune = 231
 
 		etk.Style.BorderSize /= 2
+
+		extraSmallFontSize /= 2
+		smallFontSize /= 2
+		mediumFontSize /= 2
+		mediumLargeFontSize /= 2
+		largeFontSize /= 2
 	}
+
+	fnt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	etk.Style.TextFont = fnt
+	etk.Style.TextSize = largeFontSize
 
 	etk.Style.TextColorLight = triangleA
 	etk.Style.TextColorDark = triangleA
@@ -661,7 +684,7 @@ func (g *Game) initialize() {
 
 	statusBuffer = etk.NewText("")
 	gameBuffer = etk.NewText("")
-	inputBuffer = etk.NewInput("", acceptInput)
+	inputBuffer = &Input{etk.NewInput("", acceptInput)}
 
 	statusBuffer.SetForeground(bufferTextColor)
 	statusBuffer.SetBackground(bufferBackgroundColor)
@@ -677,6 +700,9 @@ func (g *Game) initialize() {
 	if AutoEnableTouchInput {
 		fieldHeight = etk.Scale(32)
 	}
+
+	displayFrame = etk.NewFrame()
+	displayFrame.SetPositionChildren(true)
 
 	g.Board = NewBoard()
 	g.lobby = NewLobby()
@@ -694,10 +720,10 @@ func (g *Game) initialize() {
 	if connectAddress == "" {
 		connectAddress = DefaultServerAddress
 	}
-	g.connectServer = etk.NewInput(connectAddress, func(text string) (handled bool) {
+	g.connectServer = &Input{etk.NewInput(connectAddress, func(text string) (handled bool) {
 		g.selectConnect()
 		return false
-	})
+	})}
 
 	{
 		headerLabel := newCenteredText(gotext.Get("Register"))
@@ -706,22 +732,22 @@ func (g *Game) initialize() {
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
 
-		g.registerEmail = etk.NewInput("", func(text string) (handled bool) {
+		g.registerEmail = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.selectConfirmRegister()
 			return false
-		})
+		})}
 		centerInput(g.registerEmail)
 
-		g.registerUsername = etk.NewInput("", func(text string) (handled bool) {
+		g.registerUsername = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.selectConfirmRegister()
 			return false
-		})
+		})}
 		centerInput(g.registerUsername)
 
-		g.registerPassword = etk.NewInput("", func(text string) (handled bool) {
+		g.registerPassword = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.selectConfirmRegister()
 			return false
-		})
+		})}
 		centerInput(g.registerPassword)
 		g.registerPassword.SetMask('*')
 
@@ -777,10 +803,10 @@ func (g *Game) initialize() {
 		emailLabel := newCenteredText(gotext.Get("Email"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
 
-		g.resetEmail = etk.NewInput("", func(text string) (handled bool) {
+		g.resetEmail = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.selectConfirmReset()
 			return false
-		})
+		})}
 		centerInput(g.resetEmail)
 
 		cancelButton := etk.NewButton(gotext.Get("Cancel"), func() error {
@@ -842,16 +868,16 @@ func (g *Game) initialize() {
 		footerLabel.SetHorizontal(etk.AlignEnd)
 		footerLabel.SetVertical(etk.AlignEnd)
 
-		g.connectUsername = etk.NewInput("", func(text string) (handled bool) {
+		g.connectUsername = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.selectConnect()
 			return false
-		})
+		})}
 		centerInput(g.connectUsername)
 
-		g.connectPassword = etk.NewInput("", func(text string) (handled bool) {
+		g.connectPassword = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.selectConnect()
 			return false
-		})
+		})}
 		centerInput(g.connectPassword)
 		g.connectPassword.SetMask('*')
 
@@ -917,22 +943,22 @@ func (g *Game) initialize() {
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		variantLabel := newCenteredText(gotext.Get("Variant"))
 
-		g.lobby.createGameName = etk.NewInput("", func(text string) (handled bool) {
+		g.lobby.createGameName = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.lobby.confirmCreateGame()
 			return false
-		})
+		})}
 		centerInput(g.lobby.createGameName)
 
-		g.lobby.createGamePoints = etk.NewInput("", func(text string) (handled bool) {
+		g.lobby.createGamePoints = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.lobby.confirmCreateGame()
 			return false
-		})
+		})}
 		centerInput(g.lobby.createGamePoints)
 
-		g.lobby.createGamePassword = etk.NewInput("", func(text string) (handled bool) {
+		g.lobby.createGamePassword = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.lobby.confirmCreateGame()
 			return false
-		})
+		})}
 		centerInput(g.lobby.createGamePassword)
 		g.lobby.createGamePassword.SetMask('*')
 
@@ -1022,10 +1048,10 @@ func (g *Game) initialize() {
 
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 
-		g.lobby.joinGamePassword = etk.NewInput("", func(text string) (handled bool) {
+		g.lobby.joinGamePassword = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.lobby.confirmJoinGame()
 			return false
-		})
+		})}
 		centerInput(g.lobby.joinGamePassword)
 		g.lobby.joinGamePassword.SetMask('*')
 
@@ -1074,10 +1100,10 @@ func (g *Game) initialize() {
 			opponentLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		}
 
-		g.lobby.historyUsername = etk.NewInput("", func(text string) (handled bool) {
+		g.lobby.historyUsername = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.selectHistorySearch()
 			return false
-		})
+		})}
 		centerInput(g.lobby.historyUsername)
 		g.lobby.historyUsername.SetScrollBarVisible(false)
 
@@ -1211,12 +1237,6 @@ func (g *Game) initialize() {
 		listGamesFrame.AddChild(g.tutorialFrame)
 	}
 
-	if AutoEnableTouchInput {
-		g.keyboardHint = etk.NewText(gotext.Get("Press back to toggle the keyboard.") + "\n\n" + gotext.Get("Long press back to exit the application.") + "\n\n" + gotext.Get("Tap to dismiss this pop-up."))
-		g.keyboardHint.SetHorizontal(etk.AlignCenter)
-		g.keyboardHint.SetVertical(etk.AlignCenter)
-	}
-
 	statusBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	gameBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	inputBuffer.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
@@ -1249,11 +1269,12 @@ func (g *Game) initialize() {
 	go g.handleAutoRefresh()
 	go g.handleUpdateTimeLabels()
 
+	etk.SetRoot(displayFrame)
 	scheduleFrame()
 }
 
 func (g *Game) playOffline() {
-	hideKeyboard()
+	go hideKeyboard()
 	if g.loggedIn {
 		return
 	}
@@ -1330,7 +1351,8 @@ func (g *Game) setRoot(w etk.Widget) {
 	if w != g.Board.frame {
 		g.rootWidget = w
 	}
-	etk.SetRoot(w)
+	displayFrame.Clear()
+	displayFrame.AddChild(w, g.keyboardFrame)
 }
 
 func (g *Game) setBufferRects() {
@@ -2231,7 +2253,7 @@ func (g *Game) selectCancel() error {
 }
 
 func (g *Game) selectConfirmRegister() error {
-	hideKeyboard()
+	go hideKeyboard()
 	g.Email = g.registerEmail.Text()
 	g.Username = g.registerUsername.Text()
 	g.Password = g.registerPassword.Text()
@@ -2244,7 +2266,7 @@ func (g *Game) selectConfirmRegister() error {
 }
 
 func (g *Game) selectConfirmReset() error {
-	hideKeyboard()
+	go hideKeyboard()
 	if g.resetInProgress {
 		return nil
 	}
@@ -2266,7 +2288,7 @@ func (g *Game) selectConfirmReset() error {
 }
 
 func (g *Game) selectConnect() error {
-	hideKeyboard()
+	go hideKeyboard()
 	g.Username = g.connectUsername.Text()
 	g.Password = g.connectPassword.Text()
 	if ShowServerSettings {
@@ -2277,7 +2299,7 @@ func (g *Game) selectConnect() error {
 }
 
 func (g *Game) searchMatches(username string) {
-	hideKeyboard()
+	go hideKeyboard()
 	loadingText := newCenteredText(gotext.Get("Loading..."))
 	if AutoEnableTouchInput {
 		loadingText.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
@@ -2290,7 +2312,7 @@ func (g *Game) searchMatches(username string) {
 }
 
 func (g *Game) selectHistory() error {
-	hideKeyboard()
+	go hideKeyboard()
 	g.lobby.showHistory = true
 	g.setRoot(historyFrame)
 	g.lobby.historyUsername.SetText(g.Client.Username)
@@ -2301,7 +2323,7 @@ func (g *Game) selectHistory() error {
 }
 
 func (g *Game) selectHistorySearch() error {
-	hideKeyboard()
+	go hideKeyboard()
 	username := g.lobby.historyUsername.Text()
 	if strings.TrimSpace(username) == "" {
 		return nil
@@ -2311,7 +2333,7 @@ func (g *Game) selectHistorySearch() error {
 }
 
 func (g *Game) selectHistoryPrevious() error {
-	hideKeyboard()
+	go hideKeyboard()
 	if g.lobby.historyUsername.Text() == "" || g.lobby.historyPage == 1 {
 		return nil
 	}
@@ -2320,7 +2342,7 @@ func (g *Game) selectHistoryPrevious() error {
 }
 
 func (g *Game) selectHistoryNext() error {
-	hideKeyboard()
+	go hideKeyboard()
 	if g.lobby.historyUsername.Text() == "" || g.lobby.historyPage == g.lobby.historyPages {
 		return nil
 	}
@@ -2464,28 +2486,6 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 	return nil
 }
 
-func (g *Game) handleTouch(p image.Point) bool {
-	if g.keyboardHintDismissed || (p.X == 0 && p.Y == 0) {
-		return false
-	}
-
-	if g.keyboardHintVisible && p.X >= 0 && p.X < g.screenW && p.Y >= 0 && p.Y < g.screenH/3 {
-		g.keyboardHintVisible = false
-		g.keyboardHintDismissed = true
-		return true
-	}
-
-	w := etk.At(p)
-	if w == nil {
-		return false
-	}
-	switch w.(type) {
-	case *etk.Input:
-		showKeyboard()
-	}
-	return false
-}
-
 // Update is called by Ebitengine only when user input occurs, or a frame is
 // explicitly scheduled.
 func (g *Game) Update() error {
@@ -2552,16 +2552,8 @@ func (g *Game) Update() error {
 	}
 
 	// Handle touch input.
-	g.touchIDs = inpututil.AppendJustPressedTouchIDs(g.touchIDs[:0])
-	for _, id := range g.touchIDs {
-		tx, ty := ebiten.TouchPosition(id)
-		if tx != 0 || ty != 0 {
-			cx, cy = tx, ty
-			if g.handleTouch(image.Point{cx, cy}) {
-				return nil
-			}
-			break
-		}
+	if len(ebiten.AppendTouchIDs(g.touchIDs[:0])) != 0 {
+		scheduleFrame()
 	}
 
 	// Handle physical keyboard.
@@ -2576,10 +2568,6 @@ func (g *Game) Update() error {
 		if len(g.pressedRunes) != 0 {
 			scheduleFrame()
 		}
-	}
-
-	if len(ebiten.AppendTouchIDs(g.touchIDs[:0])) != 0 {
-		scheduleFrame()
 	}
 
 	err = etk.Update()
@@ -2619,17 +2607,6 @@ func (g *Game) Update() error {
 	return nil
 }
 
-func (g *Game) drawKeyboardHint(screen *ebiten.Image) {
-	if !g.keyboardHintVisible {
-		return
-	}
-	r := image.Rect(0, 0, g.screenW, g.screenH/3)
-	screen.SubImage(r).(*ebiten.Image).Fill(hintColor)
-	screen.SubImage(image.Rect(0, g.screenH/3, g.screenW, g.screenH/3+4)).(*ebiten.Image).Fill(borderColor)
-	g.keyboardHint.SetRect(r)
-	g.keyboardHint.Draw(screen)
-}
-
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.Lock()
 	defer g.Unlock()
@@ -2664,7 +2641,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		g.drawKeyboardHint(screen)
 		return
 	}
 
@@ -2676,8 +2652,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	g.drawKeyboardHint(screen)
 
 	if Debug > 0 {
 		g.drawBuffer.Reset()
@@ -2838,6 +2812,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.Board.updateOpponentLabel()
 	g.Board.updatePlayerLabel()
 
+	g.keyboard.SetRect(image.Rect(0, game.screenH-game.screenH/3, game.screenW, game.screenH))
+
 	if g.LoadReplay != nil {
 		go g.HandleReplay(g.LoadReplay)
 		g.LoadReplay = nil
@@ -2875,7 +2851,7 @@ func acceptInput(text string) (handled bool) {
 	}
 
 	game.Client.Out <- []byte(text)
-	hideKeyboard()
+	go hideKeyboard()
 	return true
 }
 
@@ -3053,6 +3029,17 @@ func LoadLocale(forceLanguage *language.Tag) error {
 	return nil
 }
 
+type Input struct {
+	*etk.Input
+}
+
+func (i *Input) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
+	if clicked {
+		go showKeyboard()
+	}
+	return i.Input.HandleMouse(cursor, pressed, clicked)
+}
+
 type ClickableText struct {
 	*etk.Text
 	onSelected func()
@@ -3071,7 +3058,7 @@ func newCenteredText(text string) *etk.Text {
 	return t
 }
 
-func centerInput(input *etk.Input) {
+func centerInput(input *Input) {
 	input.SetVertical(etk.AlignCenter)
 	input.SetPadding(etk.Scale(5))
 }

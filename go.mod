@@ -1,18 +1,18 @@
 module code.rocket9labs.com/tslocum/boxcars
 
-go 1.17
+go 1.19
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240423015129-50b743a46875
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240625060716-8acfc83de66a
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240422204629-93fba875ad23
-	code.rocket9labs.com/tslocum/etk v0.0.0-20240424172123-500cae845cf1
+	code.rocket9labs.com/tslocum/etk v0.0.0-20240625183029-399fae94ad9c
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240422202348-09cfc96fcfc9
-	github.com/hajimehoshi/ebiten/v2 v2.7.4
-	github.com/leonelquinteros/gotext v1.6.0
+	github.com/hajimehoshi/ebiten/v2 v2.7.5
+	github.com/leonelquinteros/gotext v1.6.1
 	github.com/llgcode/draw2d v0.0.0-20240322162412-ee6987bd01dc
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	golang.org/x/image v0.16.0
-	golang.org/x/text v0.15.0
+	golang.org/x/image v0.17.0
+	golang.org/x/text v0.16.0
 	nhooyr.io/websocket v1.8.11
 )
 
@@ -35,10 +35,10 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
-	github.com/huandu/xstrings v1.4.0 // indirect
+	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.6.0 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
@@ -55,8 +55,8 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.21.0 // indirect
-	golang.org/x/crypto v0.23.0 // indirect
-	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/crypto v0.24.0 // indirect
+	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 )

@@ -118,8 +118,8 @@ type board struct {
 
 	menuGrid *etk.Grid
 
-	changePasswordOld  *etk.Input
-	changePasswordNew  *etk.Input
+	changePasswordOld  *Input
+	changePasswordNew  *Input
 	changePasswordGrid *etk.Grid
 
 	highlightCheckbox        *etk.Checkbox
@@ -308,10 +308,10 @@ func NewBoard() *board {
 		}
 		oldLabel.SetVertical(etk.AlignCenter)
 
-		b.changePasswordOld = etk.NewInput("", func(text string) (handled bool) {
+		b.changePasswordOld = &Input{etk.NewInput("", func(text string) (handled bool) {
 			b.selectChangePassword()
 			return false
-		})
+		})}
 		b.changePasswordOld.SetBackground(frameColor)
 		centerInput(b.changePasswordOld)
 
@@ -324,10 +324,10 @@ func NewBoard() *board {
 		}
 		newLabel.SetVertical(etk.AlignCenter)
 
-		b.changePasswordNew = etk.NewInput("", func(text string) (handled bool) {
+		b.changePasswordNew = &Input{etk.NewInput("", func(text string) (handled bool) {
 			b.selectChangePassword()
 			return false
-		})
+		})}
 		b.changePasswordNew.SetBackground(frameColor)
 		centerInput(b.changePasswordNew)
 
