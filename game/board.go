@@ -2407,7 +2407,7 @@ func (b *board) processState() {
 				showGrid = b.buttonsOnlyRollGrid
 			}
 		} else if b.gameState.MayOK() {
-			if b.gameState.MayResign() {
+			if b.gameState.MayDecline() {
 				showGrid = b.buttonsResignAcceptGrid
 			} else if len(b.gameState.Moves) != 0 {
 				showGrid = b.buttonsUndoOKGrid

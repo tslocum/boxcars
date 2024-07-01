@@ -1801,7 +1801,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 		gs.Started = time.Unix(timestamp, 0)
 		gs.Ended = gs.Started
 	case bytes.Equal(split[0], []byte("1")), bytes.Equal(split[0], []byte("2")):
-		if len(split) < 3 {
+		if len(split) < 2 || (!bytes.Equal(split[1], []byte("t")) && len(split) < 3) {
 			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
 			return false
 		}
@@ -1997,6 +1997,17 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 						Available:    gs.Available,
 						Spectating:   true,
 					},
+				}
+				g.Client.Events <- ev
+			}
+		case bytes.Equal(split[1], []byte("t")):
+			playerName := gs.Player1.Name
+			if player == 2 {
+				playerName = gs.Player2.Name
+			}
+			if sendEvent {
+				ev := &bgammon.EventNotice{
+					Message: gotext.Get("%s resigned.", playerName),
 				}
 				g.Client.Events <- ev
 			}
