@@ -2537,13 +2537,14 @@ func (b *board) processState() {
 	}
 	onBar := tabulaBoard[tabula.SpaceBarPlayer] != 0
 	available, _ := tabulaBoard.Available(1)
+	mayBearOff := tabulaBoard.MayBearOff(b.gameState.Turn)
 	for space := 0; space < 28; space++ {
 		b.highlightSpaces[space] = b.highlightSpaces[space][:0]
 	}
 	for i := range available {
 		var moves [][2]int8
 		for _, m := range available[i] {
-			if m[0] == 0 && m[1] == 0 {
+			if m[0] == 0 && m[1] == 0 || ((m[1] == bgammon.SpaceHomePlayer || m[1] == bgammon.SpaceHomeOpponent) && !mayBearOff) {
 				break
 			}
 			moves = append(moves, m)
