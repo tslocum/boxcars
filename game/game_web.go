@@ -14,6 +14,7 @@ import (
 const (
 	AppName            = "boxcars"
 	ShowServerSettings = false
+	targetFPS          = 144
 )
 
 func init() {

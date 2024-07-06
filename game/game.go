@@ -41,7 +41,7 @@ import (
 )
 
 const (
-	version              = "v1.3.5p1"
+	version              = "v1.3.5p2"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -499,6 +499,7 @@ var viewBoard bool // View board or lobby
 var (
 	drawScreen     int
 	updatedGame    bool
+	lastDraw       time.Time
 	gameUpdateLock = &sync.Mutex{}
 )
 
@@ -608,9 +609,9 @@ type Game struct {
 }
 
 func NewGame() *Game {
-	ebiten.SetVsyncEnabled(true)
+	ebiten.SetVsyncEnabled(false)
 	ebiten.SetScreenClearedEveryFrame(false)
-	ebiten.SetTPS(144)
+	ebiten.SetTPS(targetFPS)
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetWindowClosingHandled(true)
 
@@ -2522,7 +2523,7 @@ func (g *Game) Update() error {
 	}
 
 	cx, cy := ebiten.CursorPosition()
-	if cx != g.cursorX || cy != g.cursorY {
+	if (cx != g.cursorX || cy != g.cursorY) && cx >= 0 && cy >= 0 && cx < g.screenW && cy < g.screenH {
 		g.cursorX, g.cursorY = cx, cy
 		scheduleFrame()
 	}
@@ -2635,7 +2636,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if drawScreen <= 0 {
 		gameUpdateLock.Unlock()
 		return
-	} else if updatedGame {
+	}
+	now := time.Now()
+	diff := 1000000000*time.Nanosecond/targetFPS - now.Sub(lastDraw)
+	if diff > 0 {
+		time.Sleep(diff)
+	}
+	lastDraw = now
+	if updatedGame {
 		drawScreen -= 1
 	}
 	gameUpdateLock.Unlock()

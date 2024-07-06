@@ -21,6 +21,7 @@ import (
 const (
 	AppName            = "boxcars-android"
 	ShowServerSettings = true
+	targetFPS          = 60
 )
 
 var keyboardConn net.Conn
