@@ -41,7 +41,7 @@ import (
 )
 
 const (
-	version              = "v1.3.5p2"
+	version              = "v1.3.6"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -520,6 +520,7 @@ type Game struct {
 	screenW, screenH int
 
 	drawBuffer bytes.Buffer
+	drawTick   int
 
 	spinnerIndex int
 
@@ -2506,6 +2507,8 @@ func (g *Game) Update() error {
 		return nil
 	}
 
+	g.drawTick++
+
 	g.Lock()
 	defer g.Unlock()
 
@@ -2634,8 +2637,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	gameUpdateLock.Lock()
 	if drawScreen <= 0 {
-		gameUpdateLock.Unlock()
-		return
+		if g.drawTick < targetFPS {
+			gameUpdateLock.Unlock()
+			return
+		}
+		updatedGame = false
+		drawScreen = 1
 	}
 	now := time.Now()
 	diff := 1000000000*time.Nanosecond/targetFPS - now.Sub(lastDraw)
@@ -2647,6 +2654,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		drawScreen -= 1
 	}
 	gameUpdateLock.Unlock()
+
+	g.drawTick = 0
 
 	if !viewBoard {
 		screen.Fill(frameColor)
