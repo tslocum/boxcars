@@ -155,17 +155,18 @@ func (l *lobby) toggleVariantTabula() error {
 	return nil
 }
 
-func (l *lobby) setGameList(games []bgammon.GameListing) {
-	l.games = games
-	l.loaded = true
+func (l *lobby) gameListingsEqual(a bgammon.GameListing, b bgammon.GameListing) bool {
+	return a.ID == b.ID && a.Password == b.Password && a.Points == b.Points && a.Players == b.Players && a.Rating == b.Rating && a.Name == b.Name
+}
 
-	const (
-		aceyPrefix   = "(Acey-deucey)"
-		tabulaPrefix = "(Tabula)"
-		botPrefix    = "BOT_"
-	)
-	sort.Slice(l.games, func(i, j int) bool {
-		a, b := l.games[i], l.games[j]
+func (l *lobby) sortGameListings(games []bgammon.GameListing) {
+	sort.Slice(games, func(i, j int) bool {
+		const (
+			aceyPrefix   = "(Acey-deucey)"
+			tabulaPrefix = "(Tabula)"
+			botPrefix    = "BOT_"
+		)
+		a, b := games[i], games[j]
 		switch {
 		case (a.Password) != (b.Password):
 			return !a.Password
@@ -181,6 +182,24 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 			return strings.ToLower(a.Name) < strings.ToLower(b.Name)
 		}
 	})
+}
+
+func (l *lobby) setGameList(games []bgammon.GameListing) {
+	l.sortGameListings(games)
+	if l.loaded && len(games) == len(l.games) {
+		var changed bool
+		for i := range games {
+			if !l.gameListingsEqual(games[i], l.games[i]) {
+				changed = true
+				break
+			}
+		}
+		if !changed {
+			return
+		}
+	}
+	l.games = games
+	l.loaded = true
 
 	newLabel := func(label string) *etk.Text {
 		txt := etk.NewText(label)
