@@ -3,7 +3,7 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.19
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240718161312-23ab2deae4ea
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240718194232-8bb53ef135cb
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240422204629-93fba875ad23
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240625183029-399fae94ad9c
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240703054156-ce0b448f0999
@@ -28,9 +28,6 @@ require (
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
 	github.com/ebitengine/oto/v3 v3.2.0 // indirect
 	github.com/ebitengine/purego v0.7.1 // indirect
-	github.com/gobwas/httphead v0.1.0 // indirect
-	github.com/gobwas/pool v0.2.1 // indirect
-	github.com/gobwas/ws v1.4.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect

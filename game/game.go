@@ -56,6 +56,8 @@ var (
 	onlyNumbers = regexp.MustCompile(`^[0-9]+$`)
 )
 
+var resizeDuration = 250 * time.Millisecond
+
 //go:embed asset locales
 var assetFS embed.FS
 
@@ -518,6 +520,7 @@ type replayFrame struct {
 
 type Game struct {
 	screenW, screenH int
+	lastResize       time.Time
 
 	drawBuffer bytes.Buffer
 	drawTick   int
@@ -2800,12 +2803,18 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	if outsideHeight < minHeight {
 		outsideHeight = minHeight
 	}
-	if g.screenW == outsideWidth && g.screenH == outsideHeight && !g.forceLayout {
-		return outsideWidth, outsideHeight
+	if !g.forceLayout {
+		if g.screenW == outsideWidth && g.screenH == outsideHeight {
+			return outsideWidth, outsideHeight
+		} else if !g.lastResize.IsZero() && time.Since(g.lastResize) < resizeDuration && g.screenW != 0 && g.screenH != 0 {
+			return g.screenW, g.screenH
+		}
+	} else {
+		g.forceLayout = false
 	}
-	g.forceLayout = false
 
 	g.screenW, g.screenH = outsideWidth, outsideHeight
+	g.lastResize = time.Now()
 	scheduleFrame()
 
 	fontMutex.Lock()
