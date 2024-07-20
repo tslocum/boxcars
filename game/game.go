@@ -1420,8 +1420,6 @@ func (g *Game) handleEvent(e interface{}) {
 		if strings.HasPrefix(g.Client.Username, "Guest_") && g.savedUsername == "" {
 			g.tutorialFrame.AddChild(NewTutorialWidget())
 		}
-	case *bgammon.EventHelp:
-		l(fmt.Sprintf("*** Help: %s", ev.Message))
 	case *bgammon.EventNotice:
 		l(fmt.Sprintf("*** %s", ev.Message))
 	case *bgammon.EventSay:
