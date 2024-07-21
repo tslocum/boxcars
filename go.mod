@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240720003230-1e079dcccf22
-	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240422204629-93fba875ad23
+	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240721175208-e769215e74fc
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240625183029-399fae94ad9c
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240703054156-ce0b448f0999
 	github.com/hajimehoshi/ebiten/v2 v2.7.7

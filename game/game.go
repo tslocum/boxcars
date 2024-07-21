@@ -41,7 +41,7 @@ import (
 )
 
 const (
-	version              = "v1.3.6p2"
+	version              = "v1.3.7"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -1296,9 +1296,9 @@ func (g *Game) playOffline() {
 	serverConns := server.ListenLocal()
 
 	// Connect the bots.
-	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula", "", 1, bgammon.VariantBackgammon, beiClient)
-	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula_acey", "", 1, bgammon.VariantAceyDeucey, beiClient)
-	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula_tabula", "", 1, bgammon.VariantTabula, beiClient)
+	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula", "", 1, bgammon.VariantBackgammon, false, beiClient)
+	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula_acey", "", 1, bgammon.VariantAceyDeucey, false, beiClient)
+	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula_tabula", "", 1, bgammon.VariantTabula, false, beiClient)
 
 	// Wait for the bots to finish creating matches.
 	time.Sleep(250 * time.Millisecond)
