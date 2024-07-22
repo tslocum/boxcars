@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/leonelquinteros/gotext"
+	"code.rocket9labs.com/tslocum/gotext"
 	"golang.org/x/text/language"
 )
 

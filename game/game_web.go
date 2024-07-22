@@ -8,7 +8,7 @@ import (
 	"strings"
 	"syscall/js"
 
-	"github.com/leonelquinteros/gotext"
+	"code.rocket9labs.com/tslocum/gotext"
 )
 
 const (

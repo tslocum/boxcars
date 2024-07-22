@@ -1,11 +1,13 @@
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b h1:Y0a14Kf/hSYepSmp4ZfDeE4CZZGBGBS97CNjCbKJm0c=
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b/go.mod h1:tS60/VNAJphKvDBkSLQhKALa15msIAuWWfEKNc4oFZc=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20240720003230-1e079dcccf22 h1:D1nKA9WbDvPXNt00b4TwoTqeCiG1jK2/P41uwjoAmVA=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20240720003230-1e079dcccf22/go.mod h1:z9MOUNGBYmJC0XY8Mac40nYbTwzvosmKjpF04Vr8CWo=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20240722063843-bde555532e40 h1:UpU5tRYmmxUG8V8nm3WHRmJrdfN7P0UQXO6PYgiNKW4=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20240722063843-bde555532e40/go.mod h1:wiLaPGmIrwggJJ/girtcsY2mTG4PGXr748Y52+JHEyw=
 code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240721175208-e769215e74fc h1:zKspzJaha5v9qsfV1sy920JxCMgXNLRxux0DmQOPPlA=
 code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240721175208-e769215e74fc/go.mod h1:odKdJABSCpTEsL/AfUJ4FX3Lb1dn2bjiL0tc5qV15G8=
-code.rocket9labs.com/tslocum/etk v0.0.0-20240625183029-399fae94ad9c h1:zIyk8BXf46kD6ABfwc91zrFZ8nYwNl7Pa5H7CIG955U=
-code.rocket9labs.com/tslocum/etk v0.0.0-20240625183029-399fae94ad9c/go.mod h1:InNHK22sJo9XHAUTFIfueLBP92s8VFj7Ni1zj2MAm8M=
+code.rocket9labs.com/tslocum/etk v0.0.0-20240722054109-43efb59ba5ac h1:I5Ta45/4RklTCWvkNVDErq5YEVKbRnDfZcKK1QZ1K+E=
+code.rocket9labs.com/tslocum/etk v0.0.0-20240722054109-43efb59ba5ac/go.mod h1:InNHK22sJo9XHAUTFIfueLBP92s8VFj7Ni1zj2MAm8M=
+code.rocket9labs.com/tslocum/gotext v0.0.0-20240722063358-6067ad4d7a58 h1:8A+LPX/j9qYaE/tSJcaYONIh28JX5CN9i+4ZfRefvPo=
+code.rocket9labs.com/tslocum/gotext v0.0.0-20240722063358-6067ad4d7a58/go.mod h1:ZkYZ/IF/ebzhUL2bNp4ALROsuH9iCztUWvUJBWsHXRU=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240703054156-ce0b448f0999 h1:PwfoDBtxVT3TwL2KpoijPKi6NQsGu6cXhPVoQeqKJWM=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240703054156-ce0b448f0999/go.mod h1:WEJXESKXqrMFLAArikQ79lpRibNeeE1C0VruxXYMF5M=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
@@ -79,8 +81,6 @@ github.com/jlouis/glicko2 v1.0.0/go.mod h1:5dzlxjhVPPLk+wiUwwF2oVyDwsNXMgnw7WrLR
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
-github.com/leonelquinteros/gotext v1.6.1 h1:PuTN8YUqHvfPZxW+fPXp7o0Fc2zN9L2wXBZrqT5MO5A=
-github.com/leonelquinteros/gotext v1.6.1/go.mod h1:qQRISjoonXYFdRGrTG1LARQ38Gpibad0IPeB4hpvyyM=
 github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195 h1:Vdz2cBh5Fw2MYHWi3ED2PraDQaWEUhNCr1XFHrP4N5A=
 github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195/go.mod h1:1Vk0LDW6jG5cGc2D9RQUxHaE0vYhTvIwSo9mOL6K4/U=
 github.com/llgcode/ps v0.0.0-20210114104736-f4b0c5d1e02e h1:ZAvbj5hI/G/EbAYAcj4yCXUNiFKefEhH0qfImDDD0/8=

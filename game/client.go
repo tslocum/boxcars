@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
-	"github.com/leonelquinteros/gotext"
+	"code.rocket9labs.com/tslocum/gotext"
 	"nhooyr.io/websocket"
 )
 

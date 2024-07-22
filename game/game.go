@@ -26,15 +26,14 @@ import (
 	"code.rocket9labs.com/tslocum/bgammon/pkg/server"
 	"code.rocket9labs.com/tslocum/etk"
 	"code.rocket9labs.com/tslocum/etk/kibodo"
+	"code.rocket9labs.com/tslocum/gotext"
 	"code.rocket9labs.com/tslocum/tabula"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/leonelquinteros/gotext"
 	"github.com/nfnt/resize"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/text/language"
@@ -619,6 +618,43 @@ func NewGame() *Game {
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetWindowClosingHandled(true)
 
+	if AutoEnableTouchInput {
+		etk.Bindings.ConfirmRune = 199
+		etk.Bindings.BackRune = 231
+
+		etk.Style.BorderSize /= 2
+
+		extraSmallFontSize /= 2
+		smallFontSize /= 2
+		mediumFontSize /= 2
+		mediumLargeFontSize /= 2
+		largeFontSize /= 2
+	}
+
+	fnt, err := opentype.Parse(LoadBytes("asset/font/mplus-1p-regular.ttf"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	etk.Style.TextFont = fnt
+	etk.Style.TextSize = largeFontSize
+
+	etk.Style.TextColorLight = triangleA
+	etk.Style.TextColorDark = triangleA
+	etk.Style.InputBgColor = color.RGBA{40, 24, 9, 255}
+
+	etk.Style.ScrollAreaColor = color.RGBA{26, 15, 6, 255}
+	etk.Style.ScrollHandleColor = color.RGBA{180, 154, 108, 255}
+
+	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
+	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
+
+	etk.Style.BorderColorLeft = color.RGBA{233, 207, 170, 255}
+	etk.Style.BorderColorTop = color.RGBA{233, 207, 170, 255}
+
+	etk.Style.ScrollBorderColorLeft = color.RGBA{210, 182, 135, 255}
+	etk.Style.ScrollBorderColorTop = color.RGBA{210, 182, 135, 255}
+
 	g := &Game{
 		keyboard:      etk.NewKeyboard(),
 		keyboardFrame: etk.NewFrame(),
@@ -649,43 +685,6 @@ func NewGame() *Game {
 func (g *Game) initialize() {
 	loadAudioAssets()
 	loadImageAssets(0)
-
-	if AutoEnableTouchInput {
-		etk.Bindings.ConfirmRune = 199
-		etk.Bindings.BackRune = 231
-
-		etk.Style.BorderSize /= 2
-
-		extraSmallFontSize /= 2
-		smallFontSize /= 2
-		mediumFontSize /= 2
-		mediumLargeFontSize /= 2
-		largeFontSize /= 2
-	}
-
-	fnt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	etk.Style.TextFont = fnt
-	etk.Style.TextSize = largeFontSize
-
-	etk.Style.TextColorLight = triangleA
-	etk.Style.TextColorDark = triangleA
-	etk.Style.InputBgColor = color.RGBA{40, 24, 9, 255}
-
-	etk.Style.ScrollAreaColor = color.RGBA{26, 15, 6, 255}
-	etk.Style.ScrollHandleColor = color.RGBA{180, 154, 108, 255}
-
-	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
-	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
-
-	etk.Style.BorderColorLeft = color.RGBA{233, 207, 170, 255}
-	etk.Style.BorderColorTop = color.RGBA{233, 207, 170, 255}
-
-	etk.Style.ScrollBorderColorLeft = color.RGBA{210, 182, 135, 255}
-	etk.Style.ScrollBorderColorTop = color.RGBA{210, 182, 135, 255}
 
 	statusBuffer = etk.NewText("")
 	gameBuffer = etk.NewText("")

@@ -16,11 +16,11 @@ import (
 
 	"code.rocket9labs.com/tslocum/bgammon"
 	"code.rocket9labs.com/tslocum/etk"
+	"code.rocket9labs.com/tslocum/gotext"
 	"code.rocket9labs.com/tslocum/tabula"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
-	"github.com/leonelquinteros/gotext"
 	"github.com/llgcode/draw2d/draw2dimg"
 )
 

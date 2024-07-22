@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/etk"
+	"code.rocket9labs.com/tslocum/gotext"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leonelquinteros/gotext"
 )
 
 type tutorialWidget struct {

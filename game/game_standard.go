@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/leonelquinteros/gotext"
+	"code.rocket9labs.com/tslocum/gotext"
 )
 
 const (
