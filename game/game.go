@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	version              = "v1.3.7p2"
+	version              = "v1.3.7p3"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -1643,6 +1643,16 @@ func (g *Game) handleEvent(e interface{}) {
 		b.flipBoardCheckbox.SetSelected(b.flipBoard)
 		b.traditional = ev.Traditional
 		b.traditionalCheckbox.SetSelected(b.traditional)
+		b.muteJoinLeave = ev.MuteJoinLeave
+		b.muteJoinLeaveCheckbox.SetSelected(b.muteJoinLeave)
+		b.muteChat = ev.MuteChat
+		b.muteChatCheckbox.SetSelected(b.muteChat)
+		b.muteRoll = ev.MuteRoll
+		b.muteRollCheckbox.SetSelected(b.muteRoll)
+		b.muteMove = ev.MuteMove
+		b.muteMoveCheckbox.SetSelected(b.muteMove)
+		b.muteBearOff = ev.MuteBearOff
+		b.muteBearOffCheckbox.SetSelected(b.muteBearOff)
 		if !AutoEnableTouchInput {
 			b.advancedMovement = ev.Advanced
 			b.advancedMovementCheckbox.SetSelected(b.advancedMovement)
@@ -2932,10 +2942,19 @@ func playSoundEffect(effect SoundEffect) {
 	var b []byte
 	switch effect {
 	case effectSay:
+		if game.Board.muteChat {
+			return
+		}
 		b = SoundSay
 	case effectJoinLeave:
+		if game.Board.muteJoinLeave {
+			return
+		}
 		b = SoundJoinLeave
 	case effectDie:
+		if game.Board.muteRoll {
+			return
+		}
 		b = dieSounds[dieSoundPlays]
 
 		dieSoundPlays++
@@ -2944,6 +2963,9 @@ func playSoundEffect(effect SoundEffect) {
 			dieSoundPlays = 0
 		}
 	case effectDice:
+		if game.Board.muteRoll {
+			return
+		}
 		b = diceSounds[diceSoundPlays]
 
 		diceSoundPlays++
@@ -2952,6 +2974,9 @@ func playSoundEffect(effect SoundEffect) {
 			diceSoundPlays = 0
 		}
 	case effectMove:
+		if game.Board.muteMove {
+			return
+		}
 		b = moveSounds[moveSoundPlays]
 
 		moveSoundPlays++
@@ -2960,8 +2985,14 @@ func playSoundEffect(effect SoundEffect) {
 			moveSoundPlays = 0
 		}
 	case effectHomeSingle:
+		if game.Board.muteBearOff {
+			return
+		}
 		b = SoundHomeSingle
 	case effectHomeMulti:
+		if game.Board.muteBearOff {
+			return
+		}
 		b = homeMultiSounds[homeMultiSoundPlays]
 
 		homeMultiSoundPlays++

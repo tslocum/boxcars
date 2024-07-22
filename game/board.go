@@ -122,6 +122,13 @@ type board struct {
 	changePasswordNew  *Input
 	changePasswordGrid *etk.Grid
 
+	muteJoinLeaveCheckbox *etk.Checkbox
+	muteChatCheckbox      *etk.Checkbox
+	muteRollCheckbox      *etk.Checkbox
+	muteMoveCheckbox      *etk.Checkbox
+	muteBearOffCheckbox   *etk.Checkbox
+	muteSoundsGrid        *etk.Grid
+
 	highlightCheckbox        *etk.Checkbox
 	showPipCountCheckbox     *etk.Checkbox
 	showMovesCheckbox        *etk.Checkbox
@@ -157,6 +164,11 @@ type board struct {
 	flipBoard          bool
 	traditional        bool
 	advancedMovement   bool
+	muteJoinLeave      bool
+	muteChat           bool
+	muteRoll           bool
+	muteMove           bool
+	muteBearOff        bool
 
 	widget *BoardWidget
 
@@ -217,6 +229,7 @@ func NewBoard() *board {
 		buttonsUndoOKGrid:       etk.NewGrid(),
 		selectRollGrid:          etk.NewGrid(),
 		menuGrid:                etk.NewGrid(),
+		muteSoundsGrid:          etk.NewGrid(),
 		accountGrid:             etk.NewGrid(),
 		settingsGrid:            etk.NewGrid(),
 		changePasswordGrid:      etk.NewGrid(),
@@ -350,6 +363,123 @@ func NewBoard() *board {
 		b.changePasswordGrid.SetVisible(false)
 	}
 
+	cGrid := func(checkbox *etk.Checkbox) *etk.Grid {
+		g := etk.NewGrid()
+		g.SetColumnSizes(7, -1)
+		g.AddChildAt(checkbox, 1, 0, 1, 1)
+		return g
+	}
+
+	{
+		headerLabel := etk.NewText(gotext.Get("Mute Sounds"))
+		headerLabel.SetHorizontal(etk.AlignCenter)
+
+		rowCount := 5
+
+		b.muteJoinLeaveCheckbox = etk.NewCheckbox(b.toggleMuteJoinLeave)
+		b.muteJoinLeaveCheckbox.SetBorderColor(triangleA)
+		b.muteJoinLeaveCheckbox.SetCheckColor(triangleA)
+		b.muteJoinLeaveCheckbox.SetSelected(b.muteJoinLeave)
+
+		muteJoinLeaveLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Join/Leave")),
+			onSelected: func() {
+				b.muteJoinLeaveCheckbox.SetSelected(!b.muteJoinLeaveCheckbox.Selected())
+				b.toggleMuteJoinLeave()
+			},
+		}
+		muteJoinLeaveLabel.SetVertical(etk.AlignCenter)
+
+		b.muteChatCheckbox = etk.NewCheckbox(b.toggleMuteChat)
+		b.muteChatCheckbox.SetBorderColor(triangleA)
+		b.muteChatCheckbox.SetCheckColor(triangleA)
+		b.muteChatCheckbox.SetSelected(b.muteChat)
+
+		muteChatLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Chat")),
+			onSelected: func() {
+				b.muteChatCheckbox.SetSelected(!b.muteChatCheckbox.Selected())
+				b.toggleMuteChat()
+			},
+		}
+		muteChatLabel.SetVertical(etk.AlignCenter)
+
+		b.muteRollCheckbox = etk.NewCheckbox(b.toggleMuteRoll)
+		b.muteRollCheckbox.SetBorderColor(triangleA)
+		b.muteRollCheckbox.SetCheckColor(triangleA)
+		b.muteRollCheckbox.SetSelected(b.muteRoll)
+
+		muteRollLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Roll")),
+			onSelected: func() {
+				b.muteRollCheckbox.SetSelected(!b.muteRollCheckbox.Selected())
+				b.toggleMuteRoll()
+			},
+		}
+		muteRollLabel.SetVertical(etk.AlignCenter)
+
+		b.muteMoveCheckbox = etk.NewCheckbox(b.toggleMuteMove)
+		b.muteMoveCheckbox.SetBorderColor(triangleA)
+		b.muteMoveCheckbox.SetCheckColor(triangleA)
+		b.muteMoveCheckbox.SetSelected(b.muteMove)
+
+		muteMoveLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Move")),
+			onSelected: func() {
+				b.muteMoveCheckbox.SetSelected(!b.muteMoveCheckbox.Selected())
+				b.toggleMuteMove()
+			},
+		}
+		muteMoveLabel.SetVertical(etk.AlignCenter)
+
+		b.muteBearOffCheckbox = etk.NewCheckbox(b.toggleMuteBearOff)
+		b.muteBearOffCheckbox.SetBorderColor(triangleA)
+		b.muteBearOffCheckbox.SetCheckColor(triangleA)
+		b.muteBearOffCheckbox.SetSelected(b.muteBearOff)
+
+		muteBearOffLabel := &ClickableText{
+			Text: etk.NewText(gotext.Get("Bear Off")),
+			onSelected: func() {
+				b.muteBearOffCheckbox.SetSelected(!b.muteBearOffCheckbox.Selected())
+				b.toggleMuteBearOff()
+			},
+		}
+		muteBearOffLabel.SetVertical(etk.AlignCenter)
+
+		checkboxGrid := etk.NewGrid()
+		checkboxGrid.SetColumnSizes(72, 20, -1)
+		sizes := []int{-1}
+		for i := 1; i < rowCount; i++ {
+			sizes = append(sizes, 20, -1)
+		}
+		checkboxGrid.SetRowSizes(sizes...)
+
+		gridY := 0
+		checkboxGrid.AddChildAt(cGrid(b.muteJoinLeaveCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(muteJoinLeaveLabel, 2, gridY, 1, 1)
+		gridY += 2
+		checkboxGrid.AddChildAt(cGrid(b.muteChatCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(muteChatLabel, 2, gridY, 1, 1)
+		gridY += 2
+		checkboxGrid.AddChildAt(cGrid(b.muteRollCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(muteRollLabel, 2, gridY, 1, 1)
+		gridY += 2
+		checkboxGrid.AddChildAt(cGrid(b.muteMoveCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(muteMoveLabel, 2, gridY, 1, 1)
+		gridY += 2
+		checkboxGrid.AddChildAt(cGrid(b.muteBearOffCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(muteBearOffLabel, 2, gridY, 1, 1)
+
+		b.muteSoundsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
+		b.muteSoundsGrid.SetColumnSizes(20, -1, -1, 20)
+		b.muteSoundsGrid.SetRowSizes(72, fieldHeight+((fieldHeight+20)*(rowCount-1)), -1, etk.Scale(baseButtonHeight))
+		b.muteSoundsGrid.AddChildAt(headerLabel, 1, 0, 2, 1)
+		b.muteSoundsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
+		b.muteSoundsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
+		b.muteSoundsGrid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.showSettings), 0, 3, 4, 1)
+		b.muteSoundsGrid.SetVisible(false)
+	}
+
 	{
 		b.rematchButton = etk.NewButton(gotext.Get("Rematch"), b.selectRematch)
 		b.rematchButton.SetVisible(false)
@@ -459,9 +589,9 @@ func NewBoard() *board {
 		checkboxGrid := etk.NewGrid()
 		checkboxGrid.SetColumnSizes(72, 20, -1)
 		if !AutoEnableTouchInput {
-			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
+			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
 		} else {
-			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
+			checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
 		}
 		{
 			accountLabel := etk.NewText(gotext.Get("Account"))
@@ -471,6 +601,18 @@ func NewBoard() *board {
 			grid.AddChildAt(accountLabel, 0, 0, 1, 1)
 			grid.AddChildAt(b.accountGrid, 1, 0, 2, 1)
 			checkboxGrid.AddChildAt(grid, 0, 0, 3, 1)
+		}
+		{
+			muteLabel := etk.NewText(gotext.Get("Sound"))
+			muteLabel.SetVertical(etk.AlignCenter)
+
+			openMute := etk.NewButton(gotext.Get("Mute Sounds"), b.showMuteSounds)
+			openMute.SetHorizontal(etk.AlignStart)
+
+			grid := etk.NewGrid()
+			grid.AddChildAt(muteLabel, 0, 0, 1, 1)
+			grid.AddChildAt(openMute, 1, 0, 2, 1)
+			checkboxGrid.AddChildAt(grid, 0, 2, 3, 1)
 		}
 		{
 			speedLabel := etk.NewText(gotext.Get("Speed"))
@@ -487,25 +629,24 @@ func NewBoard() *board {
 			grid := etk.NewGrid()
 			grid.AddChildAt(speedLabel, 0, 0, 1, 1)
 			grid.AddChildAt(b.selectSpeed, 1, 0, 2, 1)
-			checkboxGrid.AddChildAt(grid, 0, 2, 3, 1)
+			checkboxGrid.AddChildAt(grid, 0, 4, 3, 1)
 		}
-		cGrid := func(checkbox *etk.Checkbox) *etk.Grid {
-			g := etk.NewGrid()
-			g.SetColumnSizes(7, -1)
-			g.AddChildAt(checkbox, 1, 0, 1, 1)
-			return g
-		}
-		checkboxGrid.AddChildAt(cGrid(b.highlightCheckbox), 0, 4, 1, 1)
-		checkboxGrid.AddChildAt(highlightLabel, 2, 4, 1, 1)
-		checkboxGrid.AddChildAt(cGrid(b.showPipCountCheckbox), 0, 6, 1, 1)
-		checkboxGrid.AddChildAt(pipCountLabel, 2, 6, 1, 1)
-		checkboxGrid.AddChildAt(cGrid(b.showMovesCheckbox), 0, 8, 1, 1)
-		checkboxGrid.AddChildAt(movesLabel, 2, 8, 1, 1)
-		checkboxGrid.AddChildAt(cGrid(b.flipBoardCheckbox), 0, 10, 1, 1)
-		checkboxGrid.AddChildAt(flipBoardLabel, 2, 10, 1, 1)
-		checkboxGrid.AddChildAt(cGrid(b.traditionalCheckbox), 0, 12, 1, 1)
-		checkboxGrid.AddChildAt(traditionalLabel, 2, 12, 1, 1)
-		gridY := 14
+		gridY := 6
+		checkboxGrid.AddChildAt(cGrid(b.highlightCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(highlightLabel, 2, gridY, 1, 1)
+		gridY += 2
+		checkboxGrid.AddChildAt(cGrid(b.showPipCountCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(pipCountLabel, 2, gridY, 1, 1)
+		gridY += 2
+		checkboxGrid.AddChildAt(cGrid(b.showMovesCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(movesLabel, 2, gridY, 1, 1)
+		gridY += 2
+		checkboxGrid.AddChildAt(cGrid(b.flipBoardCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(flipBoardLabel, 2, gridY, 1, 1)
+		gridY += 2
+		checkboxGrid.AddChildAt(cGrid(b.traditionalCheckbox), 0, gridY, 1, 1)
+		checkboxGrid.AddChildAt(traditionalLabel, 2, gridY, 1, 1)
+		gridY += 2
 		if !AutoEnableTouchInput {
 			checkboxGrid.AddChildAt(cGrid(b.advancedMovementCheckbox), 0, gridY, 1, 1)
 			checkboxGrid.AddChildAt(advancedMovementLabel, 2, gridY, 1, 1)
@@ -514,7 +655,7 @@ func NewBoard() *board {
 		checkboxGrid.AddChildAt(cGrid(b.autoPlayCheckbox), 0, gridY, 1, 1)
 		checkboxGrid.AddChildAt(autoPlayLabel, 2, gridY, 1, 1)
 
-		gridSize := 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72
+		gridSize := 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72
 		if !AutoEnableTouchInput {
 			gridSize += 20 + 72
 		}
@@ -639,6 +780,7 @@ func NewBoard() *board {
 		}
 		f.AddChild(children[0])
 		f.AddChild(b.changePasswordGrid)
+		f.AddChild(b.muteSoundsGrid)
 		f.AddChild(b.leaveGameGrid)
 		b.frame.AddChild(f)
 	}
@@ -867,6 +1009,10 @@ func (b *board) leaveGame() error {
 
 func (b *board) showSettings() error {
 	b.menuGrid.SetVisible(false)
+	b.settingsGrid.SetVisible(false)
+	b.selectSpeed.SetMenuVisible(false)
+	b.changePasswordGrid.SetVisible(false)
+	b.muteSoundsGrid.SetVisible(false)
 	b.settingsGrid.SetVisible(true)
 	return nil
 }
@@ -876,6 +1022,14 @@ func (b *board) showChangePassword() error {
 	b.selectSpeed.SetMenuVisible(false)
 	b.changePasswordGrid.SetVisible(true)
 	etk.SetFocus(b.changePasswordOld)
+	return nil
+}
+
+func (b *board) showMuteSounds() error {
+	b.settingsGrid.SetVisible(false)
+	b.selectSpeed.SetMenuVisible(false)
+	b.changePasswordGrid.SetVisible(false)
+	b.muteSoundsGrid.SetVisible(true)
 	return nil
 }
 
@@ -1230,6 +1384,61 @@ func (b *board) toggleAdvancedMovementCheckbox() error {
 		advancedMovement = 1
 	}
 	b.Client.Out <- []byte(fmt.Sprintf("set advanced %d", advancedMovement))
+	return nil
+}
+
+func (b *board) toggleMuteJoinLeave() error {
+	b.muteJoinLeave = b.muteJoinLeaveCheckbox.Selected()
+
+	value := 0
+	if b.muteJoinLeave {
+		value = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set mutejoinleave %d", value))
+	return nil
+}
+
+func (b *board) toggleMuteChat() error {
+	b.muteChat = b.muteChatCheckbox.Selected()
+
+	value := 0
+	if b.muteChat {
+		value = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set mutechat %d", value))
+	return nil
+}
+
+func (b *board) toggleMuteRoll() error {
+	b.muteRoll = b.muteRollCheckbox.Selected()
+
+	value := 0
+	if b.muteRoll {
+		value = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set muteroll %d", value))
+	return nil
+}
+
+func (b *board) toggleMuteMove() error {
+	b.muteMove = b.muteMoveCheckbox.Selected()
+
+	value := 0
+	if b.muteMove {
+		value = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set mutemove %d", value))
+	return nil
+}
+
+func (b *board) toggleMuteBearOff() error {
+	b.muteBearOff = b.muteBearOffCheckbox.Selected()
+
+	value := 0
+	if b.muteBearOff {
+		value = 1
+	}
+	b.Client.Out <- []byte(fmt.Sprintf("set mutebearoff %d", value))
 	return nil
 }
 
@@ -1928,7 +2137,7 @@ func (b *board) setRect(x, y, w, h int) {
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + etk.Scale(baseButtonHeight)
+		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + etk.Scale(baseButtonHeight)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
@@ -1936,6 +2145,7 @@ func (b *board) setRect(x, y, w, h int) {
 		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
 		b.settingsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 		b.changePasswordGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+		b.muteSoundsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 		b.selectRollGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 
