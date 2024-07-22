@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	version              = "v1.3.7"
+	version              = "v1.3.7p2"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -151,6 +151,8 @@ var (
 	SoundDie1, SoundDie2, SoundDie3                []byte
 	SoundDice1, SoundDice2, SoundDice3, SoundDice4 []byte
 	SoundMove1, SoundMove2, SoundMove3             []byte
+	SoundHomeSingle                                []byte
+	SoundHomeMulti1, SoundHomeMulti2               []byte
 	SoundJoinLeave                                 []byte
 	SoundSay                                       []byte
 )
@@ -257,6 +259,11 @@ func loadAudioAssets() {
 	SoundMove2 = LoadBytes(p + "move2.ogg")
 	SoundMove3 = LoadBytes(p + "move3.ogg")
 
+	SoundHomeSingle = LoadBytes(p + "homesingle.ogg")
+
+	SoundHomeMulti1 = LoadBytes(p + "homemulti1.ogg")
+	SoundHomeMulti2 = LoadBytes(p + "homemulti2.ogg")
+
 	SoundJoinLeave = LoadBytes(p + "joinleave.ogg")
 	SoundSay = LoadBytes(p + "say.ogg")
 
@@ -281,6 +288,12 @@ func loadAudioAssets() {
 		SoundMove3,
 	}
 	randomizeByteSlice(moveSounds)
+
+	homeMultiSounds = [][]byte{
+		SoundHomeMulti1,
+		SoundHomeMulti2,
+	}
+	randomizeByteSlice(homeMultiSounds)
 }
 
 func loadImage(assetPath string) image.Image {
@@ -2896,15 +2909,19 @@ const (
 	effectDie
 	effectDice
 	effectMove
+	effectHomeSingle
+	effectHomeMulti
 )
 
 var (
-	dieSounds      [][]byte
-	dieSoundPlays  int
-	diceSounds     [][]byte
-	diceSoundPlays int
-	moveSounds     [][]byte
-	moveSoundPlays int
+	dieSounds           [][]byte
+	dieSoundPlays       int
+	diceSounds          [][]byte
+	diceSoundPlays      int
+	moveSounds          [][]byte
+	moveSoundPlays      int
+	homeMultiSounds     [][]byte
+	homeMultiSoundPlays int
 )
 
 func playSoundEffect(effect SoundEffect) {
@@ -2942,6 +2959,16 @@ func playSoundEffect(effect SoundEffect) {
 			randomizeByteSlice(moveSounds)
 			moveSoundPlays = 0
 		}
+	case effectHomeSingle:
+		b = SoundHomeSingle
+	case effectHomeMulti:
+		b = homeMultiSounds[homeMultiSoundPlays]
+
+		homeMultiSoundPlays++
+		if homeMultiSoundPlays == len(homeMultiSounds)-1 {
+			randomizeByteSlice(homeMultiSounds)
+			homeMultiSoundPlays = 0
+		}
 	default:
 		log.Panicf("unknown sound effect: %d", effect)
 		return
@@ -2957,7 +2984,9 @@ func playSoundEffect(effect SoundEffect) {
 		panic(err)
 	}
 
-	if effect == effectSay {
+	if effect == effectHomeSingle || effect == effectHomeMulti {
+		player.SetVolume(game.volume / 6)
+	} else if effect == effectSay {
 		player.SetVolume(game.volume / 2)
 	} else {
 		player.SetVolume(game.volume)

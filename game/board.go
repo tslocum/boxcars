@@ -2666,6 +2666,14 @@ func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause
 	b.spaceSprites[to] = append(b.spaceSprites[to], sprite)
 	b.moving = nil
 
+	if to == bgammon.SpaceHomePlayer || to == bgammon.SpaceHomeOpponent {
+		if b.gameState.Board[to] == 0 {
+			playSoundEffect(effectHomeSingle)
+		} else {
+			playSoundEffect(effectHomeMulti)
+		}
+	}
+
 	if pauseTime == 0 {
 		return
 	} else if pause {
@@ -2785,7 +2793,15 @@ func (b *board) finishDrag(x int, y int, click bool) {
 			if space != index {
 				ok, _ := b.gameState.AddMoves([][]int8{{space, index}}, true)
 				if ok {
-					playSoundEffect(effectMove)
+					if index == bgammon.SpaceHomePlayer || index == bgammon.SpaceHomeOpponent {
+						if b.gameState.Board[index] == 0 {
+							playSoundEffect(effectHomeSingle)
+						} else {
+							playSoundEffect(effectHomeMulti)
+						}
+					} else {
+						playSoundEffect(effectMove)
+					}
 					b.processState()
 					scheduleFrame()
 					processed = true
@@ -2797,6 +2813,11 @@ func (b *board) finishDrag(x int, y int, click bool) {
 					homeStart, homeEnd = homeEnd, homeStart
 				}
 				if index >= homeStart && index <= homeEnd {
+					if b.gameState.Board[index] == 0 {
+						playSoundEffect(effectHomeSingle)
+					} else {
+						playSoundEffect(effectHomeMulti)
+					}
 					b.Client.Out <- []byte(fmt.Sprintf("mv %d/off", index))
 				}
 			} else if time.Since(b.lastDragClick) < 500*time.Millisecond && space == bgammon.SpaceHomePlayer && !b.gameState.Player1.Entered {

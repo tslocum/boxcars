@@ -8,7 +8,7 @@ require (
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240722093150-1d8a55632df0
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240722063358-6067ad4d7a58
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240703054156-ce0b448f0999
-	github.com/hajimehoshi/ebiten/v2 v2.7.7
+	github.com/hajimehoshi/ebiten/v2 v2.7.8
 	github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	golang.org/x/image v0.18.0
@@ -43,7 +43,7 @@ require (
 	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/jlouis/glicko2 v1.0.0 // indirect
 	github.com/matcornic/hermes/v2 v2.1.0 // indirect
-	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
