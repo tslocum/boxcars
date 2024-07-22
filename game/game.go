@@ -13,9 +13,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
-	"path"
 	"regexp"
-	"runtime/pprof"
 	"strconv"
 	"strings"
 	"sync"
@@ -2550,13 +2548,6 @@ func (g *Game) Update() error {
 		}
 	}
 
-	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyP) {
-		err := g.toggleProfiling()
-		if err != nil {
-			return err
-		}
-	}
-
 	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		Debug++
 		if Debug > MaxDebug {
@@ -2891,34 +2882,6 @@ func acceptInput(text string) (handled bool) {
 
 func (g *Game) itemHeight() int {
 	return etk.Scale(48)
-}
-
-func (g *Game) toggleProfiling() error {
-	if g.cpuProfile == nil {
-		log.Println("Profiling started...")
-
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			return err
-		}
-		g.cpuProfile, err = os.Create(path.Join(homeDir, "cpu.prof")) // TODO add flag
-		if err != nil {
-			return err
-		}
-
-		if err := pprof.StartCPUProfile(g.cpuProfile); err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	pprof.StopCPUProfile()
-	_ = g.cpuProfile.Close()
-	g.cpuProfile = nil
-
-	log.Println("Profiling stopped")
-	return nil
 }
 
 func (g *Game) Exit() {

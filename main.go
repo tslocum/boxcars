@@ -5,7 +5,6 @@ package main
 import (
 	"bufio"
 	"log"
-	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
