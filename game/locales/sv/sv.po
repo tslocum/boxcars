@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-06-27 16:09+0000\n"
+"PO-Revision-Date: 2024-07-26 16:26+0000\n"
 "Last-Translator: \"T Bergkvist (Vevhus)\" <t.bergkvist@gmail.com>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/bgammon/boxcars/"
 "sv/>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "X-Generator: Weblate 5.7-dev\n"
 
 msgid "%s - Free Online Backgammon"
-msgstr "Gratis Backgammon Online"
+msgstr "%s - Gratis Backgammon Online"
 
 msgid "%s joined the match."
 msgstr "%s kom in i spelet."
@@ -36,7 +36,7 @@ msgid "Account"
 msgstr "Konto"
 
 msgid "Acey-deucey"
-msgstr ""
+msgstr "Acey-deucey"
 
 msgid "Advanced movement"
 msgstr "Avancerad förflyttning"
@@ -48,10 +48,10 @@ msgid "Available"
 msgstr "Tillgängligt"
 
 msgid "Backgammon"
-msgstr ""
+msgstr "Backgammon"
 
 msgid "Bearing Off"
-msgstr ""
+msgstr "bära av"
 
 msgid "Board"
 msgstr "Bräde"
@@ -112,8 +112,8 @@ msgstr "Dubbla"
 
 msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
 msgstr ""
-"Dubbelklicka en pjäs för att flytta ut. \n"
-"Ta ut alla 15 för att vinna."
+"Dubbelklicka på en bricka för att ta bort den. Ta bort alla 15 pjäser för "
+"att vinna."
 
 msgid "Download replay"
 msgstr "Ladda ner repris"
@@ -211,6 +211,9 @@ msgstr "Meny"
 msgid "Multi"
 msgstr "Multi"
 
+msgid "Mute Sounds"
+msgstr "Ljudlöst"
+
 msgid "Name"
 msgstr "Namn"
 
@@ -244,175 +247,190 @@ msgstr "Spelar offline."
 msgid ""
 "Please enter a valid email address, or it will not be possible to reset your "
 "password."
-msgstr ""
+msgstr "Skriv en giltig e-post adress, annars kan inte lösenordet återställas."
 
 msgid "Points"
-msgstr ""
+msgstr "Poäng"
 
 msgid "Press back to toggle the keyboard."
-msgstr ""
+msgstr "Backa för att visa tangentbordet."
 
 msgid "Private"
-msgstr ""
+msgstr "Privat"
 
 msgid "Rating"
-msgstr ""
+msgstr "Poängställning"
 
 msgid "Read error"
-msgstr ""
+msgstr "Läsfel"
 
 msgid "Reconnecting"
-msgstr ""
+msgstr "Återansluter"
 
 msgid "Refresh"
-msgstr ""
+msgstr "Uppdatera"
 
 msgid "Refresh matches"
-msgstr ""
+msgstr "Uppdatera matcher"
 
 msgid "Register"
-msgstr ""
+msgstr "Registrera"
 
 msgid "Rematch"
-msgstr ""
+msgstr "Returmatch"
 
 msgid "Replay download already in progress."
-msgstr ""
+msgstr "Nedladdning av repris redan påbörjad."
 
 msgid "Replaying %s vs. %s"
-msgstr ""
+msgstr "Spelar upp %s vs. %s"
 
 msgid "Reset Password"
-msgstr ""
+msgstr "Återställ lösenord"
 
 msgid "Resign"
 msgstr "Lämna"
 
 msgid "Result"
-msgstr ""
+msgstr "Resultat"
 
 msgid "Return"
-msgstr ""
+msgstr "Återgå"
 
 msgid "Roll"
-msgstr ""
+msgstr "Slå"
 
 msgid "Search"
-msgstr ""
+msgstr "Sök"
 
 msgid "Sending password reset request"
-msgstr ""
+msgstr "Skickar förfrågan att återställa lösenord"
 
 msgid "Server"
-msgstr ""
+msgstr "Server"
 
 msgid "Settings"
-msgstr ""
+msgstr "Inställningar"
 
 msgid "Show moves"
-msgstr ""
+msgstr "Visa drag"
 
 msgid "Show pip count"
-msgstr ""
+msgstr "Visa antal"
 
 msgid "Single"
-msgstr ""
+msgstr "Singelmatch"
 
 msgid "Slow"
-msgstr ""
+msgstr "Långsam"
+
+msgid "Sound"
+msgstr "Ljud"
 
 msgid "Speed"
-msgstr ""
+msgstr "Hastighet"
 
 msgid "Started"
-msgstr ""
+msgstr "Startad"
 
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 msgid "Submit"
-msgstr ""
+msgstr "Skicka"
 
 msgid "Tabula"
-msgstr ""
+msgstr "Tabula"
 
 msgid "Tap to dismiss this pop-up."
-msgstr ""
+msgstr "Tryck för att dölja denna ruta."
 
 msgid ""
 "This concludes the tutorial. To share feedback and chat with other players "
 "visit %s"
 msgstr ""
+"Detta avslutar handledningen. Besök %s för att dela feedback och chatta med "
+"andra spelare"
 
 msgid ""
 "This screen lists the matches that are currently available. A few bots are "
 "always available to play against. You can also spectate ongoing public "
 "matches."
 msgstr ""
+"Denna skärm listar de matchningar som är tillgängliga för närvarande. Några "
+"få bots är alltid tillgängliga att spela mot. Du kan även se pågående "
+"publika matcher."
 
 msgid "To download this replay visit"
-msgstr ""
+msgstr "För att ladda ner denna repris besök"
 
 msgid ""
 "To log in as a guest, enter a username (if you want) and do not enter a "
 "password."
 msgstr ""
+"För att logga in som gäst anger du ett användarnamn (om du vill) och anger "
+"inget lösenord."
 
 msgid "Tutorial"
-msgstr ""
+msgstr "Handledning"
 
 msgid "Undo"
-msgstr ""
+msgstr "Ångra"
 
 msgid "Username"
-msgstr ""
+msgstr "Användarnamn"
 
 msgid "Variant"
-msgstr ""
+msgstr "Variant"
 
 msgid "View replay"
-msgstr ""
+msgstr "Visa repris"
 
 msgid "Waiting"
-msgstr ""
+msgstr "Väntar"
 
 msgid "Warning: Received unknown event: %+v"
-msgstr ""
+msgstr "Varning: Mottog okänd händelse: %+v"
 
 msgid "Warning: Received unrecognized event from server."
-msgstr ""
+msgstr "Varning: Mottog en okänd händelse från servern."
 
 msgid ""
 "Welcome to the guided tutorial. Click anywhere outside of this message box "
 "to close the tutorial. Click anywhere inside of this message box to view the "
 "next page."
 msgstr ""
+"Välkommen till den guidade handledningen. Klicka var som helst utanför den "
+"här meddelanderutan för att stänga handledningen. Klicka var som helst i den "
+"här meddelanderutan för att se nästa sida."
 
 msgid "Welcome, %s. There are %d clients playing %d matches."
-msgstr ""
+msgstr "Välkommen, %s. Det finns %d klienter som spelar %d matcher."
 
 msgid "Welcome, %s. There are %d clients playing 1 match."
-msgstr ""
+msgstr "Välkommen, %s. Det finns %d klienter som spelar 1 match."
 
 msgid "Welcome, %s. There is 1 client playing %d matches."
-msgstr ""
+msgstr "Välkommen, %s. Det finns 1 klient som spelar %d match."
 
 msgid "Welcome, %s. There is 1 client playing 1 match."
-msgstr ""
+msgstr "Välkommen, %s. Det är 1 klient som spelar 1 match."
 
 msgid "Write error"
-msgstr ""
+msgstr "Skrivfel"
 
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 msgid ""
 "You have the black checkers. You can move a checker by either clicking it or "
 "dragging it."
 msgstr ""
+"Du har de svarta pjäserna. Du kan flytta en bricka genom att antingen klicka "
+"på den eller dra den."
 
 msgid "You may need to upgrade your client."
-msgstr ""
+msgstr "Du kan behöva uppgradera din klient."
 
 msgid "from %s to %s"
-msgstr ""
+msgstr "från %s till %s"

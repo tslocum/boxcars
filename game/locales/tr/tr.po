@@ -216,6 +216,9 @@ msgstr ""
 msgid "Multi"
 msgstr "Çoklu"
 
+msgid "Mute Sounds"
+msgstr ""
+
 msgid "Name"
 msgstr "Ad"
 
@@ -328,6 +331,9 @@ msgstr "Tek"
 
 msgid "Slow"
 msgstr "Yavaş"
+
+msgid "Sound"
+msgstr ""
 
 msgid "Speed"
 msgstr "Hız"

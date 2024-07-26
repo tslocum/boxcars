@@ -212,6 +212,9 @@ msgstr "Menu"
 msgid "Multi"
 msgstr "Multi"
 
+msgid "Mute Sounds"
+msgstr ""
+
 msgid "Name"
 msgstr "Nom"
 
@@ -323,6 +326,9 @@ msgstr "Simple"
 
 msgid "Slow"
 msgstr "Lent"
+
+msgid "Sound"
+msgstr ""
 
 msgid "Speed"
 msgstr "Vitesse"

@@ -226,6 +226,9 @@ msgstr "Meny"
 msgid "Multi"
 msgstr "Flerspiller"
 
+msgid "Mute Sounds"
+msgstr ""
+
 msgid "Name"
 msgstr "Navn"
 
@@ -342,6 +345,9 @@ msgstr "Enkeltspiller"
 #, fuzzy
 msgid "Slow"
 msgstr "Tregt"
+
+msgid "Sound"
+msgstr ""
 
 msgid "Speed"
 msgstr "Hastighet"

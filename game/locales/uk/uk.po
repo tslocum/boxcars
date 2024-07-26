@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-07-08 20:09+0000\n"
+"PO-Revision-Date: 2024-07-26 16:26+0000\n"
 "Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
@@ -212,6 +212,9 @@ msgstr "Меню"
 msgid "Multi"
 msgstr "Багатоочковий"
 
+msgid "Mute Sounds"
+msgstr "Вимкнути звуки"
+
 msgid "Name"
 msgstr "Назва"
 
@@ -323,6 +326,9 @@ msgstr "Одноочковий"
 
 msgid "Slow"
 msgstr "Повільно"
+
+msgid "Sound"
+msgstr "Звук"
 
 msgid "Speed"
 msgstr "Швидкість"

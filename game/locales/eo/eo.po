@@ -205,6 +205,9 @@ msgstr "Menuo"
 msgid "Multi"
 msgstr ""
 
+msgid "Mute Sounds"
+msgstr ""
+
 msgid "Name"
 msgstr "Nomo"
 
@@ -316,6 +319,9 @@ msgstr ""
 
 msgid "Slow"
 msgstr "Malrapida"
+
+msgid "Sound"
+msgstr ""
 
 msgid "Speed"
 msgstr "Rapido"

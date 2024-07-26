@@ -211,6 +211,9 @@ msgstr "Meny"
 msgid "Multi"
 msgstr "Shumës"
 
+msgid "Mute Sounds"
+msgstr ""
+
 msgid "Name"
 msgstr "Emri"
 
@@ -322,6 +325,9 @@ msgstr "Beqarë"
 
 msgid "Slow"
 msgstr "Ngadalë"
+
+msgid "Sound"
+msgstr ""
 
 msgid "Speed"
 msgstr "Shpejtësi"
