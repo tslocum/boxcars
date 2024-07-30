@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-01-11 07:32+0000\n"
-"Last-Translator: Elouin <sir@elou.in>\n"
+"PO-Revision-Date: 2024-07-29 14:09+0000\n"
+"Last-Translator: Coxcopi70f00b67b61542fe <hn_vogel@gmx.net>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/bgammon/boxcars/"
 "de/>\n"
 "Language: de\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.7-dev\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Kostenloses Online Backgammon"
@@ -21,10 +21,10 @@ msgid "%s left the match."
 msgstr "%s hat das Spiel verlassen."
 
 msgid "%s moved %s"
-msgstr ""
+msgstr "%s bewegte %s"
 
 msgid "%s rolled %s"
-msgstr ""
+msgstr "%s würfelte %s"
 
 msgid "%s wins!"
 msgstr "%s hat gewonnen!"
@@ -39,16 +39,16 @@ msgid "Acey-deucey"
 msgstr "Acey Deucey"
 
 msgid "Advanced movement"
-msgstr ""
+msgstr "Erweiterte Bewegung"
 
 msgid "Auto-play forced moves"
-msgstr ""
+msgstr "Erzwungene Bewegungen automatisch spielen"
 
 msgid "Available"
 msgstr "Verfügbar"
 
 msgid "Backgammon"
-msgstr ""
+msgstr "Backgammon"
 
 msgid "Bearing Off"
 msgstr "Abtragen"
@@ -83,7 +83,7 @@ msgid "Connecting..."
 msgstr "Verbinde..."
 
 msgid "Create"
-msgstr ""
+msgstr "Erstellen"
 
 msgid "Create Match"
 msgstr "Spiel erstellen"
@@ -143,16 +143,16 @@ msgid "Failed to submit moves: %s"
 msgstr "Konnte Zug nicht übertragen: %s"
 
 msgid "Fast"
-msgstr ""
+msgstr "Schnell"
 
 msgid "Flip board"
 msgstr "Spielbrett drehen"
 
 msgid "Flip opp. space numbers"
-msgstr ""
+msgstr "Gegnerzahlen umdrehen"
 
 msgid "Forced"
-msgstr ""
+msgstr "Erzwungen"
 
 msgid "Good Luck, Have Fun"
 msgstr "Viel Glück und Spaß"
@@ -164,10 +164,10 @@ msgid "History"
 msgstr "Verlauf"
 
 msgid "Instant"
-msgstr ""
+msgstr "Sofort"
 
 msgid "Join"
-msgstr ""
+msgstr "Beitreten"
 
 msgid "Join match"
 msgstr "Spiel beitreten"
@@ -194,7 +194,7 @@ msgid "Logged in as guest"
 msgstr "Als Gast eingeloggt"
 
 msgid "Long press back to exit the application."
-msgstr ""
+msgstr "\"Zurück\" gedrückt halten um die Anwendung zu verlassen."
 
 msgid "Match Name"
 msgstr "Spiel Name"
@@ -203,16 +203,16 @@ msgid "Matches List"
 msgstr "Spiel Liste"
 
 msgid "Medium"
-msgstr ""
+msgstr "Mittel"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menü"
 
 msgid "Multi"
-msgstr ""
+msgstr "Multi"
 
 msgid "Mute Sounds"
-msgstr ""
+msgstr "Geräusche stummschalten"
 
 msgid "Name"
 msgstr "Name"
@@ -224,7 +224,7 @@ msgid "No"
 msgstr "Nein"
 
 msgid "None"
-msgstr ""
+msgstr "Keine"
 
 msgid "OK"
 msgstr "Ok"
@@ -255,13 +255,13 @@ msgid "Points"
 msgstr "Punkte"
 
 msgid "Press back to toggle the keyboard."
-msgstr ""
+msgstr "\"Zurück\" drücken um die Tastatur umzuschalten."
 
 msgid "Private"
 msgstr "Privat"
 
 msgid "Rating"
-msgstr ""
+msgstr "Wertung"
 
 msgid "Read error"
 msgstr "Lesefehler"
@@ -270,7 +270,7 @@ msgid "Reconnecting"
 msgstr "Wiederverbinden"
 
 msgid "Refresh"
-msgstr ""
+msgstr "Aktualisieren"
 
 msgid "Refresh matches"
 msgstr "Spielliste aktualisieren"
@@ -279,13 +279,13 @@ msgid "Register"
 msgstr "Registrieren"
 
 msgid "Rematch"
-msgstr ""
+msgstr "Revanche"
 
 msgid "Replay download already in progress."
 msgstr "Replay wird bereits heruntergeladen."
 
 msgid "Replaying %s vs. %s"
-msgstr ""
+msgstr "Revanche %s gegen %s"
 
 msgid "Reset Password"
 msgstr "Passwort zurücksetzen"
@@ -321,16 +321,16 @@ msgid "Show pip count"
 msgstr "Pip count anzeigen"
 
 msgid "Single"
-msgstr ""
+msgstr "Einzel"
 
 msgid "Slow"
-msgstr ""
+msgstr "Langsam"
 
 msgid "Sound"
-msgstr ""
+msgstr "Geräusche"
 
 msgid "Speed"
-msgstr ""
+msgstr "Geschwindigkeit"
 
 msgid "Started"
 msgstr "Gestartet"
@@ -345,7 +345,7 @@ msgid "Tabula"
 msgstr "Tabula"
 
 msgid "Tap to dismiss this pop-up."
-msgstr ""
+msgstr "Drücken, um dieses Popup zu schließen."
 
 msgid ""
 "This concludes the tutorial. To share feedback and chat with other players "
@@ -407,16 +407,16 @@ msgstr ""
 "anzuzeigen."
 
 msgid "Welcome, %s. There are %d clients playing %d matches."
-msgstr ""
+msgstr "Willkommen, %s. Aktuell spielen %d Spieler in %d Partien."
 
 msgid "Welcome, %s. There are %d clients playing 1 match."
-msgstr ""
+msgstr "Willkommen, %s. Aktuell spielen %d Spieler in 1 Partie."
 
 msgid "Welcome, %s. There is 1 client playing %d matches."
-msgstr ""
+msgstr "Willkommen, %s. Aktuell spielt 1 Spieler in %d Partien."
 
 msgid "Welcome, %s. There is 1 client playing 1 match."
-msgstr ""
+msgstr "Willkommen, %s. Aktuell spielt 1 Spieler in 1 Partie."
 
 msgid "Write error"
 msgstr "Schreibe Fehler"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-04-04 23:01+0000\n"
-"Last-Translator: Francisco Ruvalcaba <fruvalc@gmail.com>\n"
+"PO-Revision-Date: 2024-07-29 14:09+0000\n"
+"Last-Translator: banerxus <bagamon@banerxus.com>\n"
 "Language-Team: Spanish (Mexico) <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/es_MX/>\n"
 "Language: es_MX\n"
@@ -9,60 +9,62 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.5-dev\n"
+"X-Generator: Weblate 5.7-dev\n"
 
 msgid "%s - Free Online Backgammon"
-msgstr ""
+msgstr "%s - Backgammon en linea gratis"
 
 msgid "%s joined the match."
-msgstr ""
+msgstr "%s ha ingresado a la partida."
 
 msgid "%s left the match."
-msgstr ""
+msgstr "%s Abandono la partida."
 
 msgid "%s moved %s"
-msgstr ""
+msgstr "%s ha movido %s"
 
 msgid "%s rolled %s"
-msgstr ""
+msgstr "%s rodado %s"
 
 msgid "%s wins!"
-msgstr ""
+msgstr "%s Gano!"
 
 msgid "Accept"
-msgstr ""
+msgstr "Aceptar"
 
 msgid "Account"
-msgstr ""
+msgstr "Cuenta"
 
 msgid "Acey-deucey"
-msgstr ""
+msgstr "Acey-deucey"
 
 msgid "Advanced movement"
-msgstr ""
+msgstr "Movimiento avanzado"
 
 msgid "Auto-play forced moves"
-msgstr ""
+msgstr "Auto-jugar movimientos forzados"
 
 msgid "Available"
-msgstr ""
+msgstr "Disponible"
 
 msgid "Backgammon"
-msgstr ""
+msgstr "Backgammon"
 
 msgid "Bearing Off"
-msgstr ""
+msgstr "Teniendo en cuenta"
 
 msgid "Board"
-msgstr ""
+msgstr "Tablero"
 
 msgid ""
 "Boxcars is a client for playing backgammon via bgammon.org, a free and open "
 "source backgammon service."
 msgstr ""
+"Boxcars es un cliente para jugar backgammon en backgammon.org, un servicio "
+"de backgammon libre y de código abierto."
 
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 msgid "Change password"
 msgstr "Cambiar contraseña"
@@ -75,344 +77,362 @@ msgstr ""
 "revisar la carpeta de correo no deseado."
 
 msgid "Connect"
-msgstr ""
+msgstr "Conectar"
 
 msgid "Connecting..."
-msgstr ""
+msgstr "Conectando..."
 
 msgid "Create"
-msgstr ""
+msgstr "Crear"
 
 msgid "Create Match"
-msgstr ""
+msgstr "Crear partida"
 
 msgid ""
 "Create a match if you would like to play against someone else. Backgammon "
 "and several of its variants are supported."
 msgstr ""
+"Crea una partida si deseas jugar contra alguien más. Backgammon y muchas de "
+"sus variantes están tienen soporte."
 
 msgid "Create match"
-msgstr ""
+msgstr "Crear una partida"
 
 msgid "Create new match"
-msgstr ""
+msgstr "Crea una nueva partida"
 
 msgid "Current"
-msgstr ""
+msgstr "Actual"
 
 msgid "Date"
-msgstr ""
+msgstr "Fecha"
 
 msgid "Double"
-msgstr ""
+msgstr "Doble"
 
 msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
 msgstr ""
+"Haz doble click en una ficha para removerla. Remueve todas las 15 fichas "
+"para ganar."
 
 msgid "Download replay"
-msgstr ""
+msgstr "Descargar repetición"
 
 msgid "Downloaded replay"
-msgstr ""
+msgstr "Repetición descargada"
 
 msgid "Email"
-msgstr ""
+msgstr "Correo electrónico"
 
 msgid "Failed to download replay: %s"
-msgstr ""
+msgstr "Falla al descargar la repetición: %s"
 
 msgid "Failed to join match: %s"
-msgstr ""
+msgstr "No se pudo ingresar a la partida: %s"
 
 msgid "Failed to leave match: %s"
-msgstr ""
+msgstr "No se pudo abandonar la partida: %s"
 
 msgid "Failed to move checker%s: %s"
-msgstr ""
+msgstr "No se pudo mover la ficha%s: %s"
 
 msgid "Failed to roll"
-msgstr ""
+msgstr "No se pudo rodar"
 
 msgid "Failed to submit moves: %s"
-msgstr ""
+msgstr "No fue posible enviar los movimientos: %s"
 
 msgid "Fast"
-msgstr ""
+msgstr "Rápido"
 
 msgid "Flip board"
-msgstr ""
+msgstr "Voltea el tablero"
 
 msgid "Flip opp. space numbers"
-msgstr ""
+msgstr "Flip opp. Número de espacios"
 
 msgid "Forced"
-msgstr ""
+msgstr "Forzado"
 
 msgid "Good Luck, Have Fun"
-msgstr ""
+msgstr "Buenas suerte, diviértete"
 
 msgid "Highlight legal moves"
-msgstr ""
+msgstr "Resalta los movimientos legales"
 
 msgid "History"
-msgstr ""
+msgstr "Historia"
 
 msgid "Instant"
-msgstr ""
+msgstr "Instantáneo"
 
 msgid "Join"
-msgstr ""
+msgstr "Unirse"
 
 msgid "Join match"
-msgstr ""
+msgstr "Unirse a la partida"
 
 msgid "Join match: %s"
-msgstr ""
+msgstr "Unirse a la partida: %s"
 
 msgid "Leave"
-msgstr ""
+msgstr "Abandonar"
 
 msgid "Leave match?"
-msgstr ""
+msgstr "Abandonar partida?"
 
 msgid "Left match"
-msgstr ""
+msgstr "Partida abandonada"
 
 msgid "Legal moves: %s"
-msgstr ""
+msgstr "Movimientos legales: %s"
 
 msgid "Loading..."
-msgstr ""
+msgstr "Cargando..."
 
 msgid "Logged in as guest"
-msgstr ""
+msgstr "Conectado como invitado"
 
 msgid "Long press back to exit the application."
-msgstr ""
+msgstr "Mantenga presionado hacia atrás para salir de la aplicación."
 
 msgid "Match Name"
-msgstr ""
+msgstr "Nombre de la partida"
 
 msgid "Matches List"
-msgstr ""
+msgstr "Lista de partidas"
 
 msgid "Medium"
-msgstr ""
+msgstr "Medio"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 msgid "Multi"
-msgstr ""
+msgstr "Multi"
 
 msgid "Mute Sounds"
-msgstr ""
+msgstr "Silenciar sonidos"
 
 msgid "Name"
-msgstr ""
+msgstr "Nombre"
 
 msgid "New"
-msgstr ""
+msgstr "Nuevo"
 
 msgid "No"
-msgstr ""
+msgstr "No"
 
 msgid "None"
-msgstr ""
+msgstr "Ninguno"
 
 msgid "OK"
-msgstr ""
+msgstr "Aceptar"
 
 msgid "Opponent"
-msgstr ""
+msgstr "Oponente"
 
 msgid "Password"
-msgstr ""
+msgstr "Contraseña"
 
 msgid "Play Offline"
-msgstr ""
+msgstr "Just fuera de línea"
 
 msgid "Play backgammon online via bgammon.org"
-msgstr ""
+msgstr "Juega backgammon en línea en bagamon.org"
 
 msgid "Playing offline."
-msgstr ""
+msgstr "Jugando fuera de línea."
 
 msgid ""
 "Please enter a valid email address, or it will not be possible to reset your "
 "password."
 msgstr ""
+"Porfavor ingresé un correo electrónico válido o no será posible resetear tu "
+"contraseña."
 
 msgid "Points"
-msgstr ""
+msgstr "Puntos"
 
 msgid "Press back to toggle the keyboard."
-msgstr ""
+msgstr "Presione atrás para activar el teclado."
 
 msgid "Private"
-msgstr ""
+msgstr "Privada"
 
 msgid "Rating"
-msgstr ""
+msgstr "Clasificación"
 
 msgid "Read error"
-msgstr ""
+msgstr "Error de lectura"
 
 msgid "Reconnecting"
-msgstr ""
+msgstr "Reconectando"
 
 msgid "Refresh"
-msgstr ""
+msgstr "Refrescar"
 
 msgid "Refresh matches"
-msgstr ""
+msgstr "Refrescar las partidas"
 
 msgid "Register"
-msgstr ""
+msgstr "Registrar"
 
 msgid "Rematch"
-msgstr ""
+msgstr "Revancha"
 
 msgid "Replay download already in progress."
-msgstr ""
+msgstr "La descarga de la repetición ya se encuentra en progreso."
 
 msgid "Replaying %s vs. %s"
-msgstr ""
+msgstr "Repitiendo %s vs. %s"
 
 msgid "Reset Password"
-msgstr ""
+msgstr "Resetear contraseña"
 
 msgid "Resign"
-msgstr ""
+msgstr "Resignación"
 
 msgid "Result"
-msgstr ""
+msgstr "Resultado"
 
 msgid "Return"
-msgstr ""
+msgstr "Regresar"
 
 msgid "Roll"
-msgstr ""
+msgstr "Ruede"
 
 msgid "Search"
-msgstr ""
+msgstr "Buscar"
 
 msgid "Sending password reset request"
-msgstr ""
+msgstr "Enviando solicitud de reseteo de contraseña"
 
 msgid "Server"
-msgstr ""
+msgstr "Servidor"
 
 msgid "Settings"
-msgstr ""
+msgstr "Configuracion"
 
 msgid "Show moves"
-msgstr ""
+msgstr "Mostar movimientos"
 
 msgid "Show pip count"
-msgstr ""
+msgstr "Mostrar recuento de pips"
 
 msgid "Single"
-msgstr ""
+msgstr "Individual"
 
 msgid "Slow"
-msgstr ""
+msgstr "Lento"
 
 msgid "Sound"
-msgstr ""
+msgstr "Sonido"
 
 msgid "Speed"
-msgstr ""
+msgstr "Velocidad"
 
 msgid "Started"
-msgstr ""
+msgstr "Iniciada"
 
 msgid "Status"
-msgstr ""
+msgstr "Estado"
 
 msgid "Submit"
-msgstr ""
+msgstr "Enviar"
 
 msgid "Tabula"
-msgstr ""
+msgstr "Tabula"
 
 msgid "Tap to dismiss this pop-up."
-msgstr ""
+msgstr "Presione para omitir está notificación."
 
 msgid ""
 "This concludes the tutorial. To share feedback and chat with other players "
 "visit %s"
 msgstr ""
+"Esto concluye el tutorial. Para enviar comentarios y hablar con otros "
+"jugadores vaya a %s"
 
 msgid ""
 "This screen lists the matches that are currently available. A few bots are "
 "always available to play against. You can also spectate ongoing public "
 "matches."
 msgstr ""
+"Esta pantalla enlista las partidas que están actualmente disponibles. Unos "
+"cuantos bots están siempre disponibles para jugar contra ellos. También "
+"puede visualizar partidas públicas en progreso."
 
 msgid "To download this replay visit"
-msgstr ""
+msgstr "Para descargar está repetición visite"
 
 msgid ""
 "To log in as a guest, enter a username (if you want) and do not enter a "
 "password."
 msgstr ""
+"Para iniciar sesión como invitado, ingresé un nombre de usuario (Si así lo "
+"quiere) y no ingresé una contraseña."
 
 msgid "Tutorial"
-msgstr ""
+msgstr "Tutorial"
 
 msgid "Undo"
-msgstr ""
+msgstr "Deshacer"
 
 msgid "Username"
-msgstr ""
+msgstr "Nombre de usuario"
 
 msgid "Variant"
-msgstr ""
+msgstr "Variante"
 
 msgid "View replay"
-msgstr ""
+msgstr "Ver repetición"
 
 msgid "Waiting"
-msgstr ""
+msgstr "Esperando"
 
 msgid "Warning: Received unknown event: %+v"
-msgstr ""
+msgstr "Precaución: se recibió un evento desconocido: %+v"
 
 msgid "Warning: Received unrecognized event from server."
-msgstr ""
+msgstr "Precaución: se recibió un evento desconocido desde el servidor."
 
 msgid ""
 "Welcome to the guided tutorial. Click anywhere outside of this message box "
 "to close the tutorial. Click anywhere inside of this message box to view the "
 "next page."
 msgstr ""
+"Bienvenido al tutorial guiado. Presione en cualquier lugar fuera de este "
+"mensaje para cerrar el tutorial. Presione en cualquier lugar de este mensaje "
+"para ver la siguiente página."
 
 msgid "Welcome, %s. There are %d clients playing %d matches."
-msgstr ""
+msgstr "Bienvenido, %s. Hay %d clientes jugabdo %d partidas."
 
 msgid "Welcome, %s. There are %d clients playing 1 match."
-msgstr ""
+msgstr "Bienvenido, %s. Hay %d clientes jugado 1 partida."
 
 msgid "Welcome, %s. There is 1 client playing %d matches."
-msgstr ""
+msgstr "Bienvenido, %s. Hay 1 cliente jugando %d partidas."
 
 msgid "Welcome, %s. There is 1 client playing 1 match."
-msgstr ""
+msgstr "Bienvenido, %s. Hay 1 cliente jugando 1 partida."
 
 msgid "Write error"
-msgstr ""
+msgstr "Error de escritura"
 
 msgid "Yes"
-msgstr ""
+msgstr "Si"
 
 msgid ""
 "You have the black checkers. You can move a checker by either clicking it or "
 "dragging it."
 msgstr ""
+"Tu tienes las fichas negras. Puedes mover una ficha ya sea presionando sobre "
+"ella o arrastrándola."
 
 msgid "You may need to upgrade your client."
-msgstr ""
+msgstr "Es posible que me cesitr actualizar la aplicación cliente."
 
 msgid "from %s to %s"
-msgstr ""
+msgstr "Desde %s hasta %s"
