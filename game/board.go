@@ -3023,12 +3023,16 @@ func (b *board) finishDrag(x int, y int, click bool) {
 					homeStart, homeEnd = homeEnd, homeStart
 				}
 				if index >= homeStart && index <= homeEnd {
-					if b.gameState.Board[index] == 0 {
-						playSoundEffect(effectHomeSingle)
-					} else {
-						playSoundEffect(effectHomeMulti)
+					bc := b.gameState.Copy(true)
+					ok, _ := bc.AddMoves([][]int8{{index, bgammon.SpaceHomePlayer}}, true)
+					if ok {
+						if b.gameState.Board[index] == 0 {
+							playSoundEffect(effectHomeSingle)
+						} else {
+							playSoundEffect(effectHomeMulti)
+						}
+						b.Client.Out <- []byte(fmt.Sprintf("mv %d/off", index))
 					}
-					b.Client.Out <- []byte(fmt.Sprintf("mv %d/off", index))
 				}
 			} else if time.Since(b.lastDragClick) < 500*time.Millisecond && space == bgammon.SpaceHomePlayer && !b.gameState.Player1.Entered {
 				var found bool
