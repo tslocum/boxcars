@@ -74,8 +74,6 @@ type board struct {
 	opponentMoves [][]int8
 	playerMoves   [][]int8
 
-	debug int8 // Print and draw debug information
-
 	Client *Client
 
 	dragX, dragY int

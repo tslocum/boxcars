@@ -139,7 +139,7 @@ func (c *Client) handleWebSocketWrite(conn *websocket.Conn) {
 			}
 
 			if Debug > 0 {
-				l(fmt.Sprintf("-> %s", split[i]))
+				log.Printf("-> %s", split[i])
 			}
 		}
 	}
@@ -168,7 +168,7 @@ func (c *Client) handleWebSocketRead(conn *websocket.Conn) {
 		c.Events <- ev
 
 		if Debug > 0 {
-			l(fmt.Sprintf("<- %s", msg))
+			log.Printf("<- %s", msg)
 		}
 	}
 }
@@ -260,7 +260,7 @@ func (c *Client) handleTCPWrite(conn net.Conn) {
 		}
 
 		if Debug > 0 {
-			l(fmt.Sprintf("-> %s", buf))
+			log.Printf("-> %s", buf)
 		}
 	}
 }
@@ -290,7 +290,7 @@ func (c *Client) handleTCPRead(conn net.Conn) {
 		c.Events <- ev
 
 		if Debug > 0 {
-			l(fmt.Sprintf("<- %s", scanner.Bytes()))
+			log.Printf("<- %s", scanner.Bytes())
 		}
 
 		conn.SetReadDeadline(time.Now().Add(40 * time.Second))

@@ -2576,7 +2576,6 @@ func (g *Game) Update() error {
 		if Debug > MaxDebug {
 			Debug = 0
 		}
-		g.Board.debug = Debug
 		etk.SetDebug(Debug == 2)
 	}
 
