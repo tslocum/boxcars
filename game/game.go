@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	version              = "v1.3.7p5"
+	version              = "v1.3.8"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -77,6 +77,8 @@ var (
 	imgCubes16 *ebiten.Image
 	imgCubes32 *ebiten.Image
 	imgCubes64 *ebiten.Image
+
+	imgProfileBirthday1 *ebiten.Image
 
 	fontMutex = &sync.Mutex{}
 )
@@ -240,6 +242,8 @@ func loadImageAssets(width int) {
 	imgCubes16 = resizeDice(imgCubes.SubImage(image.Rect(0, size*1, size*1, size*2)), 0.6)
 	imgCubes32 = resizeDice(imgCubes.SubImage(image.Rect(size*1, size*1, size*2, size*2)), 0.6)
 	imgCubes64 = resizeDice(imgCubes.SubImage(image.Rect(size*2, size*1, size*3, size*2)), 0.6)
+
+	imgProfileBirthday1 = ebiten.NewImageFromImage(loadImage("asset/image/profile_birthday_1.png"))
 }
 
 func loadAudioAssets() {

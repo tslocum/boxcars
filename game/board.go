@@ -19,6 +19,7 @@ import (
 	"code.rocket9labs.com/tslocum/gotext"
 	"code.rocket9labs.com/tslocum/tabula"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/colorm"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/llgcode/draw2d/draw2dimg"
@@ -61,6 +62,8 @@ type board struct {
 	lastDoubleValue  int8
 	lastDoublePlayer int8
 	lastVariant      int8
+	lastIconPlayer   int
+	lastIconOpponent int
 
 	gameState *bgammon.GameState
 
@@ -1691,6 +1694,51 @@ func (b *board) updateBackgroundImage() {
 		}
 		text.Draw(b.backgroundImage, sp, ff, x, y+(int(b.verticalBorderSize)-b.lineHeight)/2+b.lineOffset, spaceLabelColor)
 	}
+
+	// Draw profile icons.
+	var opponentIcon, playerIcon *ebiten.Image
+	if b.gameState.Player2.Icon == 1 {
+		opponentIcon = imgProfileBirthday1
+	}
+	if b.gameState.Player1.Icon == 1 {
+		playerIcon = imgProfileBirthday1
+	}
+	if opponentIcon == nil && playerIcon == nil {
+		return
+	}
+	drawProfileIcon := func(icon *ebiten.Image, x float64, y float64, scale float64, opacity float64, invert bool) {
+		var c colorm.ColorM
+		if invert {
+			c.Scale(-1, -1, -1, opacity)
+			c.Translate(1, 1, 1, 0)
+		} else {
+			c.Scale(1, 1, 1, opacity)
+		}
+		op := &colorm.DrawImageOptions{}
+		op.GeoM.Scale(scale, scale)
+		op.GeoM.Translate(x, y)
+		colorm.DrawImage(b.backgroundImage, icon, c, op)
+	}
+	scale := b.spaceWidth / float64(232)
+	baseOpacity := 0.1
+	dividerHeight := float64(etk.Scale(15))
+	checkerHeight := (b.spaceWidth + b.overlapSize*4 - dividerHeight*2) / 15
+	if opponentIcon != nil {
+		x, y := edge+b.horizontalBorderSize, float64(b.y)+b.verticalBorderSize+dividerHeight+checkerHeight*10+2-b.spaceWidth-1
+		opacity := baseOpacity / 2
+		if b.flipBoard {
+			opacity = baseOpacity
+		}
+		drawProfileIcon(opponentIcon, x, y, scale, opacity, !b.flipBoard)
+	}
+	if playerIcon != nil {
+		x, y := edge+b.horizontalBorderSize, float64(b.h)-b.verticalBorderSize-b.spaceWidth-dividerHeight-checkerHeight*5+2
+		opacity := baseOpacity
+		if b.flipBoard {
+			opacity = baseOpacity / 2
+		}
+		drawProfileIcon(playerIcon, x, y, scale, opacity, b.flipBoard)
+	}
 }
 
 func (b *board) drawChecker(target *ebiten.Image, checker *ebiten.Image, x float64, y float64, white bool, side bool) {
@@ -2542,7 +2590,7 @@ func (b *board) processState() {
 	if b.lastPlayerNumber != b.gameState.PlayerNumber || b.lastVariant != b.gameState.Variant {
 		b.setSpaceRects()
 		b.updateBackgroundImage()
-	} else if b.lastPoints != b.gameState.Points || b.lastDoublePlayer != b.gameState.DoublePlayer || b.lastDoubleValue != b.gameState.DoubleValue {
+	} else if b.lastPoints != b.gameState.Points || b.lastDoublePlayer != b.gameState.DoublePlayer || b.lastDoubleValue != b.gameState.DoubleValue || b.lastIconPlayer != b.gameState.Player1.Icon || b.lastIconOpponent != b.gameState.Player2.Icon {
 		b.updateBackgroundImage()
 	}
 	b.lastPlayerNumber = b.gameState.PlayerNumber
@@ -2550,6 +2598,8 @@ func (b *board) processState() {
 	b.lastPoints = b.gameState.Points
 	b.lastDoublePlayer = b.gameState.DoublePlayer
 	b.lastDoubleValue = b.gameState.DoubleValue
+	b.lastIconPlayer = b.gameState.Player1.Icon
+	b.lastIconOpponent = b.gameState.Player2.Icon
 
 	if b.flipBoard || b.gameState.PlayerNumber == 2 {
 		if b.opponentLabel.activeColor != colorBlack {
