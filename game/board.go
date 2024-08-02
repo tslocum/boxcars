@@ -411,7 +411,7 @@ func NewBoard() *board {
 		b.muteRollCheckbox.SetSelected(b.muteRoll)
 
 		muteRollLabel := &ClickableText{
-			Text: etk.NewText(gotext.Get("Roll")),
+			Text: etk.NewText(gotext.Get("Roll Dice")),
 			onSelected: func() {
 				b.muteRollCheckbox.SetSelected(!b.muteRollCheckbox.Selected())
 				b.toggleMuteRoll()

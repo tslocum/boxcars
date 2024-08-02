@@ -280,6 +280,9 @@ msgstr ""
 msgid "Roll"
 msgstr ""
 
+msgid "Roll Dice"
+msgstr ""
+
 msgid "Search"
 msgstr ""
 
