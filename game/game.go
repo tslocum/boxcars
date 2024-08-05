@@ -2657,9 +2657,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		if g.drawTick < targetFPS {
 			gameUpdateLock.Unlock()
 			return
+		} else if drawScreen == 0 {
+			drawScreen = 1
 		}
-		updatedGame = false
-		drawScreen = 1
 	}
 	now := time.Now()
 	diff := 1000000000*time.Nanosecond/targetFPS - now.Sub(lastDraw)
