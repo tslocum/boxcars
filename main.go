@@ -3,7 +3,6 @@ package main
 //go:generate xgotext -no-locations -default boxcars -in . -out game/locales
 
 import (
-	"bufio"
 	"log"
 	"os"
 	"os/signal"
@@ -23,13 +22,6 @@ func main() {
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	g := parseFlags()
-
-	go func() {
-		scanner := bufio.NewScanner(os.Stdin)
-		for scanner.Scan() {
-			g.Client.Out <- append(scanner.Bytes(), '\n')
-		}
-	}()
 
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,
