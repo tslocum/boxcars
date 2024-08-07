@@ -1443,6 +1443,20 @@ func (b *board) toggleMuteBearOff() error {
 	return nil
 }
 
+func (b *board) MuteSounds() {
+	b.muteJoinLeave = true
+	b.muteChat = true
+	b.muteRoll = true
+	b.muteMove = true
+	b.muteBearOff = true
+
+	b.muteJoinLeaveCheckbox.SetSelected(true)
+	b.muteChatCheckbox.SetSelected(true)
+	b.muteRollCheckbox.SetSelected(true)
+	b.muteMoveCheckbox.SetSelected(true)
+	b.muteBearOffCheckbox.SetSelected(true)
+}
+
 func (b *board) newSprite(white bool) *Sprite {
 	s := &Sprite{}
 	s.colorWhite = white

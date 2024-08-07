@@ -548,7 +548,9 @@ type Game struct {
 	register      bool
 	loggedIn      bool
 
-	TV bool
+	JoinGame int
+	Mute     bool
+	TV       bool
 
 	Client *Client
 
@@ -1290,6 +1292,25 @@ func (g *Game) initialize() {
 
 	etk.SetRoot(displayFrame)
 	scheduleFrame()
+
+	if g.Mute {
+		g.Board.MuteSounds()
+	}
+
+	if g.JoinGame != 0 {
+		g.Username = ""
+		g.Password = ""
+		g.Connect()
+		go func() {
+			for {
+				if g.Client.loggedIn {
+					g.Client.Out <- []byte(fmt.Sprintf("j %d", g.JoinGame))
+					break
+				}
+				time.Sleep(100 * time.Millisecond)
+			}
+		}()
+	}
 }
 
 func (g *Game) playOffline() {
