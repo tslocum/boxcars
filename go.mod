@@ -3,7 +3,7 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.19
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240807215015-06085b69d030
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240807235326-0c550b6f7557
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240721175208-e769215e74fc
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240722214147-c1f1fe1adb37
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
@@ -55,5 +55,5 @@ require (
 	golang.org/x/crypto v0.26.0 // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.23.0 // indirect
+	golang.org/x/sys v0.24.0 // indirect
 )

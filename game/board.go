@@ -974,6 +974,7 @@ func (b *board) recreateAccountGrid() {
 		w = guestLabel
 	} else {
 		changePasswordButton := etk.NewButton(gotext.Get("Change password"), b.showChangePassword)
+		changePasswordButton.SetHorizontal(etk.AlignStart)
 		w = changePasswordButton
 	}
 	b.accountGrid.Clear()
