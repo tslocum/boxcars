@@ -550,6 +550,7 @@ type Game struct {
 
 	JoinGame int
 	Mute     bool
+	Instant  bool
 	TV       bool
 
 	Client *Client
@@ -1295,6 +1296,11 @@ func (g *Game) initialize() {
 
 	if g.Mute {
 		g.Board.MuteSounds()
+	}
+
+	if g.Instant {
+		g.Board.speed = 3
+		g.Board.selectSpeed.SetSelectedItem(3)
 	}
 
 	if g.JoinGame != 0 {

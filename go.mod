@@ -3,17 +3,17 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.19
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240807235326-0c550b6f7557
-	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240721175208-e769215e74fc
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240818173949-9bcc4061a97a
+	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240818174413-cf737ec690f0
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240722214147-c1f1fe1adb37
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240703054156-ce0b448f0999
+	github.com/coder/websocket v1.8.12
 	github.com/hajimehoshi/ebiten/v2 v2.7.8
 	github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	golang.org/x/image v0.19.0
 	golang.org/x/text v0.17.0
-	nhooyr.io/websocket v1.8.11
 )
 
 require (

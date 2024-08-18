@@ -17,6 +17,7 @@ func parseFlags() *game.Game {
 		password      string
 		serverAddress string
 		mute          bool
+		instant       bool
 		locale        string
 		join          int
 		tv            bool
@@ -26,6 +27,7 @@ func parseFlags() *game.Game {
 	flag.StringVar(&password, "password", "", "Password")
 	flag.StringVar(&serverAddress, "address", game.DefaultServerAddress, "Server address")
 	flag.BoolVar(&mute, "mute", false, "Mute sound effects")
+	flag.BoolVar(&instant, "instant", false, "Instant checker movement")
 	flag.StringVar(&locale, "locale", "", "Use specified locale for translations")
 	flag.IntVar(&join, "join", 0, "Connect as guest and join specified match")
 	flag.BoolVar(&tv, "tv", false, "Watch random games continuously")
@@ -50,6 +52,7 @@ func parseFlags() *game.Game {
 	g.Password = password
 	g.ServerAddress = serverAddress
 	g.Mute = mute
+	g.Instant = instant
 	g.JoinGame = join
 	g.TV = tv
 

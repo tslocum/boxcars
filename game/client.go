@@ -12,7 +12,7 @@ import (
 
 	"code.rocket9labs.com/tslocum/bgammon"
 	"code.rocket9labs.com/tslocum/gotext"
-	"nhooyr.io/websocket"
+	"github.com/coder/websocket"
 )
 
 type Client struct {
