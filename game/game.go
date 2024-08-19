@@ -164,7 +164,7 @@ func init() {
 }
 
 func l(s string) {
-	m := time.Now().Format("3:04") + " " + s
+	m := time.Now().Format("[3:04]") + " " + s
 	if statusLogged {
 		_, _ = statusBuffer.Write([]byte("\n" + m))
 		scheduleFrame()
@@ -176,7 +176,7 @@ func l(s string) {
 }
 
 func lg(s string) {
-	m := time.Now().Format("3:04") + " " + s
+	m := time.Now().Format("[3:04]") + " " + s
 	if gameLogged {
 		_, _ = gameBuffer.Write([]byte("\n" + m))
 		scheduleFrame()
