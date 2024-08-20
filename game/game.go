@@ -551,7 +551,6 @@ type Game struct {
 	JoinGame int
 	Mute     bool
 	Instant  bool
-	TV       bool
 
 	Client *Client
 
@@ -2228,13 +2227,6 @@ func (g *Game) Connect() {
 
 	c := g.Client
 
-	if g.TV {
-		go func() {
-			time.Sleep(time.Second)
-			c.Out <- []byte("tv")
-		}()
-	}
-
 	connectTime := time.Now()
 	t := time.NewTicker(250 * time.Millisecond)
 	go func() {
@@ -2281,16 +2273,7 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 
 	go g.handleEvents()
 
-	c := g.Client
-
-	if g.TV {
-		go func() {
-			time.Sleep(time.Second)
-			c.Out <- []byte("tv")
-		}()
-	}
-
-	go c.connectTCP(conn)
+	go g.Client.connectTCP(conn)
 }
 
 func (g *Game) selectRegister() error {

@@ -3,13 +3,59 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	"io"
 	"log"
+	"net/http"
 	"os"
+	"os/exec"
+	"strconv"
+	"time"
 
+	"code.rocket9labs.com/tslocum/bgammon"
 	"code.rocket9labs.com/tslocum/boxcars/game"
 	"golang.org/x/text/language"
 )
+
+func fetchMatches(matches []*bgammon.GameListing) []*bgammon.GameListing {
+	url := "https://bgammon.org/matches.json"
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Set("User-Agent", "bgammon-tv")
+
+	client := http.Client{
+		Timeout: time.Second * 10,
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = json.Unmarshal(body, &matches)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return matches
+}
+
+func openBoxcars(boxcarsPath string, matchID int) {
+	cmd := exec.Command(boxcarsPath, "--join", strconv.Itoa(matchID), "--mute")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
+}
 
 func parseFlags() *game.Game {
 	var (
@@ -30,7 +76,7 @@ func parseFlags() *game.Game {
 	flag.BoolVar(&instant, "instant", false, "Instant checker movement")
 	flag.StringVar(&locale, "locale", "", "Use specified locale for translations")
 	flag.IntVar(&join, "join", 0, "Connect as guest and join specified match")
-	flag.BoolVar(&tv, "tv", false, "Watch random games continuously")
+	flag.BoolVar(&tv, "tv", false, "Spectate games continuously")
 	flag.IntVar(&debug, "debug", 0, "Debug level")
 	flag.Parse()
 
@@ -54,7 +100,6 @@ func parseFlags() *game.Game {
 	g.Mute = mute
 	g.Instant = instant
 	g.JoinGame = join
-	g.TV = tv
 
 	if debug > 0 {
 		game.Debug = int8(debug)
@@ -66,6 +111,32 @@ func parseFlags() *game.Game {
 			log.Fatalf("failed to open replay file %s: %s", flag.Arg(0), err)
 		}
 		g.LoadReplay = replay
+	}
+
+	if tv {
+		log.Println("Watching bgammon.org TV...")
+
+		boxcarsPath, err := os.Executable()
+		if err != nil {
+			log.Fatal(err)
+		} else if boxcarsPath == "" {
+			boxcarsPath = "boxcars"
+		}
+
+		var matches []*bgammon.GameListing
+		foundGames := make(map[int]bool)
+		t := time.NewTicker(15 * time.Second)
+		for {
+			matches = fetchMatches(matches[:0])
+			for _, match := range matches {
+				if match.Password || match.Players != 2 || foundGames[match.ID] {
+					continue
+				}
+				openBoxcars(boxcarsPath, match.ID)
+				foundGames[match.ID] = true
+			}
+			<-t.C
+		}
 	}
 
 	return g
