@@ -99,8 +99,10 @@ type board struct {
 	opponentLabel *Label
 	playerLabel   *Label
 
-	opponentRatingLabel *etk.Text
-	playerRatingLabel   *etk.Text
+	opponentRatingLabel       *etk.Text
+	playerRatingLabel         *etk.Text
+	opponentRatingShadowLabel *etk.Text
+	playerRatingShadowLabel   *etk.Text
 
 	opponentForcedLabel *etk.Text
 	playerForcedLabel   *etk.Text
@@ -186,6 +188,8 @@ const (
 var (
 	colorWhite = color.RGBA{255, 255, 255, 255}
 	colorBlack = color.RGBA{0, 0, 0, 255}
+
+	ratingShadowColor = color.RGBA{71, 49, 32, 255}
 )
 
 func NewBoard() *board {
@@ -208,54 +212,67 @@ func NewBoard() *board {
 		gameState: &bgammon.GameState{
 			Game: bgammon.NewGame(bgammon.VariantBackgammon),
 		},
-		highlightSpaces:         make([][]int8, 28),
-		spaceHighlight:          ebiten.NewImage(1, 1),
-		foundMoves:              make(map[int]bool),
-		opponentLabel:           NewLabel(colorWhite),
-		playerLabel:             NewLabel(colorBlack),
-		opponentRatingLabel:     etk.NewText(""),
-		playerRatingLabel:       etk.NewText(""),
-		opponentForcedLabel:     etk.NewText(fmt.Sprintf("=%s=", gotext.Get("Forced"))),
-		playerForcedLabel:       etk.NewText(fmt.Sprintf("=%s=", gotext.Get("Forced"))),
-		opponentMovesLabel:      etk.NewText(""),
-		playerMovesLabel:        etk.NewText(""),
-		opponentPipCount:        etk.NewText("0"),
-		playerPipCount:          etk.NewText("0"),
-		buttonsGrid:             etk.NewGrid(),
-		buttonsOnlyRollGrid:     etk.NewGrid(),
-		buttonsOnlyUndoGrid:     etk.NewGrid(),
-		buttonsOnlyOKGrid:       etk.NewGrid(),
-		buttonsDoubleRollGrid:   etk.NewGrid(),
-		buttonsResignAcceptGrid: etk.NewGrid(),
-		buttonsUndoOKGrid:       etk.NewGrid(),
-		selectRollGrid:          etk.NewGrid(),
-		menuGrid:                etk.NewGrid(),
-		muteSoundsGrid:          etk.NewGrid(),
-		accountGrid:             etk.NewGrid(),
-		settingsGrid:            etk.NewGrid(),
-		changePasswordGrid:      etk.NewGrid(),
-		uiGrid:                  etk.NewGrid(),
-		frame:                   etk.NewFrame(),
-		confirmLeaveGameFrame:   etk.NewFrame(),
-		speed:                   bgammon.SpeedMedium,
-		showPipCount:            true,
-		highlightAvailable:      true,
-		widget:                  NewBoardWidget(),
-		fontSize:                mediumFontSize,
-		repositionLock:          &sync.Mutex{},
-		stateLock:               &sync.Mutex{},
-		Mutex:                   &sync.Mutex{},
+		highlightSpaces:           make([][]int8, 28),
+		spaceHighlight:            ebiten.NewImage(1, 1),
+		foundMoves:                make(map[int]bool),
+		opponentLabel:             NewLabel(colorWhite),
+		playerLabel:               NewLabel(colorBlack),
+		opponentRatingLabel:       etk.NewText(""),
+		playerRatingLabel:         etk.NewText(""),
+		opponentRatingShadowLabel: etk.NewText(""),
+		playerRatingShadowLabel:   etk.NewText(""),
+		opponentForcedLabel:       etk.NewText(fmt.Sprintf("=%s=", gotext.Get("Forced"))),
+		playerForcedLabel:         etk.NewText(fmt.Sprintf("=%s=", gotext.Get("Forced"))),
+		opponentMovesLabel:        etk.NewText(""),
+		playerMovesLabel:          etk.NewText(""),
+		opponentPipCount:          etk.NewText("0"),
+		playerPipCount:            etk.NewText("0"),
+		buttonsGrid:               etk.NewGrid(),
+		buttonsOnlyRollGrid:       etk.NewGrid(),
+		buttonsOnlyUndoGrid:       etk.NewGrid(),
+		buttonsOnlyOKGrid:         etk.NewGrid(),
+		buttonsDoubleRollGrid:     etk.NewGrid(),
+		buttonsResignAcceptGrid:   etk.NewGrid(),
+		buttonsUndoOKGrid:         etk.NewGrid(),
+		selectRollGrid:            etk.NewGrid(),
+		menuGrid:                  etk.NewGrid(),
+		muteSoundsGrid:            etk.NewGrid(),
+		accountGrid:               etk.NewGrid(),
+		settingsGrid:              etk.NewGrid(),
+		changePasswordGrid:        etk.NewGrid(),
+		uiGrid:                    etk.NewGrid(),
+		frame:                     etk.NewFrame(),
+		confirmLeaveGameFrame:     etk.NewFrame(),
+		speed:                     bgammon.SpeedMedium,
+		showPipCount:              true,
+		highlightAvailable:        true,
+		widget:                    NewBoardWidget(),
+		fontSize:                  mediumFontSize,
+		repositionLock:            &sync.Mutex{},
+		stateLock:                 &sync.Mutex{},
+		Mutex:                     &sync.Mutex{},
 	}
 
 	{
-		b.opponentRatingLabel.SetHorizontal(etk.AlignCenter)
-		b.opponentRatingLabel.SetVertical(etk.AlignStart)
-		b.opponentRatingLabel.SetScrollBarVisible(false)
-		b.opponentRatingLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
-		b.playerRatingLabel.SetHorizontal(etk.AlignCenter)
-		b.playerRatingLabel.SetVertical(etk.AlignEnd)
-		b.playerRatingLabel.SetScrollBarVisible(false)
-		b.playerRatingLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+		for i := 0; i < 2; i++ {
+			o := b.opponentRatingLabel
+			p := b.playerRatingLabel
+			if i == 1 {
+				o = b.opponentRatingShadowLabel
+				p = b.playerRatingShadowLabel
+			}
+
+			o.SetHorizontal(etk.AlignCenter)
+			o.SetVertical(etk.AlignStart)
+			o.SetScrollBarVisible(false)
+			o.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+
+			p.SetHorizontal(etk.AlignCenter)
+			p.SetVertical(etk.AlignEnd)
+			p.SetScrollBarVisible(false)
+			p.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+		}
+
 		padding := 15
 		b.opponentForcedLabel.SetPadding(padding)
 		b.opponentForcedLabel.SetHorizontal(etk.AlignCenter)
@@ -288,6 +305,9 @@ func NewBoard() *board {
 
 	b.opponentRatingLabel.SetForeground(color.RGBA{255, 255, 255, 255})
 	b.playerRatingLabel.SetForeground(color.RGBA{0, 0, 0, 255})
+
+	b.opponentRatingShadowLabel.SetForeground(color.RGBA{0, 0, 0, 255})
+	b.playerRatingShadowLabel.SetForeground(ratingShadowColor)
 
 	b.opponentForcedLabel.SetForeground(color.RGBA{255, 255, 255, 255})
 	b.playerForcedLabel.SetForeground(color.RGBA{0, 0, 0, 255})
@@ -735,6 +755,7 @@ func NewBoard() *board {
 
 	{
 		f := etk.NewFrame()
+		f.AddChild(b.opponentRatingShadowLabel)
 		f.AddChild(b.opponentRatingLabel)
 		f.AddChild(b.opponentForcedLabel)
 		f.AddChild(b.opponentMovesLabel)
@@ -744,6 +765,7 @@ func NewBoard() *board {
 		f.AddChild(b.playerPipCount)
 		f.AddChild(b.playerMovesLabel)
 		f.AddChild(b.playerForcedLabel)
+		f.AddChild(b.playerRatingShadowLabel)
 		f.AddChild(b.playerRatingLabel)
 		f.AddChild(b.uiGrid)
 		f.AddChild(b.rematchButton)
@@ -2320,6 +2342,7 @@ func (b *board) updateOpponentLabel() {
 		x, y := b.w-int(b.spaceWidth), int(b.verticalBorderSize)+int(b.spaceWidth)+int(b.overlapSize*4)
 		newRect := image.Rect(x, y, x+int(b.spaceWidth), y+200)
 		b.opponentRatingLabel.SetRect(newRect)
+		b.opponentRatingShadowLabel.SetRect(newRect.Add(image.Point{etk.Scale(2), etk.Scale(2)}))
 	}
 
 	var moves []byte
@@ -2399,6 +2422,7 @@ func (b *board) updatePlayerLabel() {
 		x, y := b.w-int(b.spaceWidth), b.h-int(b.verticalBorderSize)-int(b.spaceWidth)-int(b.overlapSize*4)
 		newRect := image.Rect(x, y-200, x+int(b.spaceWidth), y)
 		b.playerRatingLabel.SetRect(newRect)
+		b.playerRatingShadowLabel.SetRect(newRect.Add(image.Point{etk.Scale(2), etk.Scale(2)}))
 	}
 
 	var moves []byte
@@ -2624,6 +2648,7 @@ func (b *board) processState() {
 			b.opponentPipCount.SetForeground(colorBlack)
 			b.opponentMovesLabel.SetForeground(colorBlack)
 			b.opponentRatingLabel.SetForeground(colorBlack)
+			b.opponentRatingShadowLabel.SetForeground(ratingShadowColor)
 			b.opponentLabel.lastActive = !b.opponentLabel.active
 			b.opponentLabel.updateBackground()
 		}
@@ -2634,6 +2659,7 @@ func (b *board) processState() {
 			b.playerPipCount.SetForeground(colorWhite)
 			b.playerMovesLabel.SetForeground(colorWhite)
 			b.playerRatingLabel.SetForeground(colorWhite)
+			b.playerRatingShadowLabel.SetForeground(colorBlack)
 			b.playerLabel.lastActive = !b.opponentLabel.active
 			b.playerLabel.updateBackground()
 		}
@@ -2645,6 +2671,7 @@ func (b *board) processState() {
 			b.opponentPipCount.SetForeground(colorWhite)
 			b.opponentMovesLabel.SetForeground(colorWhite)
 			b.opponentRatingLabel.SetForeground(colorWhite)
+			b.opponentRatingShadowLabel.SetForeground(colorBlack)
 			b.opponentLabel.lastActive = !b.opponentLabel.active
 			b.opponentLabel.updateBackground()
 		}
@@ -2655,6 +2682,7 @@ func (b *board) processState() {
 			b.playerPipCount.SetForeground(colorBlack)
 			b.playerMovesLabel.SetForeground(colorBlack)
 			b.playerRatingLabel.SetForeground(colorBlack)
+			b.playerRatingShadowLabel.SetForeground(ratingShadowColor)
 			b.playerLabel.lastActive = !b.opponentLabel.active
 			b.playerLabel.updateBackground()
 		}
@@ -2662,10 +2690,14 @@ func (b *board) processState() {
 
 	if b.gameState.Player1.Rating != 0 && b.gameState.Player2.Rating != 0 {
 		b.opponentRatingLabel.SetText(strconv.Itoa(b.gameState.Player2.Rating))
+		b.opponentRatingShadowLabel.SetText(strconv.Itoa(b.gameState.Player2.Rating))
 		b.playerRatingLabel.SetText(strconv.Itoa(b.gameState.Player1.Rating))
+		b.playerRatingShadowLabel.SetText(strconv.Itoa(b.gameState.Player1.Rating))
 	} else {
 		b.opponentRatingLabel.SetText("")
+		b.opponentRatingShadowLabel.SetText("")
 		b.playerRatingLabel.SetText("")
+		b.playerRatingShadowLabel.SetText("")
 	}
 
 	b.opponentForcedLabel.SetVisible(b.gameState.Forced && b.gameState.Turn != b.gameState.PlayerNumber)
