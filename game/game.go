@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	version              = "v1.3.8p1"
+	version              = "v1.3.9"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -2464,8 +2464,13 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					g.Board.menuGrid.SetVisible(true)
 				}
 				continue
+			} else if g.lobby.showHistory {
+				g.lobby.showHistory = false
+				g.lobby.rebuildButtonsGrid()
+				g.setRoot(listGamesFrame)
+			} else {
+				setViewBoard(!viewBoard)
 			}
-			setViewBoard(!viewBoard)
 		}
 	}
 
@@ -2735,7 +2740,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) portraitView() bool {
-	return g.screenH-g.screenW >= 100
+	return g.screenH-g.screenW >= 200
 }
 
 func (g *Game) layoutConnect() {
