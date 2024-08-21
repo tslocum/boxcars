@@ -50,6 +50,9 @@ msgstr "Disponibile"
 msgid "Backgammon"
 msgstr ""
 
+msgid "Bear Off"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr "Levata"
 
@@ -68,6 +71,9 @@ msgstr "Cancella"
 
 msgid "Change password"
 msgstr "Cambia password"
+
+msgid "Chat"
+msgstr ""
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -169,6 +175,9 @@ msgstr ""
 msgid "Join"
 msgstr ""
 
+msgid "Join/Leave"
+msgstr ""
+
 msgid "Join match"
 msgstr "Entra nella partita"
 
@@ -206,6 +215,9 @@ msgid "Medium"
 msgstr ""
 
 msgid "Menu"
+msgstr ""
+
+msgid "Move"
 msgstr ""
 
 msgid "Multi"
@@ -301,6 +313,9 @@ msgstr "Indietro"
 
 msgid "Roll"
 msgstr "Lancia"
+
+msgid "Roll Dice"
+msgstr ""
 
 msgid "Search"
 msgstr "Cerca"

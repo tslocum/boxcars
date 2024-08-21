@@ -50,6 +50,9 @@ msgstr "Disponueshëm"
 msgid "Backgammon"
 msgstr "Tavëll"
 
+msgid "Bear Off"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr "Duke mbajtur jashtë"
 
@@ -68,6 +71,9 @@ msgstr "Anulo"
 
 msgid "Change password"
 msgstr "Ndrysho fjalëkalimin"
+
+msgid "Chat"
+msgstr ""
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -169,6 +175,9 @@ msgstr "Menjëherë"
 msgid "Join"
 msgstr "Bashkohu"
 
+msgid "Join/Leave"
+msgstr ""
+
 msgid "Join match"
 msgstr "Bashkohu në lojë"
 
@@ -207,6 +216,9 @@ msgstr "Mesme"
 
 msgid "Menu"
 msgstr "Meny"
+
+msgid "Move"
+msgstr ""
 
 msgid "Multi"
 msgstr "Shumës"
@@ -301,6 +313,9 @@ msgstr "Kthehu"
 
 msgid "Roll"
 msgstr "Hedh zarin"
+
+msgid "Roll Dice"
+msgstr ""
 
 msgid "Search"
 msgstr "Kërko"

@@ -46,6 +46,9 @@ msgstr ""
 msgid "Backgammon"
 msgstr ""
 
+msgid "Bear Off"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -61,6 +64,9 @@ msgid "Cancel"
 msgstr ""
 
 msgid "Change password"
+msgstr ""
+
+msgid "Chat"
 msgstr ""
 
 msgid ""
@@ -157,6 +163,9 @@ msgstr ""
 msgid "Join"
 msgstr ""
 
+msgid "Join/Leave"
+msgstr ""
+
 msgid "Join match"
 msgstr ""
 
@@ -194,6 +203,9 @@ msgid "Medium"
 msgstr ""
 
 msgid "Menu"
+msgstr ""
+
+msgid "Move"
 msgstr ""
 
 msgid "Multi"
@@ -286,6 +298,9 @@ msgid "Return"
 msgstr ""
 
 msgid "Roll"
+msgstr ""
+
+msgid "Roll Dice"
 msgstr ""
 
 msgid "Search"

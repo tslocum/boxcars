@@ -51,6 +51,9 @@ msgstr "Mevcut"
 msgid "Backgammon"
 msgstr "Tavla"
 
+msgid "Bear Off"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -70,6 +73,9 @@ msgstr "İptal et"
 
 msgid "Change password"
 msgstr "Şifreyi değiştir"
+
+msgid "Chat"
+msgstr ""
 
 #, fuzzy
 msgid ""
@@ -173,6 +179,9 @@ msgstr "Anında"
 msgid "Join"
 msgstr "Katıl"
 
+msgid "Join/Leave"
+msgstr ""
+
 msgid "Join match"
 msgstr "Oyuna katıl"
 
@@ -211,6 +220,9 @@ msgid "Medium"
 msgstr "Orta"
 
 msgid "Menu"
+msgstr ""
+
+msgid "Move"
 msgstr ""
 
 msgid "Multi"
@@ -307,6 +319,9 @@ msgstr "Geri dön"
 
 msgid "Roll"
 msgstr "Zar at"
+
+msgid "Roll Dice"
+msgstr ""
 
 msgid "Search"
 msgstr "Ara"

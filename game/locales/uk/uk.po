@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-07-26 16:26+0000\n"
+"PO-Revision-Date: 2024-08-21 18:26+0000\n"
 "Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Weblate 5.7-dev\n"
+"X-Generator: Weblate 5.7\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Вільні Онлайн Нарди"
@@ -51,8 +51,11 @@ msgstr "Не почато"
 msgid "Backgammon"
 msgstr "Нарди"
 
+msgid "Bear Off"
+msgstr "Зняття шашок"
+
 msgid "Bearing Off"
-msgstr "Викидання"
+msgstr "Зняття"
 
 msgid "Board"
 msgstr "Дошка"
@@ -69,6 +72,9 @@ msgstr "Скасувати"
 
 msgid "Change password"
 msgstr "Змінити пароль"
+
+msgid "Chat"
+msgstr "Повідомлення у чаті"
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -113,8 +119,8 @@ msgstr "Подвоїти"
 
 msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
 msgstr ""
-"Натисніть по шашці двічі, щоб викинути її з дошки. Викиньте всі 15 шашок, "
-"щоб перемогти."
+"Натисніть по шашці двічі, щоб зняти її з дошки. Зніміть усі 15 шашок, щоб "
+"перемогти."
 
 msgid "Download replay"
 msgstr "Завантажити повтор"
@@ -170,6 +176,9 @@ msgstr "Моментально"
 msgid "Join"
 msgstr "Увійти"
 
+msgid "Join/Leave"
+msgstr "Приєднання/від'єднання"
+
 msgid "Join match"
 msgstr "Приєднатися до матчу"
 
@@ -208,6 +217,9 @@ msgstr "Звичайно"
 
 msgid "Menu"
 msgstr "Меню"
+
+msgid "Move"
+msgstr "Ходи"
 
 msgid "Multi"
 msgstr "Багатоочковий"
@@ -302,6 +314,9 @@ msgstr "Назад"
 
 msgid "Roll"
 msgstr "Кинути"
+
+msgid "Roll Dice"
+msgstr "Кидки кубиків"
 
 msgid "Search"
 msgstr "Пошук"

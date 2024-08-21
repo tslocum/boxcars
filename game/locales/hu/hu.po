@@ -50,6 +50,9 @@ msgstr ""
 msgid "Backgammon"
 msgstr ""
 
+msgid "Bear Off"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -67,6 +70,9 @@ msgid "Cancel"
 msgstr "Mégse"
 
 msgid "Change password"
+msgstr ""
+
+msgid "Chat"
 msgstr ""
 
 msgid ""
@@ -163,6 +169,9 @@ msgstr ""
 msgid "Join"
 msgstr "Csatlakozás"
 
+msgid "Join/Leave"
+msgstr ""
+
 msgid "Join match"
 msgstr "Csatlakozás a játékhoz"
 
@@ -200,6 +209,9 @@ msgid "Medium"
 msgstr ""
 
 msgid "Menu"
+msgstr ""
+
+msgid "Move"
 msgstr ""
 
 msgid "Multi"
@@ -293,6 +305,9 @@ msgstr "Visszatérés"
 
 msgid "Roll"
 msgstr "Dobás"
+
+msgid "Roll Dice"
+msgstr ""
 
 msgid "Search"
 msgstr ""

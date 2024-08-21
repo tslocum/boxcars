@@ -50,6 +50,9 @@ msgstr "Disponebla"
 msgid "Backgammon"
 msgstr "Triktrako"
 
+msgid "Bear Off"
+msgstr ""
+
 msgid "Bearing Off"
 msgstr ""
 
@@ -68,6 +71,9 @@ msgstr "Nuligi"
 
 msgid "Change password"
 msgstr "Ŝanĝi pasvorton"
+
+msgid "Chat"
+msgstr ""
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -163,6 +169,9 @@ msgstr "Tuja"
 msgid "Join"
 msgstr "Aligî"
 
+msgid "Join/Leave"
+msgstr ""
+
 msgid "Join match"
 msgstr "Aliĝi partion"
 
@@ -201,6 +210,9 @@ msgstr "Mezrapida"
 
 msgid "Menu"
 msgstr "Menuo"
+
+msgid "Move"
+msgstr ""
 
 msgid "Multi"
 msgstr ""
@@ -295,6 +307,9 @@ msgstr "Reen"
 
 msgid "Roll"
 msgstr "Ĵeti ĵetkubon"
+
+msgid "Roll Dice"
+msgstr ""
 
 msgid "Search"
 msgstr "Serĉi"

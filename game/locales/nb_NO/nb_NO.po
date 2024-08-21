@@ -51,6 +51,9 @@ msgstr "Tilgjengelig"
 msgid "Backgammon"
 msgstr "Backgammon"
 
+msgid "Bear Off"
+msgstr ""
+
 #, fuzzy
 msgid "Bearing Off"
 msgstr "Fjerning avslått"
@@ -71,6 +74,9 @@ msgstr "Avbryt"
 
 msgid "Change password"
 msgstr "Endre passord"
+
+msgid "Chat"
+msgstr ""
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -182,6 +188,9 @@ msgstr "Umiddelbart"
 msgid "Join"
 msgstr "Ta del"
 
+msgid "Join/Leave"
+msgstr ""
+
 msgid "Join match"
 msgstr "Ta del i spill"
 
@@ -221,6 +230,9 @@ msgstr "Middels"
 
 msgid "Menu"
 msgstr "Meny"
+
+msgid "Move"
+msgstr ""
 
 #, fuzzy
 msgid "Multi"
@@ -318,6 +330,9 @@ msgstr "Tilbake"
 
 msgid "Roll"
 msgstr "Kast terninger"
+
+msgid "Roll Dice"
+msgstr ""
 
 msgid "Search"
 msgstr "Søk"
