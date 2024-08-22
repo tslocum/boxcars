@@ -58,7 +58,7 @@ func (b *board) createChangePasswordDialog() {
 	headerLabel.SetHorizontal(etk.AlignCenter)
 
 	oldLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Current")),
+		Text: resizeText(gotext.Get("Current")),
 		onSelected: func() {
 			b.highlightCheckbox.SetSelected(!b.highlightCheckbox.Selected())
 			b.toggleHighlightCheckbox()
@@ -74,7 +74,7 @@ func (b *board) createChangePasswordDialog() {
 	centerInput(b.changePasswordOld)
 
 	newLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("New")),
+		Text: resizeText(gotext.Get("New")),
 		onSelected: func() {
 			b.showPipCountCheckbox.SetSelected(!b.showPipCountCheckbox.Selected())
 			b.togglePipCountCheckbox()
@@ -109,7 +109,7 @@ func (b *board) createChangePasswordDialog() {
 }
 
 func (b *board) createMuteSoundsDialog() {
-	headerLabel := etk.NewText(gotext.Get("Mute Sounds"))
+	headerLabel := resizeText(gotext.Get("Mute Sounds"))
 	headerLabel.SetHorizontal(etk.AlignCenter)
 
 	rowCount := 5
@@ -120,7 +120,7 @@ func (b *board) createMuteSoundsDialog() {
 	b.muteJoinLeaveCheckbox.SetSelected(b.muteJoinLeave)
 
 	muteJoinLeaveLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Join/Leave")),
+		Text: resizeText(gotext.Get("Join/Leave")),
 		onSelected: func() {
 			b.muteJoinLeaveCheckbox.SetSelected(!b.muteJoinLeaveCheckbox.Selected())
 			b.toggleMuteJoinLeave()
@@ -134,7 +134,7 @@ func (b *board) createMuteSoundsDialog() {
 	b.muteChatCheckbox.SetSelected(b.muteChat)
 
 	muteChatLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Chat")),
+		Text: resizeText(gotext.Get("Chat")),
 		onSelected: func() {
 			b.muteChatCheckbox.SetSelected(!b.muteChatCheckbox.Selected())
 			b.toggleMuteChat()
@@ -148,7 +148,7 @@ func (b *board) createMuteSoundsDialog() {
 	b.muteRollCheckbox.SetSelected(b.muteRoll)
 
 	muteRollLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Roll Dice")),
+		Text: resizeText(gotext.Get("Roll Dice")),
 		onSelected: func() {
 			b.muteRollCheckbox.SetSelected(!b.muteRollCheckbox.Selected())
 			b.toggleMuteRoll()
@@ -162,7 +162,7 @@ func (b *board) createMuteSoundsDialog() {
 	b.muteMoveCheckbox.SetSelected(b.muteMove)
 
 	muteMoveLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Move")),
+		Text: resizeText(gotext.Get("Move")),
 		onSelected: func() {
 			b.muteMoveCheckbox.SetSelected(!b.muteMoveCheckbox.Selected())
 			b.toggleMuteMove()
@@ -176,7 +176,7 @@ func (b *board) createMuteSoundsDialog() {
 	b.muteBearOffCheckbox.SetSelected(b.muteBearOff)
 
 	muteBearOffLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Bear Off")),
+		Text: resizeText(gotext.Get("Bear Off")),
 		onSelected: func() {
 			b.muteBearOffCheckbox.SetSelected(!b.muteBearOffCheckbox.Selected())
 			b.toggleMuteBearOff()
@@ -219,7 +219,7 @@ func (b *board) createMuteSoundsDialog() {
 }
 
 func (b *board) createSettingsDialog() {
-	settingsLabel := etk.NewText(gotext.Get("Settings"))
+	settingsLabel := resizeText(gotext.Get("Settings"))
 	settingsLabel.SetHorizontal(etk.AlignCenter)
 
 	b.highlightCheckbox = etk.NewCheckbox(b.toggleHighlightCheckbox)
@@ -228,7 +228,7 @@ func (b *board) createSettingsDialog() {
 	b.highlightCheckbox.SetSelected(b.highlightAvailable)
 
 	highlightLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Highlight legal moves")),
+		Text: resizeText(gotext.Get("Highlight legal moves")),
 		onSelected: func() {
 			b.highlightCheckbox.SetSelected(!b.highlightCheckbox.Selected())
 			b.toggleHighlightCheckbox()
@@ -242,7 +242,7 @@ func (b *board) createSettingsDialog() {
 	b.showPipCountCheckbox.SetSelected(b.showPipCount)
 
 	pipCountLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Show pip count")),
+		Text: resizeText(gotext.Get("Show pip count")),
 		onSelected: func() {
 			b.showPipCountCheckbox.SetSelected(!b.showPipCountCheckbox.Selected())
 			b.togglePipCountCheckbox()
@@ -256,7 +256,7 @@ func (b *board) createSettingsDialog() {
 	b.showMovesCheckbox.SetSelected(b.showMoves)
 
 	movesLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Show moves")),
+		Text: resizeText(gotext.Get("Show moves")),
 		onSelected: func() {
 			b.showMovesCheckbox.SetSelected(!b.showMovesCheckbox.Selected())
 			b.toggleMovesCheckbox()
@@ -270,7 +270,7 @@ func (b *board) createSettingsDialog() {
 	b.flipBoardCheckbox.SetSelected(b.flipBoard)
 
 	flipBoardLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Flip board")),
+		Text: resizeText(gotext.Get("Flip board")),
 		onSelected: func() {
 			b.flipBoardCheckbox.SetSelected(!b.flipBoardCheckbox.Selected())
 			b.toggleFlipBoardCheckbox()
@@ -284,7 +284,7 @@ func (b *board) createSettingsDialog() {
 	b.traditionalCheckbox.SetSelected(b.traditional)
 
 	traditionalLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Flip opp. space numbers")),
+		Text: resizeText(gotext.Get("Flip opp. space numbers")),
 		onSelected: func() {
 			b.traditionalCheckbox.SetSelected(!b.traditionalCheckbox.Selected())
 			b.toggleTraditionalCheckbox()
@@ -298,7 +298,7 @@ func (b *board) createSettingsDialog() {
 	b.advancedMovementCheckbox.SetSelected(b.advancedMovement)
 
 	advancedMovementLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Advanced movement")),
+		Text: resizeText(gotext.Get("Advanced movement")),
 		onSelected: func() {
 			b.advancedMovementCheckbox.SetSelected(!b.advancedMovementCheckbox.Selected())
 			b.toggleAdvancedMovementCheckbox()
@@ -311,7 +311,7 @@ func (b *board) createSettingsDialog() {
 	b.autoPlayCheckbox.SetCheckColor(triangleA)
 
 	autoPlayLabel := &ClickableText{
-		Text: etk.NewText(gotext.Get("Auto-play forced moves")),
+		Text: resizeText(gotext.Get("Auto-play forced moves")),
 		onSelected: func() {
 			b.autoPlayCheckbox.SetSelected(!b.autoPlayCheckbox.Selected())
 			b.toggleAutoPlayCheckbox()
@@ -329,7 +329,7 @@ func (b *board) createSettingsDialog() {
 		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
 	}
 	{
-		accountLabel := etk.NewText(gotext.Get("Account"))
+		accountLabel := resizeText(gotext.Get("Account"))
 		accountLabel.SetVertical(etk.AlignCenter)
 
 		grid := etk.NewGrid()
@@ -338,7 +338,7 @@ func (b *board) createSettingsDialog() {
 		checkboxGrid.AddChildAt(grid, 0, 0, 3, 1)
 	}
 	{
-		muteLabel := etk.NewText(gotext.Get("Sound"))
+		muteLabel := resizeText(gotext.Get("Sound"))
 		muteLabel.SetVertical(etk.AlignCenter)
 
 		openMute := etk.NewButton(gotext.Get("Mute Sounds"), b.showMuteSounds)
@@ -350,7 +350,7 @@ func (b *board) createSettingsDialog() {
 		checkboxGrid.AddChildAt(grid, 0, 2, 3, 1)
 	}
 	{
-		speedLabel := etk.NewText(gotext.Get("Speed"))
+		speedLabel := resizeText(gotext.Get("Speed"))
 		speedLabel.SetVertical(etk.AlignCenter)
 
 		b.selectSpeed = etk.NewSelect(game.itemHeight(), b.confirmSelectSpeed)
@@ -405,7 +405,7 @@ func (b *board) createSettingsDialog() {
 }
 
 func (b *board) createLeaveMatchDialog() {
-	leaveGameLabel := etk.NewText(gotext.Get("Leave match?"))
+	leaveGameLabel := resizeText(gotext.Get("Leave match?"))
 	leaveGameLabel.SetHorizontal(etk.AlignCenter)
 	leaveGameLabel.SetVertical(etk.AlignCenter)
 

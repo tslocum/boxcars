@@ -5,7 +5,7 @@ go 1.19
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240821181107-92a9180ed2bb
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240818174413-cf737ec690f0
-	code.rocket9labs.com/tslocum/etk v0.0.0-20240722214147-c1f1fe1adb37
+	code.rocket9labs.com/tslocum/etk v0.0.0-20240822064305-4c67a3c44828
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240820025521-91065b63f1be
 	github.com/coder/websocket v1.8.12

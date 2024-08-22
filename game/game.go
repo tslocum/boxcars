@@ -3131,8 +3131,14 @@ func (t *ClickableText) HandleMouse(cursor image.Point, pressed bool, clicked bo
 	return true, nil
 }
 
-func newCenteredText(text string) *etk.Text {
+func resizeText(text string) *etk.Text {
 	t := etk.NewText(text)
+	t.SetAutoResize(true)
+	return t
+}
+
+func newCenteredText(text string) *etk.Text {
+	t := resizeText(text)
 	t.SetVertical(etk.AlignCenter)
 	return t
 }

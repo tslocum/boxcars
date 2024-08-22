@@ -453,7 +453,7 @@ func (b *board) recreateButtonGrid() {
 func (b *board) recreateAccountGrid() {
 	var w etk.Widget
 	if b.Client == nil || (game.Password == "" && b.Client.Password == "") {
-		guestLabel := etk.NewText(gotext.Get("Logged in as guest"))
+		guestLabel := resizeText(gotext.Get("Logged in as guest"))
 		guestLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		guestLabel.SetVertical(etk.AlignCenter)
 		w = guestLabel
