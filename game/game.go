@@ -1519,6 +1519,10 @@ func (g *Game) handleEvent(e interface{}) {
 			lg(gotext.Get("%s left the match.", ev.Player))
 			playSoundEffect(effectJoinLeave)
 		}
+
+		if g.JoinGame != 0 && g.Board.gameState.Player1.Name == "" && g.Board.gameState.Player2.Name == "" {
+			g.Exit()
+		}
 	case *bgammon.EventBoard:
 		g.Board.Lock()
 
