@@ -31,6 +31,7 @@ func NewLabel(c color.RGBA) *Label {
 	l.Text.SetSingleLine(true)
 	l.Text.SetHorizontal(etk.AlignCenter)
 	l.Text.SetVertical(etk.AlignCenter)
+	l.Text.SetAutoResize(true)
 	return l
 }
 

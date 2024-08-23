@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	version              = "v1.3.9"
+	version              = "v1.3.9p1"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -2850,9 +2850,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.lastResize = time.Now()
 	scheduleFrame()
 
-	fontMutex.Lock()
 	g.bufferWidth = etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(g.Board.fontSize)), strings.Repeat("A", bufferCharacterWidth)).Dx()
-	fontMutex.Unlock()
 	if g.bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		g.bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}

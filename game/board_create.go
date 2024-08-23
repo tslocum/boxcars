@@ -22,11 +22,13 @@ func (b *board) createRatingLabels() {
 		o.SetVertical(etk.AlignStart)
 		o.SetScrollBarVisible(false)
 		o.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+		o.SetAutoResize(true)
 
 		p.SetHorizontal(etk.AlignCenter)
 		p.SetVertical(etk.AlignEnd)
 		p.SetScrollBarVisible(false)
 		p.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+		p.SetAutoResize(true)
 	}
 }
 

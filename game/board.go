@@ -6,7 +6,6 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	"log"
 	"math"
 	"sort"
 	"strconv"
@@ -272,6 +271,9 @@ func NewBoard() *board {
 
 	b.opponentPipCount.SetHorizontal(etk.AlignEnd)
 	b.playerPipCount.SetHorizontal(etk.AlignStart)
+
+	b.opponentPipCount.SetAutoResize(true)
+	b.playerPipCount.SetAutoResize(true)
 
 	b.opponentRatingLabel.SetForeground(color.RGBA{255, 255, 255, 255})
 	b.playerRatingLabel.SetForeground(color.RGBA{0, 0, 0, 255})
@@ -1166,8 +1168,6 @@ func (b *board) updateBackgroundImage() {
 	}
 
 	// Draw space numbers.
-	fontMutex.Lock()
-	defer fontMutex.Unlock()
 
 	ff := etk.FontFace(etk.Style.TextFont, etk.Scale(b.fontSize))
 
@@ -1192,7 +1192,9 @@ func (b *board) updateBackgroundImage() {
 		if b.bottomRow(int8(space)) {
 			y = b.h - int(b.verticalBorderSize)
 		}
+		fontMutex.Lock()
 		text.Draw(b.backgroundImage, sp, ff, x, y+(int(b.verticalBorderSize)-b.lineHeight)/2+b.lineOffset, spaceLabelColor)
+		fontMutex.Unlock()
 	}
 
 	// Draw profile icons.
@@ -1375,9 +1377,9 @@ func (b *board) Draw(screen *ebiten.Image) {
 				labelColor = color.RGBA{0, 0, 0, 255}
 			}
 
-			fontMutex.Lock()
 			bounds := etk.BoundString(ff, overlayText)
 			overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
+			fontMutex.Lock()
 			text.Draw(overlayImage, overlayText, ff, 0, bounds.Dy(), labelColor)
 			fontMutex.Unlock()
 
@@ -1769,9 +1771,12 @@ func (b *board) updateOpponentLabel() {
 	label.active = b.gameState.Turn == player.Number
 	label.Text.SetForeground(label.activeColor)
 
-	fontMutex.Lock()
 	bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), text)
-	fontMutex.Unlock()
+
+	maxWidth := int(b.spaceWidth)*3 - label.Padding()*2
+	if bounds.Dx() > maxWidth {
+		bounds.Max.X = bounds.Min.X + maxWidth
+	}
 
 	padding := 13
 	innerCenter := b.innerBoardCenter(false)
@@ -1848,9 +1853,12 @@ func (b *board) updatePlayerLabel() {
 	label.active = b.gameState.Turn == player.Number
 	label.Text.SetForeground(label.activeColor)
 
-	fontMutex.Lock()
 	bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), text)
-	defer fontMutex.Unlock()
+
+	maxWidth := int(b.spaceWidth)*3 - label.Padding()*2
+	if bounds.Dx() > maxWidth {
+		bounds.Max.X = bounds.Min.X + maxWidth
+	}
 
 	padding := 13
 	innerCenter := b.innerBoardCenter(true)
@@ -2455,8 +2463,7 @@ func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause
 func (b *board) movePiece(from int8, to int8, pause bool) {
 	pieces := b.spaceSprites[from]
 	if len(pieces) == 0 {
-		log.Printf("ERROR: NO SPRITE FOR MOVE %d/%d", from, to)
-		return
+		return // No sprite available.
 	}
 
 	sprite := pieces[len(pieces)-1]
