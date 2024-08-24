@@ -1345,52 +1345,57 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	ff := etk.FontFace(etk.Style.TextFont, etk.Scale(b.fontSize))
 
-	for space := int8(0); space < bgammon.BoardSpaces; space++ {
-		if space == bgammon.SpaceHomePlayer || space == bgammon.SpaceHomeOpponent {
-			continue
-		}
-		var numPieces int8
-		for i, sprite := range b.spaceSprites[space] {
-			if sprite == b.dragging || sprite == b.moving {
+	for j := 0; j < 2; j++ {
+		drawWhite := j == 1
+		for space := int8(1); space < bgammon.BoardSpaces; space++ {
+			if space == bgammon.SpaceHomeOpponent {
 				continue
 			}
-			numPieces++
-
-			b.drawSprite(screen, sprite)
-
-			var overlayText string
-			if i > 5 {
-				overlayText = fmt.Sprintf("%d", numPieces)
-			}
-			if sprite.premove {
-				if overlayText != "" {
-					overlayText += " "
+			var numPieces int8
+			for i, sprite := range b.spaceSprites[space] {
+				if sprite.colorWhite != drawWhite {
+					break
+				} else if sprite == b.dragging || sprite == b.moving {
+					continue
 				}
-				overlayText += "%"
+				numPieces++
+
+				b.drawSprite(screen, sprite)
+
+				var overlayText string
+				if i > 5 {
+					overlayText = fmt.Sprintf("%d", numPieces)
+				}
+				if sprite.premove {
+					if overlayText != "" {
+						overlayText += " "
+					}
+					overlayText += "%"
+				}
+				if overlayText == "" {
+					continue
+				}
+
+				labelColor := color.RGBA{255, 255, 255, 255}
+				if sprite.colorWhite {
+					labelColor = color.RGBA{0, 0, 0, 255}
+				}
+
+				bounds := etk.BoundString(ff, overlayText)
+				overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
+				fontMutex.Lock()
+				text.Draw(overlayImage, overlayText, ff, 0, bounds.Dy(), labelColor)
+				fontMutex.Unlock()
+
+				x, y, w, h := b.stackSpaceRect(space, numPieces-1)
+				x += (w / 2) - (bounds.Dx() / 2)
+				y += (h / 2) - (bounds.Dy() / 2)
+				x, y = b.offsetPosition(space, x, y)
+
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Translate(float64(x), float64(y))
+				screen.DrawImage(overlayImage, op)
 			}
-			if overlayText == "" {
-				continue
-			}
-
-			labelColor := color.RGBA{255, 255, 255, 255}
-			if sprite.colorWhite {
-				labelColor = color.RGBA{0, 0, 0, 255}
-			}
-
-			bounds := etk.BoundString(ff, overlayText)
-			overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
-			fontMutex.Lock()
-			text.Draw(overlayImage, overlayText, ff, 0, bounds.Dy(), labelColor)
-			fontMutex.Unlock()
-
-			x, y, w, h := b.stackSpaceRect(space, numPieces-1)
-			x += (w / 2) - (bounds.Dx() / 2)
-			y += (h / 2) - (bounds.Dy() / 2)
-			x, y = b.offsetPosition(space, x, y)
-
-			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(x), float64(y))
-			screen.DrawImage(overlayImage, op)
 		}
 	}
 
