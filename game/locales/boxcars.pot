@@ -166,6 +166,9 @@ msgstr ""
 msgid "Join match: %s"
 msgstr ""
 
+msgid "Joining..."
+msgstr ""
+
 msgid "Leave"
 msgstr ""
 

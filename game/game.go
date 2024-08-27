@@ -1471,6 +1471,9 @@ func (g *Game) handleEvent(e interface{}) {
 			scheduleFrame()
 		}
 	case *bgammon.EventJoined:
+		g.lobby.joiningGameID, g.lobby.joiningGamePassword, g.lobby.joiningGameShown = 0, "", false
+		g.lobby.rebuildButtonsGrid()
+
 		g.Board.Lock()
 		if ev.PlayerNumber == 1 {
 			g.Board.gameState.Player1.Name = ev.Player
@@ -1500,6 +1503,9 @@ func (g *Game) handleEvent(e interface{}) {
 			playSoundEffect(effectJoinLeave)
 		}
 	case *bgammon.EventFailedJoin:
+		g.lobby.joiningGameID, g.lobby.joiningGamePassword, g.lobby.joiningGameShown = 0, "", false
+		g.lobby.rebuildButtonsGrid()
+
 		l("*** " + gotext.Get("Failed to join match: %s", ev.Reason))
 	case *bgammon.EventFailedLeave:
 		l("*** " + gotext.Get("Failed to leave match: %s", ev.Reason))
@@ -2715,6 +2721,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	err := etk.Draw(screen)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if g.lobby.joiningGameID != 0 && drawScreen == 0 && !g.lobby.joiningGameShown {
+		g.lobby.joiningGameShown = true
+		g.lobby.c.Out <- []byte(fmt.Sprintf("j %d %s", g.lobby.joiningGameID, g.lobby.joiningGamePassword))
 	}
 
 	if Debug > 0 {

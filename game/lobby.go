@@ -73,6 +73,10 @@ type lobby struct {
 	joinGameLabel    *etk.Text
 	joinGamePassword *Input
 
+	joiningGameID       int
+	joiningGamePassword string
+	joiningGameShown    bool
+
 	showHistory                         bool
 	historySelected                     int
 	historyLastClick                    time.Time
@@ -284,7 +288,10 @@ func (l *lobby) confirmCreateGame() {
 
 func (l *lobby) confirmJoinGame() {
 	go hideKeyboard()
-	l.c.Out <- []byte(fmt.Sprintf("j %d %s", l.joinGameID, l.joinGamePassword.Text()))
+	l.joiningGameID = l.joinGameID
+	l.joiningGamePassword = l.joinGamePassword.Text()
+	l.rebuildButtonsGrid()
+	scheduleFrame()
 }
 
 func (l *lobby) selectButton(buttonIndex int) func() error {
@@ -377,8 +384,9 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				l.joinGameID = l.games[l.selected].ID
 				l.rebuildButtonsGrid()
 			} else {
-				l.c.Out <- []byte(fmt.Sprintf("j %d", l.games[l.selected].ID))
-				setViewBoard(true)
+				l.joiningGameID = l.games[l.selected].ID
+				l.joiningGamePassword = ""
+				l.rebuildButtonsGrid()
 				scheduleFrame()
 			}
 		}
@@ -390,7 +398,19 @@ func (l *lobby) rebuildButtonsGrid() {
 	r := l.buttonsGrid.Rect()
 	l.buttonsGrid.Clear()
 
-	for i, label := range l.getButtons() {
+	buttons := l.getButtons()
+	if l.joiningGameID != 0 {
+		btns := make([]string, len(buttons))
+		for i, label := range buttons {
+			if label == gotext.Get("Join match") || label == gotext.Get("Join") {
+				btns[i] = gotext.Get("Joining...")
+			} else {
+				btns[i] = label
+			}
+		}
+		buttons = btns
+	}
+	for i, label := range buttons {
 		l.buttonsGrid.AddChildAt(etk.NewButton(label, l.selectButton(i)), i, 0, 1, 1)
 	}
 
@@ -414,7 +434,10 @@ func (l *lobby) selectMatch(index int) bool {
 				l.joinGameID = entry.ID
 				l.rebuildButtonsGrid()
 			} else {
-				l.c.Out <- []byte(fmt.Sprintf("j %d", entry.ID))
+				l.joiningGameID = entry.ID
+				l.joiningGamePassword = ""
+				l.rebuildButtonsGrid()
+				scheduleFrame()
 			}
 			l.lastClick = time.Time{}
 			return true
