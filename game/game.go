@@ -441,7 +441,7 @@ func setViewBoard(view bool) {
 		game.layoutBoard()
 	}
 
-	game.Board.selectRollGrid.SetVisible(false)
+	game.board.selectRollGrid.SetVisible(false)
 
 	if viewBoard {
 		// Exit dialogs.
@@ -451,10 +451,10 @@ func setViewBoard(view bool) {
 		game.lobby.createGamePassword.SetText("")
 		game.lobby.rebuildButtonsGrid()
 
-		game.setRoot(game.Board.frame)
+		game.setRoot(game.board.frame)
 		etk.SetFocus(inputBuffer)
 
-		game.Board.uiGrid.SetRect(game.Board.uiGrid.Rect())
+		game.board.uiGrid.SetRect(game.board.uiGrid.Rect())
 	} else {
 		if !game.loggedIn {
 			game.setRoot(connectFrame)
@@ -468,21 +468,21 @@ func setViewBoard(view bool) {
 			game.setRoot(listGamesFrame)
 		}
 
-		game.Board.menuGrid.SetVisible(false)
-		game.Board.settingsGrid.SetVisible(false)
-		game.Board.selectSpeed.SetMenuVisible(false)
-		game.Board.leaveGameGrid.SetVisible(false)
+		game.board.menuGrid.SetVisible(false)
+		game.board.settingsGrid.SetVisible(false)
+		game.board.selectSpeed.SetMenuVisible(false)
+		game.board.leaveGameGrid.SetVisible(false)
 
 		statusBuffer.SetRect(statusBuffer.Rect())
 
-		game.Board.playerRoll1, game.Board.playerRoll2, game.Board.playerRoll3 = 0, 0, 0
-		game.Board.playerRollStale = false
-		game.Board.opponentRoll1, game.Board.opponentRoll2, game.Board.opponentRoll3 = 0, 0, 0
-		game.Board.opponentRollStale = false
+		game.board.playerRoll1, game.board.playerRoll2, game.board.playerRoll3 = 0, 0, 0
+		game.board.playerRollStale = false
+		game.board.opponentRoll1, game.board.opponentRoll2, game.board.opponentRoll3 = 0, 0, 0
+		game.board.opponentRollStale = false
 	}
 
-	if refreshLobby && game.Client != nil {
-		game.Client.Out <- []byte("list")
+	if refreshLobby && game.client != nil {
+		game.client.Out <- []byte("list")
 	}
 
 	scheduleFrame()
@@ -552,9 +552,9 @@ type Game struct {
 	Mute     bool
 	Instant  bool
 
-	Client *Client
+	client *Client
 
-	Board *board
+	board *board
 
 	lobby *lobby
 
@@ -723,7 +723,7 @@ func (g *Game) initialize() {
 	displayFrame = etk.NewFrame()
 	displayFrame.SetPositionChildren(true)
 
-	g.Board = NewBoard()
+	g.board = NewBoard()
 	g.lobby = NewLobby()
 
 	xPadding := etk.Scale(10)
@@ -787,7 +787,7 @@ func (g *Game) initialize() {
 		footerLabel.SetVertical(etk.AlignEnd)
 
 		grid := etk.NewGrid()
-		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
+		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
 		grid.SetColumnSizes(xPadding, labelWidth, -1, -1, xPadding)
 		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
@@ -845,7 +845,7 @@ func (g *Game) initialize() {
 		footerLabel.SetVertical(etk.AlignEnd)
 
 		grid := etk.NewGrid()
-		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
+		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
 		grid.SetColumnSizes(xPadding, labelWidth, -1, -1, xPadding)
 		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
@@ -915,7 +915,7 @@ func (g *Game) initialize() {
 		})
 
 		grid := etk.NewGrid()
-		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
+		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
 		grid.SetColumnSizes(xPadding, labelWidth, -1, -1, xPadding)
 		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
@@ -1034,7 +1034,7 @@ func (g *Game) initialize() {
 		variantFlex.AddChild(tabulaGrid)
 
 		grid := etk.NewGrid()
-		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
+		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
 		grid.SetColumnSizes(xPadding, labelWidth, -1, xPadding)
 		grid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, fieldHeight)
@@ -1075,7 +1075,7 @@ func (g *Game) initialize() {
 		g.lobby.joinGamePassword.SetMask('*')
 
 		grid := etk.NewGrid()
-		grid.SetColumnPadding(int(g.Board.horizontalBorderSize / 2))
+		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
 		grid.SetColumnSizes(xPadding, labelWidth, -1, xPadding)
 		grid.SetRowSizes(60, fieldHeight, fieldHeight)
@@ -1309,12 +1309,12 @@ func (g *Game) initialize() {
 	scheduleFrame()
 
 	if g.Mute {
-		g.Board.MuteSounds()
+		g.board.MuteSounds()
 	}
 
 	if g.Instant {
-		g.Board.speed = 3
-		g.Board.selectSpeed.SetSelectedItem(3)
+		g.board.speed = 3
+		g.board.selectSpeed.SetSelectedItem(3)
 	}
 
 	if g.JoinGame != 0 {
@@ -1323,8 +1323,8 @@ func (g *Game) initialize() {
 		g.Connect()
 		go func() {
 			for {
-				if g.Client.loggedIn {
-					g.Client.Out <- []byte(fmt.Sprintf("j %d", g.JoinGame))
+				if g.client.loggedIn {
+					g.client.Out <- []byte(fmt.Sprintf("j %d", g.JoinGame))
 					break
 				}
 				time.Sleep(100 * time.Millisecond)
@@ -1374,11 +1374,11 @@ func (g *Game) handleUpdateTimeLabels() {
 		now = time.Now()
 
 		// Update match timer.
-		started := g.Board.gameState.Started
+		started := g.board.gameState.Started
 		if started.IsZero() {
 			h, m = 0, 0
 		} else {
-			ended := g.Board.gameState.Ended
+			ended := g.board.gameState.Ended
 			if ended.IsZero() {
 				d = now.Sub(started)
 			} else {
@@ -1387,7 +1387,7 @@ func (g *Game) handleUpdateTimeLabels() {
 			h, m = int(d.Hours()), int(d.Minutes())%60
 		}
 		if h != lastTimerHour || m != lastTimerMinute {
-			g.Board.timerLabel.SetText(fmt.Sprintf("%d:%02d", h, m))
+			g.board.timerLabel.SetText(fmt.Sprintf("%d:%02d", h, m))
 			lastTimerHour, lastTimerMinute = h, m
 			scheduleFrame()
 		}
@@ -1398,7 +1398,7 @@ func (g *Game) handleUpdateTimeLabels() {
 			h = 12
 		}
 		if h != lastClockHour || m != lastClockMinute {
-			g.Board.clockLabel.SetText(fmt.Sprintf("%d:%02d", h, m))
+			g.board.clockLabel.SetText(fmt.Sprintf("%d:%02d", h, m))
 			lastClockHour, lastClockMinute = h, m
 			scheduleFrame()
 		}
@@ -1408,7 +1408,7 @@ func (g *Game) handleUpdateTimeLabels() {
 }
 
 func (g *Game) setRoot(w etk.Widget) {
-	if w != g.Board.frame {
+	if w != g.board.frame {
 		g.rootWidget = w
 	}
 	displayFrame.Clear()
@@ -1437,8 +1437,8 @@ func (g *Game) handleAutoRefresh() {
 			continue
 		}
 
-		if g.Client != nil && g.Client.Username != "" {
-			g.Client.Out <- []byte("ls")
+		if g.client != nil && g.client.Username != "" {
+			g.client.Out <- []byte("ls")
 			g.lastRefresh = time.Now()
 		}
 	}
@@ -1447,7 +1447,7 @@ func (g *Game) handleAutoRefresh() {
 func (g *Game) handleEvent(e interface{}) {
 	switch ev := e.(type) {
 	case *bgammon.EventWelcome:
-		g.Client.Username = ev.PlayerName
+		g.client.Username = ev.PlayerName
 		g.register = false
 
 		username := ev.PlayerName
@@ -1472,7 +1472,7 @@ func (g *Game) handleEvent(e interface{}) {
 		}
 		l(fmt.Sprintf("*** " + msg))
 
-		if strings.HasPrefix(g.Client.Username, "Guest_") && g.savedUsername == "" {
+		if strings.HasPrefix(g.client.Username, "Guest_") && g.savedUsername == "" {
 			g.tutorialFrame.AddChild(NewTutorialWidget())
 		}
 	case *bgammon.EventNotice:
@@ -1489,30 +1489,30 @@ func (g *Game) handleEvent(e interface{}) {
 		g.lobby.joiningGameID, g.lobby.joiningGamePassword, g.lobby.joiningGameShown = 0, "", false
 		g.lobby.rebuildButtonsGrid()
 
-		g.Board.Lock()
+		g.board.Lock()
 		if ev.PlayerNumber == 1 {
-			g.Board.gameState.Player1.Name = ev.Player
+			g.board.gameState.Player1.Name = ev.Player
 		} else if ev.PlayerNumber == 2 {
-			g.Board.gameState.Player2.Name = ev.Player
+			g.board.gameState.Player2.Name = ev.Player
 		}
-		g.Board.playerRoll1, g.Board.playerRoll2, g.Board.playerRoll3 = 0, 0, 0
-		g.Board.opponentRoll1, g.Board.opponentRoll2, g.Board.opponentRoll3 = 0, 0, 0
-		g.Board.playerRollStale = false
-		g.Board.opponentRollStale = false
-		g.Board.availableStale = false
-		g.Board.playerMoves = nil
-		g.Board.opponentMoves = nil
+		g.board.playerRoll1, g.board.playerRoll2, g.board.playerRoll3 = 0, 0, 0
+		g.board.opponentRoll1, g.board.opponentRoll2, g.board.opponentRoll3 = 0, 0, 0
+		g.board.playerRollStale = false
+		g.board.opponentRollStale = false
+		g.board.availableStale = false
+		g.board.playerMoves = nil
+		g.board.opponentMoves = nil
 		if g.needLayoutBoard {
 			g.layoutBoard()
 		}
-		g.Board.processState()
-		g.Board.Unlock()
+		g.board.processState()
+		g.board.Unlock()
 		setViewBoard(true)
 
-		if ev.Player == g.Client.Username {
+		if ev.Player == g.client.Username {
 			gameBuffer.SetText("")
 			gameLogged = false
-			g.Board.rematchButton.SetVisible(false)
+			g.board.rematchButton.SetVisible(false)
 		} else {
 			lg(gotext.Get("%s joined the match.", ev.Player))
 			playSoundEffect(effectJoinLeave)
@@ -1526,163 +1526,163 @@ func (g *Game) handleEvent(e interface{}) {
 		l("*** " + gotext.Get("Failed to leave match: %s", ev.Reason))
 		setViewBoard(false)
 	case *bgammon.EventLeft:
-		g.Board.Lock()
-		if g.Board.gameState.Player1.Name == ev.Player {
-			g.Board.gameState.Player1.Name = ""
-		} else if g.Board.gameState.Player2.Name == ev.Player {
-			g.Board.gameState.Player2.Name = ""
+		g.board.Lock()
+		if g.board.gameState.Player1.Name == ev.Player {
+			g.board.gameState.Player1.Name = ""
+		} else if g.board.gameState.Player2.Name == ev.Player {
+			g.board.gameState.Player2.Name = ""
 		}
-		g.Board.processState()
-		g.Board.Unlock()
-		if ev.Player == g.Client.Username {
+		g.board.processState()
+		g.board.Unlock()
+		if ev.Player == g.client.Username {
 			setViewBoard(false)
 		} else {
 			lg(gotext.Get("%s left the match.", ev.Player))
 			playSoundEffect(effectJoinLeave)
 		}
 
-		if g.JoinGame != 0 && g.Board.gameState.Player1.Name == "" && g.Board.gameState.Player2.Name == "" {
+		if g.JoinGame != 0 && g.board.gameState.Player1.Name == "" && g.board.gameState.Player2.Name == "" {
 			g.Exit()
 		}
 	case *bgammon.EventBoard:
-		g.Board.Lock()
+		g.board.Lock()
 
-		g.Board.stateLock.Lock()
-		*g.Board.gameState = ev.GameState
-		*g.Board.gameState.Game = *ev.GameState.Game
-		if g.Board.gameState.Turn == 0 {
-			if g.Board.playerRoll2 != 0 {
-				g.Board.playerRoll1, g.Board.playerRoll2, g.Board.playerRoll3 = 0, 0, 0
+		g.board.stateLock.Lock()
+		*g.board.gameState = ev.GameState
+		*g.board.gameState.Game = *ev.GameState.Game
+		if g.board.gameState.Turn == 0 {
+			if g.board.playerRoll2 != 0 {
+				g.board.playerRoll1, g.board.playerRoll2, g.board.playerRoll3 = 0, 0, 0
 			}
-			if g.Board.opponentRoll1 != 0 {
-				g.Board.opponentRoll1, g.Board.opponentRoll2, g.Board.opponentRoll3 = 0, 0, 0
+			if g.board.opponentRoll1 != 0 {
+				g.board.opponentRoll1, g.board.opponentRoll2, g.board.opponentRoll3 = 0, 0, 0
 			}
-			if g.Board.gameState.Roll1 != 0 {
-				g.Board.playerRoll1 = g.Board.gameState.Roll1
+			if g.board.gameState.Roll1 != 0 {
+				g.board.playerRoll1 = g.board.gameState.Roll1
 			}
-			if g.Board.gameState.Roll2 != 0 {
-				g.Board.opponentRoll2 = g.Board.gameState.Roll2
+			if g.board.gameState.Roll2 != 0 {
+				g.board.opponentRoll2 = g.board.gameState.Roll2
 			}
-		} else if g.Board.gameState.Roll1 != 0 {
-			if g.Board.gameState.Turn == 1 {
-				g.Board.playerRoll1, g.Board.playerRoll2, g.Board.playerRoll3 = g.Board.gameState.Roll1, g.Board.gameState.Roll2, g.Board.gameState.Roll3
-				g.Board.playerRollStale = false
-				g.Board.opponentRollStale = true
-				if g.Board.opponentRoll1 == 0 || g.Board.opponentRoll2 == 0 {
-					g.Board.opponentRoll1, g.Board.opponentRoll2, g.Board.opponentRoll3 = 0, 0, 0
+		} else if g.board.gameState.Roll1 != 0 {
+			if g.board.gameState.Turn == 1 {
+				g.board.playerRoll1, g.board.playerRoll2, g.board.playerRoll3 = g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3
+				g.board.playerRollStale = false
+				g.board.opponentRollStale = true
+				if g.board.opponentRoll1 == 0 || g.board.opponentRoll2 == 0 {
+					g.board.opponentRoll1, g.board.opponentRoll2, g.board.opponentRoll3 = 0, 0, 0
 				}
 			} else {
-				g.Board.opponentRoll1, g.Board.opponentRoll2, g.Board.opponentRoll3 = g.Board.gameState.Roll1, g.Board.gameState.Roll2, g.Board.gameState.Roll3
-				g.Board.opponentRollStale = false
-				g.Board.playerRollStale = true
-				if g.Board.playerRoll1 == 0 || g.Board.playerRoll2 == 0 {
-					g.Board.playerRoll1, g.Board.playerRoll2, g.Board.playerRoll3 = 0, 0, 0
+				g.board.opponentRoll1, g.board.opponentRoll2, g.board.opponentRoll3 = g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3
+				g.board.opponentRollStale = false
+				g.board.playerRollStale = true
+				if g.board.playerRoll1 == 0 || g.board.playerRoll2 == 0 {
+					g.board.playerRoll1, g.board.playerRoll2, g.board.playerRoll3 = 0, 0, 0
 				}
-				g.Board.dragging = nil
+				g.board.dragging = nil
 			}
 		}
-		g.Board.availableStale = false
-		g.Board.stateLock.Unlock()
+		g.board.availableStale = false
+		g.board.stateLock.Unlock()
 
-		g.Board.processState()
-		g.Board.Unlock()
+		g.board.processState()
+		g.board.Unlock()
 
 		setViewBoard(true)
 	case *bgammon.EventRolled:
-		g.Board.Lock()
-		g.Board.stateLock.Lock()
-		g.Board.gameState.Roll1 = ev.Roll1
-		g.Board.gameState.Roll2 = ev.Roll2
-		g.Board.gameState.Roll3 = ev.Roll3
+		g.board.Lock()
+		g.board.stateLock.Lock()
+		g.board.gameState.Roll1 = ev.Roll1
+		g.board.gameState.Roll2 = ev.Roll2
+		g.board.gameState.Roll3 = ev.Roll3
 		var diceFormatted string
-		if g.Board.gameState.Turn == 0 {
-			if g.Board.gameState.Player1.Name == ev.Player {
-				diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll1)
-				g.Board.playerRoll1 = g.Board.gameState.Roll1
-				g.Board.playerRollStale = false
+		if g.board.gameState.Turn == 0 {
+			if g.board.gameState.Player1.Name == ev.Player {
+				diceFormatted = fmt.Sprintf("%d", g.board.gameState.Roll1)
+				g.board.playerRoll1 = g.board.gameState.Roll1
+				g.board.playerRollStale = false
 			} else {
-				diceFormatted = fmt.Sprintf("%d", g.Board.gameState.Roll2)
-				g.Board.opponentRoll2 = g.Board.gameState.Roll2
-				g.Board.opponentRollStale = false
+				diceFormatted = fmt.Sprintf("%d", g.board.gameState.Roll2)
+				g.board.opponentRoll2 = g.board.gameState.Roll2
+				g.board.opponentRollStale = false
 			}
 			if !ev.Selected {
 				playSoundEffect(effectDie)
 			}
-			g.Board.availableStale = false
+			g.board.availableStale = false
 		} else {
-			diceFormatted = fmt.Sprintf("%d-%d", g.Board.gameState.Roll1, g.Board.gameState.Roll2)
-			if g.Board.gameState.Player1.Name == ev.Player {
-				g.Board.playerRoll1, g.Board.playerRoll2, g.Board.playerRoll3 = g.Board.gameState.Roll1, g.Board.gameState.Roll2, g.Board.gameState.Roll3
-				g.Board.playerRollStale = false
+			diceFormatted = fmt.Sprintf("%d-%d", g.board.gameState.Roll1, g.board.gameState.Roll2)
+			if g.board.gameState.Player1.Name == ev.Player {
+				g.board.playerRoll1, g.board.playerRoll2, g.board.playerRoll3 = g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3
+				g.board.playerRollStale = false
 			} else {
-				g.Board.opponentRoll1, g.Board.opponentRoll2, g.Board.opponentRoll3 = g.Board.gameState.Roll1, g.Board.gameState.Roll2, g.Board.gameState.Roll3
-				g.Board.opponentRollStale = false
+				g.board.opponentRoll1, g.board.opponentRoll2, g.board.opponentRoll3 = g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3
+				g.board.opponentRollStale = false
 			}
-			if g.Board.gameState.Roll3 != 0 {
-				diceFormatted += fmt.Sprintf("-%d", g.Board.gameState.Roll3)
+			if g.board.gameState.Roll3 != 0 {
+				diceFormatted += fmt.Sprintf("-%d", g.board.gameState.Roll3)
 			}
 			if !ev.Selected {
 				playSoundEffect(effectDice)
 			}
-			g.Board.availableStale = true
+			g.board.availableStale = true
 		}
-		g.Board.stateLock.Unlock()
-		g.Board.processState()
-		g.Board.Unlock()
+		g.board.stateLock.Unlock()
+		g.board.processState()
+		g.board.Unlock()
 		scheduleFrame()
 		lg(gotext.Get("%s rolled %s", ev.Player, diceFormatted))
 	case *bgammon.EventFailedRoll:
 		l(fmt.Sprintf("*** %s: %s", gotext.Get("Failed to roll"), ev.Reason))
 	case *bgammon.EventMoved:
 		moves := ev.Moves
-		if g.Board.gameState.Turn == 2 && game.Board.traditional {
-			moves = bgammon.FlipMoves(moves, 2, g.Board.gameState.Variant)
+		if g.board.gameState.Turn == 2 && game.board.traditional {
+			moves = bgammon.FlipMoves(moves, 2, g.board.gameState.Variant)
 		}
 		lg(gotext.Get("%s moved %s", ev.Player, bgammon.FormatMoves(moves)))
-		if ev.Player == g.Client.Username && !g.Board.gameState.Spectating && !g.Board.gameState.Forced {
+		if ev.Player == g.client.Username && !g.board.gameState.Spectating && !g.board.gameState.Forced {
 			return
 		}
 
-		g.Board.Lock()
+		g.board.Lock()
 		g.Unlock()
 		for _, move := range ev.Moves {
 			playSoundEffect(effectMove)
-			g.Board.movePiece(move[0], move[1], true)
+			g.board.movePiece(move[0], move[1], true)
 		}
 		g.Lock()
-		if g.Board.showMoves {
-			moves := g.Board.gameState.Moves
-			if g.Board.gameState.Turn == 2 && game.Board.traditional {
-				moves = bgammon.FlipMoves(moves, 2, g.Board.gameState.Variant)
+		if g.board.showMoves {
+			moves := g.board.gameState.Moves
+			if g.board.gameState.Turn == 2 && game.board.traditional {
+				moves = bgammon.FlipMoves(moves, 2, g.board.gameState.Variant)
 			}
-			if g.Board.gameState.Turn == 1 {
-				g.Board.playerMoves = expandMoves(moves)
-			} else if g.Board.gameState.Turn == 2 {
-				g.Board.opponentMoves = expandMoves(moves)
+			if g.board.gameState.Turn == 1 {
+				g.board.playerMoves = expandMoves(moves)
+			} else if g.board.gameState.Turn == 2 {
+				g.board.opponentMoves = expandMoves(moves)
 			}
 		}
-		g.Board.Unlock()
+		g.board.Unlock()
 	case *bgammon.EventFailedMove:
-		g.Client.Out <- []byte("board") // Refresh game state.
+		g.client.Out <- []byte("board") // Refresh game state.
 
 		var extra string
 		if ev.From != 0 || ev.To != 0 {
 			extra = " " + gotext.Get("from %s to %s", bgammon.FormatSpace(ev.From), bgammon.FormatSpace(ev.To))
 		}
 		l("*** " + gotext.Get("Failed to move checker%s: %s", extra, ev.Reason))
-		l("*** " + gotext.Get("Legal moves: %s", bgammon.FormatMoves(g.Board.gameState.Available)))
+		l("*** " + gotext.Get("Legal moves: %s", bgammon.FormatMoves(g.board.gameState.Available)))
 	case *bgammon.EventFailedOk:
-		g.Client.Out <- []byte("board") // Refresh game state.
+		g.client.Out <- []byte("board") // Refresh game state.
 		l("*** " + gotext.Get("Failed to submit moves: %s", ev.Reason))
 	case *bgammon.EventWin:
-		g.Board.Lock()
+		g.board.Lock()
 		lg(gotext.Get("%s wins!", ev.Player))
-		if (g.Board.gameState.Player1.Points >= g.Board.gameState.Points || g.Board.gameState.Player2.Points >= g.Board.gameState.Points) && !g.Board.gameState.Spectating {
-			g.Board.rematchButton.SetVisible(true)
+		if (g.board.gameState.Player1.Points >= g.board.gameState.Points || g.board.gameState.Player2.Points >= g.board.gameState.Points) && !g.board.gameState.Spectating {
+			g.board.rematchButton.SetVisible(true)
 		}
-		g.Board.Unlock()
+		g.board.Unlock()
 	case *bgammon.EventSettings:
-		b := g.Board
+		b := g.board
 		b.Lock()
 		if ev.Speed >= bgammon.SpeedSlow && ev.Speed <= bgammon.SpeedInstant {
 			b.speed = ev.Speed
@@ -1773,7 +1773,7 @@ func (g *Game) handleEvent(e interface{}) {
 		}
 		scheduleFrame()
 	case *bgammon.EventPing:
-		g.Client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
+		g.client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
 	default:
 		l("*** " + gotext.Get("Warning: Received unknown event: %+v", ev))
 		l("*** " + gotext.Get("You may need to upgrade your client."))
@@ -1781,10 +1781,10 @@ func (g *Game) handleEvent(e interface{}) {
 }
 
 func (g *Game) handleEvents() {
-	for e := range g.Client.Events {
-		g.Board.Lock()
+	for e := range g.client.Events {
+		g.board.Lock()
 		g.Lock()
-		g.Board.Unlock()
+		g.board.Unlock()
 		g.handleEvent(e)
 		g.Unlock()
 	}
@@ -1819,8 +1819,8 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 				GameID: 1,
 			}
 			ev.PlayerNumber = 1
-			ev.Player = game.Client.Username
-			g.Client.Events <- ev
+			ev.Player = game.client.Username
+			g.client.Events <- ev
 		}
 
 		variant, err := strconv.Atoi(string(split[9]))
@@ -1868,7 +1868,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 					Spectating:   true,
 				},
 			}
-			g.Client.Events <- ev
+			g.client.Events <- ev
 		}
 
 		timestamp, err := strconv.ParseInt(string(split[1]), 10, 64)
@@ -1947,7 +1947,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 							Spectating:   true,
 						},
 					}
-					g.Client.Events <- ev
+					g.client.Events <- ev
 				}
 			}
 
@@ -1963,7 +1963,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 					Roll3: int8(r3),
 				}
 				ev.Player = playerName
-				g.Client.Events <- ev
+				g.client.Events <- ev
 			}
 
 			gs.Roll1, gs.Roll2, gs.Roll3 = int8(r1), int8(r2), int8(r3)
@@ -1980,7 +1980,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 						Spectating:   true,
 					},
 				}
-				g.Client.Events <- ev
+				g.client.Events <- ev
 			}
 
 			if len(split) == 3 {
@@ -2009,7 +2009,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 						Moves: [][]int8{{from, to}},
 					}
 					ev.Player = playerName
-					g.Client.Events <- ev
+					g.client.Events <- ev
 				}
 				ok, _ := gs.AddMoves([][]int8{{from, to}}, false)
 				if !ok {
@@ -2063,7 +2063,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 						Points: winPoints * gs.DoubleValue,
 					}
 					ev.Player = playerName
-					g.Client.Events <- ev
+					g.client.Events <- ev
 				}
 			}
 
@@ -2076,7 +2076,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 						Spectating:   true,
 					},
 				}
-				g.Client.Events <- ev
+				g.client.Events <- ev
 			}
 		case bytes.Equal(split[1], []byte("t")):
 			playerName := gs.Player1.Name
@@ -2087,7 +2087,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 				ev := &bgammon.EventNotice{
 					Message: gotext.Get("%s resigned.", playerName),
 				}
-				g.Client.Events <- ev
+				g.client.Events <- ev
 			}
 		default:
 			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
@@ -2110,7 +2110,7 @@ func (g *Game) showReplayFrame(replayFrame int, showInfo bool) {
 	}
 
 	if replayFrame == 0 && showInfo {
-		g.Board.recreateUIGrid()
+		g.board.recreateUIGrid()
 	}
 
 	g.replayFrame = replayFrame
@@ -2124,7 +2124,7 @@ func (g *Game) showReplayFrame(replayFrame int, showInfo bool) {
 			Spectating:   true,
 		},
 	}
-	g.Client.Events <- ev
+	g.client.Events <- ev
 
 	if replayFrame == 0 && showInfo {
 		l(fmt.Sprintf("*** "+gotext.Get("Replaying %s vs. %s", "%s", "%s")+" (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, frame.Game.Started.Format("2006-01-02 15:04")))
@@ -2143,7 +2143,7 @@ func (g *Game) HandleReplay(replay []byte) {
 	g.replayData = replay
 	g.Unlock()
 
-	g.Board.rematchButton.SetVisible(false)
+	g.board.rematchButton.SetVisible(false)
 
 	if !g.loggedIn {
 		go g.playOffline()
@@ -2240,17 +2240,17 @@ func (g *Game) Connect() {
 	if address == "" {
 		address = DefaultServerAddress
 	}
-	g.Client = newClient(address, g.Username, g.Password, false)
-	g.lobby.c = g.Client
-	g.Board.Client = g.Client
+	g.client = newClient(address, g.Username, g.Password, false)
+	g.lobby.c = g.client
+	g.board.client = g.client
 
 	go g.handleEvents()
 
 	if g.Password != "" {
-		g.Board.recreateAccountGrid()
+		g.board.recreateAccountGrid()
 	}
 
-	c := g.Client
+	c := g.client
 
 	connectTime := time.Now()
 	t := time.NewTicker(250 * time.Millisecond)
@@ -2289,16 +2289,16 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 
 	g.setRoot(listGamesFrame)
 
-	g.Client = newClient("", g.Username, g.Password, false)
-	g.lobby.c = g.Client
-	g.Board.Client = g.Client
+	g.client = newClient("", g.Username, g.Password, false)
+	g.lobby.c = g.client
+	g.board.client = g.client
 
 	g.Username = ""
 	g.Password = ""
 
 	go g.handleEvents()
 
-	go g.Client.connectTCP(conn)
+	go g.client.connectTCP(conn)
 }
 
 func (g *Game) selectRegister() error {
@@ -2381,15 +2381,15 @@ func (g *Game) searchMatches(username string) {
 	g.lobby.historyList.Clear()
 	g.lobby.historyList.SetSelectionMode(etk.SelectNone)
 	g.lobby.historyList.AddChildAt(loadingText, 0, 0)
-	g.Client.Out <- []byte(fmt.Sprintf("history %s", username))
+	g.client.Out <- []byte(fmt.Sprintf("history %s", username))
 }
 
 func (g *Game) selectHistory() error {
 	go hideKeyboard()
 	g.lobby.showHistory = true
 	g.setRoot(historyFrame)
-	g.lobby.historyUsername.SetText(g.Client.Username)
-	g.searchMatches(g.Client.Username)
+	g.lobby.historyUsername.SetText(g.client.Username)
+	g.searchMatches(g.client.Username)
 	etk.SetFocus(g.lobby.historyUsername)
 	g.lobby.rebuildButtonsGrid()
 	return nil
@@ -2410,7 +2410,7 @@ func (g *Game) selectHistoryPrevious() error {
 	if g.lobby.historyUsername.Text() == "" || g.lobby.historyPage == 1 {
 		return nil
 	}
-	g.Client.Out <- []byte(fmt.Sprintf("history %s %d", g.lobby.historyUsername.Text(), g.lobby.historyPage-1))
+	g.client.Out <- []byte(fmt.Sprintf("history %s %d", g.lobby.historyUsername.Text(), g.lobby.historyPage-1))
 	return nil
 }
 
@@ -2419,7 +2419,7 @@ func (g *Game) selectHistoryNext() error {
 	if g.lobby.historyUsername.Text() == "" || g.lobby.historyPage == g.lobby.historyPages {
 		return nil
 	}
-	g.Client.Out <- []byte(fmt.Sprintf("history %s %d", g.lobby.historyUsername.Text(), g.lobby.historyPage+1))
+	g.client.Out <- []byte(fmt.Sprintf("history %s %d", g.lobby.historyUsername.Text(), g.lobby.historyPage+1))
 	return nil
 }
 
@@ -2438,7 +2438,7 @@ func (g *Game) confirmHistoryPage(text string) bool {
 	if err != nil || page < 0 {
 		page = 0
 	}
-	g.Client.Out <- []byte(fmt.Sprintf("history %s %d", g.lobby.historyUsername.Text(), page))
+	g.client.Out <- []byte(fmt.Sprintf("history %s %d", g.lobby.historyUsername.Text(), page))
 	return true
 }
 
@@ -2500,17 +2500,17 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 		switch key {
 		case ebiten.KeyEscape:
 			if viewBoard {
-				if g.Board.menuGrid.Visible() {
-					g.Board.menuGrid.SetVisible(false)
-				} else if g.Board.settingsGrid.Visible() {
-					g.Board.settingsGrid.SetVisible(false)
-					g.Board.selectSpeed.SetMenuVisible(false)
-				} else if g.Board.changePasswordGrid.Visible() {
-					g.Board.hideMenu()
-				} else if g.Board.leaveGameGrid.Visible() {
-					g.Board.leaveGameGrid.SetVisible(false)
+				if g.board.menuGrid.Visible() {
+					g.board.menuGrid.SetVisible(false)
+				} else if g.board.settingsGrid.Visible() {
+					g.board.settingsGrid.SetVisible(false)
+					g.board.selectSpeed.SetMenuVisible(false)
+				} else if g.board.changePasswordGrid.Visible() {
+					g.board.hideMenu()
+				} else if g.board.leaveGameGrid.Visible() {
+					g.board.leaveGameGrid.SetVisible(false)
 				} else {
-					g.Board.menuGrid.SetVisible(true)
+					g.board.menuGrid.SetVisible(true)
 				}
 				continue
 			} else if g.lobby.showHistory {
@@ -2573,18 +2573,18 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 		for _, key := range keys {
 			switch key {
 			case ebiten.KeyTab:
-				if g.Board.changePasswordGrid.Visible() {
+				if g.board.changePasswordGrid.Visible() {
 					focusedWidget := etk.Focused()
 					switch focusedWidget {
-					case g.Board.changePasswordOld:
-						etk.SetFocus(g.Board.changePasswordNew)
-					case g.Board.changePasswordNew:
-						etk.SetFocus(g.Board.changePasswordOld)
+					case g.board.changePasswordOld:
+						etk.SetFocus(g.board.changePasswordNew)
+					case g.board.changePasswordNew:
+						etk.SetFocus(g.board.changePasswordOld)
 					}
 				}
 			case ebiten.KeyEnter:
-				if g.Board.changePasswordGrid.Visible() {
-					g.Board.selectChangePassword()
+				if g.board.changePasswordGrid.Visible() {
+					g.board.selectChangePassword()
 				}
 			}
 		}
@@ -2702,7 +2702,7 @@ func (g *Game) Update() error {
 			}
 		}
 	} else {
-		g.Board.Update()
+		g.board.Update()
 	}
 	return nil
 }
@@ -2758,7 +2758,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	if viewBoard {
-		g.Board.Draw(screen)
+		g.board.Draw(screen)
 	}
 
 	err := etk.Draw(screen)
@@ -2838,7 +2838,7 @@ func (g *Game) layoutLobby() {
 			dialogHeight = game.screenH
 		}
 
-		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(g.Board.verticalBorderSize)
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(g.board.verticalBorderSize)
 		g.lobby.historyPageDialog.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 }
@@ -2847,33 +2847,33 @@ func (g *Game) layoutBoard() {
 	g.needLayoutBoard = false
 
 	if g.portraitView() { // Portrait view.
-		g.Board.fullHeight = false
-		g.Board.horizontalBorderSize = 0
-		g.Board.setRect(0, 0, g.screenW, g.screenW)
+		g.board.fullHeight = false
+		g.board.horizontalBorderSize = 0
+		g.board.setRect(0, 0, g.screenW, g.screenW)
 
-		g.Board.uiGrid.SetRect(image.Rect(0, g.Board.h, g.screenW, g.screenH))
+		g.board.uiGrid.SetRect(image.Rect(0, g.board.h, g.screenW, g.screenH))
 	} else { // Landscape view.
-		g.Board.fullHeight = true
-		g.Board.horizontalBorderSize = 20
-		g.Board.setRect(0, 0, g.screenW-g.bufferWidth, g.screenH)
+		g.board.fullHeight = true
+		g.board.horizontalBorderSize = 20
+		g.board.setRect(0, 0, g.screenW-g.bufferWidth, g.screenH)
 
-		availableWidth := g.screenW - (g.Board.innerW + int(g.Board.horizontalBorderSize*2))
+		availableWidth := g.screenW - (g.board.innerW + int(g.board.horizontalBorderSize*2))
 		if availableWidth > g.bufferWidth {
 			g.bufferWidth = availableWidth
-			g.Board.setRect(0, 0, g.screenW-g.bufferWidth, g.screenH)
+			g.board.setRect(0, 0, g.screenW-g.bufferWidth, g.screenH)
 		}
 
-		if g.Board.h > g.Board.w {
-			g.Board.fullHeight = false
-			g.Board.setRect(0, 0, g.Board.w, g.Board.w)
+		if g.board.h > g.board.w {
+			g.board.fullHeight = false
+			g.board.setRect(0, 0, g.board.w, g.board.w)
 		}
 
-		g.Board.uiGrid.SetRect(image.Rect(g.Board.w, 0, g.screenW, g.screenH))
+		g.board.uiGrid.SetRect(image.Rect(g.board.w, 0, g.screenW, g.screenH))
 	}
 
 	g.setBufferRects()
 
-	g.Board.widget.SetRect(image.Rect(0, 0, g.screenW, g.screenH))
+	g.board.widget.SetRect(image.Rect(0, 0, g.screenW, g.screenH))
 }
 
 func (g *Game) bufferPadding() int {
@@ -2918,7 +2918,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.lastResize = time.Now()
 	scheduleFrame()
 
-	g.bufferWidth = etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(g.Board.fontSize)), strings.Repeat("A", bufferCharacterWidth)).Dx()
+	g.bufferWidth = etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(g.board.fontSize)), strings.Repeat("A", bufferCharacterWidth)).Dx()
 	if g.bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		g.bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
@@ -2945,8 +2945,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	viewBoard = !old
 	setViewBoard(old)
 
-	g.Board.updateOpponentLabel()
-	g.Board.updatePlayerLabel()
+	g.board.updateOpponentLabel()
+	g.board.updatePlayerLabel()
 
 	g.keyboard.SetRect(image.Rect(0, game.screenH-game.screenH/3, game.screenW, game.screenH))
 
@@ -2974,7 +2974,7 @@ func acceptInput(text string) (handled bool) {
 			} else {
 				if game.downloadReplay == 0 {
 					game.downloadReplay = -1
-					game.Client.Out <- []byte("replay")
+					game.client.Out <- []byte("replay")
 				} else {
 					l("*** " + gotext.Get("Replay download already in progress."))
 				}
@@ -2982,11 +2982,11 @@ func acceptInput(text string) (handled bool) {
 			return true
 		}
 	} else {
-		l(fmt.Sprintf("<%s> %s", game.Client.Username, text))
+		l(fmt.Sprintf("<%s> %s", game.client.Username, text))
 		text = "say " + text
 	}
 
-	game.Client.Out <- []byte(text)
+	game.client.Out <- []byte(text)
 	go hideKeyboard()
 	return true
 }
@@ -3030,17 +3030,17 @@ func playSoundEffect(effect SoundEffect) {
 	var b []byte
 	switch effect {
 	case effectSay:
-		if game.Board.muteChat {
+		if game.board.muteChat {
 			return
 		}
 		b = SoundSay
 	case effectJoinLeave:
-		if game.Board.muteJoinLeave {
+		if game.board.muteJoinLeave {
 			return
 		}
 		b = SoundJoinLeave
 	case effectDie:
-		if game.Board.muteRoll {
+		if game.board.muteRoll {
 			return
 		}
 		b = dieSounds[dieSoundPlays]
@@ -3051,7 +3051,7 @@ func playSoundEffect(effect SoundEffect) {
 			dieSoundPlays = 0
 		}
 	case effectDice:
-		if game.Board.muteRoll {
+		if game.board.muteRoll {
 			return
 		}
 		b = diceSounds[diceSoundPlays]
@@ -3062,7 +3062,7 @@ func playSoundEffect(effect SoundEffect) {
 			diceSoundPlays = 0
 		}
 	case effectMove:
-		if game.Board.muteMove {
+		if game.board.muteMove {
 			return
 		}
 		b = moveSounds[moveSoundPlays]
@@ -3073,12 +3073,12 @@ func playSoundEffect(effect SoundEffect) {
 			moveSoundPlays = 0
 		}
 	case effectHomeSingle:
-		if game.Board.muteBearOff {
+		if game.board.muteBearOff {
 			return
 		}
 		b = SoundHomeSingle
 	case effectHomeMulti:
-		if game.Board.muteBearOff {
+		if game.board.muteBearOff {
 			return
 		}
 		b = homeMultiSounds[homeMultiSoundPlays]

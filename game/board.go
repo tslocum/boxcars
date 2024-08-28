@@ -76,7 +76,7 @@ type board struct {
 	opponentMoves [][]int8
 	playerMoves   [][]int8
 
-	Client *Client
+	client *Client
 
 	dragX, dragY int
 
@@ -454,7 +454,7 @@ func (b *board) recreateButtonGrid() {
 
 func (b *board) recreateAccountGrid() {
 	var w etk.Widget
-	if b.Client == nil || (game.Password == "" && b.Client.Password == "") {
+	if b.client == nil || (game.Password == "" && b.client.Password == "") {
 		guestLabel := resizeText(gotext.Get("Logged in as guest"))
 		guestLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		guestLabel.SetVertical(etk.AlignCenter)
@@ -477,15 +477,15 @@ func (b *board) confirmLeaveGame() error {
 	if game.replay {
 		game.replay = false
 		ev := &bgammon.EventLeft{}
-		ev.Player = b.Client.Username
-		b.Client.Events <- ev
+		ev.Player = b.client.Username
+		b.client.Events <- ev
 		if !b.replayAuto.IsZero() {
 			b.replayAuto = time.Time{}
 			b.replayPauseButton.SetText("|>")
 		}
 		b.recreateUIGrid()
 	} else {
-		b.Client.Out <- []byte("leave")
+		b.client.Out <- []byte("leave")
 	}
 	return nil
 }
@@ -545,13 +545,13 @@ func (b *board) toggleMenu() error {
 }
 
 func (b *board) selectRoll() error {
-	b.Client.Out <- []byte("roll")
+	b.client.Out <- []byte("roll")
 	return nil
 }
 
 func (b *board) selectRollFunc(value int) func() error {
 	return func() error {
-		b.Client.Out <- []byte(fmt.Sprintf("ok %d", value))
+		b.client.Out <- []byte(fmt.Sprintf("ok %d", value))
 		return nil
 	}
 }
@@ -561,7 +561,7 @@ func (b *board) selectOK() error {
 		b.selectRollGrid.SetVisible(true)
 		return nil
 	}
-	b.Client.Out <- []byte("ok")
+	b.client.Out <- []byte("ok")
 	return nil
 }
 
@@ -583,7 +583,7 @@ func (b *board) _selectUndo() {
 	b._positionCheckers()
 
 	lastMove := b.gameState.Moves[l-1]
-	b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", lastMove[1], lastMove[0]))
+	b.client.Out <- []byte(fmt.Sprintf("mv %d/%d", lastMove[1], lastMove[0]))
 
 	playSoundEffect(effectMove)
 	b.movePiece(lastMove[1], lastMove[0], false)
@@ -596,23 +596,23 @@ func (b *board) selectUndo() error {
 }
 
 func (b *board) selectDouble() error {
-	b.Client.Out <- []byte("double")
+	b.client.Out <- []byte("double")
 	return nil
 }
 
 func (b *board) selectResign() error {
-	b.Client.Out <- []byte("resign")
+	b.client.Out <- []byte("resign")
 	return nil
 }
 
 func (b *board) selectRematch() error {
-	b.Client.Out <- []byte("rematch")
+	b.client.Out <- []byte("rematch")
 	b.rematchButton.SetVisible(false)
 	return nil
 }
 
 func (b *board) selectChangePassword() error {
-	b.Client.Out <- []byte(fmt.Sprintf("password %s %s", strings.ReplaceAll(b.changePasswordOld.Text(), " ", "_"), strings.ReplaceAll(b.changePasswordNew.Text(), " ", "_")))
+	b.client.Out <- []byte(fmt.Sprintf("password %s %s", strings.ReplaceAll(b.changePasswordOld.Text(), " ", "_"), strings.ReplaceAll(b.changePasswordNew.Text(), " ", "_")))
 	return b.hideMenu()
 }
 
@@ -621,7 +621,7 @@ func (b *board) confirmSelectSpeed(index int) (accept bool) {
 		return false
 	}
 	b.speed = int8(index)
-	b.Client.Out <- []byte(fmt.Sprintf("set speed %d", b.speed))
+	b.client.Out <- []byte(fmt.Sprintf("set speed %d", b.speed))
 	return true
 }
 
@@ -804,7 +804,7 @@ func (b *board) toggleHighlightCheckbox() error {
 	if b.highlightAvailable {
 		highlight = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set highlight %d", highlight))
+	b.client.Out <- []byte(fmt.Sprintf("set highlight %d", highlight))
 	return nil
 }
 
@@ -816,7 +816,7 @@ func (b *board) togglePipCountCheckbox() error {
 	if b.showPipCount {
 		pips = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set pips %d", pips))
+	b.client.Out <- []byte(fmt.Sprintf("set pips %d", pips))
 	return nil
 }
 
@@ -827,7 +827,7 @@ func (b *board) toggleMovesCheckbox() error {
 	if b.showMoves {
 		moves = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set moves %d", moves))
+	b.client.Out <- []byte(fmt.Sprintf("set moves %d", moves))
 	return nil
 }
 
@@ -836,7 +836,7 @@ func (b *board) toggleAutoPlayCheckbox() error {
 	if b.autoPlayCheckbox.Selected() {
 		autoPlay = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set autoplay %d", autoPlay))
+	b.client.Out <- []byte(fmt.Sprintf("set autoplay %d", autoPlay))
 	return nil
 }
 
@@ -849,8 +849,8 @@ func (b *board) toggleFlipBoardCheckbox() error {
 	if b.flipBoard {
 		flipBoard = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set flip %d", flipBoard))
-	b.Client.Out <- []byte("board")
+	b.client.Out <- []byte(fmt.Sprintf("set flip %d", flipBoard))
+	b.client.Out <- []byte("board")
 	return nil
 }
 
@@ -861,7 +861,7 @@ func (b *board) toggleTraditionalCheckbox() error {
 	if b.traditional {
 		traditional = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set traditional %d", traditional))
+	b.client.Out <- []byte(fmt.Sprintf("set traditional %d", traditional))
 	return nil
 }
 
@@ -872,7 +872,7 @@ func (b *board) toggleAdvancedMovementCheckbox() error {
 	if b.advancedMovement {
 		advancedMovement = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set advanced %d", advancedMovement))
+	b.client.Out <- []byte(fmt.Sprintf("set advanced %d", advancedMovement))
 	return nil
 }
 
@@ -883,7 +883,7 @@ func (b *board) toggleMuteJoinLeave() error {
 	if b.muteJoinLeave {
 		value = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set mutejoinleave %d", value))
+	b.client.Out <- []byte(fmt.Sprintf("set mutejoinleave %d", value))
 	return nil
 }
 
@@ -894,7 +894,7 @@ func (b *board) toggleMuteChat() error {
 	if b.muteChat {
 		value = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set mutechat %d", value))
+	b.client.Out <- []byte(fmt.Sprintf("set mutechat %d", value))
 	return nil
 }
 
@@ -905,7 +905,7 @@ func (b *board) toggleMuteRoll() error {
 	if b.muteRoll {
 		value = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set muteroll %d", value))
+	b.client.Out <- []byte(fmt.Sprintf("set muteroll %d", value))
 	return nil
 }
 
@@ -916,7 +916,7 @@ func (b *board) toggleMuteMove() error {
 	if b.muteMove {
 		value = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set mutemove %d", value))
+	b.client.Out <- []byte(fmt.Sprintf("set mutemove %d", value))
 	return nil
 }
 
@@ -927,7 +927,7 @@ func (b *board) toggleMuteBearOff() error {
 	if b.muteBearOff {
 		value = 1
 	}
-	b.Client.Out <- []byte(fmt.Sprintf("set mutebearoff %d", value))
+	b.client.Out <- []byte(fmt.Sprintf("set mutebearoff %d", value))
 	return nil
 }
 
@@ -2568,7 +2568,7 @@ func (b *board) finishDrag(x int, y int, click bool) {
 		}
 
 		var processed bool
-		if index >= 0 && b.Client != nil {
+		if index >= 0 && b.client != nil {
 			space := b.draggingSpace
 			if space != index {
 				ok, _ := b.gameState.AddMoves([][]int8{{space, index}}, true)
@@ -2585,7 +2585,7 @@ func (b *board) finishDrag(x int, y int, click bool) {
 					b.processState()
 					scheduleFrame()
 					processed = true
-					b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
+					b.client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
 				}
 			} else if time.Since(b.lastDragClick) < 500*time.Millisecond && b.gameState.MayBearOff(b.gameState.PlayerNumber, true) {
 				homeStart, homeEnd := bgammon.HomeRange(b.gameState.PlayerNumber, b.gameState.Variant)
@@ -2601,14 +2601,14 @@ func (b *board) finishDrag(x int, y int, click bool) {
 						} else {
 							playSoundEffect(effectHomeMulti)
 						}
-						b.Client.Out <- []byte(fmt.Sprintf("mv %d/off", index))
+						b.client.Out <- []byte(fmt.Sprintf("mv %d/off", index))
 					}
 				}
 			} else if time.Since(b.lastDragClick) < 500*time.Millisecond && space == bgammon.SpaceHomePlayer && !b.gameState.Player1.Entered {
 				var found bool
 				for _, m := range b.gameState.Available {
 					if m[0] == bgammon.SpaceHomePlayer && bgammon.SpaceDiff(m[0], m[1], b.gameState.Variant) == b.gameState.Roll1 {
-						b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
+						b.client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
 						found = true
 						break
 					}
@@ -2616,7 +2616,7 @@ func (b *board) finishDrag(x int, y int, click bool) {
 				if !found {
 					for _, m := range b.gameState.Available {
 						if m[0] == bgammon.SpaceHomePlayer {
-							b.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
+							b.client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
 							break
 						}
 					}
@@ -2650,7 +2650,7 @@ func (b *board) Update() {
 func expandMoves(moves [][]int8) [][]int8 {
 	var expanded bool
 	for _, m := range moves {
-		expandedMoves, ok := game.Board.gameState.ExpandMove(m, m[0], nil, true)
+		expandedMoves, ok := game.board.gameState.ExpandMove(m, m[0], nil, true)
 		if !ok {
 			return moves
 		}
@@ -2664,7 +2664,7 @@ func expandMoves(moves [][]int8) [][]int8 {
 	}
 	var newMoves [][]int8
 	for _, m := range moves {
-		expandedMoves, ok := game.Board.gameState.ExpandMove(m, m[0], nil, true)
+		expandedMoves, ok := game.board.gameState.ExpandMove(m, m[0], nil, true)
 		if !ok {
 			return moves
 		}

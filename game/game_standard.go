@@ -95,7 +95,7 @@ func saveReplay(id int, content []byte) error {
 				return fmt.Errorf("failed to parse replay timestamp")
 			}
 
-			if bytes.Equal(split[3], []byte(game.Client.Username)) {
+			if bytes.Equal(split[3], []byte(game.client.Username)) {
 				player1, player2 = string(split[3]), string(split[2])
 			} else {
 				player1, player2 = string(split[2]), string(split[3])

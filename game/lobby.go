@@ -316,7 +316,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				l.showJoinGame = false
 				l.rebuildButtonsGrid()
 				if viewBoard {
-					game.setRoot(game.Board.frame)
+					game.setRoot(game.board.frame)
 				} else {
 					game.setRoot(listGamesFrame)
 				}
@@ -338,13 +338,13 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				if selected >= 0 && selected < len(l.historyMatches) {
 					match := l.historyMatches[selected]
 					game.downloadReplay = match.ID
-					game.Client.Out <- []byte(fmt.Sprintf("replay %d", match.ID))
+					game.client.Out <- []byte(fmt.Sprintf("replay %d", match.ID))
 				}
 			case lobbyButtonHistoryView:
 				_, selected := l.historyList.SelectedItem()
 				if selected >= 0 && selected < len(l.historyMatches) {
 					match := l.historyMatches[selected]
-					game.Client.Out <- []byte(fmt.Sprintf("replay %d", match.ID))
+					game.client.Out <- []byte(fmt.Sprintf("replay %d", match.ID))
 				}
 			}
 			return nil

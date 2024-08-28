@@ -127,7 +127,7 @@ func (b *DieButton) Draw(screen *ebiten.Image) error {
 
 	r := b.Rect()
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(r.Min.X+(r.Dx()-int(game.Board.spaceWidth))/2), float64(r.Min.Y+(r.Dy()-int(game.Board.spaceWidth))/2))
+	op.GeoM.Translate(float64(r.Min.X+(r.Dx()-int(game.board.spaceWidth))/2), float64(r.Min.Y+(r.Dy()-int(game.board.spaceWidth))/2))
 	screen.DrawImage(dieFace, op)
 	return nil
 }
@@ -143,19 +143,19 @@ func NewBoardWidget() *BoardWidget {
 }
 
 func (bw *BoardWidget) finishClick(cursor image.Point, double bool) {
-	game.Board.Lock()
+	game.board.Lock()
 	game.Lock()
-	game.Board.Unlock()
+	game.board.Unlock()
 	defer game.Unlock()
-	if game.Board.draggingSpace == -1 || len(game.Board.gameState.Available) == 0 {
+	if game.board.draggingSpace == -1 || len(game.board.gameState.Available) == 0 {
 		return
 	}
-	rolls := game.Board.gameState.DiceRolls()
+	rolls := game.board.gameState.DiceRolls()
 	if len(rolls) == 0 {
 		return
 	}
-	space := game.Board.spaceAt(cursor.X, cursor.Y)
-	if space == -1 || space != game.Board.draggingSpace {
+	space := game.board.spaceAt(cursor.X, cursor.Y)
+	if space == -1 || space != game.board.draggingSpace {
 		return
 	} else if !double {
 		lowest := int8(math.MaxInt8)
@@ -169,20 +169,20 @@ func (bw *BoardWidget) finishClick(cursor image.Point, double bool) {
 			}
 		}
 		var roll int8
-		if game.Board.draggingRightClick {
+		if game.board.draggingRightClick {
 			roll = lowest
 		} else {
 			roll = highest
 		}
 		var useMove []int8
-		for _, move := range game.Board.gameState.Available {
+		for _, move := range game.board.gameState.Available {
 			if move[0] != space {
 				continue
 			}
-			diff := bgammon.SpaceDiff(move[0], move[1], game.Board.gameState.Variant)
-			haveRoll := diff == roll && game.Board.gameState.Game.HaveDiceRoll(move[0], move[1]) > 0
+			diff := bgammon.SpaceDiff(move[0], move[1], game.board.gameState.Variant)
+			haveRoll := diff == roll && game.board.gameState.Game.HaveDiceRoll(move[0], move[1]) > 0
 			if !haveRoll && (move[1] == bgammon.SpaceHomePlayer || move[1] == bgammon.SpaceHomeOpponent) {
-				haveRoll = diff <= roll && game.Board.gameState.Game.HaveBearOffDiceRoll(diff) > 0
+				haveRoll = diff <= roll && game.board.gameState.Game.HaveBearOffDiceRoll(diff) > 0
 			}
 			if haveRoll {
 				useMove = move
@@ -194,22 +194,22 @@ func (bw *BoardWidget) finishClick(cursor image.Point, double bool) {
 		}
 		playSoundEffect(effectMove)
 		game.Unlock()
-		game.Board.Lock()
-		game.Board.movePiece(useMove[0], useMove[1], false)
-		game.Board.gameState.AddLocalMove([]int8{useMove[0], useMove[1]})
-		game.Board.gameState.Moves = append(game.Board.gameState.Moves, []int8{useMove[0], useMove[1]})
-		game.Board.processState()
-		game.Board.Unlock()
+		game.board.Lock()
+		game.board.movePiece(useMove[0], useMove[1], false)
+		game.board.gameState.AddLocalMove([]int8{useMove[0], useMove[1]})
+		game.board.gameState.Moves = append(game.board.gameState.Moves, []int8{useMove[0], useMove[1]})
+		game.board.processState()
+		game.board.Unlock()
 		game.Lock()
-		game.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", useMove[0], useMove[1]))
+		game.client.Out <- []byte(fmt.Sprintf("mv %d/%d", useMove[0], useMove[1]))
 		return
 	}
 
 	var useMoves [][]int8
 FINDMOVE:
-	for _, move := range game.Board.gameState.Available {
+	for _, move := range game.board.gameState.Available {
 		expanded := expandMoves([][]int8{{move[0], space}})
-		gc := game.Board.gameState.Game.Copy(true)
+		gc := game.board.gameState.Game.Copy(true)
 		for _, m := range expanded {
 			var found bool
 			for _, m2 := range gc.LegalMoves(false) {
@@ -221,10 +221,10 @@ FINDMOVE:
 			if !found {
 				continue FINDMOVE
 			}
-			diff := bgammon.SpaceDiff(m[0], m[1], game.Board.gameState.Variant)
-			haveRoll := game.Board.gameState.Game.HaveDiceRoll(m[0], m[1]) > 0
+			diff := bgammon.SpaceDiff(m[0], m[1], game.board.gameState.Variant)
+			haveRoll := game.board.gameState.Game.HaveDiceRoll(m[0], m[1]) > 0
 			if !haveRoll && (m[1] == bgammon.SpaceHomePlayer || m[1] == bgammon.SpaceHomeOpponent) {
-				haveRoll = game.Board.gameState.Game.HaveBearOffDiceRoll(diff) > 0
+				haveRoll = game.board.gameState.Game.HaveBearOffDiceRoll(diff) > 0
 			}
 			if !haveRoll {
 				continue FINDMOVE
@@ -241,28 +241,28 @@ FINDMOVE:
 		return
 	}
 	game.Unlock()
-	game.Board.Lock()
+	game.board.Lock()
 	for _, move := range useMoves {
 		playSoundEffect(effectMove)
-		game.Board.movePiece(move[0], move[1], false)
-		game.Board.gameState.AddMoves([][]int8{{move[0], move[1]}}, true)
-		game.Board.gameState.Moves = append(game.Board.gameState.Moves, []int8{move[0], move[1]})
-		game.Board.processState()
+		game.board.movePiece(move[0], move[1], false)
+		game.board.gameState.AddMoves([][]int8{{move[0], move[1]}}, true)
+		game.board.gameState.Moves = append(game.board.gameState.Moves, []int8{move[0], move[1]})
+		game.board.processState()
 	}
-	game.Board.Unlock()
+	game.board.Unlock()
 	game.Lock()
 	for _, move := range useMoves {
-		game.Client.Out <- []byte(fmt.Sprintf("mv %d/%d", move[0], move[1]))
+		game.client.Out <- []byte(fmt.Sprintf("mv %d/%d", move[0], move[1]))
 	}
 }
 
 func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
-	if !pressed && !clicked && game.Board.dragging == nil {
+	if !pressed && !clicked && game.board.dragging == nil {
 		return false, nil
 	}
 
-	b := game.Board
-	if b.Client == nil || !b.playerTurn() {
+	b := game.board
+	if b.client == nil || !b.playerTurn() {
 		return false, nil
 	}
 
@@ -301,7 +301,7 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 		// TODO allow grabbing multiple pieces by grabbing further down the stack
 		if !handled && b.playerTurn() && clicked && (b.lastDragClick.IsZero() || time.Since(b.lastDragClick) >= 50*time.Millisecond) {
 			s, space := b.spriteAt(cx, cy)
-			if s != nil && s.colorWhite == (b.flipBoard || b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomeOpponent && (game.Board.gameState.Variant == bgammon.VariantBackgammon || space != bgammon.SpaceHomePlayer || !game.Board.gameState.Player1.Entered) {
+			if s != nil && s.colorWhite == (b.flipBoard || b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomeOpponent && (game.board.gameState.Variant == bgammon.VariantBackgammon || space != bgammon.SpaceHomePlayer || !game.board.gameState.Player1.Entered) {
 				b.startDrag(s, space, false)
 				handled = true
 			}
@@ -330,7 +330,7 @@ func NewBoardMovingWidget() *BoardMovingWidget {
 }
 
 func (w *BoardMovingWidget) Draw(screen *ebiten.Image) error {
-	b := game.Board
+	b := game.board
 	if b.moving != nil {
 		b.drawSprite(screen, b.moving)
 	}
@@ -348,7 +348,7 @@ func NewBoardDraggedWidget() *BoardDraggedWidget {
 }
 
 func (w *BoardDraggedWidget) Draw(screen *ebiten.Image) error {
-	b := game.Board
+	b := game.board
 	if b.dragging != nil {
 		b.drawSprite(screen, b.dragging)
 	}
