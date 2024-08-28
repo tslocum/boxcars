@@ -567,8 +567,6 @@ type Game struct {
 
 	debugImg *ebiten.Image
 
-	cpuProfile *os.File
-
 	connectUsername *Input
 	connectPassword *Input
 	connectServer   *Input
@@ -1176,12 +1174,28 @@ func (g *Game) initialize() {
 		historyDividerLine := etk.NewBox()
 		historyDividerLine.SetBackground(bufferTextColor)
 
-		g.lobby.historyPageLabel = newLabel("...", etk.AlignCenter)
+		g.lobby.historyPageButton = etk.NewButton("1/1", g.selectHistoryPage)
+
+		{
+			g.lobby.historyPageDialog = etk.NewGrid()
+			g.lobby.historyPageDialogInput = etk.NewInput("", g.confirmHistoryPage)
+			label := resizeText(gotext.Get("Go to page:"))
+			label.SetHorizontal(etk.AlignCenter)
+			label.SetVertical(etk.AlignCenter)
+
+			d := g.lobby.historyPageDialog
+			d.SetBackground(color.RGBA{40, 24, 9, 255})
+			d.AddChildAt(label, 0, 0, 2, 1)
+			d.AddChildAt(g.lobby.historyPageDialogInput, 0, 1, 2, 1)
+			d.AddChildAt(etk.NewButton(gotext.Get("Cancel"), g.cancelHistoryPage), 0, 2, 1, 1)
+			d.AddChildAt(etk.NewButton(gotext.Get("Go"), func() error { g.confirmHistoryPage(g.lobby.historyPageDialogInput.Text()); return nil }), 1, 2, 1, 1)
+			d.SetVisible(false)
+		}
 
 		pageControlGrid := etk.NewGrid()
-		pageControlGrid.AddChildAt(etk.NewButton("<", g.selectHistoryPrevious), 0, 0, 1, 1)
-		pageControlGrid.AddChildAt(g.lobby.historyPageLabel, 1, 0, 1, 1)
-		pageControlGrid.AddChildAt(etk.NewButton(">", g.selectHistoryNext), 2, 0, 1, 1)
+		pageControlGrid.AddChildAt(etk.NewButton("<- "+gotext.Get("Previous"), g.selectHistoryPrevious), 0, 0, 1, 1)
+		pageControlGrid.AddChildAt(g.lobby.historyPageButton, 1, 0, 1, 1)
+		pageControlGrid.AddChildAt(etk.NewButton(gotext.Get("Next")+" ->", g.selectHistoryNext), 2, 0, 1, 1)
 
 		historyRatingGrid := etk.NewGrid()
 		historyRatingGrid.SetRowSizes(2, -1, -1, -1)
@@ -1204,6 +1218,7 @@ func (g *Game) initialize() {
 
 		historyFrame.SetPositionChildren(true)
 		historyFrame.AddChild(historyContainer)
+		historyFrame.AddChild(etk.NewFrame(g.lobby.historyPageDialog))
 	}
 
 	{
@@ -1721,7 +1736,7 @@ func (g *Game) handleEvent(e interface{}) {
 		game.lobby.historyMatches = ev.Matches
 		game.lobby.historyPage = ev.Page
 		game.lobby.historyPages = ev.Pages
-		game.lobby.historyPageLabel.SetText(fmt.Sprintf("%d/%d", ev.Page, ev.Pages))
+		game.lobby.historyPageButton.SetText(fmt.Sprintf("%d/%d", ev.Page, ev.Pages))
 		game.lobby.historyRatingCasualBackgammonSingle.SetText(fmt.Sprintf("%d", ev.CasualBackgammonSingle))
 		game.lobby.historyRatingCasualBackgammonMulti.SetText(fmt.Sprintf("%d", ev.CasualBackgammonMulti))
 		game.lobby.historyRatingCasualAceySingle.SetText(fmt.Sprintf("%d", ev.CasualAceyDeuceySingle))
@@ -2408,6 +2423,30 @@ func (g *Game) selectHistoryNext() error {
 	return nil
 }
 
+func (g *Game) selectHistoryPage() error {
+	go showKeyboard()
+	g.lobby.historyPageDialogInput.SetText("")
+	g.lobby.historyPageDialog.SetVisible(true)
+	etk.SetFocus(g.lobby.historyPageDialogInput)
+	return nil
+}
+
+func (g *Game) confirmHistoryPage(text string) bool {
+	go hideKeyboard()
+	g.lobby.historyPageDialog.SetVisible(false)
+	page, err := strconv.Atoi(g.lobby.historyPageDialogInput.Text())
+	if err != nil || page < 0 {
+		page = 0
+	}
+	g.Client.Out <- []byte(fmt.Sprintf("history %s %d", g.lobby.historyUsername.Text(), page))
+	return true
+}
+
+func (g *Game) cancelHistoryPage() error {
+	go hideKeyboard()
+	g.lobby.historyPageDialog.SetVisible(false)
+	return nil
+}
 func (g *Game) handleInput(keys []ebiten.Key) error {
 	if len(keys) == 0 {
 		return nil
@@ -2475,9 +2514,13 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 				}
 				continue
 			} else if g.lobby.showHistory {
-				g.lobby.showHistory = false
-				g.lobby.rebuildButtonsGrid()
-				g.setRoot(listGamesFrame)
+				if g.lobby.historyPageDialog.Visible() {
+					g.lobby.historyPageDialog.SetVisible(false)
+				} else {
+					g.lobby.showHistory = false
+					g.lobby.rebuildButtonsGrid()
+					g.setRoot(listGamesFrame)
+				}
 			} else {
 				setViewBoard(!viewBoard)
 			}
@@ -2784,6 +2827,20 @@ func (g *Game) layoutLobby() {
 	g.lobby.buttonBarHeight = etk.Scale(baseButtonHeight)
 	g.lobby.rebuildButtonsGrid()
 	g.setBufferRects()
+
+	{
+		dialogWidth := etk.Scale(400)
+		if dialogWidth > game.screenW {
+			dialogWidth = game.screenW
+		}
+		dialogHeight := g.lobby.buttonBarHeight * 3
+		if dialogHeight > game.screenH {
+			dialogHeight = game.screenH
+		}
+
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(g.Board.verticalBorderSize)
+		g.lobby.historyPageDialog.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+	}
 }
 
 func (g *Game) layoutBoard() {
