@@ -14,7 +14,7 @@ Download Boxcars at https://bgammon.org/boxcars
 
 ### Android
 
-Download Boxcars via [Google Play](https://play.google.com/store/apps/details?id=com.rocket9labs.boxcars) or [F-Droid](https://f-droid.org/packages/com.rocket9labs.boxcars/)
+Download Boxcars via [F-Droid](https://f-droid.org/packages/com.rocket9labs.boxcars/)
 
 ## Screenshot
 
