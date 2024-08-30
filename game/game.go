@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.3.9p1"
+	AppVersion           = "v1.4.0"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -1375,14 +1375,14 @@ func (g *Game) handleUpdateTimeLabels() {
 
 		// Update match timer.
 		started := g.board.gameState.Started
-		if started.IsZero() {
+		if started == 0 {
 			h, m = 0, 0
 		} else {
 			ended := g.board.gameState.Ended
-			if ended.IsZero() {
-				d = now.Sub(started)
+			if ended == 0 {
+				d = now.Sub(time.Unix(started, 0))
 			} else {
-				d = ended.Sub(started)
+				d = time.Unix(ended, 0).Sub(time.Unix(started, 0))
 			}
 			h, m = int(d.Hours()), int(d.Minutes())%60
 		}
@@ -1876,7 +1876,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 			log.Printf("warning: failed to read replay: failed to parse line %d", lineNumber)
 			return false
 		}
-		gs.Started = time.Unix(timestamp, 0)
+		gs.Started = timestamp
 		gs.Ended = gs.Started
 	case bytes.Equal(split[0], []byte("1")), bytes.Equal(split[0], []byte("2")):
 		if len(split) < 2 || (!bytes.Equal(split[1], []byte("t")) && len(split) < 3) {
@@ -2127,7 +2127,7 @@ func (g *Game) showReplayFrame(replayFrame int, showInfo bool) {
 	g.client.Events <- ev
 
 	if replayFrame == 0 && showInfo {
-		l(fmt.Sprintf("*** "+gotext.Get("Replaying %s vs. %s", "%s", "%s")+" (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, frame.Game.Started.Format("2006-01-02 15:04")))
+		l(fmt.Sprintf("*** "+gotext.Get("Replaying %s vs. %s", "%s", "%s")+" (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, time.Unix(frame.Game.Started, 0).Format("2006-01-02 15:04")))
 	}
 }
 
