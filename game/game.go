@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	version              = "v1.3.9p1"
+	AppVersion           = "v1.3.9p1"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org"
@@ -782,7 +782,7 @@ func (g *Game) initialize() {
 
 		infoLabel := etk.NewText(gotext.Get("Please enter a valid email address, or it will not be possible to reset your password."))
 
-		footerLabel := etk.NewText("Boxcars " + version)
+		footerLabel := etk.NewText("Boxcars " + AppVersion)
 		footerLabel.SetHorizontal(etk.AlignEnd)
 		footerLabel.SetVertical(etk.AlignEnd)
 
@@ -840,7 +840,7 @@ func (g *Game) initialize() {
 
 		g.resetInfo = etk.NewText("")
 
-		footerLabel := etk.NewText("Boxcars " + version)
+		footerLabel := etk.NewText("Boxcars " + AppVersion)
 		footerLabel.SetHorizontal(etk.AlignEnd)
 		footerLabel.SetVertical(etk.AlignEnd)
 
@@ -883,7 +883,7 @@ func (g *Game) initialize() {
 
 		infoLabel := etk.NewText(gotext.Get("To log in as a guest, enter a username (if you want) and do not enter a password."))
 
-		footerLabel := etk.NewText("Boxcars " + version)
+		footerLabel := etk.NewText("Boxcars " + AppVersion)
 		footerLabel.SetHorizontal(etk.AlignEnd)
 		footerLabel.SetVertical(etk.AlignEnd)
 
