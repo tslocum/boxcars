@@ -548,9 +548,10 @@ type Game struct {
 	register      bool
 	loggedIn      bool
 
-	JoinGame int
-	Mute     bool
-	Instant  bool
+	JoinGame   int
+	Mute       bool
+	Instant    bool
+	Fullscreen bool
 
 	client *Client
 
@@ -2604,6 +2605,11 @@ func (g *Game) Update() error {
 
 	g.Lock()
 	defer g.Unlock()
+
+	if ebiten.IsKeyPressed(ebiten.KeyAlt) && inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		g.Fullscreen = !g.Fullscreen
+		ebiten.SetFullscreen(g.Fullscreen)
+	}
 
 	gameUpdateLock.Lock()
 	updatedGame = true

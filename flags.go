@@ -15,6 +15,7 @@ import (
 
 	"code.rocket9labs.com/tslocum/bgammon"
 	"code.rocket9labs.com/tslocum/boxcars/game"
+	"github.com/hajimehoshi/ebiten/v2"
 	"golang.org/x/text/language"
 )
 
@@ -64,6 +65,8 @@ func parseFlags() *game.Game {
 		serverAddress string
 		mute          bool
 		instant       bool
+		fullscreen    bool
+		windowed      bool
 		locale        string
 		join          int
 		tv            bool
@@ -74,6 +77,8 @@ func parseFlags() *game.Game {
 	flag.StringVar(&serverAddress, "address", game.DefaultServerAddress, "Server address")
 	flag.BoolVar(&mute, "mute", false, "Mute sound effects")
 	flag.BoolVar(&instant, "instant", false, "Instant checker movement")
+	flag.BoolVar(&fullscreen, "fullscreen", false, "Start in fullscreen mode")
+	flag.BoolVar(&windowed, "windowed", false, "Start in windowed mode")
 	flag.StringVar(&locale, "locale", "", "Use specified locale for translations")
 	flag.IntVar(&join, "join", 0, "Connect as guest and join specified match")
 	flag.BoolVar(&tv, "tv", false, "Spectate games continuously")
@@ -100,6 +105,11 @@ func parseFlags() *game.Game {
 	g.Mute = mute
 	g.Instant = instant
 	g.JoinGame = join
+
+	if fullscreen && !windowed {
+		g.Fullscreen = true
+		ebiten.SetFullscreen(true)
+	}
 
 	if debug > 0 {
 		game.Debug = int8(debug)
