@@ -112,6 +112,12 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+msgid "Exit"
+msgstr ""
+
+msgid "Exit Boxcars?"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr ""
 

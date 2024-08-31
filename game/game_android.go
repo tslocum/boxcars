@@ -21,6 +21,7 @@ import (
 const (
 	AppName            = "boxcars-android"
 	ShowServerSettings = true
+	ShowQuitDialog     = true
 	targetFPS          = 60
 )
 

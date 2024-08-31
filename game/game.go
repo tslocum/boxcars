@@ -582,6 +582,8 @@ type Game struct {
 
 	tutorialFrame *etk.Frame
 
+	quitDialog *etk.Grid
+
 	pressedKeys  []ebiten.Key
 	pressedRunes []rune
 
@@ -952,8 +954,23 @@ func (g *Game) initialize() {
 		grid.AddChildAt(footerLabel, 1, g.connectGridY+3, 3, 1)
 		connectGrid = grid
 
+		{
+			g.quitDialog = etk.NewGrid()
+			label := resizeText(gotext.Get("Exit Boxcars?"))
+			label.SetHorizontal(etk.AlignCenter)
+			label.SetVertical(etk.AlignCenter)
+
+			d := g.quitDialog
+			d.SetBackground(color.RGBA{40, 24, 9, 255})
+			d.AddChildAt(label, 0, 0, 2, 1)
+			d.AddChildAt(etk.NewButton(gotext.Get("Cancel"), func() error { g.quitDialog.SetVisible(false); return nil }), 0, 1, 1, 1)
+			d.AddChildAt(etk.NewButton(gotext.Get("Exit"), func() error { g.Exit(); return nil }), 1, 1, 1, 1)
+			d.SetVisible(false)
+		}
+
 		connectFrame = etk.NewFrame(connectGrid)
 		connectFrame.SetPositionChildren(true)
+		connectFrame.AddChild(etk.NewFrame(g.quitDialog))
 	}
 
 	{
@@ -2492,6 +2509,10 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 				} else {
 					g.selectConnect()
 				}
+			case ebiten.KeyEscape:
+				if ShowQuitDialog {
+					g.quitDialog.SetVisible(!g.quitDialog.Visible())
+				}
 			}
 		}
 		return nil
@@ -2824,6 +2845,20 @@ func (g *Game) layoutConnect() {
 		connectGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), etk.Scale(baseButtonHeight), infoHeight)
 		registerGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
 		resetGrid.SetRowSizes(headerHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
+	}
+
+	{
+		dialogWidth := etk.Scale(400)
+		if dialogWidth > game.screenW {
+			dialogWidth = game.screenW
+		}
+		dialogHeight := etk.Scale(baseButtonHeight) * 2
+		if dialogHeight > game.screenH {
+			dialogHeight = game.screenH
+		}
+
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(g.board.verticalBorderSize)
+		g.quitDialog.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 }
 
