@@ -112,9 +112,6 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-msgid "Exit"
-msgstr ""
-
 msgid "Exit Boxcars?"
 msgstr ""
 

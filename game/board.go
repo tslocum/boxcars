@@ -1686,6 +1686,22 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 
 	{
+		dialogWidth := etk.Scale(620)
+		if dialogWidth > game.screenW {
+			dialogWidth = game.screenW
+		}
+		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + etk.Scale(baseButtonHeight)
+		if dialogHeight > game.screenH {
+			dialogHeight = game.screenH
+		}
+
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
+		b.settingsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+		b.changePasswordGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+		b.muteSoundsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+	}
+
+	{
 		dialogWidth := int(float64(diceSize) * 6)
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
@@ -1696,9 +1712,6 @@ func (b *board) setRect(x, y, w, h int) {
 		}
 
 		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
-		b.settingsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
-		b.changePasswordGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
-		b.muteSoundsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 		b.selectRollGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 

@@ -25,6 +25,7 @@ type Client struct {
 	connecting    bool
 	loggedIn      bool
 	resetPassword bool
+	local         bool
 	close         func()
 }
 

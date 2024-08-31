@@ -965,8 +965,8 @@ func (g *Game) initialize() {
 			d := g.quitDialog
 			d.SetBackground(color.RGBA{40, 24, 9, 255})
 			d.AddChildAt(label, 0, 0, 2, 1)
-			d.AddChildAt(etk.NewButton(gotext.Get("Cancel"), func() error { g.quitDialog.SetVisible(false); return nil }), 0, 1, 1, 1)
-			d.AddChildAt(etk.NewButton(gotext.Get("Exit"), func() error { g.Exit(); return nil }), 1, 1, 1, 1)
+			d.AddChildAt(etk.NewButton(gotext.Get("No"), func() error { g.quitDialog.SetVisible(false); return nil }), 0, 1, 1, 1)
+			d.AddChildAt(etk.NewButton(gotext.Get("Yes"), func() error { g.Exit(); return nil }), 1, 1, 1, 1)
 			d.SetVisible(false)
 		}
 
@@ -1508,7 +1508,9 @@ func (g *Game) handleEvent(e interface{}) {
 		if password == "" {
 			password = g.registerPassword.Text()
 		}
-		go saveCredentials(username, password)
+		if !g.client.local {
+			go saveCredentials(username, password)
+		}
 
 		var msg string
 		if ev.Clients == 1 && ev.Games == 1 {
@@ -2343,6 +2345,7 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 	g.lobby.c = g.client
 	g.board.client = g.client
 
+	g.client.local = true
 	g.client.connecting = true
 
 	g.Username = ""
