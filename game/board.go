@@ -1686,11 +1686,11 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 
 	{
-		dialogWidth := etk.Scale(620)
+		dialogWidth := int(float64(diceSize) * 6)
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + etk.Scale(baseButtonHeight)
+		dialogHeight := diceSize * 4
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}

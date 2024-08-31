@@ -127,7 +127,7 @@ func (b *DieButton) Draw(screen *ebiten.Image) error {
 
 	r := b.Rect()
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(r.Min.X+(r.Dx()-int(game.board.spaceWidth))/2), float64(r.Min.Y+(r.Dy()-int(game.board.spaceWidth))/2))
+	op.GeoM.Translate(float64(r.Min.X+(r.Dx()-diceSize)/2), float64(r.Min.Y+(r.Dy()-diceSize)/2))
 	screen.DrawImage(dieFace, op)
 	return nil
 }
