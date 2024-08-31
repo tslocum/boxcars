@@ -1,5 +1,6 @@
 1.4.0:
 - Auto-scale font size to fit text
+- Support returning to the main menu
 
 1.3.9:
 - Add shadow behind player rating labels

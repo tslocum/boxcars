@@ -626,6 +626,8 @@ type Game struct {
 	replaySummary1 []byte
 	replaySummary2 []byte
 
+	localServer chan net.Conn
+
 	*sync.Mutex
 }
 
@@ -1357,27 +1359,57 @@ func (g *Game) playOffline() {
 		return
 	}
 
-	// Start the local BEI server.
-	beiServer := &tabula.BEIServer{}
-	beiConns := beiServer.ListenLocal()
+	if g.localServer == nil {
+		// Start the local BEI server.
+		beiServer := &tabula.BEIServer{}
+		beiConns := beiServer.ListenLocal()
 
-	// Connect to the local BEI server.
-	beiClient := bot.NewLocalBEIClient(<-beiConns, false)
+		// Connect to the local BEI server.
+		beiClient := bot.NewLocalBEIClient(<-beiConns, false)
 
-	// Start the local bgammon server.
-	server := server.NewServer("", "", "", "", "", false, true, false)
-	serverConns := server.ListenLocal()
+		// Start the local bgammon server.
+		server := server.NewServer("", "", "", "", "", false, true, false)
+		g.localServer = server.ListenLocal()
 
-	// Connect the bots.
-	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula", "", 1, bgammon.VariantBackgammon, false, beiClient)
-	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula_acey", "", 1, bgammon.VariantAceyDeucey, false, beiClient)
-	go bot.NewLocalClient(<-serverConns, "", "BOT_tabula_tabula", "", 1, bgammon.VariantTabula, false, beiClient)
+		// Connect the bots.
+		go bot.NewLocalClient(<-g.localServer, "", "BOT_tabula", "", 1, bgammon.VariantBackgammon, false, beiClient)
+		go bot.NewLocalClient(<-g.localServer, "", "BOT_tabula_acey", "", 1, bgammon.VariantAceyDeucey, false, beiClient)
+		go bot.NewLocalClient(<-g.localServer, "", "BOT_tabula_tabula", "", 1, bgammon.VariantTabula, false, beiClient)
 
-	// Wait for the bots to finish creating matches.
-	time.Sleep(250 * time.Millisecond)
+		// Wait for the bots to finish creating matches.
+		time.Sleep(250 * time.Millisecond)
+	}
 
 	// Connect the player.
-	go g.ConnectLocal(<-serverConns)
+	go g.ConnectLocal(<-g.localServer)
+}
+
+func (g *Game) showMainMenu() {
+	if !g.loggedIn {
+		return
+	}
+	g.loggedIn = false
+
+	if g.client == nil {
+		return
+	}
+	g.client.Disconnect()
+	g.client = nil
+
+	g.client = nil
+	g.lobby.c = nil
+	g.board.client = nil
+
+	g.setRoot(connectFrame)
+
+	statusBuffer.SetText("")
+	gameBuffer.SetText("")
+	inputBuffer.SetText("")
+
+	statusLogged = false
+	gameLogged = false
+
+	g.loggedIn = false
 }
 
 func (g *Game) handleUpdateTimeLabels() {
@@ -1798,8 +1830,8 @@ func (g *Game) handleEvent(e interface{}) {
 	}
 }
 
-func (g *Game) handleEvents() {
-	for e := range g.client.Events {
+func (g *Game) handleEvents(c *Client) {
+	for e := range c.Events {
 		g.board.Lock()
 		g.Lock()
 		g.board.Unlock()
@@ -2262,7 +2294,7 @@ func (g *Game) Connect() {
 	g.lobby.c = g.client
 	g.board.client = g.client
 
-	go g.handleEvents()
+	go g.handleEvents(g.client)
 
 	if g.Password != "" {
 		g.board.recreateAccountGrid()
@@ -2311,10 +2343,12 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 	g.lobby.c = g.client
 	g.board.client = g.client
 
+	g.client.connecting = true
+
 	g.Username = ""
 	g.Password = ""
 
-	go g.handleEvents()
+	go g.handleEvents(g.client)
 
 	go g.client.connectTCP(conn)
 }
@@ -2543,8 +2577,16 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					g.lobby.rebuildButtonsGrid()
 					g.setRoot(listGamesFrame)
 				}
+			} else if g.lobby.showCreateGame {
+				g.lobby.showCreateGame = false
+				g.lobby.rebuildButtonsGrid()
+				g.setRoot(listGamesFrame)
+			} else if g.lobby.showJoinGame {
+				g.lobby.showJoinGame = false
+				g.lobby.rebuildButtonsGrid()
+				g.setRoot(listGamesFrame)
 			} else {
-				setViewBoard(!viewBoard)
+				g.showMainMenu()
 			}
 		}
 	}

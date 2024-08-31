@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -24,6 +25,7 @@ type Client struct {
 	connecting    bool
 	loggedIn      bool
 	resetPassword bool
+	close         func()
 }
 
 func newClient(address string, username string, password string, resetPassword bool) *Client {
@@ -55,6 +57,16 @@ func (c *Client) Connect() {
 	c.connectTCP(nil)
 }
 
+func (c *Client) Disconnect() {
+	if !c.connecting {
+		return
+	}
+	c.connecting = false
+	if c.close != nil {
+		c.close()
+	}
+}
+
 func (c *Client) logIn() []byte {
 	if c.resetPassword {
 		return []byte(fmt.Sprintf("resetpassword %s\n", c.Username))
@@ -75,6 +87,11 @@ func (c *Client) LoggedIn() bool {
 }
 
 func (c *Client) connectWebSocket() {
+	if !c.connecting {
+		debug.PrintStack()
+		return
+	}
+
 	connectTime := time.Now()
 	reconnect := func() {
 		if c.resetPassword || time.Since(connectTime) < 20*time.Second {
@@ -82,6 +99,10 @@ func (c *Client) connectWebSocket() {
 			return
 		}
 		for {
+			if !c.connecting {
+				debug.PrintStack()
+				return
+			}
 			if !focused() {
 				time.Sleep(2 * time.Second)
 				continue
@@ -99,6 +120,9 @@ func (c *Client) connectWebSocket() {
 	if err != nil {
 		reconnect()
 		return
+	}
+	c.close = func() {
+		conn.Close(websocket.StatusNormalClosure, "")
 	}
 
 	for _, msg := range bytes.Split(c.logIn(), []byte("\n")) {
@@ -174,6 +198,10 @@ func (c *Client) handleWebSocketRead(conn *websocket.Conn) {
 }
 
 func (c *Client) connectTCP(conn net.Conn) {
+	if !c.connecting {
+		return
+	}
+
 	address := c.Address
 	if strings.HasPrefix(c.Address, "tcp://") {
 		address = c.Address[6:]
@@ -186,6 +214,9 @@ func (c *Client) connectTCP(conn net.Conn) {
 			return
 		}
 		for {
+			if !c.connecting {
+				return
+			}
 			if !focused() {
 				time.Sleep(2 * time.Second)
 				continue
@@ -204,6 +235,9 @@ func (c *Client) connectTCP(conn net.Conn) {
 			reconnect()
 			return
 		}
+	}
+	c.close = func() {
+		conn.Close()
 	}
 
 	// Read a single line of text and parse remaining output as JSON.
