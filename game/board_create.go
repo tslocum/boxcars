@@ -462,45 +462,41 @@ func (b *board) createReplayControls() {
 	b.replayGrid.AddChildAt(etk.NewButton(">>|", b.selectReplayEnd), 6, 0, 1, 1)
 }
 
+func (b *board) createReplayList() {
+	scrollBarWidth := etk.Scale(32)
+	b.replayList = etk.NewList(etk.Scale(baseButtonHeight), nil)
+	b.replayList.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
+	b.replayList.SetScrollBarWidth(scrollBarWidth)
+}
+
 func (b *board) recreateUIGrid() {
 	b.uiGrid.Clear()
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
 	b.uiGrid.AddChildAt(b.matchStatusGrid, 0, 1, 1, 1)
 	b.uiGrid.AddChildAt(etk.NewBox(), 0, 2, 1, 1)
 	gridY := 3
-	if AutoEnableTouchInput {
-		b.uiGrid.AddChildAt(b.inputGrid, 0, gridY, 1, 1)
-		b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY+1, 1, 1)
-		gridY += 2
-	}
 	if game.replay {
-		summary1 := etk.NewText("")
-		summary1.SetFont(etk.Style.TextFont, etk.Scale(smallFontSize))
-		summary1.Write(game.replaySummary1)
-		summary2 := etk.NewText("")
-		summary2.SetFont(etk.Style.TextFont, etk.Scale(smallFontSize))
-		summary2.Write(game.replaySummary2)
-		subGrid := etk.NewGrid()
-		subGrid.SetBackground(bufferBackgroundColor)
-		subGrid.AddChildAt(summary2, 0, 0, 1, 1)
-		subGrid.AddChildAt(summary1, 1, 0, 1, 1)
-
 		g := etk.NewGrid()
-		g.SetRowSizes(etk.Scale(baseButtonHeight), int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), lobbyStatusBufferHeight*2)
+		g.SetRowSizes(etk.Scale(baseButtonHeight), int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), etk.Scale(baseButtonHeight*2))
 		g.AddChildAt(b.replayGrid, 0, 0, 1, 1)
-		g.AddChildAt(subGrid, 0, 2, 1, 1)
+		g.AddChildAt(b.replayList, 0, 2, 1, 1)
 		g.AddChildAt(statusBuffer, 0, 4, 1, 1)
 		b.uiGrid.AddChildAt(g, 0, gridY, 1, 3)
 		gridY++
 	} else {
+		if AutoEnableTouchInput {
+			b.uiGrid.AddChildAt(b.inputGrid, 0, gridY, 1, 1)
+			b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY+1, 1, 1)
+			gridY += 2
+		}
 		b.uiGrid.AddChildAt(statusBuffer, 0, gridY, 1, 1)
 		b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY+1, 1, 1)
 		b.uiGrid.AddChildAt(gameBuffer, 0, gridY+2, 1, 1)
 		gridY += 3
-	}
-	if !AutoEnableTouchInput {
-		b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY, 1, 1)
-		b.uiGrid.AddChildAt(b.inputGrid, 0, gridY+1, 1, 1)
+		if !AutoEnableTouchInput {
+			b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY, 1, 1)
+			b.uiGrid.AddChildAt(b.inputGrid, 0, gridY+1, 1, 1)
+		}
 	}
 }
 

@@ -621,12 +621,10 @@ type Game struct {
 
 	downloadReplay int
 
-	replay         bool
-	replayData     []byte
-	replayFrame    int
-	replayFrames   []*replayFrame
-	replaySummary1 []byte
-	replaySummary2 []byte
+	replay       bool
+	replayData   []byte
+	replayFrame  int
+	replayFrames []*replayFrame
 
 	localServer chan net.Conn
 
@@ -2215,11 +2213,8 @@ func (g *Game) HandleReplay(replay []byte) {
 		Spectating:   true,
 	}
 
-	g.replaySummary1 = g.replaySummary1[:0]
-	g.replaySummary2 = g.replaySummary2[:0]
-	var haveRoll bool
-	var wrote1 bool
-	var wrote2 bool
+	g.board.replayList.Clear()
+	var listY int
 
 	var lineNumber int
 	scanner := bufio.NewScanner(bytes.NewReader(replay))
@@ -2241,23 +2236,26 @@ func (g *Game) HandleReplay(replay []byte) {
 				player = 2
 			}
 
-			if player == 1 {
-				if wrote1 {
-					g.replaySummary1 = append(g.replaySummary1, '\n')
+			label := string(scanner.Bytes()[4:])
+
+			var x int
+			if player == 2 {
+				x = 1
+			}
+			frame := len(g.replayFrames)
+			btn := etk.NewButton(label, func() error {
+				if !game.board.replayAuto.IsZero() {
+					game.board.replayAuto = time.Time{}
+					game.board.replayPauseButton.SetText("|>")
 				}
-				g.replaySummary1 = append(g.replaySummary1, scanner.Bytes()[4:]...)
-				haveRoll = true
-				wrote1 = true
-			} else {
-				if wrote2 {
-					g.replaySummary2 = append(g.replaySummary2, '\n')
-				}
-				g.replaySummary2 = append(g.replaySummary2, scanner.Bytes()[4:]...)
-				wrote2 = true
-				if !haveRoll {
-					g.replaySummary1 = append(g.replaySummary1, '\n')
-					haveRoll = true
-				}
+				g.showReplayFrame(frame, true)
+				return nil
+			})
+			btn.SetHorizontal(etk.AlignStart)
+			g.board.replayList.AddChildAt(btn, x, listY)
+
+			if player == 2 {
+				listY++
 			}
 		}
 	}

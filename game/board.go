@@ -146,6 +146,7 @@ type board struct {
 
 	replayAuto        time.Time
 	replayPauseButton *etk.Button
+	replayList        *etk.List
 	replayGrid        *etk.Grid
 
 	inputGrid *etk.Grid
@@ -309,6 +310,7 @@ func NewBoard() *board {
 	b.inputGrid.AddChildAt(inputBuffer, 0, 0, 1, 1)
 
 	b.createReplayControls()
+	b.createReplayList()
 
 	b.uiGrid.SetBackground(frameColor)
 	b.recreateUIGrid()
