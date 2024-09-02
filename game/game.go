@@ -595,6 +595,8 @@ type Game struct {
 
 	lastRefresh time.Time
 
+	ignoreEnter bool
+
 	forceLayout bool
 
 	bufferWidth int
@@ -1401,6 +1403,11 @@ func (g *Game) showMainMenu() {
 	g.board.client = nil
 
 	g.setRoot(connectFrame)
+	if g.connectUsername.Text() == "" {
+		etk.SetFocus(g.connectUsername)
+	} else {
+		etk.SetFocus(g.connectPassword)
+	}
 
 	statusBuffer.SetText("")
 	gameBuffer.SetText("")
@@ -2672,9 +2679,18 @@ func (g *Game) Update() error {
 	g.Lock()
 	defer g.Unlock()
 
+	if g.ignoreEnter {
+		if ebiten.IsKeyPressed(ebiten.KeyEnter) {
+			return nil
+		}
+		g.ignoreEnter = false
+	}
+
 	if ebiten.IsKeyPressed(ebiten.KeyAlt) && inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 		g.Fullscreen = !g.Fullscreen
 		ebiten.SetFullscreen(g.Fullscreen)
+		g.ignoreEnter = true
+		return nil
 	}
 
 	gameUpdateLock.Lock()
