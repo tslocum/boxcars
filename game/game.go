@@ -1411,6 +1411,13 @@ func (g *Game) showMainMenu() {
 	gameBuffer.SetText("")
 	inputBuffer.SetText("")
 
+	loadingText := newCenteredText(gotext.Get("Loading..."))
+	if AutoEnableTouchInput {
+		loadingText.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+	}
+	g.lobby.availableMatchesList.Clear()
+	g.lobby.availableMatchesList.AddChildAt(loadingText, 0, 0)
+
 	statusLogged = false
 	gameLogged = false
 
