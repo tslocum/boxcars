@@ -1368,7 +1368,7 @@ func (g *Game) playOffline() {
 		beiClient := bot.NewLocalBEIClient(<-beiConns, false)
 
 		// Start the local bgammon server.
-		server := server.NewServer("", "", "", "", "", false, true, false)
+		server := server.NewServer("", "", "", "", "", "", "", "", "", "", false, true, false)
 		g.localServer = server.ListenLocal()
 
 		// Connect the bots.
@@ -1746,46 +1746,9 @@ func (g *Game) handleEvent(e interface{}) {
 		}
 		g.board.Unlock()
 	case *bgammon.EventSettings:
-		b := g.board
-		b.Lock()
-		if ev.Speed >= bgammon.SpeedSlow && ev.Speed <= bgammon.SpeedInstant {
-			b.speed = ev.Speed
-			b.selectSpeed.SetSelectedItem(int(b.speed))
-		}
-		b.highlightAvailable = ev.Highlight
-		b.highlightCheckbox.SetSelected(b.highlightAvailable)
-		b.showPipCount = ev.Pips
-		b.showPipCountCheckbox.SetSelected(b.showPipCount)
-		b.showMoves = ev.Moves
-		b.showMovesCheckbox.SetSelected(b.showMoves)
-		b.flipBoard = ev.Flip
-		b.flipBoardCheckbox.SetSelected(b.flipBoard)
-		b.traditional = ev.Traditional
-		b.traditionalCheckbox.SetSelected(b.traditional)
-		b.muteJoinLeave = ev.MuteJoinLeave
-		b.muteJoinLeaveCheckbox.SetSelected(b.muteJoinLeave)
-		b.muteChat = ev.MuteChat
-		b.muteChatCheckbox.SetSelected(b.muteChat)
-		b.muteRoll = ev.MuteRoll
-		b.muteRollCheckbox.SetSelected(b.muteRoll)
-		b.muteMove = ev.MuteMove
-		b.muteMoveCheckbox.SetSelected(b.muteMove)
-		b.muteBearOff = ev.MuteBearOff
-		b.muteBearOffCheckbox.SetSelected(b.muteBearOff)
-		if !AutoEnableTouchInput {
-			b.advancedMovement = ev.Advanced
-			b.advancedMovementCheckbox.SetSelected(b.advancedMovement)
-		}
-		b.autoPlayCheckbox.SetSelected(ev.AutoPlay)
-		if g.needLayoutBoard {
-			g.layoutBoard()
-		}
-		b.setSpaceRects()
-		b.updateBackgroundImage()
-		b.processState()
-		b.updatePlayerLabel()
-		b.updateOpponentLabel()
-		b.Unlock()
+		g.board.stateLock.Lock()
+		g.board.pendingSettings = ev
+		g.board.stateLock.Unlock()
 	case *bgammon.EventReplay:
 		if game.downloadReplay == ev.ID {
 			err := saveReplay(ev.ID, ev.Content)

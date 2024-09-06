@@ -173,6 +173,8 @@ type board struct {
 	muteMove           bool
 	muteBearOff        bool
 
+	pendingSettings *bgammon.EventSettings
+
 	widget *BoardWidget
 
 	repositionLock *sync.Mutex
@@ -2647,6 +2649,51 @@ func (b *board) finishDrag(x int, y int, click bool) {
 }
 
 func (b *board) Update() {
+	if b.pendingSettings != nil {
+		b.stateLock.Lock()
+		ev := b.pendingSettings
+		b.pendingSettings = nil
+		b.stateLock.Unlock()
+
+		if ev.Speed >= bgammon.SpeedSlow && ev.Speed <= bgammon.SpeedInstant {
+			b.speed = ev.Speed
+			b.selectSpeed.SetSelectedItem(int(b.speed))
+		}
+		b.highlightAvailable = ev.Highlight
+		b.highlightCheckbox.SetSelected(b.highlightAvailable)
+		b.showPipCount = ev.Pips
+		b.showPipCountCheckbox.SetSelected(b.showPipCount)
+		b.showMoves = ev.Moves
+		b.showMovesCheckbox.SetSelected(b.showMoves)
+		b.flipBoard = ev.Flip
+		b.flipBoardCheckbox.SetSelected(b.flipBoard)
+		b.traditional = ev.Traditional
+		b.traditionalCheckbox.SetSelected(b.traditional)
+		b.muteJoinLeave = ev.MuteJoinLeave
+		b.muteJoinLeaveCheckbox.SetSelected(b.muteJoinLeave)
+		b.muteChat = ev.MuteChat
+		b.muteChatCheckbox.SetSelected(b.muteChat)
+		b.muteRoll = ev.MuteRoll
+		b.muteRollCheckbox.SetSelected(b.muteRoll)
+		b.muteMove = ev.MuteMove
+		b.muteMoveCheckbox.SetSelected(b.muteMove)
+		b.muteBearOff = ev.MuteBearOff
+		b.muteBearOffCheckbox.SetSelected(b.muteBearOff)
+		if !AutoEnableTouchInput {
+			b.advancedMovement = ev.Advanced
+			b.advancedMovementCheckbox.SetSelected(b.advancedMovement)
+		}
+		b.autoPlayCheckbox.SetSelected(ev.AutoPlay)
+		if game.needLayoutBoard {
+			game.layoutBoard()
+		}
+		b.setSpaceRects()
+		b.updateBackgroundImage()
+		b.processState()
+		b.updatePlayerLabel()
+		b.updateOpponentLabel()
+	}
+
 	b.finishDrag(0, 0, inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft))
 	if b.dragging != nil && b.draggingClick {
 		x, y := ebiten.CursorPosition()

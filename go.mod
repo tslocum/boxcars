@@ -3,7 +3,7 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.19
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240830210522-ef40f1443a36
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240906010515-c6d042e08010
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240830071659-92734e0c2a83
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240902055205-10177aa6dcb9
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
@@ -12,8 +12,8 @@ require (
 	github.com/hajimehoshi/ebiten/v2 v2.7.8
 	github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	golang.org/x/image v0.19.0
-	golang.org/x/text v0.17.0
+	golang.org/x/image v0.20.0
+	golang.org/x/text v0.18.0
 )
 
 require (
@@ -52,8 +52,8 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.21.0 // indirect
-	golang.org/x/crypto v0.26.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
+	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/sys v0.25.0 // indirect
 )
