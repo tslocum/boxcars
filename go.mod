@@ -3,9 +3,9 @@ module code.rocket9labs.com/tslocum/boxcars
 go 1.19
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240906010515-c6d042e08010
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240906024349-61fffdea5106
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240830071659-92734e0c2a83
-	code.rocket9labs.com/tslocum/etk v0.0.0-20240902055205-10177aa6dcb9
+	code.rocket9labs.com/tslocum/etk v0.0.0-20240906031719-99a40d1dad59
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240820025521-91065b63f1be
 	github.com/coder/websocket v1.8.12
