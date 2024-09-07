@@ -1,3 +1,6 @@
+1.4.1:
+- Fix locale detection on Windows and Linux
+
 1.4.0:
 - Auto-scale font size to fit text
 - Support returning to the main menu

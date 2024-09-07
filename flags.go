@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
@@ -87,14 +88,21 @@ func parseFlags() *game.Game {
 
 	var forceLanguage *language.Tag
 	if locale == "" {
-		locale = game.DefaultLocale()
+		var err error
+		locale, err = game.GetLocale()
+		if err != nil {
+			locale = ""
+		}
 	}
 	if locale != "" {
-		tag, err := language.Parse(locale)
-		if err != nil {
-			log.Fatalf("unknown locale: %s", locale)
+		dotIndex := strings.IndexByte(locale, '.')
+		if dotIndex != -1 {
+			locale = locale[:dotIndex]
 		}
-		forceLanguage = &tag
+		tag, err := language.Parse(locale)
+		if err == nil {
+			forceLanguage = &tag
+		}
 	}
 	game.LoadLocale(forceLanguage)
 

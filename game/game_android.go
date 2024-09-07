@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"code.rocket9labs.com/tslocum/gotext"
-	"golang.org/x/text/language"
 )
 
 const (
@@ -61,21 +60,6 @@ func init() {
 		return
 	}
 	time.Local = tz
-
-	// Detect locale.
-	out, err = exec.Command("/system/bin/getprop", "persist.sys.locale").Output()
-	if err != nil {
-		return
-	}
-	tag, err := language.Parse(strings.TrimSpace(string(out)))
-	if err != nil {
-		return
-	}
-	LoadLocale(&tag)
-}
-
-func DefaultLocale() string {
-	return ""
 }
 
 func focused() bool {

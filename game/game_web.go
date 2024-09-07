@@ -36,10 +36,6 @@ func init() {
 	}
 }
 
-func DefaultLocale() string {
-	return js.Global().Get("navigator").Get("language").String()
-}
-
 func focused() bool {
 	document := js.Global().Get("document")
 	hasFocus := document.Call("hasFocus", nil)

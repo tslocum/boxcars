@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"runtime/debug"
 	"strings"
 	"time"
 
@@ -89,7 +88,6 @@ func (c *Client) LoggedIn() bool {
 
 func (c *Client) connectWebSocket() {
 	if !c.connecting {
-		debug.PrintStack()
 		return
 	}
 
@@ -101,7 +99,6 @@ func (c *Client) connectWebSocket() {
 		}
 		for {
 			if !c.connecting {
-				debug.PrintStack()
 				return
 			}
 			if !focused() {

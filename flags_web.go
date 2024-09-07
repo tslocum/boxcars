@@ -9,8 +9,8 @@ import (
 
 func parseFlags() *game.Game {
 	var forceLanguage *language.Tag
-	locale := game.DefaultLocale()
-	if locale != "" {
+	locale, err := game.GetLocale()
+	if err == nil && locale != "" {
 		tag, err := language.Parse(locale)
 		if err == nil {
 			forceLanguage = &tag

@@ -21,10 +21,6 @@ const (
 	targetFPS          = 144
 )
 
-func DefaultLocale() string {
-	return ""
-}
-
 func focused() bool {
 	return true
 }
