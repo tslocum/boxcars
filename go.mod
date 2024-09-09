@@ -9,10 +9,11 @@ require (
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240820025521-91065b63f1be
 	github.com/coder/websocket v1.8.12
-	github.com/hajimehoshi/ebiten/v2 v2.7.8
+	github.com/hajimehoshi/ebiten/v2 v2.7.9
 	github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	golang.org/x/image v0.20.0
+	golang.org/x/sys v0.25.0
 	golang.org/x/text v0.18.0
 )
 
@@ -21,7 +22,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
-	github.com/PuerkitoBio/goquery v1.9.2 // indirect
+	github.com/PuerkitoBio/goquery v1.10.0 // indirect
 	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/ebitengine/gomobile v0.0.0-20240825043811-96c531f5bd83 // indirect
@@ -36,7 +37,7 @@ require (
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.6.0 // indirect
+	github.com/jackc/pgx/v5 v5.7.0 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/jfreymuth/oggvorbis v1.0.5 // indirect
@@ -55,5 +56,4 @@ require (
 	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
 )
