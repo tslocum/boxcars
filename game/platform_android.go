@@ -29,3 +29,7 @@ func GetLocale() (string, error) {
 	}
 	return string(out), nil
 }
+
+func DefaultFullscreen() bool {
+	return false
+}

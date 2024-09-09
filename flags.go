@@ -86,6 +86,10 @@ func parseFlags() *game.Game {
 	flag.IntVar(&debug, "debug", 0, "Debug level")
 	flag.Parse()
 
+	if game.DefaultFullscreen() {
+		fullscreen = true
+	}
+
 	var forceLanguage *language.Tag
 	if locale == "" {
 		var err error
