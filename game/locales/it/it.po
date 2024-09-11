@@ -130,6 +130,9 @@ msgstr "Partita scaricata"
 msgid "Email"
 msgstr "Email"
 
+msgid "Exit Boxcars?"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr "Errore (scarica partita): %s"
 
@@ -160,6 +163,12 @@ msgstr ""
 msgid "Forced"
 msgstr ""
 
+msgid "Go"
+msgstr ""
+
+msgid "Go to page:"
+msgstr ""
+
 msgid "Good Luck, Have Fun"
 msgstr "In bocca al lupo, buon divertimento!"
 
@@ -183,6 +192,9 @@ msgstr "Entra nella partita"
 
 msgid "Join match: %s"
 msgstr "Entra in partita: %s"
+
+msgid "Joining..."
+msgstr ""
 
 msgid "Leave"
 msgstr "Esci"
@@ -232,6 +244,9 @@ msgstr "Nome"
 msgid "New"
 msgstr "Nuovo"
 
+msgid "Next"
+msgstr ""
+
 msgid "No"
 msgstr "No"
 
@@ -267,6 +282,9 @@ msgid "Points"
 msgstr "Punti"
 
 msgid "Press back to toggle the keyboard."
+msgstr ""
+
+msgid "Previous"
 msgstr ""
 
 msgid "Private"

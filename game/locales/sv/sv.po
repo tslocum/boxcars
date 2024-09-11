@@ -130,6 +130,9 @@ msgstr "Nerladdad repris"
 msgid "Email"
 msgstr "Epost"
 
+msgid "Exit Boxcars?"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr "Nedladdning av repris %s avbruten"
 
@@ -160,6 +163,12 @@ msgstr "Omvänd numrering"
 msgid "Forced"
 msgstr "Tvingad"
 
+msgid "Go"
+msgstr ""
+
+msgid "Go to page:"
+msgstr ""
+
 msgid "Good Luck, Have Fun"
 msgstr "Lycka till, ha kul"
 
@@ -183,6 +192,9 @@ msgstr "Öppna match"
 
 msgid "Join match: %s"
 msgstr "Öppna match: %s"
+
+msgid "Joining..."
+msgstr ""
 
 msgid "Leave"
 msgstr "Lämna"
@@ -232,6 +244,9 @@ msgstr "Namn"
 msgid "New"
 msgstr "Ny"
 
+msgid "Next"
+msgstr ""
+
 msgid "No"
 msgstr "Nej"
 
@@ -266,6 +281,9 @@ msgstr "Poäng"
 
 msgid "Press back to toggle the keyboard."
 msgstr "Backa för att visa tangentbordet."
+
+msgid "Previous"
+msgstr ""
 
 msgid "Private"
 msgstr "Privat"

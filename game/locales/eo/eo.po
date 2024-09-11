@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-05-13 00:01+0000\n"
+"PO-Revision-Date: 2024-09-09 01:09+0000\n"
 "Last-Translator: phlostically <phlostically@mailinator.com>\n"
 "Language-Team: Esperanto <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/eo/>\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.5.4\n"
+"X-Generator: Weblate 5.8-dev\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Libera Interreta triktrako"
@@ -73,7 +73,7 @@ msgid "Change password"
 msgstr "Ŝanĝi pasvorton"
 
 msgid "Chat"
-msgstr ""
+msgstr "Babili"
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -124,6 +124,9 @@ msgstr ""
 msgid "Email"
 msgstr "Retpoŝto"
 
+msgid "Exit Boxcars?"
+msgstr "Ĉu forlasi Boxcars?"
+
 msgid "Failed to download replay: %s"
 msgstr ""
 
@@ -154,6 +157,12 @@ msgstr ""
 msgid "Forced"
 msgstr "Deviga"
 
+msgid "Go"
+msgstr "Iri"
+
+msgid "Go to page:"
+msgstr "Iri al paĝo:"
+
 msgid "Good Luck, Have Fun"
 msgstr "Bonan ŝancon, ĝuu"
 
@@ -170,13 +179,16 @@ msgid "Join"
 msgstr "Aligî"
 
 msgid "Join/Leave"
-msgstr ""
+msgstr "Aliĝi/forlasi"
 
 msgid "Join match"
 msgstr "Aliĝi partion"
 
 msgid "Join match: %s"
 msgstr "Aliĝi partion: %s"
+
+msgid "Joining..."
+msgstr "Aliĝante…"
 
 msgid "Leave"
 msgstr "Forlasi"
@@ -212,7 +224,7 @@ msgid "Menu"
 msgstr "Menuo"
 
 msgid "Move"
-msgstr ""
+msgstr "Movi"
 
 msgid "Multi"
 msgstr ""
@@ -225,6 +237,9 @@ msgstr "Nomo"
 
 msgid "New"
 msgstr "Nova"
+
+msgid "Next"
+msgstr "Sekven"
 
 msgid "No"
 msgstr "Ne"
@@ -262,6 +277,9 @@ msgstr "Poentoj"
 
 msgid "Press back to toggle the keyboard."
 msgstr ""
+
+msgid "Previous"
+msgstr "Antaŭen"
 
 msgid "Private"
 msgstr "Privata"
@@ -309,7 +327,7 @@ msgid "Roll"
 msgstr "Ĵeti ĵetkubon"
 
 msgid "Roll Dice"
-msgstr ""
+msgstr "Ĵeti ĵetkubojn"
 
 msgid "Search"
 msgstr "Serĉi"
@@ -336,7 +354,7 @@ msgid "Slow"
 msgstr "Malrapida"
 
 msgid "Sound"
-msgstr ""
+msgstr "Sono"
 
 msgid "Speed"
 msgstr "Rapido"
@@ -399,7 +417,7 @@ msgid "Warning: Received unknown event: %+v"
 msgstr "Averto: ricevis nekonatan eventon: %+v"
 
 msgid "Warning: Received unrecognized event from server."
-msgstr ""
+msgstr "Averto: ricevis de servilo nekonatan eventon."
 
 msgid ""
 "Welcome to the guided tutorial. Click anywhere outside of this message box "

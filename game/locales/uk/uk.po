@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-08-21 18:26+0000\n"
+"PO-Revision-Date: 2024-09-11 20:02+0000\n"
 "Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
@@ -10,16 +10,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Weblate 5.7\n"
+"X-Generator: Weblate 5.8-dev\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Вільні Онлайн Нарди"
 
 msgid "%s joined the match."
-msgstr "%s приєднується."
+msgstr "%s приєднується до матчу."
 
 msgid "%s left the match."
-msgstr "%s від'єднується."
+msgstr "%s покидає матч."
 
 msgid "%s moved %s"
 msgstr "%s робить хід %s"
@@ -109,7 +109,7 @@ msgid "Create new match"
 msgstr "Новий матч"
 
 msgid "Current"
-msgstr "У процесі"
+msgstr "Поточний"
 
 msgid "Date"
 msgstr "Дата"
@@ -130,6 +130,9 @@ msgstr "Завантажений повтор"
 
 msgid "Email"
 msgstr "Пошта"
+
+msgid "Exit Boxcars?"
+msgstr "Вийти з Boxcars?"
 
 msgid "Failed to download replay: %s"
 msgstr "Помилка завантаження повтору: %s"
@@ -161,6 +164,12 @@ msgstr "Перевертати числа противника"
 msgid "Forced"
 msgstr "Примусовий"
 
+msgid "Go"
+msgstr ""
+
+msgid "Go to page:"
+msgstr ""
+
 msgid "Good Luck, Have Fun"
 msgstr "Щасти вам, розважайтеся"
 
@@ -184,6 +193,9 @@ msgstr "Приєднатися до матчу"
 
 msgid "Join match: %s"
 msgstr "Приєднано до матчу: %s"
+
+msgid "Joining..."
+msgstr ""
 
 msgid "Leave"
 msgstr "Покинути"
@@ -233,6 +245,9 @@ msgstr "Назва"
 msgid "New"
 msgstr "Новий"
 
+msgid "Next"
+msgstr ""
+
 msgid "No"
 msgstr "Ні"
 
@@ -269,6 +284,9 @@ msgstr "Бали"
 
 msgid "Press back to toggle the keyboard."
 msgstr "Натисніть \"Назад\", щоб перемкнути клавіатуру."
+
+msgid "Previous"
+msgstr ""
 
 msgid "Private"
 msgstr "Приватна"

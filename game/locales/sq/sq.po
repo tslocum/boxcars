@@ -130,6 +130,9 @@ msgstr "Ngarkuar rishikimin"
 msgid "Email"
 msgstr "E-posta"
 
+msgid "Exit Boxcars?"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr "Ngarkimi i rishikimit dështoi: %s"
 
@@ -160,6 +163,12 @@ msgstr "Rrokullis numrat"
 msgid "Forced"
 msgstr "Detyruar"
 
+msgid "Go"
+msgstr ""
+
+msgid "Go to page:"
+msgstr ""
+
 msgid "Good Luck, Have Fun"
 msgstr "Paç fat, bëj qefë"
 
@@ -183,6 +192,9 @@ msgstr "Bashkohu në lojë"
 
 msgid "Join match: %s"
 msgstr "Bashkohu në lojë: %s"
+
+msgid "Joining..."
+msgstr ""
 
 msgid "Leave"
 msgstr "Largohu"
@@ -232,6 +244,9 @@ msgstr "Emri"
 msgid "New"
 msgstr "E re"
 
+msgid "Next"
+msgstr ""
+
 msgid "No"
 msgstr "Jo"
 
@@ -268,6 +283,9 @@ msgstr "Pikët"
 
 msgid "Press back to toggle the keyboard."
 msgstr "Prek prapa për të shfaqur tastjerën."
+
+msgid "Previous"
+msgstr ""
 
 msgid "Private"
 msgstr "Private"

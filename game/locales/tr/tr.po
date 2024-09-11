@@ -132,6 +132,9 @@ msgstr "Yeniden oynatma indirildi"
 msgid "Email"
 msgstr "E-posta"
 
+msgid "Exit Boxcars?"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr "Yeniden oynatma indirilemedi: %s"
 
@@ -163,6 +166,12 @@ msgstr ""
 msgid "Forced"
 msgstr "Zorunlu hamle"
 
+msgid "Go"
+msgstr ""
+
+msgid "Go to page:"
+msgstr ""
+
 msgid "Good Luck, Have Fun"
 msgstr "İyi şanslar, iyi eğlenceler"
 
@@ -187,6 +196,9 @@ msgstr "Oyuna katıl"
 
 msgid "Join match: %s"
 msgstr "Oyuna katıl: %s"
+
+msgid "Joining..."
+msgstr ""
 
 msgid "Leave"
 msgstr "Ayrıl"
@@ -237,6 +249,9 @@ msgstr "Ad"
 msgid "New"
 msgstr "Yeni"
 
+msgid "Next"
+msgstr ""
+
 #, fuzzy
 msgid "No"
 msgstr "Hayır"
@@ -273,6 +288,9 @@ msgstr "Puan"
 
 msgid "Press back to toggle the keyboard."
 msgstr "Klavyeyi açıp kapamak için geri tuşuna basınız."
+
+msgid "Previous"
+msgstr ""
 
 msgid "Private"
 msgstr "Özel"

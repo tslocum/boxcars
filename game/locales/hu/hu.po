@@ -124,6 +124,9 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+msgid "Exit Boxcars?"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr ""
 
@@ -154,6 +157,12 @@ msgstr ""
 msgid "Forced"
 msgstr ""
 
+msgid "Go"
+msgstr ""
+
+msgid "Go to page:"
+msgstr ""
+
 msgid "Good Luck, Have Fun"
 msgstr ""
 
@@ -177,6 +186,9 @@ msgstr "Csatlakozás a játékhoz"
 
 msgid "Join match: %s"
 msgstr "Csatlakozás a játékhoz: %s"
+
+msgid "Joining..."
+msgstr ""
 
 msgid "Leave"
 msgstr "Elhagyás"
@@ -226,6 +238,9 @@ msgstr "Név"
 msgid "New"
 msgstr ""
 
+msgid "Next"
+msgstr ""
+
 msgid "No"
 msgstr "Nem"
 
@@ -259,6 +274,9 @@ msgid "Points"
 msgstr "Pontok"
 
 msgid "Press back to toggle the keyboard."
+msgstr ""
+
+msgid "Previous"
 msgstr ""
 
 msgid "Private"

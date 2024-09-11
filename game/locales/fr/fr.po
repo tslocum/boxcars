@@ -130,6 +130,9 @@ msgstr "Replay téléchargé"
 msgid "Email"
 msgstr "Email"
 
+msgid "Exit Boxcars?"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr "Impossible de télécharger le replay : %s"
 
@@ -160,6 +163,12 @@ msgstr "Retourne les nombres des espaces opposés"
 msgid "Forced"
 msgstr "Forcé"
 
+msgid "Go"
+msgstr ""
+
+msgid "Go to page:"
+msgstr ""
+
 msgid "Good Luck, Have Fun"
 msgstr "Bonne Chance, Amusez Vous"
 
@@ -183,6 +192,9 @@ msgstr "Rejoindre la partie"
 
 msgid "Join match: %s"
 msgstr "Rejoindre la partie : %s"
+
+msgid "Joining..."
+msgstr ""
 
 msgid "Leave"
 msgstr "Quitter"
@@ -233,6 +245,9 @@ msgstr "Nom"
 msgid "New"
 msgstr "Nouveau"
 
+msgid "Next"
+msgstr ""
+
 msgid "No"
 msgstr "Non"
 
@@ -269,6 +284,9 @@ msgstr "Points"
 
 msgid "Press back to toggle the keyboard."
 msgstr "Appuyez sur retour pour activer le clavier."
+
+msgid "Previous"
+msgstr ""
 
 msgid "Private"
 msgstr "Privé"

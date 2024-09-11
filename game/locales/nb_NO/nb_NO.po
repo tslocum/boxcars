@@ -135,6 +135,9 @@ msgstr "Laster ned opptak"
 msgid "Email"
 msgstr "E-post"
 
+msgid "Exit Boxcars?"
+msgstr ""
+
 #, fuzzy
 msgid "Failed to download replay: %s"
 msgstr "Klarte ikke å laste ned opptak: %s"
@@ -172,6 +175,12 @@ msgstr ""
 msgid "Forced"
 msgstr "Påtvunget"
 
+msgid "Go"
+msgstr ""
+
+msgid "Go to page:"
+msgstr ""
+
 msgid "Good Luck, Have Fun"
 msgstr "Lykke til. Kos deg."
 
@@ -196,6 +205,9 @@ msgstr "Ta del i spill"
 
 msgid "Join match: %s"
 msgstr "Ta del i spill: %s"
+
+msgid "Joining..."
+msgstr ""
 
 #, fuzzy
 msgid "Leave"
@@ -248,6 +260,9 @@ msgstr "Navn"
 msgid "New"
 msgstr "Nytt"
 
+msgid "Next"
+msgstr ""
+
 msgid "No"
 msgstr "Nei"
 
@@ -284,6 +299,9 @@ msgstr "Poeng"
 #, fuzzy
 msgid "Press back to toggle the keyboard."
 msgstr "Trykk tilbake for å slå av/på tastatur."
+
+msgid "Previous"
+msgstr ""
 
 msgid "Private"
 msgstr "Privat"

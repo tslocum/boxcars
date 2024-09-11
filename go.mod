@@ -1,9 +1,11 @@
 module code.rocket9labs.com/tslocum/boxcars
 
-go 1.19
+go 1.23
+
+toolchain go1.23.0
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240906024349-61fffdea5106
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240912005020-6ce77b607b90
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240830071659-92734e0c2a83
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240906031719-99a40d1dad59
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
@@ -25,7 +27,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.0 // indirect
 	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
-	github.com/ebitengine/gomobile v0.0.0-20240825043811-96c531f5bd83 // indirect
+	github.com/ebitengine/gomobile v0.0.0-20240911145611-4856209ac325 // indirect
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
 	github.com/ebitengine/oto/v3 v3.2.0 // indirect
 	github.com/ebitengine/purego v0.7.1 // indirect
@@ -37,7 +39,7 @@ require (
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.7.0 // indirect
+	github.com/jackc/pgx/v5 v5.7.1 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/jfreymuth/oggvorbis v1.0.5 // indirect

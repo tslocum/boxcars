@@ -118,6 +118,9 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+msgid "Exit Boxcars?"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr ""
 
@@ -148,6 +151,12 @@ msgstr ""
 msgid "Forced"
 msgstr ""
 
+msgid "Go"
+msgstr ""
+
+msgid "Go to page:"
+msgstr ""
+
 msgid "Good Luck, Have Fun"
 msgstr ""
 
@@ -170,6 +179,9 @@ msgid "Join match"
 msgstr ""
 
 msgid "Join match: %s"
+msgstr ""
+
+msgid "Joining..."
 msgstr ""
 
 msgid "Leave"
@@ -220,6 +232,9 @@ msgstr ""
 msgid "New"
 msgstr ""
 
+msgid "Next"
+msgstr ""
+
 msgid "No"
 msgstr ""
 
@@ -253,6 +268,9 @@ msgid "Points"
 msgstr ""
 
 msgid "Press back to toggle the keyboard."
+msgstr ""
+
+msgid "Previous"
 msgstr ""
 
 msgid "Private"
