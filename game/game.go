@@ -2825,6 +2825,10 @@ type ClickableText struct {
 	onSelected func()
 }
 
+func (t *ClickableText) Cursor() ebiten.CursorShapeType {
+	return ebiten.CursorShapePointer
+}
+
 func (t *ClickableText) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
 	if clicked {
 		t.onSelected()
