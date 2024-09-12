@@ -5,7 +5,13 @@ package game
 import (
 	"bytes"
 	"os"
+
+	"github.com/coder/websocket"
 )
+
+var dialOptions = &websocket.DialOptions{
+	CompressionMode: websocket.CompressionContextTakeover,
+}
 
 func GetLocale() (string, error) {
 	return os.Getenv("LANG"), nil

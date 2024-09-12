@@ -6,8 +6,13 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/coder/websocket"
 	"golang.org/x/text/language"
 )
+
+var dialOptions = &websocket.DialOptions{
+	CompressionMode: websocket.CompressionContextTakeover,
+}
 
 func init() {
 	// Load locale early on Android.

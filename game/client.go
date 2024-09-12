@@ -114,7 +114,7 @@ func (c *Client) connectWebSocket() {
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	conn, _, err := websocket.Dial(ctx, c.Address, nil)
+	conn, _, err := websocket.Dial(ctx, c.Address, dialOptions)
 	if err != nil {
 		reconnect()
 		return
