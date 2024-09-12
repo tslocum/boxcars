@@ -8,6 +8,8 @@ import (
 	"github.com/coder/websocket"
 )
 
+const AppName = "boxcars-web"
+
 var dialOptions = &websocket.DialOptions{}
 
 func GetLocale() (string, error) {

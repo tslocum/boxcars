@@ -9,6 +9,8 @@ import (
 	"github.com/coder/websocket"
 )
 
+const AppName = "boxcars-linux"
+
 var dialOptions = &websocket.DialOptions{
 	CompressionMode: websocket.CompressionContextTakeover,
 }

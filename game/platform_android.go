@@ -10,6 +10,8 @@ import (
 	"golang.org/x/text/language"
 )
 
+const AppName = "boxcars-android"
+
 var dialOptions = &websocket.DialOptions{
 	CompressionMode: websocket.CompressionContextTakeover,
 }
