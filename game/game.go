@@ -1,6 +1,7 @@
 package game
 
 import (
+	"bufio"
 	"bytes"
 	"embed"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -42,8 +44,6 @@ const (
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
 )
-
-var AutoEnableTouchInput bool
 
 var AppLanguage = "en"
 
@@ -2848,6 +2848,70 @@ func newCenteredText(text string) *etk.Text {
 func centerInput(input *Input) {
 	input.SetVertical(etk.AlignCenter)
 	input.SetPadding(etk.Scale(5))
+}
+
+func saveReplay(id int, content []byte) error {
+	if id <= 0 {
+		return nil
+	}
+
+	replayDir := ReplayDir()
+	if replayDir == "" {
+		l(fmt.Sprintf("*** %s https://bgammon.org/match/%d", gotext.Get("To download this replay visit"), id))
+		return nil
+	}
+
+	var (
+		timestamp int64
+		player1   string
+		player2   string
+		err       error
+	)
+	scanner := bufio.NewScanner(bytes.NewReader(content))
+	for scanner.Scan() {
+		if bytes.HasPrefix(scanner.Bytes(), []byte("i ")) {
+			split := bytes.Split(scanner.Bytes(), []byte(" "))
+			if len(split) < 4 {
+				return fmt.Errorf("failed to parse replay")
+			}
+
+			timestamp, err = strconv.ParseInt(string(split[1]), 10, 64)
+			if err != nil {
+				return fmt.Errorf("failed to parse replay timestamp")
+			}
+
+			if bytes.Equal(split[3], []byte(game.client.Username)) {
+				player1, player2 = string(split[3]), string(split[2])
+			} else {
+				player1, player2 = string(split[2]), string(split[3])
+			}
+		}
+	}
+
+	_ = os.MkdirAll(replayDir, 0700)
+	filePath := path.Join(replayDir, fmt.Sprintf("%d_%s_%s.match", timestamp, player1, player2))
+	err = os.WriteFile(filePath, content, 0600)
+	if err != nil {
+		return fmt.Errorf("failed to write replay to %s: %s", filePath, err)
+	}
+	l(fmt.Sprintf("*** %s: %s", gotext.Get("Downloaded replay"), filePath))
+	return nil
+}
+
+func showKeyboard() {
+	if !enableOnScreenKeyboard {
+		return
+	}
+	game.keyboard.SetVisible(true)
+	scheduleFrame()
+}
+
+func hideKeyboard() {
+	if !enableOnScreenKeyboard {
+		return
+	}
+	game.keyboard.SetVisible(false)
+	scheduleFrame()
 }
 
 // Short description.

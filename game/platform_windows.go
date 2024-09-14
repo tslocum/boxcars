@@ -2,9 +2,17 @@
 
 package game
 
-import "github.com/coder/websocket"
+import (
+	"os"
+	"path"
+)
 
-const AppName = "boxcars-windows"
+const (
+	AppName            = "boxcars-windows"
+	ShowServerSettings = false
+	ShowQuitDialog     = true
+	targetFPS          = 144
+)
 
 var (
 	smallScreen            = false
@@ -13,10 +21,22 @@ var (
 	enableRightClick       = true
 )
 
-var dialOptions = &websocket.DialOptions{
-	CompressionMode: websocket.CompressionContextTakeover,
+func userConfigDir() string {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return ""
+	}
+	return path.Join(configDir, "boxcars")
 }
 
 func DefaultFullscreen() bool {
 	return false
+}
+
+func ReplayDir() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	return path.Join(homeDir, "boxcars")
 }

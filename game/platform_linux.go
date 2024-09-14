@@ -5,15 +5,15 @@ package game
 import (
 	"bytes"
 	"os"
-
-	"github.com/coder/websocket"
+	"path"
 )
 
-const AppName = "boxcars-linux"
-
-var dialOptions = &websocket.DialOptions{
-	CompressionMode: websocket.CompressionContextTakeover,
-}
+const (
+	AppName            = "boxcars-linux"
+	ShowServerSettings = false
+	ShowQuitDialog     = true
+	targetFPS          = 144
+)
 
 var (
 	steamDeck              = isSteamDeck()
@@ -23,10 +23,12 @@ var (
 	enableRightClick       = true
 )
 
-func init() {
-	if steamDeck {
-		AutoEnableTouchInput = true // Use mobile interface on Steam Deck.
+func userConfigDir() string {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return ""
 	}
+	return path.Join(configDir, "boxcars")
 }
 
 func isSteamDeck() bool {
@@ -43,4 +45,12 @@ func GetLocale() (string, error) {
 
 func DefaultFullscreen() bool {
 	return steamDeck // Default to fullscreen mode on Steam Deck.
+}
+
+func ReplayDir() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	return path.Join(homeDir, ".local", "share", "boxcars")
 }
