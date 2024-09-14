@@ -15,7 +15,13 @@ var dialOptions = &websocket.DialOptions{
 	CompressionMode: websocket.CompressionContextTakeover,
 }
 
-var steamDeck = isSteamDeck()
+var (
+	steamDeck              = isSteamDeck()
+	smallScreen            = false
+	mobileDevice           = steamDeck
+	enableOnScreenKeyboard = false
+	enableRightClick       = true
+)
 
 func init() {
 	if steamDeck {

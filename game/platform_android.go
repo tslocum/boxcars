@@ -12,6 +12,13 @@ import (
 
 const AppName = "boxcars-android"
 
+var (
+	smallScreen            = true
+	mobileDevice           = true
+	enableOnScreenKeyboard = true
+	enableRightClick       = false
+)
+
 var dialOptions = &websocket.DialOptions{
 	CompressionMode: websocket.CompressionContextTakeover,
 }

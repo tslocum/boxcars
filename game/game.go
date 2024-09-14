@@ -632,10 +632,7 @@ func NewGame() *Game {
 	ebiten.SetRunnableOnUnfocused(true)
 	ebiten.SetWindowClosingHandled(true)
 
-	if AutoEnableTouchInput {
-		etk.Bindings.ConfirmRune = 199
-		etk.Bindings.BackRune = 231
-
+	if smallScreen {
 		etk.Style.BorderSize /= 2
 
 		extraSmallFontSize /= 2
@@ -685,7 +682,7 @@ func NewGame() *Game {
 	g.keyboard.SetScheduleFrameFunc(scheduleFrame)
 	g.keyboard.SetKeys(kibodo.KeysMobileQWERTY)
 	g.keyboard.SetExtendedKeys(kibodo.KeysMobileSymbols)
-	if !AutoEnableTouchInput {
+	if !enableOnScreenKeyboard {
 		g.keyboard.SetVisible(false)
 	}
 	g.keyboardFrame.AddChild(g.keyboard)
@@ -715,7 +712,7 @@ func (g *Game) initialize() {
 	inputBuffer.SetSuffix("")
 
 	fieldHeight = etk.Scale(50)
-	if AutoEnableTouchInput {
+	if smallScreen {
 		fieldHeight = etk.Scale(32)
 	}
 
@@ -728,7 +725,7 @@ func (g *Game) initialize() {
 	xPadding := etk.Scale(10)
 	yPadding := etk.Scale(20)
 	labelWidth := etk.Scale(200)
-	if AutoEnableTouchInput {
+	if smallScreen {
 		xPadding = 0
 		yPadding /= 2
 		labelWidth /= 2
@@ -875,7 +872,7 @@ func (g *Game) initialize() {
 		nameLabel := newCenteredText(gotext.Get("Username"))
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
-		if AutoEnableTouchInput {
+		if smallScreen {
 			headerLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumLargeFontSize))
 			headerLabel.SetHorizontal(etk.AlignCenter)
 		}
@@ -1037,7 +1034,7 @@ func (g *Game) initialize() {
 
 		variantPadding := 20
 		variantWidth := 400
-		if AutoEnableTouchInput {
+		if smallScreen {
 			variantPadding = 30
 			variantWidth = 500
 		}
@@ -1127,7 +1124,7 @@ func (g *Game) initialize() {
 		opponentLabel := newCenteredText(gotext.Get("Opponent"))
 		opponentLabel.SetFollow(false)
 		opponentLabel.SetScrollBarVisible(false)
-		if AutoEnableTouchInput {
+		if smallScreen {
 			dateLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 			resultLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 			opponentLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
@@ -1145,7 +1142,7 @@ func (g *Game) initialize() {
 		indentA, indentB := etk.Scale(lobbyIndentA), etk.Scale(lobbyIndentB)
 
 		historyItemHeight := game.itemHeight()
-		if AutoEnableTouchInput {
+		if smallScreen {
 			historyItemHeight /= 2
 		}
 		g.lobby.historyList = etk.NewList(historyItemHeight, g.lobby.selectHistory)
@@ -1255,7 +1252,7 @@ func (g *Game) initialize() {
 		nameLabel := newCenteredText(gotext.Get("Match Name"))
 		nameLabel.SetFollow(false)
 		nameLabel.SetScrollBarVisible(false)
-		if AutoEnableTouchInput {
+		if smallScreen {
 			statusLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 			ratingLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 			pointsLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
@@ -1406,7 +1403,7 @@ func (g *Game) showMainMenu() {
 	inputBuffer.SetText("")
 
 	loadingText := newCenteredText(gotext.Get("Loading..."))
-	if AutoEnableTouchInput {
+	if smallScreen {
 		loadingText.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 	}
 	g.lobby.availableMatchesList.Clear()
@@ -1474,7 +1471,7 @@ func (g *Game) setRoot(w etk.Widget) {
 func (g *Game) setBufferRects() {
 	statusBufferHeight := etk.Scale(75)
 	historyRatingHeight := etk.Scale(200)
-	if AutoEnableTouchInput {
+	if smallScreen {
 		historyRatingHeight /= 2
 	}
 
@@ -1482,7 +1479,7 @@ func (g *Game) setBufferRects() {
 	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, g.lobby.buttonBarHeight, historyRatingHeight, statusBufferHeight, g.lobby.buttonBarHeight)
 	listHeaderHeight := g.itemHeight()
-	if AutoEnableTouchInput {
+	if smallScreen {
 		listHeaderHeight /= 2
 	}
 	listGamesContainer.SetRowSizes(listHeaderHeight, 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
@@ -1783,7 +1780,7 @@ func (g *Game) handleEvent(e interface{}) {
 			dateLabel := newCenteredText(time.Unix(match.Timestamp, 0).Format("2006-01-02"))
 			resultLabel := newCenteredText(result)
 			opponentLabel := newCenteredText(match.Opponent)
-			if AutoEnableTouchInput {
+			if smallScreen {
 				dateLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 				resultLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 				opponentLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
@@ -1969,7 +1966,7 @@ func (g *Game) selectConnect() error {
 func (g *Game) searchMatches(username string) {
 	go hideKeyboard()
 	loadingText := newCenteredText(gotext.Get("Loading..."))
-	if AutoEnableTouchInput {
+	if smallScreen {
 		loadingText.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 	}
 
@@ -2045,7 +2042,7 @@ func (g *Game) cancelHistoryPage() error {
 func (g *Game) handleInput(keys []ebiten.Key) error {
 	if len(keys) == 0 {
 		return nil
-	} else if AutoEnableTouchInput {
+	} else if mobileDevice {
 		scheduleFrame()
 	}
 
@@ -2284,7 +2281,7 @@ func (g *Game) Update() error {
 		return err
 	}
 
-	if AutoEnableTouchInput {
+	if mobileDevice {
 		g.pressedRunes = ebiten.AppendInputChars(g.pressedRunes[:0])
 		if len(g.pressedRunes) != 0 {
 			scheduleFrame()
@@ -2427,7 +2424,7 @@ func (g *Game) layoutConnect() {
 
 	headerHeight := etk.Scale(60)
 	infoHeight := etk.Scale(108)
-	if AutoEnableTouchInput {
+	if smallScreen {
 		headerHeight = etk.Scale(20)
 	}
 

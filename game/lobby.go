@@ -36,7 +36,7 @@ var (
 )
 
 func init() {
-	if AutoEnableTouchInput {
+	if smallScreen {
 		lobbyIndentA, lobbyIndentB = lobbyIndentA/3, lobbyIndentB/3
 	}
 }
@@ -137,7 +137,7 @@ func NewLobby() *lobby {
 	}
 
 	loadingText := newCenteredText(gotext.Get("Loading..."))
-	if AutoEnableTouchInput {
+	if smallScreen {
 		loadingText.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 	}
 
@@ -214,7 +214,7 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 		txt.SetScrollBarVisible(false)
 		txt.SetWordWrap(false)
 		txt.SetVertical(etk.AlignCenter)
-		if AutoEnableTouchInput {
+		if smallScreen {
 			txt.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		}
 		return txt
@@ -238,7 +238,7 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 			rating = fmt.Sprintf("%d", entry.Rating)
 		}
 		nameLabel := newLabel(entry.Name)
-		if AutoEnableTouchInput {
+		if smallScreen {
 			nameLabel.SetWordWrap(true)
 		}
 		l.availableMatchesList.AddChildAt(newLabel(status), 0, i)
@@ -264,7 +264,7 @@ func (l *lobby) getButtons() []string {
 		return cancelJoinButtons
 	} else if l.showHistory {
 		return historyButtons
-	} else if AutoEnableTouchInput && game.portraitView() {
+	} else if smallScreen && game.portraitView() {
 		return mainShortButtons
 	}
 	return mainButtons

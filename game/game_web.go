@@ -73,24 +73,8 @@ func saveReplay(id int, content []byte) error {
 	return nil
 }
 
-func mobileDevice() bool {
-	navigator := js.Global().Get("navigator")
-	agent := navigator.Get("userAgent")
-	if agent.IsUndefined() {
-		agent = navigator.Get("vendor")
-		if agent.IsUndefined() {
-			agent = navigator.Get("opera")
-			if agent.IsUndefined() {
-				return false
-			}
-		}
-	}
-	agentString := agent.String()
-	return strings.Contains(strings.ToLower(agentString), "android") || strings.Contains(agentString, "iPhone") || strings.Contains(agentString, "iPad") || strings.Contains(agentString, "iPod")
-}
-
 func showKeyboard() {
-	if !mobileDevice() {
+	if !enableOnScreenKeyboard {
 		return
 	}
 	game.keyboard.SetVisible(true)
@@ -98,7 +82,7 @@ func showKeyboard() {
 }
 
 func hideKeyboard() {
-	if !mobileDevice() {
+	if !enableOnScreenKeyboard {
 		return
 	}
 	game.keyboard.SetVisible(false)

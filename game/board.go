@@ -196,7 +196,7 @@ var (
 
 func NewBoard() *board {
 	var extraBorder float64
-	if AutoEnableTouchInput {
+	if smallScreen {
 		extraBorder = float64(etk.Scale(5))
 	}
 	b := &board{
@@ -342,7 +342,7 @@ func (b *board) fontUpdated() {
 	gameBuffer.SetFont(etk.Style.TextFont, bufferFontSize)
 	inputBuffer.SetFont(etk.Style.TextFont, bufferFontSize)
 
-	if AutoEnableTouchInput {
+	if smallScreen {
 		b.showMenuButton.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
 	} else {
 		b.showMenuButton.SetFont(etk.Style.TextFont, etk.Scale(smallFontSize))
@@ -351,7 +351,7 @@ func (b *board) fontUpdated() {
 	b.timerLabel.SetFont(etk.Style.TextFont, etk.Scale(b.fontSize))
 	b.clockLabel.SetFont(etk.Style.TextFont, etk.Scale(b.fontSize))
 
-	if AutoEnableTouchInput {
+	if smallScreen {
 		b.opponentForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
 		b.playerForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
 	} else {
@@ -362,7 +362,7 @@ func (b *board) fontUpdated() {
 	b.opponentMovesLabel.SetFont(etk.Style.TextFont, bufferFontSize)
 	b.playerMovesLabel.SetFont(etk.Style.TextFont, bufferFontSize)
 
-	if AutoEnableTouchInput {
+	if smallScreen {
 		b.opponentPipCount.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
 		b.playerPipCount.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
 	} else {
@@ -1669,7 +1669,7 @@ func (b *board) setRect(x, y, w, h int) {
 	b.processState()
 
 	matchStatus := etk.Scale(36)
-	if AutoEnableTouchInput {
+	if mobileDevice {
 		b.uiGrid.SetRowSizes(int(b.verticalBorderSize/2), matchStatus, int(b.verticalBorderSize/2), fieldHeight, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), -1)
 	} else {
 		b.uiGrid.SetRowSizes(int(b.verticalBorderSize/2), matchStatus, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), fieldHeight)
@@ -2566,7 +2566,7 @@ func (b *board) finishDrag(x int, y int, click bool) {
 
 		if !b.draggingClick && index == b.draggingSpace && !b.lastDragClick.IsZero() && time.Since(b.lastDragClick) < 500*time.Millisecond {
 			b.startDrag(dropped, index, true)
-			if AutoEnableTouchInput {
+			if mobileDevice {
 				r := b.spaceRects[index]
 				offset := int(b.spaceWidth) + int(b.overlapSize)*4
 				if !b.bottomRow(index) {
@@ -2679,7 +2679,7 @@ func (b *board) Update() {
 		b.muteMoveCheckbox.SetSelected(b.muteMove)
 		b.muteBearOff = ev.MuteBearOff
 		b.muteBearOffCheckbox.SetSelected(b.muteBearOff)
-		if !AutoEnableTouchInput {
+		if enableRightClick {
 			b.advancedMovement = ev.Advanced
 			b.advancedMovementCheckbox.SetSelected(b.advancedMovement)
 		}

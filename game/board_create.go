@@ -325,7 +325,7 @@ func (b *board) createSettingsDialog() {
 
 	checkboxGrid := etk.NewGrid()
 	checkboxGrid.SetColumnSizes(72, 20, -1)
-	if !AutoEnableTouchInput {
+	if !enableOnScreenKeyboard {
 		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
 	} else {
 		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
@@ -384,7 +384,7 @@ func (b *board) createSettingsDialog() {
 	checkboxGrid.AddChildAt(cGrid(b.traditionalCheckbox), 0, gridY, 1, 1)
 	checkboxGrid.AddChildAt(traditionalLabel, 2, gridY, 1, 1)
 	gridY += 2
-	if !AutoEnableTouchInput {
+	if enableRightClick {
 		checkboxGrid.AddChildAt(cGrid(b.advancedMovementCheckbox), 0, gridY, 1, 1)
 		checkboxGrid.AddChildAt(advancedMovementLabel, 2, gridY, 1, 1)
 		gridY += 2
@@ -393,7 +393,7 @@ func (b *board) createSettingsDialog() {
 	checkboxGrid.AddChildAt(autoPlayLabel, 2, gridY, 1, 1)
 
 	gridSize := 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72
-	if !AutoEnableTouchInput {
+	if enableRightClick {
 		gridSize += 20 + 72
 	}
 	b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
@@ -437,7 +437,7 @@ func (b *board) createMatchStatus() {
 	b.clockLabel = clockLabel
 
 	b.showMenuButton = etk.NewButton(gotext.Get("Menu"), b.toggleMenu)
-	if !AutoEnableTouchInput {
+	if !mobileDevice {
 		b.showMenuButton.SetBorderSize(etk.Scale(etk.Style.BorderSize / 2))
 	}
 
@@ -484,7 +484,7 @@ func (b *board) recreateUIGrid() {
 		b.uiGrid.AddChildAt(g, 0, gridY, 1, 3)
 		gridY++
 	} else {
-		if AutoEnableTouchInput {
+		if mobileDevice {
 			b.uiGrid.AddChildAt(b.inputGrid, 0, gridY, 1, 1)
 			b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY+1, 1, 1)
 			gridY += 2
@@ -493,7 +493,7 @@ func (b *board) recreateUIGrid() {
 		b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY+1, 1, 1)
 		b.uiGrid.AddChildAt(gameBuffer, 0, gridY+2, 1, 1)
 		gridY += 3
-		if !AutoEnableTouchInput {
+		if !mobileDevice {
 			b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY, 1, 1)
 			b.uiGrid.AddChildAt(b.inputGrid, 0, gridY+1, 1, 1)
 		}
