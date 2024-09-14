@@ -15,13 +15,15 @@ var dialOptions = &websocket.DialOptions{
 	CompressionMode: websocket.CompressionContextTakeover,
 }
 
+var steamDeck = isSteamDeck()
+
 func init() {
-	if steamDeck() {
+	if steamDeck {
 		AutoEnableTouchInput = true // Use mobile interface on Steam Deck.
 	}
 }
 
-func steamDeck() bool {
+func isSteamDeck() bool {
 	buf, err := os.ReadFile("/sys/devices/virtual/dmi/id/board_vendor")
 	if err != nil {
 		return false
@@ -34,5 +36,5 @@ func GetLocale() (string, error) {
 }
 
 func DefaultFullscreen() bool {
-	return steamDeck() // Default to fullscreen mode on Steam Deck.
+	return steamDeck // Default to fullscreen mode on Steam Deck.
 }

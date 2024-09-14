@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-09-11 20:02+0000\n"
+"PO-Revision-Date: 2024-09-13 12:09+0000\n"
 "Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
@@ -87,7 +87,7 @@ msgid "Connect"
 msgstr "Приєднатися"
 
 msgid "Connecting..."
-msgstr "Приєднання..."
+msgstr "З'єднання..."
 
 msgid "Create"
 msgstr "Створити"
@@ -165,10 +165,10 @@ msgid "Forced"
 msgstr "Примусовий"
 
 msgid "Go"
-msgstr ""
+msgstr "Перейти"
 
 msgid "Go to page:"
-msgstr ""
+msgstr "Перейти на сторінку:"
 
 msgid "Good Luck, Have Fun"
 msgstr "Щасти вам, розважайтеся"
@@ -195,7 +195,7 @@ msgid "Join match: %s"
 msgstr "Приєднано до матчу: %s"
 
 msgid "Joining..."
-msgstr ""
+msgstr "Приєднання..."
 
 msgid "Leave"
 msgstr "Покинути"
@@ -246,7 +246,7 @@ msgid "New"
 msgstr "Новий"
 
 msgid "Next"
-msgstr ""
+msgstr "Наступна"
 
 msgid "No"
 msgstr "Ні"
@@ -286,7 +286,7 @@ msgid "Press back to toggle the keyboard."
 msgstr "Натисніть \"Назад\", щоб перемкнути клавіатуру."
 
 msgid "Previous"
-msgstr ""
+msgstr "Попередня"
 
 msgid "Private"
 msgstr "Приватна"
@@ -409,7 +409,7 @@ msgid "Tutorial"
 msgstr "Посібник"
 
 msgid "Undo"
-msgstr "Скасув. хід"
+msgstr "Скасувати хід"
 
 msgid "Username"
 msgstr "Логін"
