@@ -13,9 +13,9 @@ import (
 
 const (
 	AppName            = "boxcars-web"
+	targetFPS          = 144
 	ShowServerSettings = false
 	ShowQuitDialog     = false
-	targetFPS          = 144
 )
 
 var (

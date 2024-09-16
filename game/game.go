@@ -1189,7 +1189,7 @@ func (g *Game) initialize() {
 
 		{
 			g.lobby.historyPageDialog = etk.NewGrid()
-			g.lobby.historyPageDialogInput = etk.NewInput("", g.confirmHistoryPage)
+			g.lobby.historyPageDialogInput = &Input{etk.NewInput("", g.confirmHistoryPage)}
 			label := resizeText(gotext.Get("Go to page:"))
 			label.SetHorizontal(etk.AlignCenter)
 			label.SetVertical(etk.AlignCenter)
@@ -2631,6 +2631,14 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func acceptInput(text string) (handled bool) {
 	if len(text) == 0 {
+		g := game
+		if viewBoard && !g.board.menuGrid.Visible() && !g.board.settingsGrid.Visible() && !g.board.changePasswordGrid.Visible() && !g.board.leaveGameGrid.Visible() {
+			if g.board.gameState.MayRoll() {
+				g.board.selectRoll()
+			} else if g.board.gameState.MayOK() {
+				g.board.selectOK()
+			}
+		}
 		return true
 	}
 

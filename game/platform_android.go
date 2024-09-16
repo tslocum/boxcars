@@ -13,13 +13,10 @@ import (
 )
 
 const (
-	AppName            = "boxcars-android"
-	ShowServerSettings = true
-	ShowQuitDialog     = true
-	targetFPS          = 60
-)
-
-var (
+	AppName                = "boxcars-android"
+	targetFPS              = 60
+	ShowServerSettings     = true
+	ShowQuitDialog         = true
 	smallScreen            = true
 	mobileDevice           = true
 	enableOnScreenKeyboard = true

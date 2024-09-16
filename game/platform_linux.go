@@ -9,18 +9,18 @@ import (
 )
 
 const (
-	AppName            = "boxcars-linux"
-	ShowServerSettings = false
-	ShowQuitDialog     = true
-	targetFPS          = 144
+	AppName                = "boxcars-linux"
+	targetFPS              = 144
+	ShowServerSettings     = false
+	ShowQuitDialog         = true
+	smallScreen            = false
+	enableOnScreenKeyboard = false
+	enableRightClick       = true
 )
 
 var (
-	steamDeck              = isSteamDeck()
-	smallScreen            = false
-	mobileDevice           = steamDeck
-	enableOnScreenKeyboard = false
-	enableRightClick       = true
+	steamDeck    = isSteamDeck()
+	mobileDevice = steamDeck
 )
 
 func userConfigDir() string {

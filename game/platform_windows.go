@@ -8,13 +8,10 @@ import (
 )
 
 const (
-	AppName            = "boxcars-windows"
-	ShowServerSettings = false
-	ShowQuitDialog     = true
-	targetFPS          = 144
-)
-
-var (
+	AppName                = "boxcars-windows"
+	targetFPS              = 144
+	ShowServerSettings     = false
+	ShowQuitDialog         = true
 	smallScreen            = false
 	mobileDevice           = false
 	enableOnScreenKeyboard = false
