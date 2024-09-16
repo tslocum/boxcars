@@ -2054,38 +2054,53 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 				switch focusedWidget {
 				case g.connectUsername:
 					etk.SetFocus(g.connectPassword)
+					return nil
 				case g.connectPassword:
 					etk.SetFocus(g.connectUsername)
+					return nil
 				case g.registerEmail:
 					if ebiten.IsKeyPressed(ebiten.KeyShift) {
 						etk.SetFocus(g.registerPassword)
+						return nil
 					} else {
 						etk.SetFocus(g.registerUsername)
+						return nil
 					}
 				case g.registerUsername:
 					if ebiten.IsKeyPressed(ebiten.KeyShift) {
 						etk.SetFocus(g.registerEmail)
+						return nil
 					} else {
 						etk.SetFocus(g.registerPassword)
+						return nil
 					}
 				case g.registerPassword:
 					if ebiten.IsKeyPressed(ebiten.KeyShift) {
 						etk.SetFocus(g.registerUsername)
+						return nil
 					} else {
 						etk.SetFocus(g.registerEmail)
+						return nil
 					}
 				}
 			case ebiten.KeyEnter, ebiten.KeyKPEnter:
 				if g.showRegister {
 					g.selectConfirmRegister()
+					return nil
 				} else if g.showReset {
 					g.selectConfirmReset()
+					return nil
+				} else if ShowQuitDialog && g.quitDialog.Visible() {
+					g.Exit()
+					return nil
 				} else {
 					g.selectConnect()
+					return nil
 				}
 			case ebiten.KeyEscape:
 				if ShowQuitDialog {
 					g.quitDialog.SetVisible(!g.quitDialog.Visible())
+					return nil
 				}
 			}
 		}
@@ -2098,35 +2113,44 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 			if viewBoard {
 				if g.board.menuGrid.Visible() {
 					g.board.menuGrid.SetVisible(false)
+					return nil
 				} else if g.board.settingsGrid.Visible() {
 					g.board.settingsGrid.SetVisible(false)
 					g.board.selectSpeed.SetMenuVisible(false)
+					return nil
 				} else if g.board.changePasswordGrid.Visible() {
 					g.board.hideMenu()
+					return nil
 				} else if g.board.leaveGameGrid.Visible() {
 					g.board.leaveGameGrid.SetVisible(false)
+					return nil
 				} else {
 					g.board.menuGrid.SetVisible(true)
+					return nil
 				}
-				continue
 			} else if g.lobby.showHistory {
 				if g.lobby.historyPageDialog.Visible() {
 					g.lobby.historyPageDialog.SetVisible(false)
+					return nil
 				} else {
 					g.lobby.showHistory = false
 					g.lobby.rebuildButtonsGrid()
 					g.setRoot(listGamesFrame)
+					return nil
 				}
 			} else if g.lobby.showCreateGame {
 				g.lobby.showCreateGame = false
 				g.lobby.rebuildButtonsGrid()
 				g.setRoot(listGamesFrame)
+				return nil
 			} else if g.lobby.showJoinGame {
 				g.lobby.showJoinGame = false
 				g.lobby.rebuildButtonsGrid()
 				g.setRoot(listGamesFrame)
+				return nil
 			} else {
 				g.showMainMenu()
+				return nil
 			}
 		}
 	}
@@ -2140,19 +2164,25 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					switch focusedWidget {
 					case g.lobby.createGameName:
 						etk.SetFocus(g.lobby.createGamePassword)
+						return nil
 					case g.lobby.createGamePoints:
 						etk.SetFocus(g.lobby.createGameName)
+						return nil
 					case g.lobby.createGamePassword:
 						etk.SetFocus(g.lobby.createGamePoints)
+						return nil
 					}
 				} else {
 					switch focusedWidget {
 					case g.lobby.createGameName:
 						etk.SetFocus(g.lobby.createGamePoints)
+						return nil
 					case g.lobby.createGamePoints:
 						etk.SetFocus(g.lobby.createGamePassword)
+						return nil
 					case g.lobby.createGamePassword:
 						etk.SetFocus(g.lobby.createGameName)
+						return nil
 					}
 				}
 			}
@@ -2164,10 +2194,13 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 			if key == ebiten.KeyEnter || key == ebiten.KeyKPEnter {
 				if g.lobby.showCreateGame {
 					g.lobby.confirmCreateGame()
+					return nil
 				} else if g.lobby.showHistory {
 					g.selectHistorySearch()
+					return nil
 				} else {
 					g.lobby.confirmJoinGame()
+					return nil
 				}
 			}
 		}
@@ -2182,13 +2215,19 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					switch focusedWidget {
 					case g.board.changePasswordOld:
 						etk.SetFocus(g.board.changePasswordNew)
+						return nil
 					case g.board.changePasswordNew:
 						etk.SetFocus(g.board.changePasswordOld)
+						return nil
 					}
 				}
 			case ebiten.KeyEnter:
 				if g.board.changePasswordGrid.Visible() {
 					g.board.selectChangePassword()
+					return nil
+				} else if g.board.leaveGameGrid.Visible() {
+					g.board.confirmLeaveGame()
+					return nil
 				}
 			}
 		}
