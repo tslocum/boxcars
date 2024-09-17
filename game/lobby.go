@@ -307,6 +307,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				game.lobby.createGamePassword.SetText("")
 				l.rebuildButtonsGrid()
 				game.setRoot(listGamesFrame)
+				etk.SetFocus(nil)
 			case lobbyButtonCreateConfirm:
 				l.confirmCreateGame()
 			}
@@ -319,6 +320,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 					game.setRoot(game.board.frame)
 				} else {
 					game.setRoot(listGamesFrame)
+					etk.SetFocus(nil)
 				}
 			} else {
 				l.confirmJoinGame()
@@ -330,6 +332,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				l.showHistory = false
 				l.rebuildButtonsGrid()
 				game.setRoot(listGamesFrame)
+				etk.SetFocus(nil)
 			case lobbyButtonHistoryDownload:
 				if game.downloadReplay != 0 {
 					return nil

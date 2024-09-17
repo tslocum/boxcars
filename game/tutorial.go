@@ -33,6 +33,7 @@ func NewTutorialWidget() *tutorialWidget {
 func (w *tutorialWidget) hide() {
 	game.lobby.showCreateGame = false
 	game.setRoot(listGamesFrame)
+	etk.SetFocus(nil)
 	setViewBoard(false)
 	game.board.gameState.PlayerNumber = 0
 	game.savedUsername = "a"
@@ -84,6 +85,7 @@ func (w *tutorialWidget) setPage(page int) {
 	case 3:
 		game.lobby.showCreateGame = false
 		game.setRoot(listGamesFrame)
+		etk.SetFocus(nil)
 		game.board.gameState.PlayerNumber = 1
 		if game.needLayoutBoard {
 			game.layoutBoard()
