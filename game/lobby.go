@@ -267,6 +267,15 @@ func (l *lobby) getButtons() []string {
 	return mainButtons
 }
 
+func (l *lobby) cancelCreateGame() {
+	game.lobby.showCreateGame = false
+	game.lobby.createGameName.SetText("")
+	game.lobby.createGamePassword.SetText("")
+	l.rebuildButtonsGrid()
+	game.setRoot(listGamesFrame)
+	etk.SetFocus(nil)
+}
+
 func (l *lobby) confirmCreateGame() {
 	go hideKeyboard()
 	typeAndPassword := "public"
@@ -299,12 +308,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 		if l.showCreateGame {
 			switch buttonIndex {
 			case lobbyButtonCreateCancel:
-				game.lobby.showCreateGame = false
-				game.lobby.createGameName.SetText("")
-				game.lobby.createGamePassword.SetText("")
-				l.rebuildButtonsGrid()
-				game.setRoot(listGamesFrame)
-				etk.SetFocus(nil)
+				l.cancelCreateGame()
 			case lobbyButtonCreateConfirm:
 				l.confirmCreateGame()
 			}

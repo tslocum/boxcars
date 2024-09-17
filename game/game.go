@@ -2107,8 +2107,13 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					return nil
 				}
 			case ebiten.KeyEscape:
-				if ShowQuitDialog {
-					g.quitDialog.SetVisible(!g.quitDialog.Visible())
+				if g.showRegister || g.showReset {
+					g.selectCancel()
+					return nil
+				} else {
+					if ShowQuitDialog {
+						g.quitDialog.SetVisible(!g.quitDialog.Visible())
+					}
 					return nil
 				}
 			}
