@@ -39,7 +39,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.0"
+	AppVersion           = "v1.4.1"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -116,8 +116,6 @@ var (
 
 	statusLogged bool
 	gameLogged   bool
-
-	lobbyStatusBufferHeight = 75
 
 	Debug int8
 
@@ -578,6 +576,8 @@ type Game struct {
 	tutorialFrame *etk.Frame
 
 	quitDialog *etk.Grid
+
+	bufferFontSize int
 
 	pressedKeys  []ebiten.Key
 	pressedRunes []rune
@@ -1470,7 +1470,10 @@ func (g *Game) setRoot(w etk.Widget) {
 }
 
 func (g *Game) setBufferRects() {
-	statusBufferHeight := etk.Scale(75)
+	fontMutex.Lock()
+	lineHeight := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics().Height.Round()
+	fontMutex.Unlock()
+	statusBufferHeight := lineHeight * 3
 	historyRatingHeight := etk.Scale(200)
 	if smallScreen {
 		historyRatingHeight /= 2

@@ -337,10 +337,15 @@ func (b *board) fontUpdated() {
 	b.lineOffset = m.Ascent.Round()
 	fontMutex.Unlock()
 
-	bufferFontSize := etk.Scale(smallFontSize)
-	statusBuffer.SetFont(etk.Style.TextFont, bufferFontSize)
-	gameBuffer.SetFont(etk.Style.TextFont, bufferFontSize)
-	inputBuffer.SetFont(etk.Style.TextFont, bufferFontSize)
+	if smallScreen {
+		game.bufferFontSize = etk.Scale(mediumFontSize)
+	} else {
+		game.bufferFontSize = etk.Scale(smallFontSize)
+	}
+
+	statusBuffer.SetFont(etk.Style.TextFont, game.bufferFontSize)
+	gameBuffer.SetFont(etk.Style.TextFont, game.bufferFontSize)
+	inputBuffer.SetFont(etk.Style.TextFont, game.bufferFontSize)
 
 	if smallScreen {
 		b.showMenuButton.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
@@ -359,15 +364,15 @@ func (b *board) fontUpdated() {
 		b.playerForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
 	}
 
-	b.opponentMovesLabel.SetFont(etk.Style.TextFont, bufferFontSize)
-	b.playerMovesLabel.SetFont(etk.Style.TextFont, bufferFontSize)
+	b.opponentMovesLabel.SetFont(etk.Style.TextFont, game.bufferFontSize)
+	b.playerMovesLabel.SetFont(etk.Style.TextFont, game.bufferFontSize)
 
 	if smallScreen {
 		b.opponentPipCount.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
 		b.playerPipCount.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
 	} else {
-		b.opponentPipCount.SetFont(etk.Style.TextFont, bufferFontSize)
-		b.playerPipCount.SetFont(etk.Style.TextFont, bufferFontSize)
+		b.opponentPipCount.SetFont(etk.Style.TextFont, game.bufferFontSize)
+		b.playerPipCount.SetFont(etk.Style.TextFont, game.bufferFontSize)
 	}
 }
 
