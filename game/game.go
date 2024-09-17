@@ -1190,7 +1190,7 @@ func (g *Game) initialize() {
 
 		{
 			g.lobby.historyPageDialog = etk.NewGrid()
-			g.lobby.historyPageDialogInput = &Input{etk.NewInput("", g.confirmHistoryPage)}
+			g.lobby.historyPageDialogInput = &NumericInput{etk.NewInput("", g.confirmHistoryPage)}
 			label := resizeText(gotext.Get("Go to page:"))
 			label.SetHorizontal(etk.AlignCenter)
 			label.SetVertical(etk.AlignCenter)
@@ -2032,6 +2032,8 @@ func (g *Game) confirmHistoryPage(text string) bool {
 	page, err := strconv.Atoi(g.lobby.historyPageDialogInput.Text())
 	if err != nil || page < 0 {
 		page = 0
+	} else if page > g.lobby.historyPages {
+		page = g.lobby.historyPages
 	}
 	g.client.Out <- []byte(fmt.Sprintf("history %s %d", g.lobby.historyUsername.Text(), page))
 	return true
@@ -2873,6 +2875,23 @@ func (i *Input) HandleMouse(cursor image.Point, pressed bool, clicked bool) (han
 		go showKeyboard()
 	}
 	return i.Input.HandleMouse(cursor, pressed, clicked)
+}
+
+type NumericInput struct {
+	*etk.Input
+}
+
+func (i *NumericInput) HandleKeyboard(key ebiten.Key, r rune) (handled bool, err error) {
+	if r != 0 {
+		switch r {
+		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+		default:
+			return true, nil
+		}
+	} else if key != ebiten.KeyBackspace && key != ebiten.KeyEnter && key != ebiten.KeyKPEnter {
+		return true, nil
+	}
+	return i.Input.HandleKeyboard(key, r)
 }
 
 type ClickableText struct {

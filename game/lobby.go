@@ -94,7 +94,7 @@ type lobby struct {
 	historyRatingCasualTabulaMulti      *etk.Text
 
 	historyPageDialog      *etk.Grid
-	historyPageDialogInput *Input
+	historyPageDialogInput *NumericInput
 
 	availableMatchesList *etk.List
 
