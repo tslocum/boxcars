@@ -76,8 +76,8 @@ func (c *Client) logIn() []byte {
 		return []byte(fmt.Sprintf("rj %s/%s %s %s %s\n", AppName, AppLanguage, game.Email, game.Username, game.Password))
 	}
 	loginInfo := strings.ReplaceAll(c.Username, " ", "_")
-	if c.Username != "" && c.Password != "" {
-		loginInfo = fmt.Sprintf("%s %s", strings.ReplaceAll(c.Username, " ", "_"), strings.ReplaceAll(c.Password, " ", "_"))
+	if !c.local && c.Username != "" && c.Password != "" {
+		loginInfo += " " + strings.ReplaceAll(c.Password, " ", "_")
 	}
 	return []byte(fmt.Sprintf("lj %s-%s/%s %s\n", AppName, AppVersion, AppLanguage, loginInfo))
 }

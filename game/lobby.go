@@ -59,8 +59,6 @@ type lobby struct {
 
 	c *Client
 
-	refresh bool
-
 	showCreateGame           bool
 	createGameName           *Input
 	createGamePoints         *Input
@@ -132,7 +130,6 @@ func NewLobby() *lobby {
 	}
 
 	l := &lobby{
-		refresh:     true,
 		buttonsGrid: etk.NewGrid(),
 	}
 
@@ -354,7 +351,6 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 		}
 		switch buttonIndex {
 		case lobbyButtonRefresh:
-			l.refresh = true
 			l.c.Out <- []byte("ls")
 		case lobbyButtonCreate:
 			if l.c.Username == "" {

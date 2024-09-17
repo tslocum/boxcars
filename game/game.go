@@ -1835,6 +1835,8 @@ func (g *Game) Connect() {
 	g.lobby.c = g.client
 	g.board.client = g.client
 
+	g.lobby.loaded = false
+
 	go g.handleEvents(g.client)
 
 	if g.Password != "" {
@@ -1888,8 +1890,7 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 	g.client.local = true
 	g.client.connecting = true
 
-	g.Username = ""
-	g.Password = ""
+	g.lobby.loaded = false
 
 	go g.handleEvents(g.client)
 
