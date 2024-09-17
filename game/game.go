@@ -162,7 +162,7 @@ func init() {
 	gotext.SetDomain("boxcars")
 }
 
-func l(s string) {
+func ls(s string) {
 	m := time.Now().Format("[3:04]") + " " + s
 	if statusLogged {
 		_, _ = statusBuffer.Write([]byte("\n" + m))
@@ -1528,15 +1528,15 @@ func (g *Game) handleEvent(e interface{}) {
 		} else {
 			msg = gotext.Get("Welcome, %s. There are %d clients playing %d matches.", ev.PlayerName, ev.Clients, ev.Games)
 		}
-		l(fmt.Sprintf("*** " + msg))
+		ls(fmt.Sprintf("*** " + msg))
 
 		if strings.HasPrefix(g.client.Username, "Guest_") && g.savedUsername == "" {
 			g.tutorialFrame.AddChild(NewTutorialWidget())
 		}
 	case *bgammon.EventNotice:
-		l(fmt.Sprintf("*** %s", ev.Message))
+		ls(fmt.Sprintf("*** %s", ev.Message))
 	case *bgammon.EventSay:
-		l(fmt.Sprintf("<%s> %s", ev.Player, ev.Message))
+		ls(fmt.Sprintf("<%s> %s", ev.Player, ev.Message))
 		playSoundEffect(effectSay)
 	case *bgammon.EventList:
 		g.lobby.setGameList(ev.Games)
@@ -1579,9 +1579,9 @@ func (g *Game) handleEvent(e interface{}) {
 		g.lobby.joiningGameID, g.lobby.joiningGamePassword, g.lobby.joiningGameShown = 0, "", false
 		g.lobby.rebuildButtonsGrid()
 
-		l("*** " + gotext.Get("Failed to join match: %s", ev.Reason))
+		ls("*** " + gotext.Get("Failed to join match: %s", ev.Reason))
 	case *bgammon.EventFailedLeave:
-		l("*** " + gotext.Get("Failed to leave match: %s", ev.Reason))
+		ls("*** " + gotext.Get("Failed to leave match: %s", ev.Reason))
 		setViewBoard(false)
 	case *bgammon.EventLeft:
 		g.board.Lock()
@@ -1690,7 +1690,7 @@ func (g *Game) handleEvent(e interface{}) {
 		scheduleFrame()
 		lg(gotext.Get("%s rolled %s", ev.Player, diceFormatted))
 	case *bgammon.EventFailedRoll:
-		l(fmt.Sprintf("*** %s: %s", gotext.Get("Failed to roll"), ev.Reason))
+		ls(fmt.Sprintf("*** %s: %s", gotext.Get("Failed to roll"), ev.Reason))
 	case *bgammon.EventMoved:
 		moves := ev.Moves
 		if g.board.gameState.Turn == 2 && game.board.traditional {
@@ -1727,11 +1727,11 @@ func (g *Game) handleEvent(e interface{}) {
 		if ev.From != 0 || ev.To != 0 {
 			extra = " " + gotext.Get("from %s to %s", bgammon.FormatSpace(ev.From), bgammon.FormatSpace(ev.To))
 		}
-		l("*** " + gotext.Get("Failed to move checker%s: %s", extra, ev.Reason))
-		l("*** " + gotext.Get("Legal moves: %s", bgammon.FormatMoves(g.board.gameState.Available)))
+		ls("*** " + gotext.Get("Failed to move checker%s: %s", extra, ev.Reason))
+		ls("*** " + gotext.Get("Legal moves: %s", bgammon.FormatMoves(g.board.gameState.Available)))
 	case *bgammon.EventFailedOk:
 		g.client.Out <- []byte("board") // Refresh game state.
-		l("*** " + gotext.Get("Failed to submit moves: %s", ev.Reason))
+		ls("*** " + gotext.Get("Failed to submit moves: %s", ev.Reason))
 	case *bgammon.EventWin:
 		g.board.Lock()
 		lg(gotext.Get("%s wins!", ev.Player))
@@ -1747,7 +1747,7 @@ func (g *Game) handleEvent(e interface{}) {
 		if game.downloadReplay == ev.ID {
 			err := saveReplay(ev.ID, ev.Content)
 			if err != nil {
-				l("*** " + gotext.Get("Failed to download replay: %s", err))
+				ls("*** " + gotext.Get("Failed to download replay: %s", err))
 			}
 			game.downloadReplay = 0
 			return
@@ -1796,8 +1796,8 @@ func (g *Game) handleEvent(e interface{}) {
 	case *bgammon.EventPing:
 		g.client.Out <- []byte(fmt.Sprintf("pong %s", ev.Message))
 	default:
-		l("*** " + gotext.Get("Warning: Received unknown event: %+v", ev))
-		l("*** " + gotext.Get("You may need to upgrade your client."))
+		ls("*** " + gotext.Get("Warning: Received unknown event: %+v", ev))
+		ls("*** " + gotext.Get("You may need to upgrade your client."))
 	}
 }
 
@@ -1817,7 +1817,7 @@ func (g *Game) Connect() {
 	}
 	g.loggedIn = true
 
-	l("*** " + gotext.Get("Connecting..."))
+	ls("*** " + gotext.Get("Connecting..."))
 
 	if g.Password != "" {
 		g.lobby.historyButton.SetVisible(true)
@@ -1874,7 +1874,7 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 	}
 	g.loggedIn = true
 
-	l("*** " + gotext.Get("Playing offline."))
+	ls("*** " + gotext.Get("Playing offline."))
 
 	g.setRoot(listGamesFrame)
 
@@ -2653,20 +2653,20 @@ func acceptInput(text string) (handled bool) {
 			if game.replay {
 				err := saveReplay(-1, game.replayData)
 				if err != nil {
-					l("*** " + gotext.Get("Failed to download replay: %s", err))
+					ls("*** " + gotext.Get("Failed to download replay: %s", err))
 				}
 			} else {
 				if game.downloadReplay == 0 {
 					game.downloadReplay = -1
 					game.client.Out <- []byte("replay")
 				} else {
-					l("*** " + gotext.Get("Replay download already in progress."))
+					ls("*** " + gotext.Get("Replay download already in progress."))
 				}
 			}
 			return true
 		}
 	} else {
-		l(fmt.Sprintf("<%s> %s", game.client.Username, text))
+		ls(fmt.Sprintf("<%s> %s", game.client.Username, text))
 		text = "say " + text
 	}
 
@@ -2909,7 +2909,7 @@ func saveReplay(id int, content []byte) error {
 
 	replayDir := ReplayDir()
 	if replayDir == "" {
-		l(fmt.Sprintf("*** %s https://bgammon.org/match/%d", gotext.Get("To download this replay visit"), id))
+		ls(fmt.Sprintf("*** %s https://bgammon.org/match/%d", gotext.Get("To download this replay visit"), id))
 		return nil
 	}
 
@@ -2946,7 +2946,7 @@ func saveReplay(id int, content []byte) error {
 	if err != nil {
 		return fmt.Errorf("failed to write replay to %s: %s", filePath, err)
 	}
-	l(fmt.Sprintf("*** %s: %s", gotext.Get("Downloaded replay"), filePath))
+	ls(fmt.Sprintf("*** %s: %s", gotext.Get("Downloaded replay"), filePath))
 	return nil
 }
 

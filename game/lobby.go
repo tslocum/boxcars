@@ -356,6 +356,9 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 		case lobbyButtonCreate:
 			if l.c.Username == "" {
 				return nil
+			} else if l.c.local {
+				ls("*** Failed to create match: Offline human versus human matches are not supported yet. Stay tuned.")
+				return nil
 			}
 
 			l.showCreateGame = true

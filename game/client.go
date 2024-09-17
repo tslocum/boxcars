@@ -105,7 +105,7 @@ func (c *Client) connectWebSocket() {
 				time.Sleep(2 * time.Second)
 				continue
 			}
-			l(fmt.Sprintf("*** %s...", gotext.Get("Reconnecting")))
+			ls(fmt.Sprintf("*** %s...", gotext.Get("Reconnecting")))
 			time.Sleep(2 * time.Second)
 			go c.connectWebSocket()
 			break
@@ -178,8 +178,8 @@ func (c *Client) handleWebSocketRead(conn *websocket.Conn) {
 		ev, err := bgammon.DecodeEvent(msg)
 		if err != nil {
 			log.Printf("warning: failed to parse message: %s", msg)
-			l("*** " + gotext.Get("Warning: Received unrecognized event from server."))
-			l("*** " + gotext.Get("You may need to upgrade your client."))
+			ls("*** " + gotext.Get("Warning: Received unrecognized event from server."))
+			ls("*** " + gotext.Get("You may need to upgrade your client."))
 			continue
 		}
 		if !c.loggedIn {
@@ -219,7 +219,7 @@ func (c *Client) connectTCP(conn net.Conn) {
 				time.Sleep(2 * time.Second)
 				continue
 			}
-			l(fmt.Sprintf("*** %s...", gotext.Get("Reconnecting")))
+			ls(fmt.Sprintf("*** %s...", gotext.Get("Reconnecting")))
 			time.Sleep(2 * time.Second)
 			go c.connectTCP(nil)
 			break
@@ -310,8 +310,8 @@ func (c *Client) handleTCPRead(conn net.Conn) {
 		ev, err := bgammon.DecodeEvent(scanner.Bytes())
 		if err != nil {
 			log.Printf("warning: failed to parse message: %s", scanner.Bytes())
-			l("*** " + gotext.Get("Warning: Received unrecognized event from server."))
-			l("*** " + gotext.Get("You may need to upgrade your client."))
+			ls("*** " + gotext.Get("Warning: Received unrecognized event from server."))
+			ls("*** " + gotext.Get("You may need to upgrade your client."))
 			continue
 		}
 		if !c.loggedIn {

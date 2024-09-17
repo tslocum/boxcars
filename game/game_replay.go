@@ -135,7 +135,7 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 			if resultValue == 0 {
 				resultText = "declines"
 			}
-			l(fmt.Sprintf("*** %s offers a double (%d points). %s %s.", gs.Player1.Name, doubleValue, gs.Player2.Name, resultText))
+			ls(fmt.Sprintf("*** %s offers a double (%d points). %s %s.", gs.Player1.Name, doubleValue, gs.Player2.Name, resultText))
 		case bytes.Equal(split[1], []byte("r")):
 			rollSplit := bytes.Split(split[2], []byte("-"))
 			if len(rollSplit) < 2 || len(rollSplit[0]) != 1 || len(rollSplit[1]) != 1 {
@@ -355,7 +355,7 @@ func (g *Game) showReplayFrame(replayFrame int, showInfo bool) {
 	g.client.Events <- ev
 
 	if replayFrame == 0 && showInfo {
-		l(fmt.Sprintf("*** "+gotext.Get("Replaying %s vs. %s", "%s", "%s")+" (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, time.Unix(frame.Game.Started, 0).Format("2006-01-02 15:04")))
+		ls(fmt.Sprintf("*** "+gotext.Get("Replaying %s vs. %s", "%s", "%s")+" (%s)", frame.Game.Player2.Name, frame.Game.Player1.Name, time.Unix(frame.Game.Started, 0).Format("2006-01-02 15:04")))
 	}
 }
 
