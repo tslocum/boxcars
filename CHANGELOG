@@ -1,5 +1,7 @@
 1.4.1:
 - Fix locale detection on Windows and Linux
+- Support undoing moves using backspace key
+- Support confirming moves using enter key
 
 1.4.0:
 - Auto-scale font size to fit text

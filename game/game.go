@@ -2221,6 +2221,11 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 						return nil
 					}
 				}
+			case ebiten.KeyBackspace:
+				if len(inputBuffer.Text()) == 0 && !g.board.gameState.Spectating && g.board.gameState.Turn == g.board.gameState.PlayerNumber && len(g.board.gameState.Moves) > 0 && !g.board.menuGrid.Visible() && !g.board.settingsGrid.Visible() && !g.board.changePasswordGrid.Visible() && !g.board.leaveGameGrid.Visible() {
+					g.board.selectUndo()
+					return nil
+				}
 			case ebiten.KeyEnter:
 				if g.board.changePasswordGrid.Visible() {
 					g.board.selectChangePassword()
