@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-09-13 12:09+0000\n"
+"PO-Revision-Date: 2024-09-18 15:40+0000\n"
 "Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
@@ -40,13 +40,13 @@ msgid "Acey-deucey"
 msgstr "Ейсі-дусі"
 
 msgid "Advanced movement"
-msgstr "Просунуті рухи"
+msgstr "Просунуті ходи"
 
 msgid "Auto-play forced moves"
 msgstr "Автоматичні примусові ходи"
 
 msgid "Available"
-msgstr "Не почато"
+msgstr "Вільний"
 
 msgid "Backgammon"
 msgstr "Нарди"
@@ -74,7 +74,7 @@ msgid "Change password"
 msgstr "Змінити пароль"
 
 msgid "Chat"
-msgstr "Повідомлення у чаті"
+msgstr "Чат"
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -84,7 +84,7 @@ msgstr ""
 "відновлення паролю. Також перевірте папку \"спам\"."
 
 msgid "Connect"
-msgstr "Приєднатися"
+msgstr "Увійти"
 
 msgid "Connecting..."
 msgstr "З'єднання..."
@@ -135,22 +135,22 @@ msgid "Exit Boxcars?"
 msgstr "Вийти з Boxcars?"
 
 msgid "Failed to download replay: %s"
-msgstr "Помилка завантаження повтору: %s"
+msgstr "Не вдалося завантажити повтор: %s"
 
 msgid "Failed to join match: %s"
-msgstr "Помилка приєднання: %s"
+msgstr "Не вдалося приєднатися до матчу: %s"
 
 msgid "Failed to leave match: %s"
-msgstr "Помилка від'єднання: %s"
+msgstr "Не вдалося від'єднатися від матчу: %s"
 
 msgid "Failed to move checker%s: %s"
-msgstr "Помилка пересування шашки%s: %s"
+msgstr "Не вдалося пересунути шашку%s: %s"
 
 msgid "Failed to roll"
-msgstr "Помилка кидку"
+msgstr "Не вдалося кинути кубики"
 
 msgid "Failed to submit moves: %s"
-msgstr "Помилка підтвердження ходів: %s"
+msgstr "Не вдалося підтвердити ходи: %s"
 
 msgid "Fast"
 msgstr "Швидко"
@@ -183,7 +183,7 @@ msgid "Instant"
 msgstr "Моментально"
 
 msgid "Join"
-msgstr "Увійти"
+msgstr "Приєднатися"
 
 msgid "Join/Leave"
 msgstr "Приєднання/від'єднання"
@@ -252,7 +252,7 @@ msgid "No"
 msgstr "Ні"
 
 msgid "None"
-msgstr "-"
+msgstr "Немає"
 
 msgid "OK"
 msgstr "Готово"
@@ -289,7 +289,7 @@ msgid "Previous"
 msgstr "Попередня"
 
 msgid "Private"
-msgstr "Приватна"
+msgstr "Приватний"
 
 msgid "Rating"
 msgstr "Рейтинг"
@@ -313,7 +313,7 @@ msgid "Rematch"
 msgstr "Реванш"
 
 msgid "Replay download already in progress."
-msgstr "Завантаження повтору в процесі."
+msgstr "Завантаження повтору вже виконується."
 
 msgid "Replaying %s vs. %s"
 msgstr "Повтор гри %s проти %s"
@@ -367,7 +367,7 @@ msgid "Speed"
 msgstr "Швидкість"
 
 msgid "Started"
-msgstr "Почато"
+msgstr "Початий"
 
 msgid "Status"
 msgstr "Статус"
