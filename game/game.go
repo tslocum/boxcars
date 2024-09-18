@@ -81,6 +81,8 @@ var (
 
 	imgProfileBirthday1 *ebiten.Image
 
+	imgIcon *ebiten.Image
+
 	fontMutex = &sync.Mutex{}
 )
 
@@ -137,6 +139,8 @@ var (
 
 	displayFrame    *etk.Frame
 	connectFrame    *etk.Frame
+	registerFrame   *etk.Frame
+	resetFrame      *etk.Frame
 	createGameFrame *etk.Frame
 	joinGameFrame   *etk.Frame
 	historyFrame    *etk.Frame
@@ -244,6 +248,8 @@ func loadImageAssets(width int) {
 	imgCubes64 = resizeDice(imgCubes.SubImage(image.Rect(size*2, size*1, size*3, size*2)), 0.6)
 
 	imgProfileBirthday1 = ebiten.NewImageFromImage(loadImage("asset/image/profile_birthday_1.png"))
+
+	imgIcon = ebiten.NewImageFromImage(loadImage("asset/image/icon.png"))
 }
 
 func loadAudioAssets() {
@@ -578,7 +584,8 @@ type Game struct {
 
 	tutorialFrame *etk.Frame
 
-	quitDialog *etk.Grid
+	aboutDialog *etk.Grid
+	quitDialog  *etk.Grid
 
 	bufferFontSize int
 
@@ -744,6 +751,81 @@ func (g *Game) initialize() {
 		return false
 	})}
 
+	var aboutGrid *etk.Grid
+	{
+		aboutLabel := gotext.Get("About")
+		bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), aboutLabel)
+		aboutButton := etk.NewButton(aboutLabel, g.showAboutDialog)
+		aboutGrid = etk.NewGrid()
+		aboutGrid.SetRowSizes(-1, bounds.Dy()*2)
+		aboutGrid.SetColumnSizes(-1, bounds.Dx()+etk.Scale(50))
+		aboutGrid.AddChildAt(etk.NewText("Boxcars "+AppVersion), 0, 1, 1, 1)
+		aboutGrid.AddChildAt(aboutButton, 1, 1, 1, 1)
+	}
+
+	{
+		g.aboutDialog = etk.NewGrid()
+		d := g.aboutDialog
+		d.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, etk.Scale(baseButtonHeight))
+		d.SetColumnSizes(etk.Scale(10), etk.Scale(172), -1, etk.Scale(128), etk.Scale(10))
+		d.SetBackground(color.RGBA{40, 24, 9, 255})
+
+		var y int
+		{
+			label := resizeText("Boxcars")
+			label.SetHorizontal(etk.AlignCenter)
+			label.SetVertical(etk.AlignCenter)
+			label.SetFont(etk.Style.TextFont, largeFontSize)
+			d.AddChildAt(label, 1, y, 3, 1)
+			y++
+		}
+
+		{
+			label := resizeText(fmt.Sprintf(gotext.Get("Created by %s"), "Trevor Slocum"))
+			label.SetVertical(etk.AlignCenter)
+			iconSprite := etk.NewSprite(imgIcon)
+			iconSprite.SetHorizontal(etk.AlignEnd)
+			iconSprite.SetVertical(etk.AlignStart)
+			d.AddChildAt(label, 1, y, 2, 1)
+			d.AddChildAt(iconSprite, 3, y, 1, 3)
+			d.AddChildAt(etk.NewBox(), 4, y, 1, 1)
+			y++
+		}
+
+		{
+			ll := resizeText(gotext.Get("Source:"))
+			ll.SetVertical(etk.AlignCenter)
+			rl := resizeText("bgammon.org/code")
+			rl.SetVertical(etk.AlignCenter)
+			d.AddChildAt(ll, 1, y, 1, 1)
+			d.AddChildAt(rl, 2, y, 1, 1)
+			y++
+		}
+
+		{
+			ll := resizeText(gotext.Get("Donate:"))
+			ll.SetVertical(etk.AlignCenter)
+			rl := resizeText("bgammon.org/donate")
+			rl.SetVertical(etk.AlignCenter)
+			d.AddChildAt(ll, 1, y, 1, 1)
+			d.AddChildAt(rl, 2, y, 1, 1)
+			y++
+		}
+
+		{
+			ll := resizeText(gotext.Get("Contact:"))
+			ll.SetVertical(etk.AlignCenter)
+			rl := resizeText("bgammon.org/community")
+			rl.SetVertical(etk.AlignCenter)
+			d.AddChildAt(ll, 1, y, 1, 1)
+			d.AddChildAt(rl, 2, y, 2, 1)
+			y++
+		}
+
+		d.AddChildAt(etk.NewButton(gotext.Get("Return"), func() error { g.aboutDialog.SetVisible(false); return nil }), 0, 5, 5, 1)
+		d.SetVisible(false)
+	}
+
 	{
 		headerLabel := newCenteredText(gotext.Get("Register"))
 		emailLabel := newCenteredText(gotext.Get("Email"))
@@ -782,10 +864,6 @@ func (g *Game) initialize() {
 
 		infoLabel := etk.NewText(gotext.Get("Please enter a valid email address, or it will not be possible to reset your password."))
 
-		footerLabel := etk.NewText("Boxcars " + AppVersion)
-		footerLabel.SetHorizontal(etk.AlignEnd)
-		footerLabel.SetVertical(etk.AlignEnd)
-
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
@@ -813,8 +891,12 @@ func (g *Game) initialize() {
 			grid.AddChildAt(subGrid, 1, y, 3, 1)
 		}
 		grid.AddChildAt(infoLabel, 1, y+1, 3, 1)
-		grid.AddChildAt(footerLabel, 1, y+2, 3, 1)
+		grid.AddChildAt(aboutGrid, 1, y+2, 3, 1)
 		registerGrid = grid
+
+		registerFrame = etk.NewFrame(registerGrid)
+		registerFrame.SetPositionChildren(true)
+		registerFrame.AddChild(etk.NewFrame(g.aboutDialog))
 	}
 
 	{
@@ -840,10 +922,6 @@ func (g *Game) initialize() {
 
 		g.resetInfo = etk.NewText("")
 
-		footerLabel := etk.NewText("Boxcars " + AppVersion)
-		footerLabel.SetHorizontal(etk.AlignEnd)
-		footerLabel.SetVertical(etk.AlignEnd)
-
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
@@ -867,8 +945,12 @@ func (g *Game) initialize() {
 			grid.AddChildAt(subGrid, 1, y, 3, 1)
 		}
 		grid.AddChildAt(g.resetInfo, 1, y+1, 3, 1)
-		grid.AddChildAt(footerLabel, 1, y+2, 3, 1)
+		grid.AddChildAt(aboutGrid, 1, y+2, 3, 1)
 		resetGrid = grid
+
+		resetFrame = etk.NewFrame(resetGrid)
+		resetFrame.SetPositionChildren(true)
+		resetFrame.AddChild(etk.NewFrame(g.aboutDialog))
 	}
 
 	{
@@ -882,10 +964,6 @@ func (g *Game) initialize() {
 		}
 
 		infoLabel := etk.NewText(gotext.Get("To log in as a guest, enter a username (if you want) and do not enter a password."))
-
-		footerLabel := etk.NewText("Boxcars " + AppVersion)
-		footerLabel.SetHorizontal(etk.AlignEnd)
-		footerLabel.SetVertical(etk.AlignEnd)
 
 		g.connectUsername = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.selectConnect()
@@ -948,7 +1026,7 @@ func (g *Game) initialize() {
 			grid.AddChildAt(subGrid, 1, g.connectGridY+1, 3, 1)
 		}
 		grid.AddChildAt(infoLabel, 1, g.connectGridY+2, 3, 1)
-		grid.AddChildAt(footerLabel, 1, g.connectGridY+3, 3, 1)
+		grid.AddChildAt(aboutGrid, 1, g.connectGridY+3, 3, 1)
 		connectGrid = grid
 
 		{
@@ -967,6 +1045,7 @@ func (g *Game) initialize() {
 
 		connectFrame = etk.NewFrame(connectGrid)
 		connectFrame.SetPositionChildren(true)
+		connectFrame.AddChild(etk.NewFrame(g.aboutDialog))
 		connectFrame.AddChild(etk.NewFrame(g.quitDialog))
 	}
 
@@ -983,11 +1062,11 @@ func (g *Game) initialize() {
 		})}
 		centerInput(g.lobby.createGameName)
 
-		g.lobby.createGamePoints = &Input{etk.NewInput("", func(text string) (handled bool) {
+		g.lobby.createGamePoints = &NumericInput{etk.NewInput("", func(text string) (handled bool) {
 			g.lobby.confirmCreateGame()
 			return false
 		})}
-		centerInput(g.lobby.createGamePoints)
+		centerNumericInput(g.lobby.createGamePoints)
 
 		g.lobby.createGamePassword = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.lobby.confirmCreateGame()
@@ -1194,6 +1273,7 @@ func (g *Game) initialize() {
 		{
 			g.lobby.historyPageDialog = etk.NewGrid()
 			g.lobby.historyPageDialogInput = &NumericInput{etk.NewInput("", g.confirmHistoryPage)}
+			centerNumericInput(g.lobby.historyPageDialogInput)
 			label := resizeText(gotext.Get("Go to page:"))
 			label.SetHorizontal(etk.AlignCenter)
 			label.SetVertical(etk.AlignCenter)
@@ -1904,22 +1984,25 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 }
 
 func (g *Game) selectRegister() error {
+	g.closeDialogs()
 	g.showRegister = true
 	g.registerUsername.SetText(g.connectUsername.Text())
 	g.registerPassword.SetText(g.connectPassword.Text())
-	g.setRoot(registerGrid)
+	g.setRoot(registerFrame)
 	etk.SetFocus(g.registerEmail)
 	return nil
 }
 
 func (g *Game) selectReset() error {
+	g.closeDialogs()
 	g.showReset = true
-	g.setRoot(resetGrid)
+	g.setRoot(resetFrame)
 	etk.SetFocus(g.resetEmail)
 	return nil
 }
 
 func (g *Game) selectCancel() error {
+	g.closeDialogs()
 	g.showRegister = false
 	g.showReset = false
 	g.setRoot(connectFrame)
@@ -1928,6 +2011,7 @@ func (g *Game) selectCancel() error {
 }
 
 func (g *Game) selectConfirmRegister() error {
+	g.closeDialogs()
 	go hideKeyboard()
 	g.Email = g.registerEmail.Text()
 	g.Username = g.registerUsername.Text()
@@ -1941,6 +2025,7 @@ func (g *Game) selectConfirmRegister() error {
 }
 
 func (g *Game) selectConfirmReset() error {
+	g.closeDialogs()
 	go hideKeyboard()
 	if g.resetInProgress {
 		return nil
@@ -1963,6 +2048,7 @@ func (g *Game) selectConfirmReset() error {
 }
 
 func (g *Game) selectConnect() error {
+	g.closeDialogs()
 	go hideKeyboard()
 	g.Username = g.connectUsername.Text()
 	g.Password = g.connectPassword.Text()
@@ -1971,6 +2057,16 @@ func (g *Game) selectConnect() error {
 	}
 	g.Connect()
 	return nil
+}
+
+func (g *Game) showAboutDialog() error {
+	g.aboutDialog.SetVisible(true)
+	return nil
+}
+
+func (g *Game) closeDialogs() {
+	g.aboutDialog.SetVisible(false)
+	g.quitDialog.SetVisible(false)
 }
 
 func (g *Game) searchMatches(username string) {
@@ -2096,7 +2192,11 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					}
 				}
 			case ebiten.KeyEnter, ebiten.KeyKPEnter:
-				if g.showRegister {
+				if g.aboutDialog.Visible() {
+					g.aboutDialog.SetVisible(false)
+					g.ignoreEnter = true
+					return nil
+				} else if g.showRegister {
 					g.selectConfirmRegister()
 					return nil
 				} else if g.showReset {
@@ -2110,7 +2210,10 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					return nil
 				}
 			case ebiten.KeyEscape:
-				if g.showRegister || g.showReset {
+				if g.aboutDialog.Visible() {
+					g.aboutDialog.SetVisible(false)
+					return nil
+				} else if g.showRegister || g.showReset {
 					g.selectCancel()
 					return nil
 				} else {
@@ -2274,7 +2377,7 @@ func (g *Game) Update() error {
 	defer g.Unlock()
 
 	if g.ignoreEnter {
-		if ebiten.IsKeyPressed(ebiten.KeyEnter) {
+		if ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeyKPEnter) {
 			return nil
 		}
 		g.ignoreEnter = false
@@ -2343,6 +2446,8 @@ func (g *Game) Update() error {
 	err := g.handleInput(g.pressedKeys)
 	if err != nil {
 		return err
+	} else if g.ignoreEnter {
+		return nil
 	}
 
 	if mobileDevice {
@@ -2356,34 +2461,10 @@ func (g *Game) Update() error {
 	if err != nil {
 		return err
 	}
+
 	if !g.loggedIn {
 		return nil
-	}
-
-	if !viewBoard {
-		if g.lobby.showCreateGame || g.lobby.showJoinGame {
-			if g.lobby.showCreateGame {
-				if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-					p := image.Point{cx, cy}
-					if p.In(g.lobby.createGameName.Rect()) {
-						etk.SetFocus(g.lobby.createGameName)
-					} else if p.In(g.lobby.createGamePoints.Rect()) {
-						etk.SetFocus(g.lobby.createGamePoints)
-					} else if p.In(g.lobby.createGamePassword.Rect()) {
-						etk.SetFocus(g.lobby.createGamePassword)
-					}
-				}
-			}
-
-			if g.lobby.showCreateGame {
-				pointsText := g.lobby.createGamePoints.Text()
-				strippedText := strings.Join(anyNumbers.FindAllString(pointsText, -1), "")
-				if pointsText != strippedText {
-					g.lobby.createGamePoints.SetText(strippedText)
-				}
-			}
-		}
-	} else {
+	} else if viewBoard {
 		g.board.Update()
 	}
 	return nil
@@ -2500,6 +2581,20 @@ func (g *Game) layoutConnect() {
 		connectGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), etk.Scale(baseButtonHeight), infoHeight)
 		registerGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
 		resetGrid.SetRowSizes(headerHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
+	}
+
+	{
+		dialogWidth := etk.Scale(800)
+		if dialogWidth > game.screenW {
+			dialogWidth = game.screenW
+		}
+		dialogHeight := etk.Scale(baseButtonHeight)*2 + etk.Scale(250)
+		if dialogHeight > game.screenH {
+			dialogHeight = game.screenH
+		}
+
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(g.board.verticalBorderSize)
+		g.aboutDialog.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 
 	{
@@ -2935,6 +3030,11 @@ func newCenteredText(text string) *etk.Text {
 }
 
 func centerInput(input *Input) {
+	input.SetVertical(etk.AlignCenter)
+	input.SetPadding(etk.Scale(5))
+}
+
+func centerNumericInput(input *NumericInput) {
 	input.SetVertical(etk.AlignCenter)
 	input.SetPadding(etk.Scale(5))
 }

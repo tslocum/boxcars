@@ -61,7 +61,7 @@ type lobby struct {
 
 	showCreateGame           bool
 	createGameName           *Input
-	createGamePoints         *Input
+	createGamePoints         *NumericInput
 	createGamePassword       *Input
 	createGameAceyCheckbox   *etk.Checkbox
 	createGameTabulaCheckbox *etk.Checkbox
