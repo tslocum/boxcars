@@ -957,7 +957,7 @@ func (b *board) MuteSounds() {
 func (b *board) newSprite(white bool) *Sprite {
 	s := &Sprite{}
 	s.colorWhite = white
-	s.w, s.h = imgCheckerTop.Bounds().Dx(), imgCheckerTop.Bounds().Dy()
+	s.w, s.h = imgCheckerTopLight.Bounds().Dx(), imgCheckerTopLight.Bounds().Dy()
 	return s
 }
 
@@ -1253,42 +1253,25 @@ func (b *board) updateBackgroundImage() {
 }
 
 func (b *board) drawChecker(target *ebiten.Image, checker *ebiten.Image, x float64, y float64, white bool, side bool) {
-	// Draw shadow.
-	if !side {
-		op := &ebiten.DrawImageOptions{}
-		op.Filter = ebiten.FilterLinear
-		op.GeoM.Translate(x, y)
-		op.ColorScale.Scale(0, 0, 0, 1)
-		target.DrawImage(checker, op)
-	}
-
-	// Draw checker.
-
-	checkerScale := 0.94
-
-	height := b.spaceWidth
-	if side {
-		height = 80
-	}
-
 	op := &ebiten.DrawImageOptions{}
 	op.Filter = ebiten.FilterLinear
-	op.GeoM.Translate(-b.spaceWidth/2, -height/2)
-	op.GeoM.Scale(checkerScale, checkerScale)
-	op.GeoM.Translate((b.spaceWidth/2)+x, (height/2)+y)
+	op.GeoM.Translate(x, y)
 
-	c := lightCheckerColor
-	if !white {
-		c = darkCheckerColor
-	}
 	op.ColorScale.Scale(0, 0, 0, 1)
-	r := float32(c.R) / 0xff
-	g := float32(c.G) / 0xff
-	bl := float32(c.B) / 0xff
+	r := float32(checkerColor.R) / 0xff
+	g := float32(checkerColor.G) / 0xff
+	bl := float32(checkerColor.B) / 0xff
 	op.ColorScale.SetR(r)
 	op.ColorScale.SetG(g)
 	op.ColorScale.SetB(bl)
 
+	if !white {
+		if checker == imgCheckerTopLight {
+			checker = imgCheckerTopDark
+		} else {
+			checker = imgCheckerSideDark
+		}
+	}
 	target.DrawImage(checker, op)
 }
 
@@ -1335,7 +1318,7 @@ func (b *board) drawSprite(target *ebiten.Image, sprite *Sprite) {
 		// Schedule another frame
 		scheduleFrame()
 	}
-	b.drawChecker(target, imgCheckerTop, x, y, sprite.colorWhite, false)
+	b.drawChecker(target, imgCheckerTopLight, x, y, sprite.colorWhite, false)
 }
 
 func (b *board) innerBoardCenter(right bool) int {
@@ -1424,7 +1407,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		} else {
 			checkerOffset = 0
 		}
-		b.drawChecker(screen, imgCheckerSide, float64(b.x+b.w)-b.spaceWidth, checkerY-checkerHeight*float64(i+1)-checkerOffset, b.flipBoard, true)
+		b.drawChecker(screen, imgCheckerSideLight, float64(b.x+b.w)-b.spaceWidth, checkerY-checkerHeight*float64(i+1)-checkerOffset, b.flipBoard, true)
 	}
 
 	checkerY = float64(b.y+int(b.verticalBorderSize)) + 1
@@ -1438,7 +1421,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		} else {
 			checkerOffset = 0
 		}
-		b.drawChecker(screen, imgCheckerSide, float64(b.x+b.w)-b.spaceWidth, float64(checkerY+checkerHeight*float64(i)+checkerOffset), !b.flipBoard, true)
+		b.drawChecker(screen, imgCheckerSideLight, float64(b.x+b.w)-b.spaceWidth, float64(checkerY+checkerHeight*float64(i)+checkerOffset), !b.flipBoard, true)
 	}
 
 	b.stateLock.Lock()
@@ -1666,7 +1649,7 @@ func (b *board) setRect(x, y, w, h int) {
 
 	for i := 0; i < b.Sprites.num; i++ {
 		s := b.Sprites.sprites[i]
-		s.w, s.h = imgCheckerTop.Bounds().Dx(), imgCheckerTop.Bounds().Dy()
+		s.w, s.h = imgCheckerTopLight.Bounds().Dx(), imgCheckerTopLight.Bounds().Dy()
 	}
 
 	b.setSpaceRects()

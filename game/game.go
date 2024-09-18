@@ -58,8 +58,10 @@ var resizeDuration = 250 * time.Millisecond
 var assetFS embed.FS
 
 var (
-	imgCheckerTop  *ebiten.Image
-	imgCheckerSide *ebiten.Image
+	imgCheckerTopLight  *ebiten.Image
+	imgCheckerTopDark   *ebiten.Image
+	imgCheckerSideLight *ebiten.Image
+	imgCheckerSideDark  *ebiten.Image
 
 	imgDice  *ebiten.Image
 	imgDice1 *ebiten.Image
@@ -83,8 +85,7 @@ var (
 )
 
 var (
-	lightCheckerColor = color.RGBA{232, 211, 162, 255}
-	darkCheckerColor  = color.RGBA{0, 0, 0, 255}
+	checkerColor = color.RGBA{232, 211, 162, 255}
 )
 
 const maxStatusWidthRatio = 0.5
@@ -196,8 +197,10 @@ func loadImageAssets(width int) {
 	}
 	loadedCheckerWidth = width
 
-	imgCheckerTop = loadAsset("asset/image/checker_top.png", width)
-	imgCheckerSide = loadAsset("asset/image/checker_side.png", width)
+	imgCheckerTopLight = loadAsset("asset/image/checker_top_light.png", width)
+	imgCheckerTopDark = loadAsset("asset/image/checker_top_dark.png", width)
+	imgCheckerSideLight = loadAsset("asset/image/checker_side_light.png", width)
+	imgCheckerSideDark = loadAsset("asset/image/checker_side_dark.png", width)
 
 	resizeDice := func(img image.Image, scale float64) *ebiten.Image {
 		if game == nil {
