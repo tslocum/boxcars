@@ -5,7 +5,7 @@ go 1.23
 toolchain go1.23.0
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240916195023-c833adb3566e
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240918192230-0a4b5e9b0923
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240912051307-7b35245a5adc
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b

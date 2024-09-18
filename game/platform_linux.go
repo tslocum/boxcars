@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	AppName                = "boxcars-linux"
 	targetFPS              = 144
 	ShowServerSettings     = false
 	ShowQuitDialog         = true
@@ -20,6 +19,7 @@ const (
 
 var (
 	steamDeck    = isSteamDeck()
+	AppName      = appName()
 	mobileDevice = steamDeck
 )
 
@@ -37,6 +37,14 @@ func isSteamDeck() bool {
 		return false
 	}
 	return bytes.Equal(bytes.ToLower(bytes.TrimSpace(buf)), []byte("valve"))
+}
+
+func appName() string {
+	platform := "linux"
+	if steamDeck {
+		platform = "steamdeck"
+	}
+	return "boxcars-" + platform
 }
 
 func GetLocale() (string, error) {
