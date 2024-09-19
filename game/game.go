@@ -753,13 +753,15 @@ func (g *Game) initialize() {
 
 	var aboutGrid *etk.Grid
 	{
+		versionInfo := etk.NewText("Boxcars " + AppVersion)
+		versionInfo.SetVertical(etk.AlignCenter)
 		aboutLabel := gotext.Get("About")
 		bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), aboutLabel)
 		aboutButton := etk.NewButton(aboutLabel, g.showAboutDialog)
 		aboutGrid = etk.NewGrid()
 		aboutGrid.SetRowSizes(-1, bounds.Dy()*2)
 		aboutGrid.SetColumnSizes(-1, bounds.Dx()+etk.Scale(50))
-		aboutGrid.AddChildAt(etk.NewText("Boxcars "+AppVersion), 0, 1, 1, 1)
+		aboutGrid.AddChildAt(versionInfo, 0, 1, 1, 1)
 		aboutGrid.AddChildAt(aboutButton, 1, 1, 1, 1)
 	}
 
@@ -1459,11 +1461,21 @@ func (g *Game) playOffline() {
 	go g.ConnectLocal(<-g.localServer)
 }
 
-func (g *Game) showMainMenu() {
+func (g *Game) clearBuffers() {
+	statusBuffer.SetText("")
+	gameBuffer.SetText("")
+	inputBuffer.SetText("")
+
+	statusLogged = false
+	gameLogged = false
+}
+
+func (g *Game) showMainMenu(clearBuffers bool) {
 	if !g.loggedIn {
 		return
 	}
 	g.loggedIn = false
+	g.register = false
 
 	if g.client == nil {
 		return
@@ -1482,9 +1494,9 @@ func (g *Game) showMainMenu() {
 		etk.SetFocus(g.connectPassword)
 	}
 
-	statusBuffer.SetText("")
-	gameBuffer.SetText("")
-	inputBuffer.SetText("")
+	if clearBuffers {
+		g.clearBuffers()
+	}
 
 	loadingText := newCenteredText(gotext.Get("Loading..."))
 	if smallScreen {
@@ -1492,9 +1504,6 @@ func (g *Game) showMainMenu() {
 	}
 	g.lobby.availableMatchesList.Clear()
 	g.lobby.availableMatchesList.AddChildAt(loadingText, 0, 0)
-
-	statusLogged = false
-	gameLogged = false
 
 	g.loggedIn = false
 }
@@ -1904,6 +1913,7 @@ func (g *Game) Connect() {
 	}
 	g.loggedIn = true
 
+	g.clearBuffers()
 	ls("*** " + gotext.Get("Connecting..."))
 
 	if g.Password != "" {
@@ -1944,8 +1954,7 @@ func (g *Game) Connect() {
 					g.showConnectStatusBuffer = true
 				}
 
-				g.loggedIn = false
-				g.setRoot(connectFrame)
+				g.showMainMenu(false)
 				scheduleFrame()
 				return
 			}
@@ -1964,6 +1973,7 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 	}
 	g.loggedIn = true
 
+	g.clearBuffers()
 	ls("*** " + gotext.Get("Playing offline."))
 
 	g.setRoot(listGamesFrame)
@@ -2272,7 +2282,7 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 				etk.SetFocus(nil)
 				return nil
 			} else {
-				g.showMainMenu()
+				g.showMainMenu(true)
 				return nil
 			}
 		}
