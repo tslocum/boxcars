@@ -583,8 +583,8 @@ type Game struct {
 
 	tutorialFrame *etk.Frame
 
-	aboutDialog *etk.Grid
-	quitDialog  *etk.Grid
+	aboutDialog *Dialog
+	quitDialog  *Dialog
 
 	bufferFontSize int
 
@@ -765,10 +765,10 @@ func (g *Game) initialize() {
 	}
 
 	{
-		g.aboutDialog = etk.NewGrid()
+		g.aboutDialog = &Dialog{etk.NewGrid()}
 		d := g.aboutDialog
-		d.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, etk.Scale(baseButtonHeight))
-		d.SetColumnSizes(etk.Scale(10), etk.Scale(172), -1, etk.Scale(128), etk.Scale(10))
+		d.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, -1, -1, etk.Scale(baseButtonHeight))
+		d.SetColumnSizes(etk.Scale(10), etk.Scale(172), -1, etk.Scale(144), etk.Scale(10))
 		d.SetBackground(color.RGBA{40, 24, 9, 255})
 
 		var y int
@@ -783,13 +783,25 @@ func (g *Game) initialize() {
 
 		{
 			label := resizeText(fmt.Sprintf(gotext.Get("Created by %s"), "Trevor Slocum"))
-			label.SetVertical(etk.AlignCenter)
+			label.SetHorizontal(etk.AlignCenter)
+			label.SetVertical(etk.AlignStart)
+			label.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+			d.AddChildAt(label, 1, y, 3, 1)
+			d.AddChildAt(etk.NewBox(), 4, y, 1, 1)
+			y++
+		}
+
+		{
+			ll := resizeText(gotext.Get("FAQ:"))
+			ll.SetVertical(etk.AlignCenter)
+			rl := resizeText("bgammon.org/faq")
+			rl.SetVertical(etk.AlignCenter)
+			d.AddChildAt(ll, 1, y, 1, 1)
+			d.AddChildAt(rl, 2, y, 1, 1)
 			iconSprite := etk.NewSprite(imgIcon)
 			iconSprite.SetHorizontal(etk.AlignEnd)
 			iconSprite.SetVertical(etk.AlignStart)
-			d.AddChildAt(label, 1, y, 2, 1)
-			d.AddChildAt(iconSprite, 3, y, 1, 3)
-			d.AddChildAt(etk.NewBox(), 4, y, 1, 1)
+			d.AddChildAt(iconSprite, 3, y-1, 1, 4)
 			y++
 		}
 
@@ -823,7 +835,7 @@ func (g *Game) initialize() {
 			y++
 		}
 
-		d.AddChildAt(etk.NewButton(gotext.Get("Return"), func() error { g.aboutDialog.SetVisible(false); return nil }), 0, 5, 5, 1)
+		d.AddChildAt(etk.NewButton(gotext.Get("Return"), func() error { g.aboutDialog.SetVisible(false); return nil }), 0, y+1, 5, 1)
 		d.SetVisible(false)
 	}
 
@@ -1031,7 +1043,7 @@ func (g *Game) initialize() {
 		connectGrid = grid
 
 		{
-			g.quitDialog = etk.NewGrid()
+			g.quitDialog = &Dialog{etk.NewGrid()}
 			label := resizeText(gotext.Get("Exit Boxcars?"))
 			label.SetHorizontal(etk.AlignCenter)
 			label.SetVertical(etk.AlignCenter)
@@ -2589,7 +2601,7 @@ func (g *Game) layoutConnect() {
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := etk.Scale(baseButtonHeight)*2 + etk.Scale(250)
+		dialogHeight := etk.Scale(baseButtonHeight)*2 + etk.Scale(276)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
@@ -2972,6 +2984,15 @@ func LoadLocale(forceLanguage *language.Tag) error {
 
 	AppLanguage = useLanguageName
 	return nil
+}
+
+type Dialog struct {
+	*etk.Grid
+}
+
+func (d *Dialog) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
+	_, err = d.Grid.HandleMouse(cursor, pressed, clicked)
+	return true, err
 }
 
 type Input struct {

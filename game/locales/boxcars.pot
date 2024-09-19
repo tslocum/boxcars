@@ -127,6 +127,9 @@ msgstr ""
 msgid "Exit Boxcars?"
 msgstr ""
 
+msgid "FAQ:"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr ""
 
