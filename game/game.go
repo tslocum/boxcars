@@ -768,7 +768,7 @@ func (g *Game) initialize() {
 		g.aboutDialog = &Dialog{etk.NewGrid()}
 		d := g.aboutDialog
 		d.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, -1, -1, etk.Scale(baseButtonHeight))
-		d.SetColumnSizes(etk.Scale(10), etk.Scale(172), -1, etk.Scale(144), etk.Scale(10))
+		d.SetColumnSizes(etk.Scale(10), labelWidth, -1, 144, etk.Scale(10))
 		d.SetBackground(color.RGBA{40, 24, 9, 255})
 
 		var y int
@@ -776,8 +776,8 @@ func (g *Game) initialize() {
 			label := resizeText("Boxcars")
 			label.SetHorizontal(etk.AlignCenter)
 			label.SetVertical(etk.AlignCenter)
-			label.SetFont(etk.Style.TextFont, largeFontSize)
-			d.AddChildAt(label, 1, y, 3, 1)
+			label.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
+			d.AddChildAt(label, 0, y, 5, 1)
 			y++
 		}
 
@@ -2524,53 +2524,53 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		screen.Fill(tableColor)
 	}
 
-	// Log in screen
-	if !g.loggedIn {
+	if !g.loggedIn { // Draw main menu.
 		err := etk.Draw(screen)
 		if err != nil {
 			log.Fatal(err)
 		}
+	} else { // Draw lobby and board.
+		if viewBoard {
+			g.board.Draw(screen)
+		}
+
+		err := etk.Draw(screen)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if g.lobby.joiningGameID != 0 && drawScreen == 0 && !g.lobby.joiningGameShown {
+			g.lobby.joiningGameShown = true
+			g.lobby.c.Out <- []byte(fmt.Sprintf("j %d %s", g.lobby.joiningGameID, g.lobby.joiningGamePassword))
+		}
+	}
+
+	if Debug == 0 {
 		return
 	}
+	// Draw debug information.
+	g.drawBuffer.Reset()
 
-	if viewBoard {
-		g.board.Draw(screen)
+	g.spinnerIndex++
+	if g.spinnerIndex == 4 {
+		g.spinnerIndex = 0
 	}
 
-	err := etk.Draw(screen)
-	if err != nil {
-		log.Fatal(err)
+	scale := etk.ScaleFactor()
+	if scale != 1.0 {
+		g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f\n", scale)))
 	}
 
-	if g.lobby.joiningGameID != 0 && drawScreen == 0 && !g.lobby.joiningGameShown {
-		g.lobby.joiningGameShown = true
-		g.lobby.c.Out <- []byte(fmt.Sprintf("j %d %s", g.lobby.joiningGameID, g.lobby.joiningGamePassword))
-	}
+	g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %c %0.0f", spinner[g.spinnerIndex], ebiten.ActualFPS())))
 
-	if Debug > 0 {
-		g.drawBuffer.Reset()
+	g.debugImg.Clear()
 
-		g.spinnerIndex++
-		if g.spinnerIndex == 4 {
-			g.spinnerIndex = 0
-		}
+	ebitenutil.DebugPrint(g.debugImg, g.drawBuffer.String())
 
-		scale := etk.ScaleFactor()
-		if scale != 1.0 {
-			g.drawBuffer.Write([]byte(fmt.Sprintf("SCA %0.1f\n", scale)))
-		}
-
-		g.drawBuffer.Write([]byte(fmt.Sprintf("FPS %c %0.0f", spinner[g.spinnerIndex], ebiten.ActualFPS())))
-
-		g.debugImg.Clear()
-
-		ebitenutil.DebugPrint(g.debugImg, g.drawBuffer.String())
-
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(3, 0)
-		op.GeoM.Scale(2, 2)
-		screen.DrawImage(g.debugImg, op)
-	}
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(3, 0)
+	op.GeoM.Scale(2, 2)
+	screen.DrawImage(g.debugImg, op)
 }
 
 func (g *Game) portraitView() bool {
@@ -2597,16 +2597,27 @@ func (g *Game) layoutConnect() {
 	}
 
 	{
+		fontMutex.Lock()
+		m := etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)).Metrics()
+		lineHeight := m.Height.Round()
+		fontMutex.Unlock()
+
 		dialogWidth := etk.Scale(800)
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := etk.Scale(baseButtonHeight)*2 + etk.Scale(276)
+		dialogHeight := etk.Scale(baseButtonHeight)*2 + lineHeight*5
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
 
-		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(g.board.verticalBorderSize)
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
+		if x < 0 {
+			x = 0
+		}
+		if y < 0 {
+			y = 0
+		}
 		g.aboutDialog.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 
@@ -2620,7 +2631,13 @@ func (g *Game) layoutConnect() {
 			dialogHeight = game.screenH
 		}
 
-		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(g.board.verticalBorderSize)
+		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
+		if x < 0 {
+			x = 0
+		}
+		if y < 0 {
+			y = 0
+		}
 		g.quitDialog.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 }
