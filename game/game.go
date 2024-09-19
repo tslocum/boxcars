@@ -539,7 +539,6 @@ type Game struct {
 	lastResize       time.Time
 
 	drawBuffer bytes.Buffer
-	drawTick   int
 
 	spinnerIndex int
 
@@ -2381,8 +2380,6 @@ func (g *Game) Update() error {
 		return nil
 	}
 
-	g.drawTick++
-
 	g.Lock()
 	defer g.Unlock()
 
@@ -2495,12 +2492,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	gameUpdateLock.Lock()
 	if drawScreen <= 0 {
-		if g.drawTick < targetFPS {
-			gameUpdateLock.Unlock()
-			return
-		} else if drawScreen == 0 {
-			drawScreen = 1
-		}
+		gameUpdateLock.Unlock()
+		return
 	}
 	now := time.Now()
 	diff := 1000000000*time.Nanosecond/targetFPS - now.Sub(lastDraw)
@@ -2512,8 +2505,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		drawScreen -= 1
 	}
 	gameUpdateLock.Unlock()
-
-	g.drawTick = 0
 
 	if !viewBoard {
 		screen.Fill(frameColor)
