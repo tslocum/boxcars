@@ -643,7 +643,7 @@ func NewGame() *Game {
 	ebiten.SetWindowClosingHandled(true)
 
 	if smallScreen {
-		etk.Style.BorderSize /= 2
+		etk.Style.ButtonBorderSize /= 2
 
 		extraSmallFontSize /= 2
 		smallFontSize /= 2
@@ -670,11 +670,15 @@ func NewGame() *Game {
 	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
 	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
 
-	etk.Style.BorderColorLeft = color.RGBA{233, 207, 170, 255}
-	etk.Style.BorderColorTop = color.RGBA{233, 207, 170, 255}
+	etk.Style.ButtonBorderLeft = color.RGBA{233, 207, 170, 255}
+	etk.Style.ButtonBorderTop = color.RGBA{233, 207, 170, 255}
 
-	etk.Style.ScrollBorderColorLeft = color.RGBA{210, 182, 135, 255}
-	etk.Style.ScrollBorderColorTop = color.RGBA{210, 182, 135, 255}
+	etk.Style.InputBorderSize = 1
+	etk.Style.InputBorderFocused = color.RGBA{0, 0, 0, 255}
+	etk.Style.InputBorderUnfocused = color.RGBA{0, 0, 0, 255}
+
+	etk.Style.ScrollBorderLeft = color.RGBA{210, 182, 135, 255}
+	etk.Style.ScrollBorderTop = color.RGBA{210, 182, 135, 255}
 
 	g := &Game{
 		keyboard:      etk.NewKeyboard(),
@@ -710,6 +714,8 @@ func (g *Game) initialize() {
 	statusBuffer = etk.NewText("")
 	gameBuffer = etk.NewText("")
 	inputBuffer = &Input{etk.NewInput("", acceptInput)}
+
+	inputBuffer.SetBorderSize(0)
 
 	statusBuffer.SetForeground(bufferTextColor)
 	statusBuffer.SetBackground(bufferBackgroundColor)
@@ -1286,6 +1292,7 @@ func (g *Game) initialize() {
 			g.lobby.historyPageDialog = etk.NewGrid()
 			g.lobby.historyPageDialogInput = &NumericInput{etk.NewInput("", g.confirmHistoryPage)}
 			centerNumericInput(g.lobby.historyPageDialogInput)
+			g.lobby.historyPageDialogInput.SetBorderSize(0)
 			label := resizeText(gotext.Get("Go to page:"))
 			label.SetHorizontal(etk.AlignCenter)
 			label.SetVertical(etk.AlignCenter)

@@ -454,7 +454,7 @@ func (b *board) createMatchStatus() {
 
 	b.showMenuButton = etk.NewButton(gotext.Get("Menu"), b.toggleMenu)
 	if !mobileDevice {
-		b.showMenuButton.SetBorderSize(etk.Scale(etk.Style.BorderSize / 2))
+		b.showMenuButton.SetBorderSize(etk.Scale(etk.Style.ButtonBorderSize / 2))
 	}
 
 	b.matchStatusGrid = etk.NewGrid()
