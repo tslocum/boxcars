@@ -74,6 +74,7 @@ func (b *board) createChangePasswordDialog() {
 	})}
 	b.changePasswordOld.SetBackground(frameColor)
 	centerInput(b.changePasswordOld)
+	b.changePasswordOld.SetMask('*')
 
 	newLabel := &ClickableText{
 		Text: resizeText(gotext.Get("New")),
@@ -90,6 +91,7 @@ func (b *board) createChangePasswordDialog() {
 	})}
 	b.changePasswordNew.SetBackground(frameColor)
 	centerInput(b.changePasswordNew)
+	b.changePasswordNew.SetMask('*')
 
 	fieldGrid := etk.NewGrid()
 	fieldGrid.SetColumnSizes(-1, -1)
