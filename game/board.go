@@ -120,16 +120,16 @@ type board struct {
 
 	menuGrid *etk.Grid
 
-	changePasswordOld  *Input
-	changePasswordNew  *Input
-	changePasswordGrid *etk.Grid
+	changePasswordOld    *Input
+	changePasswordNew    *Input
+	changePasswordDialog *Dialog
 
 	muteJoinLeaveCheckbox *etk.Checkbox
 	muteChatCheckbox      *etk.Checkbox
 	muteRollCheckbox      *etk.Checkbox
 	muteMoveCheckbox      *etk.Checkbox
 	muteBearOffCheckbox   *etk.Checkbox
-	muteSoundsGrid        *etk.Grid
+	muteSoundsDialog      *Dialog
 
 	highlightCheckbox        *etk.Checkbox
 	showPipCountCheckbox     *etk.Checkbox
@@ -140,7 +140,7 @@ type board struct {
 	autoPlayCheckbox         *etk.Checkbox
 	selectSpeed              *etk.Select
 	accountGrid              *etk.Grid
-	settingsGrid             *etk.Grid
+	settingsDialog           *Dialog
 
 	matchStatusGrid *etk.Grid
 
@@ -237,10 +237,7 @@ func NewBoard() *board {
 		buttonsUndoOKGrid:         etk.NewGrid(),
 		selectRollGrid:            etk.NewGrid(),
 		menuGrid:                  etk.NewGrid(),
-		muteSoundsGrid:            etk.NewGrid(),
 		accountGrid:               etk.NewGrid(),
-		settingsGrid:              etk.NewGrid(),
-		changePasswordGrid:        etk.NewGrid(),
 		uiGrid:                    etk.NewGrid(),
 		frame:                     etk.NewFrame(),
 		speed:                     bgammon.SpeedMedium,
@@ -505,35 +502,35 @@ func (b *board) leaveMatch() error {
 
 func (b *board) showSettings() error {
 	b.menuGrid.SetVisible(false)
-	b.settingsGrid.SetVisible(false)
+	b.settingsDialog.SetVisible(false)
 	b.selectSpeed.SetMenuVisible(false)
-	b.changePasswordGrid.SetVisible(false)
-	b.muteSoundsGrid.SetVisible(false)
-	b.settingsGrid.SetVisible(true)
+	b.changePasswordDialog.SetVisible(false)
+	b.muteSoundsDialog.SetVisible(false)
+	b.settingsDialog.SetVisible(true)
 	return nil
 }
 
 func (b *board) showChangePassword() error {
-	b.settingsGrid.SetVisible(false)
+	b.settingsDialog.SetVisible(false)
 	b.selectSpeed.SetMenuVisible(false)
-	b.changePasswordGrid.SetVisible(true)
+	b.changePasswordDialog.SetVisible(true)
 	etk.SetFocus(b.changePasswordOld)
 	return nil
 }
 
 func (b *board) showMuteSounds() error {
-	b.settingsGrid.SetVisible(false)
+	b.settingsDialog.SetVisible(false)
 	b.selectSpeed.SetMenuVisible(false)
-	b.changePasswordGrid.SetVisible(false)
-	b.muteSoundsGrid.SetVisible(true)
+	b.changePasswordDialog.SetVisible(false)
+	b.muteSoundsDialog.SetVisible(true)
 	return nil
 }
 
 func (b *board) hideMenu() error {
 	b.menuGrid.SetVisible(false)
-	b.settingsGrid.SetVisible(false)
+	b.settingsDialog.SetVisible(false)
 	b.selectSpeed.SetMenuVisible(false)
-	b.changePasswordGrid.SetVisible(false)
+	b.changePasswordDialog.SetVisible(false)
 	b.changePasswordOld.SetText("")
 	b.changePasswordNew.SetText("")
 	return nil
@@ -542,7 +539,7 @@ func (b *board) hideMenu() error {
 func (b *board) toggleMenu() error {
 	if b.menuGrid.Visible() {
 		b.menuGrid.SetVisible(false)
-		b.settingsGrid.SetVisible(false)
+		b.settingsDialog.SetVisible(false)
 		b.selectSpeed.SetMenuVisible(false)
 	} else {
 		b.menuGrid.SetVisible(true)
@@ -1686,9 +1683,9 @@ func (b *board) setRect(x, y, w, h int) {
 		}
 
 		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight/2
-		b.settingsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
-		b.changePasswordGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
-		b.muteSoundsGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+		b.settingsDialog.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+		b.changePasswordDialog.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+		b.muteSoundsDialog.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 
 	{

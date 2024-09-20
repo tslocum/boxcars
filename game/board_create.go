@@ -99,15 +99,18 @@ func (b *board) createChangePasswordDialog() {
 	fieldGrid.AddChildAt(newLabel, 0, 2, 1, 1)
 	fieldGrid.AddChildAt(b.changePasswordNew, 1, 2, 2, 1)
 
-	b.changePasswordGrid.SetBackground(color.RGBA{40, 24, 9, 255})
-	b.changePasswordGrid.SetColumnSizes(20, -1, -1, 20)
-	b.changePasswordGrid.SetRowSizes(72, fieldHeight+20+fieldHeight, -1, etk.Scale(baseButtonHeight))
-	b.changePasswordGrid.AddChildAt(headerLabel, 1, 0, 2, 1)
-	b.changePasswordGrid.AddChildAt(fieldGrid, 1, 1, 2, 1)
-	b.changePasswordGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
-	b.changePasswordGrid.AddChildAt(etk.NewButton(gotext.Get("Cancel"), b.hideMenu), 0, 3, 2, 1)
-	b.changePasswordGrid.AddChildAt(etk.NewButton(gotext.Get("Submit"), b.selectChangePassword), 2, 3, 2, 1)
-	b.changePasswordGrid.SetVisible(false)
+	grid := etk.NewGrid()
+	grid.SetBackground(color.RGBA{40, 24, 9, 255})
+	grid.SetColumnSizes(20, -1, -1, 20)
+	grid.SetRowSizes(72, fieldHeight+20+fieldHeight, -1, etk.Scale(baseButtonHeight))
+	grid.AddChildAt(headerLabel, 1, 0, 2, 1)
+	grid.AddChildAt(fieldGrid, 1, 1, 2, 1)
+	grid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
+	grid.AddChildAt(etk.NewButton(gotext.Get("Cancel"), b.hideMenu), 0, 3, 2, 1)
+	grid.AddChildAt(etk.NewButton(gotext.Get("Submit"), b.selectChangePassword), 2, 3, 2, 1)
+
+	b.changePasswordDialog = &Dialog{grid}
+	b.changePasswordDialog.SetVisible(false)
 }
 
 func (b *board) createMuteSoundsDialog() {
@@ -210,14 +213,17 @@ func (b *board) createMuteSoundsDialog() {
 	checkboxGrid.AddChildAt(cGrid(b.muteBearOffCheckbox), 0, gridY, 1, 1)
 	checkboxGrid.AddChildAt(muteBearOffLabel, 2, gridY, 1, 1)
 
-	b.muteSoundsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
-	b.muteSoundsGrid.SetColumnSizes(20, -1, -1, 20)
-	b.muteSoundsGrid.SetRowSizes(72, fieldHeight+((fieldHeight+20)*(rowCount-1)), -1, etk.Scale(baseButtonHeight))
-	b.muteSoundsGrid.AddChildAt(headerLabel, 1, 0, 2, 1)
-	b.muteSoundsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
-	b.muteSoundsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
-	b.muteSoundsGrid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.showSettings), 0, 3, 4, 1)
-	b.muteSoundsGrid.SetVisible(false)
+	grid := etk.NewGrid()
+	grid.SetBackground(color.RGBA{40, 24, 9, 255})
+	grid.SetColumnSizes(20, -1, -1, 20)
+	grid.SetRowSizes(72, fieldHeight+((fieldHeight+20)*(rowCount-1)), -1, etk.Scale(baseButtonHeight))
+	grid.AddChildAt(headerLabel, 1, 0, 2, 1)
+	grid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
+	grid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
+	grid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.showSettings), 0, 3, 4, 1)
+
+	b.muteSoundsDialog = &Dialog{grid}
+	b.muteSoundsDialog.SetVisible(false)
 }
 
 func (b *board) createSettingsDialog() {
@@ -396,14 +402,17 @@ func (b *board) createSettingsDialog() {
 	if enableRightClick {
 		gridSize += 20 + 72
 	}
-	b.settingsGrid.SetBackground(color.RGBA{40, 24, 9, 255})
-	b.settingsGrid.SetColumnSizes(20, -1, -1, 20)
-	b.settingsGrid.SetRowSizes(72, -1, 20, etk.Scale(baseButtonHeight))
-	b.settingsGrid.AddChildAt(settingsLabel, 1, 0, 2, 1)
-	b.settingsGrid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
-	b.settingsGrid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
-	b.settingsGrid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.hideMenu), 0, 3, 4, 1)
-	b.settingsGrid.SetVisible(false)
+	grid := etk.NewGrid()
+	grid.SetBackground(color.RGBA{40, 24, 9, 255})
+	grid.SetColumnSizes(20, -1, -1, 20)
+	grid.SetRowSizes(72, -1, 20, etk.Scale(baseButtonHeight))
+	grid.AddChildAt(settingsLabel, 1, 0, 2, 1)
+	grid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
+	grid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
+	grid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.hideMenu), 0, 3, 4, 1)
+
+	b.settingsDialog = &Dialog{grid}
+	b.settingsDialog.SetVisible(false)
 }
 
 func (b *board) createLeaveMatchDialog() {
@@ -416,9 +425,9 @@ func (b *board) createLeaveMatchDialog() {
 	grid.AddChildAt(label, 0, 0, 2, 1)
 	grid.AddChildAt(etk.NewButton(gotext.Get("No"), b.cancelLeaveMatch), 0, 1, 1, 1)
 	grid.AddChildAt(etk.NewButton(gotext.Get("Yes"), b.confirmLeaveMatch), 1, 1, 1, 1)
-	grid.SetVisible(false)
 
 	b.leaveMatchDialog = &Dialog{grid}
+	b.leaveMatchDialog.SetVisible(false)
 }
 
 func (b *board) createMatchStatus() {
@@ -547,14 +556,14 @@ func (b *board) createFrame() {
 
 	f = etk.NewFrame()
 	f.AddChild(b.menuGrid)
-	f.AddChild(b.settingsGrid)
+	f.AddChild(b.settingsDialog)
 	children := b.selectSpeed.Children()
 	if len(children) == 0 {
 		log.Panicf("failed to find speed selection list")
 	}
 	f.AddChild(children[0])
-	f.AddChild(b.changePasswordGrid)
-	f.AddChild(b.muteSoundsGrid)
+	f.AddChild(b.changePasswordDialog)
+	f.AddChild(b.muteSoundsDialog)
 	f.AddChild(b.leaveMatchDialog)
 	b.frame.AddChild(f)
 

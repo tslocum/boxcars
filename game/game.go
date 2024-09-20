@@ -476,7 +476,7 @@ func setViewBoard(view bool) {
 		}
 
 		game.board.menuGrid.SetVisible(false)
-		game.board.settingsGrid.SetVisible(false)
+		game.board.settingsDialog.SetVisible(false)
 		game.board.selectSpeed.SetMenuVisible(false)
 		game.board.leaveMatchDialog.SetVisible(false)
 
@@ -2254,11 +2254,11 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 				if g.board.menuGrid.Visible() {
 					g.board.menuGrid.SetVisible(false)
 					return nil
-				} else if g.board.settingsGrid.Visible() {
-					g.board.settingsGrid.SetVisible(false)
+				} else if g.board.settingsDialog.Visible() {
+					g.board.settingsDialog.SetVisible(false)
 					g.board.selectSpeed.SetMenuVisible(false)
 					return nil
-				} else if g.board.changePasswordGrid.Visible() {
+				} else if g.board.changePasswordDialog.Visible() {
 					g.board.hideMenu()
 					return nil
 				} else if g.board.leaveMatchDialog.Visible() {
@@ -2353,7 +2353,7 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 		for _, key := range keys {
 			switch key {
 			case ebiten.KeyTab:
-				if g.board.changePasswordGrid.Visible() {
+				if g.board.changePasswordDialog.Visible() {
 					focusedWidget := etk.Focused()
 					switch focusedWidget {
 					case g.board.changePasswordOld:
@@ -2365,12 +2365,12 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					}
 				}
 			case ebiten.KeyBackspace:
-				if len(inputBuffer.Text()) == 0 && !g.board.gameState.Spectating && g.board.gameState.Turn == g.board.gameState.PlayerNumber && len(g.board.gameState.Moves) > 0 && !g.board.menuGrid.Visible() && !g.board.settingsGrid.Visible() && !g.board.changePasswordGrid.Visible() && !g.board.leaveMatchDialog.Visible() {
+				if len(inputBuffer.Text()) == 0 && !g.board.gameState.Spectating && g.board.gameState.Turn == g.board.gameState.PlayerNumber && len(g.board.gameState.Moves) > 0 && !g.board.menuGrid.Visible() && !g.board.settingsDialog.Visible() && !g.board.changePasswordDialog.Visible() && !g.board.leaveMatchDialog.Visible() {
 					g.board.selectUndo()
 					return nil
 				}
 			case ebiten.KeyEnter:
-				if g.board.changePasswordGrid.Visible() {
+				if g.board.changePasswordDialog.Visible() {
 					g.board.selectChangePassword()
 					return nil
 				} else if g.board.leaveMatchDialog.Visible() {
@@ -2781,7 +2781,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func acceptInput(text string) (handled bool) {
 	if len(text) == 0 {
 		g := game
-		if viewBoard && !g.board.menuGrid.Visible() && !g.board.settingsGrid.Visible() && !g.board.changePasswordGrid.Visible() && !g.board.leaveMatchDialog.Visible() {
+		if viewBoard && !g.board.menuGrid.Visible() && !g.board.settingsDialog.Visible() && !g.board.changePasswordDialog.Visible() && !g.board.leaveMatchDialog.Visible() {
 			if g.board.gameState.MayRoll() {
 				g.board.selectRoll()
 			} else if g.board.gameState.MayOK() {
