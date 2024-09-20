@@ -51,7 +51,7 @@ func (b *board) createMenu() {
 	b.menuGrid.AddChildAt(etk.NewBox(), 1, 0, 1, 1)
 	b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Settings"), b.showSettings), 2, 0, 1, 1)
 	b.menuGrid.AddChildAt(etk.NewBox(), 3, 0, 1, 1)
-	b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Leave"), b.leaveGame), 4, 0, 1, 1)
+	b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Leave"), b.leaveMatch), 4, 0, 1, 1)
 	b.menuGrid.SetVisible(false)
 }
 
@@ -407,16 +407,18 @@ func (b *board) createSettingsDialog() {
 }
 
 func (b *board) createLeaveMatchDialog() {
-	leaveGameLabel := resizeText(gotext.Get("Leave match?"))
-	leaveGameLabel.SetHorizontal(etk.AlignCenter)
-	leaveGameLabel.SetVertical(etk.AlignCenter)
+	label := resizeText(gotext.Get("Leave match?"))
+	label.SetHorizontal(etk.AlignCenter)
+	label.SetVertical(etk.AlignCenter)
 
-	b.leaveGameGrid = etk.NewGrid()
-	b.leaveGameGrid.SetBackground(color.RGBA{40, 24, 9, 255})
-	b.leaveGameGrid.AddChildAt(leaveGameLabel, 0, 0, 2, 1)
-	b.leaveGameGrid.AddChildAt(etk.NewButton(gotext.Get("No"), b.cancelLeaveGame), 0, 1, 1, 1)
-	b.leaveGameGrid.AddChildAt(etk.NewButton(gotext.Get("Yes"), b.confirmLeaveGame), 1, 1, 1, 1)
-	b.leaveGameGrid.SetVisible(false)
+	grid := etk.NewGrid()
+	grid.SetBackground(color.RGBA{40, 24, 9, 255})
+	grid.AddChildAt(label, 0, 0, 2, 1)
+	grid.AddChildAt(etk.NewButton(gotext.Get("No"), b.cancelLeaveMatch), 0, 1, 1, 1)
+	grid.AddChildAt(etk.NewButton(gotext.Get("Yes"), b.confirmLeaveMatch), 1, 1, 1, 1)
+	grid.SetVisible(false)
+
+	b.leaveMatchDialog = &Dialog{grid}
 }
 
 func (b *board) createMatchStatus() {
@@ -553,7 +555,7 @@ func (b *board) createFrame() {
 	f.AddChild(children[0])
 	f.AddChild(b.changePasswordGrid)
 	f.AddChild(b.muteSoundsGrid)
-	f.AddChild(b.leaveGameGrid)
+	f.AddChild(b.leaveMatchDialog)
 	b.frame.AddChild(f)
 
 	b.frame.AddChild(game.tutorialFrame)

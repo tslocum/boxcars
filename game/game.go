@@ -478,7 +478,7 @@ func setViewBoard(view bool) {
 		game.board.menuGrid.SetVisible(false)
 		game.board.settingsGrid.SetVisible(false)
 		game.board.selectSpeed.SetMenuVisible(false)
-		game.board.leaveGameGrid.SetVisible(false)
+		game.board.leaveMatchDialog.SetVisible(false)
 
 		statusBuffer.SetRect(statusBuffer.Rect())
 
@@ -787,7 +787,6 @@ func (g *Game) initialize() {
 			label.SetVertical(etk.AlignStart)
 			label.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 			d.AddChildAt(label, 1, y, 3, 1)
-			d.AddChildAt(etk.NewBox(), 4, y, 1, 1)
 			y++
 		}
 
@@ -796,12 +795,12 @@ func (g *Game) initialize() {
 			ll.SetVertical(etk.AlignCenter)
 			rl := resizeText("bgammon.org/faq")
 			rl.SetVertical(etk.AlignCenter)
-			d.AddChildAt(ll, 1, y, 1, 1)
-			d.AddChildAt(rl, 2, y, 1, 1)
 			iconSprite := etk.NewSprite(imgIcon)
 			iconSprite.SetHorizontal(etk.AlignEnd)
 			iconSprite.SetVertical(etk.AlignStart)
-			d.AddChildAt(iconSprite, 3, y-1, 1, 4)
+			d.AddChildAt(ll, 1, y, 1, 1)
+			d.AddChildAt(rl, 2, y, 1, 1)
+			d.AddChildAt(iconSprite, 3, y, 1, 3)
 			y++
 		}
 
@@ -2262,8 +2261,8 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 				} else if g.board.changePasswordGrid.Visible() {
 					g.board.hideMenu()
 					return nil
-				} else if g.board.leaveGameGrid.Visible() {
-					g.board.leaveGameGrid.SetVisible(false)
+				} else if g.board.leaveMatchDialog.Visible() {
+					g.board.leaveMatchDialog.SetVisible(false)
 					return nil
 				} else {
 					g.board.menuGrid.SetVisible(true)
@@ -2366,7 +2365,7 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					}
 				}
 			case ebiten.KeyBackspace:
-				if len(inputBuffer.Text()) == 0 && !g.board.gameState.Spectating && g.board.gameState.Turn == g.board.gameState.PlayerNumber && len(g.board.gameState.Moves) > 0 && !g.board.menuGrid.Visible() && !g.board.settingsGrid.Visible() && !g.board.changePasswordGrid.Visible() && !g.board.leaveGameGrid.Visible() {
+				if len(inputBuffer.Text()) == 0 && !g.board.gameState.Spectating && g.board.gameState.Turn == g.board.gameState.PlayerNumber && len(g.board.gameState.Moves) > 0 && !g.board.menuGrid.Visible() && !g.board.settingsGrid.Visible() && !g.board.changePasswordGrid.Visible() && !g.board.leaveMatchDialog.Visible() {
 					g.board.selectUndo()
 					return nil
 				}
@@ -2374,8 +2373,8 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 				if g.board.changePasswordGrid.Visible() {
 					g.board.selectChangePassword()
 					return nil
-				} else if g.board.leaveGameGrid.Visible() {
-					g.board.confirmLeaveGame()
+				} else if g.board.leaveMatchDialog.Visible() {
+					g.board.confirmLeaveMatch()
 					return nil
 				}
 			}
@@ -2782,7 +2781,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func acceptInput(text string) (handled bool) {
 	if len(text) == 0 {
 		g := game
-		if viewBoard && !g.board.menuGrid.Visible() && !g.board.settingsGrid.Visible() && !g.board.changePasswordGrid.Visible() && !g.board.leaveGameGrid.Visible() {
+		if viewBoard && !g.board.menuGrid.Visible() && !g.board.settingsGrid.Visible() && !g.board.changePasswordGrid.Visible() && !g.board.leaveMatchDialog.Visible() {
 			if g.board.gameState.MayRoll() {
 				g.board.selectRoll()
 			} else if g.board.gameState.MayOK() {
@@ -3010,6 +3009,17 @@ type Dialog struct {
 func (d *Dialog) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
 	_, err = d.Grid.HandleMouse(cursor, pressed, clicked)
 	return true, err
+}
+
+func (d *Dialog) Draw(screen *ebiten.Image) error {
+	const borderSize = 2
+	borderColor := color.RGBA{0, 0, 0, 255}
+	r := d.Rect()
+	screen.SubImage(image.Rect(r.Min.X, r.Min.Y-borderSize, r.Min.X-borderSize, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
+	screen.SubImage(image.Rect(r.Min.X-borderSize, r.Min.Y, r.Max.X+borderSize, r.Min.Y-borderSize)).(*ebiten.Image).Fill(borderColor)
+	screen.SubImage(image.Rect(r.Max.X+borderSize, r.Min.Y, r.Max.X, r.Max.Y+borderSize)).(*ebiten.Image).Fill(borderColor)
+	screen.SubImage(image.Rect(r.Min.X-borderSize, r.Max.Y+borderSize, r.Max.X, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
+	return d.Grid.Draw(screen)
 }
 
 type Input struct {

@@ -153,8 +153,7 @@ type board struct {
 	uiGrid    *etk.Grid
 	frame     *etk.Frame
 
-	leaveGameGrid         *etk.Grid
-	confirmLeaveGameFrame *etk.Frame
+	leaveMatchDialog *Dialog
 
 	fontSize   int
 	lineHeight int
@@ -244,7 +243,6 @@ func NewBoard() *board {
 		changePasswordGrid:        etk.NewGrid(),
 		uiGrid:                    etk.NewGrid(),
 		frame:                     etk.NewFrame(),
-		confirmLeaveGameFrame:     etk.NewFrame(),
 		speed:                     bgammon.SpeedMedium,
 		showPipCount:              true,
 		highlightAvailable:        true,
@@ -477,12 +475,12 @@ func (b *board) recreateAccountGrid() {
 	b.accountGrid.AddChildAt(w, 0, 0, 1, 1)
 }
 
-func (b *board) cancelLeaveGame() error {
-	b.leaveGameGrid.SetVisible(false)
+func (b *board) cancelLeaveMatch() error {
+	b.leaveMatchDialog.SetVisible(false)
 	return nil
 }
 
-func (b *board) confirmLeaveGame() error {
+func (b *board) confirmLeaveMatch() error {
 	if game.replay {
 		game.replay = false
 		ev := &bgammon.EventLeft{}
@@ -499,9 +497,9 @@ func (b *board) confirmLeaveGame() error {
 	return nil
 }
 
-func (b *board) leaveGame() error {
+func (b *board) leaveMatch() error {
 	b.menuGrid.SetVisible(false)
-	b.leaveGameGrid.SetVisible(true)
+	b.leaveMatchDialog.SetVisible(true)
 	return nil
 }
 
@@ -1718,7 +1716,7 @@ func (b *board) setRect(x, y, w, h int) {
 		}
 
 		x, y := game.screenW/2-dialogWidth/2, game.screenH/2-dialogHeight+int(b.verticalBorderSize)
-		b.leaveGameGrid.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
+		b.leaveMatchDialog.SetRect(image.Rect(x, y, x+dialogWidth, y+dialogHeight))
 	}
 
 	rematchWidth := b.innerW / 6
