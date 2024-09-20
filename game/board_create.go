@@ -58,6 +58,7 @@ func (b *board) createMenu() {
 func (b *board) createChangePasswordDialog() {
 	headerLabel := etk.NewText(gotext.Get("Change password"))
 	headerLabel.SetHorizontal(etk.AlignCenter)
+	headerLabel.SetVertical(etk.AlignCenter)
 
 	oldLabel := &ClickableText{
 		Text: resizeText(gotext.Get("Current")),
@@ -118,6 +119,7 @@ func (b *board) createChangePasswordDialog() {
 func (b *board) createMuteSoundsDialog() {
 	headerLabel := resizeText(gotext.Get("Mute Sounds"))
 	headerLabel.SetHorizontal(etk.AlignCenter)
+	headerLabel.SetVertical(etk.AlignCenter)
 
 	rowCount := 5
 
@@ -231,6 +233,7 @@ func (b *board) createMuteSoundsDialog() {
 func (b *board) createSettingsDialog() {
 	settingsLabel := resizeText(gotext.Get("Settings"))
 	settingsLabel.SetHorizontal(etk.AlignCenter)
+	settingsLabel.SetVertical(etk.AlignCenter)
 
 	b.highlightCheckbox = etk.NewCheckbox(b.toggleHighlightCheckbox)
 	b.highlightCheckbox.SetBorderColor(triangleA)

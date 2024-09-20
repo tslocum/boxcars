@@ -3012,14 +3012,15 @@ func (d *Dialog) HandleMouse(cursor image.Point, pressed bool, clicked bool) (ha
 }
 
 func (d *Dialog) Draw(screen *ebiten.Image) error {
-	const borderSize = 2
-	borderColor := color.RGBA{0, 0, 0, 255}
+	err := d.Grid.Draw(screen)
 	r := d.Rect()
-	screen.SubImage(image.Rect(r.Min.X, r.Min.Y-borderSize, r.Min.X-borderSize, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
-	screen.SubImage(image.Rect(r.Min.X-borderSize, r.Min.Y, r.Max.X+borderSize, r.Min.Y-borderSize)).(*ebiten.Image).Fill(borderColor)
-	screen.SubImage(image.Rect(r.Max.X+borderSize, r.Min.Y, r.Max.X, r.Max.Y+borderSize)).(*ebiten.Image).Fill(borderColor)
-	screen.SubImage(image.Rect(r.Min.X-borderSize, r.Max.Y+borderSize, r.Max.X, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
-	return d.Grid.Draw(screen)
+	const borderSize = 4
+	borderColor := color.RGBA{0, 0, 0, 255}
+	screen.SubImage(image.Rect(r.Min.X, r.Min.Y, r.Min.X+borderSize, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
+	screen.SubImage(image.Rect(r.Min.X, r.Min.Y, r.Max.X, r.Min.Y+borderSize)).(*ebiten.Image).Fill(borderColor)
+	screen.SubImage(image.Rect(r.Max.X-borderSize, r.Min.Y, r.Max.X, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
+	screen.SubImage(image.Rect(r.Min.X, r.Max.Y-borderSize, r.Max.X, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
+	return err
 }
 
 type Input struct {
