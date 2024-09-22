@@ -581,6 +581,8 @@ type Game struct {
 	resetInfo       *etk.Text
 	resetInProgress bool
 
+	mainStatusGrid *etk.Grid
+
 	tutorialFrame *etk.Frame
 
 	aboutDialog *Dialog
@@ -605,8 +607,7 @@ type Game struct {
 
 	bufferWidth int
 
-	connectGridY            int
-	showConnectStatusBuffer bool
+	connectGridY int
 
 	needLayoutConnect bool
 	needLayoutLobby   bool
@@ -757,17 +758,60 @@ func (g *Game) initialize() {
 	})}
 
 	var aboutGrid *etk.Grid
+	var aboutHeight int
 	{
 		versionInfo := etk.NewText("Boxcars " + AppVersion)
 		versionInfo.SetVertical(etk.AlignCenter)
 		aboutLabel := gotext.Get("About")
 		bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), aboutLabel)
+		aboutHeight = bounds.Dy() * 2
 		aboutButton := etk.NewButton(aboutLabel, g.showAboutDialog)
 		aboutGrid = etk.NewGrid()
-		aboutGrid.SetRowSizes(-1, bounds.Dy()*2)
+		aboutGrid.SetRowSizes(-1, aboutHeight)
 		aboutGrid.SetColumnSizes(-1, bounds.Dx()+etk.Scale(50))
 		aboutGrid.AddChildAt(versionInfo, 0, 1, 1, 1)
 		aboutGrid.AddChildAt(aboutButton, 1, 1, 1, 1)
+	}
+
+	g.mainStatusGrid = etk.NewGrid()
+	g.mainStatusGrid.AddChildAt(statusBuffer, 0, 0, 1, 1)
+	g.mainStatusGrid.SetVisible(false)
+
+	var mainStatusHeight int
+	{
+		fontMutex.Lock()
+		lineHeight := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics().Height.Round()
+		fontMutex.Unlock()
+		mainStatusHeight = lineHeight * 2
+	}
+
+	mainScreen := func(subGrid *etk.Grid, rows int, buttons int, header string, info string) *etk.Grid {
+		var wgt etk.Widget
+		wgt = subGrid
+		if !smallScreen {
+			f := etk.NewFrame(subGrid)
+			f.SetPositionChildren(true)
+			f.SetMaxWidth(1024)
+			wgt = f
+		}
+		headerHeight := etk.Scale(60)
+		headerLabel := newCenteredText(header)
+		if smallScreen {
+			headerHeight = etk.Scale(20)
+			headerLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumLargeFontSize))
+		}
+		infoLabel := newCenteredText(info)
+		infoLabel.SetVertical(etk.AlignStart)
+		grid := etk.NewGrid()
+		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
+		grid.SetRowPadding(int(g.board.horizontalBorderSize / 2))
+		grid.SetRowSizes(headerHeight, rows*fieldHeight+buttons*etk.Scale(baseButtonHeight)+yPadding*(rows+1)+yPadding*buttons, -1, mainStatusHeight, aboutHeight)
+		grid.AddChildAt(headerLabel, 0, 0, 1, 1)
+		grid.AddChildAt(wgt, 0, 1, 1, 1)
+		grid.AddChildAt(infoLabel, 0, 2, 1, 1)
+		grid.AddChildAt(g.mainStatusGrid, 0, 3, 1, 1)
+		grid.AddChildAt(aboutGrid, 0, 4, 1, 1)
+		return grid
 	}
 
 	{
@@ -845,7 +889,6 @@ func (g *Game) initialize() {
 	}
 
 	{
-		headerLabel := newCenteredText(gotext.Get("Register"))
 		emailLabel := newCenteredText(gotext.Get("Email"))
 		nameLabel := newCenteredText(gotext.Get("Username"))
 		passwordLabel := newCenteredText(gotext.Get("Password"))
@@ -880,21 +923,22 @@ func (g *Game) initialize() {
 			return nil
 		})
 
-		infoLabel := etk.NewText(gotext.Get("Please enter a valid email address, or it will not be possible to reset your password."))
-
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
 		grid.SetColumnSizes(xPadding, labelWidth, -1, -1, xPadding)
-		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
-		grid.AddChildAt(etk.NewBox(), 4, 0, 1, 1)
-		grid.AddChildAt(emailLabel, 1, 1, 2, 1)
-		grid.AddChildAt(g.registerEmail, 2, 1, 2, 1)
-		grid.AddChildAt(nameLabel, 1, 2, 2, 1)
-		grid.AddChildAt(g.registerUsername, 2, 2, 2, 1)
-		grid.AddChildAt(passwordLabel, 1, 3, 2, 1)
-		grid.AddChildAt(g.registerPassword, 2, 3, 2, 1)
-		y := 4
+		if ShowServerSettings {
+			grid.SetRowSizes(fieldHeight, fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight))
+		} else {
+			grid.SetRowSizes(fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight))
+		}
+		grid.AddChildAt(emailLabel, 1, 0, 2, 1)
+		grid.AddChildAt(g.registerEmail, 2, 0, 2, 1)
+		grid.AddChildAt(nameLabel, 1, 1, 2, 1)
+		grid.AddChildAt(g.registerUsername, 2, 1, 2, 1)
+		grid.AddChildAt(passwordLabel, 1, 2, 2, 1)
+		grid.AddChildAt(g.registerPassword, 2, 2, 2, 1)
+		y := 3
 		if ShowServerSettings {
 			centerInput(g.connectServer)
 			grid.AddChildAt(serverLabel, 1, y, 2, 1)
@@ -908,17 +952,16 @@ func (g *Game) initialize() {
 			subGrid.AddChildAt(submitButton, 2, 0, 1, 1)
 			grid.AddChildAt(subGrid, 1, y, 3, 1)
 		}
-		grid.AddChildAt(infoLabel, 1, y+1, 3, 1)
-		grid.AddChildAt(aboutGrid, 1, y+2, 3, 1)
 		registerGrid = grid
 
-		registerFrame = etk.NewFrame(registerGrid)
+		header := gotext.Get("Register")
+		info := gotext.Get("Please enter a valid email address, or it will not be possible to reset your password.")
+		registerFrame = etk.NewFrame(mainScreen(registerGrid, 3, 1, header, info))
 		registerFrame.SetPositionChildren(true)
 		registerFrame.AddChild(etk.NewFrame(g.aboutDialog))
 	}
 
 	{
-		headerLabel := newCenteredText(gotext.Get("Reset Password"))
 		emailLabel := newCenteredText(gotext.Get("Email"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
 
@@ -944,11 +987,14 @@ func (g *Game) initialize() {
 		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
 		grid.SetColumnSizes(xPadding, labelWidth, -1, -1, xPadding)
-		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
-		grid.AddChildAt(etk.NewBox(), 4, 0, 1, 1)
-		grid.AddChildAt(emailLabel, 1, 1, 2, 1)
-		grid.AddChildAt(g.resetEmail, 2, 1, 2, 1)
-		y := 2
+		if ShowServerSettings {
+			grid.SetRowSizes(fieldHeight, fieldHeight, etk.Scale(baseButtonHeight))
+		} else {
+			grid.SetRowSizes(fieldHeight, etk.Scale(baseButtonHeight))
+		}
+		grid.AddChildAt(emailLabel, 1, 0, 2, 1)
+		grid.AddChildAt(g.resetEmail, 2, 0, 2, 1)
+		y := 1
 		if ShowServerSettings {
 			centerInput(g.connectServer)
 			grid.AddChildAt(serverLabel, 1, y, 2, 1)
@@ -963,25 +1009,18 @@ func (g *Game) initialize() {
 			grid.AddChildAt(subGrid, 1, y, 3, 1)
 		}
 		grid.AddChildAt(g.resetInfo, 1, y+1, 3, 1)
-		grid.AddChildAt(aboutGrid, 1, y+2, 3, 1)
 		resetGrid = grid
 
-		resetFrame = etk.NewFrame(resetGrid)
+		header := gotext.Get("Reset Password")
+		resetFrame = etk.NewFrame(mainScreen(resetGrid, 3, 1, header, ""))
 		resetFrame.SetPositionChildren(true)
 		resetFrame.AddChild(etk.NewFrame(g.aboutDialog))
 	}
 
 	{
-		headerLabel := newCenteredText(gotext.Get("%s - Free Online Backgammon", "bgammon.org"))
 		nameLabel := newCenteredText(gotext.Get("Username"))
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
-		if smallScreen {
-			headerLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumLargeFontSize))
-			headerLabel.SetHorizontal(etk.AlignCenter)
-		}
-
-		infoLabel := etk.NewText(gotext.Get("To log in as a guest, enter a username (if you want) and do not enter a password."))
 
 		g.connectUsername = &Input{etk.NewInput("", func(text string) (handled bool) {
 			g.selectConnect()
@@ -1013,14 +1052,17 @@ func (g *Game) initialize() {
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
+		if ShowServerSettings {
+			grid.SetRowSizes(fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), etk.Scale(baseButtonHeight))
+		} else {
+			grid.SetRowSizes(fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), etk.Scale(baseButtonHeight))
+		}
 		grid.SetColumnSizes(xPadding, labelWidth, -1, -1, xPadding)
-		grid.AddChildAt(headerLabel, 0, 0, 4, 1)
-		grid.AddChildAt(etk.NewBox(), 4, 0, 1, 1)
-		grid.AddChildAt(nameLabel, 1, 1, 2, 1)
-		grid.AddChildAt(g.connectUsername, 2, 1, 2, 1)
-		grid.AddChildAt(passwordLabel, 1, 2, 2, 1)
-		grid.AddChildAt(g.connectPassword, 2, 2, 2, 1)
-		g.connectGridY = 3
+		grid.AddChildAt(nameLabel, 1, 0, 2, 1)
+		grid.AddChildAt(g.connectUsername, 2, 0, 2, 1)
+		grid.AddChildAt(passwordLabel, 1, 1, 2, 1)
+		grid.AddChildAt(g.connectPassword, 2, 1, 2, 1)
+		g.connectGridY = 2
 		if ShowServerSettings {
 			centerInput(g.connectServer)
 			grid.AddChildAt(serverLabel, 1, g.connectGridY, 2, 1)
@@ -1043,8 +1085,6 @@ func (g *Game) initialize() {
 			subGrid.AddChildAt(offlineButton, 2, 0, 1, 1)
 			grid.AddChildAt(subGrid, 1, g.connectGridY+1, 3, 1)
 		}
-		grid.AddChildAt(infoLabel, 1, g.connectGridY+2, 3, 1)
-		grid.AddChildAt(aboutGrid, 1, g.connectGridY+3, 3, 1)
 		connectGrid = grid
 
 		{
@@ -1061,10 +1101,14 @@ func (g *Game) initialize() {
 			d.SetVisible(false)
 		}
 
-		connectFrame = etk.NewFrame(connectGrid)
-		connectFrame.SetPositionChildren(true)
-		connectFrame.AddChild(etk.NewFrame(g.aboutDialog))
-		connectFrame.AddChild(etk.NewFrame(g.quitDialog))
+		{
+			header := gotext.Get("%s - Free Online Backgammon", "bgammon.org")
+			info := gotext.Get("To log in as a guest, enter a username (if you want) and do not enter a password.")
+			connectFrame = etk.NewFrame(mainScreen(connectGrid, 2, 2, header, info))
+			connectFrame.SetPositionChildren(true)
+			connectFrame.AddChild(etk.NewFrame(g.aboutDialog))
+			connectFrame.AddChild(etk.NewFrame(g.quitDialog))
+		}
 	}
 
 	{
@@ -1966,10 +2010,7 @@ func (g *Game) Connect() {
 			if c.loggedIn {
 				return
 			} else if !c.connecting || time.Since(connectTime) >= 20*time.Second {
-				if !g.showConnectStatusBuffer {
-					connectGrid.AddChildAt(statusBuffer, 0, g.connectGridY+4, 5, 1)
-					g.showConnectStatusBuffer = true
-				}
+				g.mainStatusGrid.SetVisible(true)
 
 				g.showMainMenu(false)
 				scheduleFrame()
@@ -2585,22 +2626,6 @@ func (g *Game) portraitView() bool {
 
 func (g *Game) layoutConnect() {
 	g.needLayoutConnect = false
-
-	headerHeight := etk.Scale(60)
-	infoHeight := etk.Scale(108)
-	if smallScreen {
-		headerHeight = etk.Scale(20)
-	}
-
-	if ShowServerSettings {
-		connectGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), etk.Scale(baseButtonHeight), infoHeight)
-		registerGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
-		resetGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
-	} else {
-		connectGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), etk.Scale(baseButtonHeight), infoHeight)
-		registerGrid.SetRowSizes(headerHeight, fieldHeight, fieldHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
-		resetGrid.SetRowSizes(headerHeight, fieldHeight, etk.Scale(baseButtonHeight), infoHeight)
-	}
 
 	{
 		fontMutex.Lock()
