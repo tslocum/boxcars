@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-09-18 15:40+0000\n"
+"PO-Revision-Date: 2024-09-21 19:02+0000\n"
 "Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
@@ -29,6 +29,9 @@ msgstr "%s кидає %s"
 
 msgid "%s wins!"
 msgstr "%s перемагає!"
+
+msgid "About"
+msgstr "Про Boxcars"
 
 msgid "Accept"
 msgstr "Прийняти"
@@ -89,6 +92,9 @@ msgstr "Увійти"
 msgid "Connecting..."
 msgstr "З'єднання..."
 
+msgid "Contact:"
+msgstr "Зв'язатися:"
+
 msgid "Create"
 msgstr "Створити"
 
@@ -108,11 +114,17 @@ msgstr "Створити матч"
 msgid "Create new match"
 msgstr "Новий матч"
 
+msgid "Created by %s"
+msgstr "Автор — %s"
+
 msgid "Current"
 msgstr "Поточний"
 
 msgid "Date"
 msgstr "Дата"
+
+msgid "Donate:"
+msgstr "Підтримати:"
 
 msgid "Double"
 msgstr "Подвоїти"
@@ -133,6 +145,9 @@ msgstr "Пошта"
 
 msgid "Exit Boxcars?"
 msgstr "Вийти з Boxcars?"
+
+msgid "FAQ:"
+msgstr ""
 
 msgid "Failed to download replay: %s"
 msgstr "Не вдалося завантажити повтор: %s"
@@ -362,6 +377,9 @@ msgstr "Повільно"
 
 msgid "Sound"
 msgstr "Звук"
+
+msgid "Source:"
+msgstr "Код:"
 
 msgid "Speed"
 msgstr "Швидкість"

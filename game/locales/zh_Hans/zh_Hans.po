@@ -25,6 +25,9 @@ msgstr ""
 msgid "%s wins!"
 msgstr ""
 
+msgid "About"
+msgstr ""
+
 msgid "Accept"
 msgstr ""
 
@@ -80,6 +83,9 @@ msgstr ""
 msgid "Connecting..."
 msgstr ""
 
+msgid "Contact:"
+msgstr ""
+
 msgid "Create"
 msgstr ""
 
@@ -97,10 +103,16 @@ msgstr ""
 msgid "Create new match"
 msgstr ""
 
+msgid "Created by %s"
+msgstr ""
+
 msgid "Current"
 msgstr ""
 
 msgid "Date"
+msgstr ""
+
+msgid "Donate:"
 msgstr ""
 
 msgid "Double"
@@ -119,6 +131,9 @@ msgid "Email"
 msgstr ""
 
 msgid "Exit Boxcars?"
+msgstr ""
+
+msgid "FAQ:"
 msgstr ""
 
 msgid "Failed to download replay: %s"
@@ -346,6 +361,9 @@ msgid "Slow"
 msgstr ""
 
 msgid "Sound"
+msgstr ""
+
+msgid "Source:"
 msgstr ""
 
 msgid "Speed"

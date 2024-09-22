@@ -30,6 +30,9 @@ msgstr "%s rullet %s"
 msgid "%s wins!"
 msgstr "%s vant."
 
+msgid "About"
+msgstr ""
+
 msgid "Accept"
 msgstr "Godta"
 
@@ -91,6 +94,9 @@ msgstr "Koble til"
 msgid "Connecting..."
 msgstr "Kobler til …"
 
+msgid "Contact:"
+msgstr ""
+
 #, fuzzy
 msgid "Create"
 msgstr "Opprett spill"
@@ -111,11 +117,17 @@ msgstr "Opprett spill"
 msgid "Create new match"
 msgstr "Opprett nytt spill"
 
+msgid "Created by %s"
+msgstr ""
+
 msgid "Current"
 msgstr "Nåværende"
 
 msgid "Date"
 msgstr "Dato"
+
+msgid "Donate:"
+msgstr ""
 
 msgid "Double"
 msgstr "Dobling"
@@ -136,6 +148,9 @@ msgid "Email"
 msgstr "E-post"
 
 msgid "Exit Boxcars?"
+msgstr ""
+
+msgid "FAQ:"
 msgstr ""
 
 #, fuzzy
@@ -380,6 +395,9 @@ msgid "Slow"
 msgstr "Tregt"
 
 msgid "Sound"
+msgstr ""
+
+msgid "Source:"
 msgstr ""
 
 msgid "Speed"

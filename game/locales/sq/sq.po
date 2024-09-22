@@ -29,6 +29,9 @@ msgstr "%s hodhi zarin %s"
 msgid "%s wins!"
 msgstr "%s fitoi!"
 
+msgid "About"
+msgstr ""
+
 msgid "Accept"
 msgstr "Pranoj"
 
@@ -88,6 +91,9 @@ msgstr "Lidhu"
 msgid "Connecting..."
 msgstr "Duke u lidhur..."
 
+msgid "Contact:"
+msgstr ""
+
 msgid "Create"
 msgstr "Krijo"
 
@@ -107,11 +113,17 @@ msgstr "Krijo ndeshjen"
 msgid "Create new match"
 msgstr "Krijo një ndeshje të re"
 
+msgid "Created by %s"
+msgstr ""
+
 msgid "Current"
 msgstr "Aktuale"
 
 msgid "Date"
 msgstr "Datë"
+
+msgid "Donate:"
+msgstr ""
 
 msgid "Double"
 msgstr "Dyfisho"
@@ -131,6 +143,9 @@ msgid "Email"
 msgstr "E-posta"
 
 msgid "Exit Boxcars?"
+msgstr ""
+
+msgid "FAQ:"
 msgstr ""
 
 msgid "Failed to download replay: %s"
@@ -360,6 +375,9 @@ msgid "Slow"
 msgstr "Ngadalë"
 
 msgid "Sound"
+msgstr ""
+
+msgid "Source:"
 msgstr ""
 
 msgid "Speed"

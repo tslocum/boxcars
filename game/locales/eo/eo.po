@@ -29,6 +29,9 @@ msgstr ""
 msgid "%s wins!"
 msgstr "%s gajnis la ludon!"
 
+msgid "About"
+msgstr ""
+
 msgid "Accept"
 msgstr "Akcepti"
 
@@ -86,6 +89,9 @@ msgstr "Konekti"
 msgid "Connecting..."
 msgstr "Konektante…"
 
+msgid "Contact:"
+msgstr ""
+
 msgid "Create"
 msgstr "Krei"
 
@@ -103,11 +109,17 @@ msgstr "Krei partion"
 msgid "Create new match"
 msgstr "Krei novan partion"
 
+msgid "Created by %s"
+msgstr ""
+
 msgid "Current"
 msgstr "Aktuala"
 
 msgid "Date"
 msgstr "Dato"
+
+msgid "Donate:"
+msgstr ""
 
 msgid "Double"
 msgstr "Duobla"
@@ -126,6 +138,9 @@ msgstr "Retpoŝto"
 
 msgid "Exit Boxcars?"
 msgstr "Ĉu forlasi Boxcars?"
+
+msgid "FAQ:"
+msgstr ""
 
 msgid "Failed to download replay: %s"
 msgstr ""
@@ -355,6 +370,9 @@ msgstr "Malrapida"
 
 msgid "Sound"
 msgstr "Sono"
+
+msgid "Source:"
+msgstr ""
 
 msgid "Speed"
 msgstr "Rapido"

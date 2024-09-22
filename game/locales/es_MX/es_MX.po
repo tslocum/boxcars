@@ -29,6 +29,9 @@ msgstr "%s rodado %s"
 msgid "%s wins!"
 msgstr "%s Gano!"
 
+msgid "About"
+msgstr ""
+
 msgid "Accept"
 msgstr "Aceptar"
 
@@ -88,6 +91,9 @@ msgstr "Conectar"
 msgid "Connecting..."
 msgstr "Conectando..."
 
+msgid "Contact:"
+msgstr ""
+
 msgid "Create"
 msgstr "Crear"
 
@@ -107,11 +113,17 @@ msgstr "Crear una partida"
 msgid "Create new match"
 msgstr "Crea una nueva partida"
 
+msgid "Created by %s"
+msgstr ""
+
 msgid "Current"
 msgstr "Actual"
 
 msgid "Date"
 msgstr "Fecha"
+
+msgid "Donate:"
+msgstr ""
 
 msgid "Double"
 msgstr "Doble"
@@ -131,6 +143,9 @@ msgid "Email"
 msgstr "Correo electrónico"
 
 msgid "Exit Boxcars?"
+msgstr ""
+
+msgid "FAQ:"
 msgstr ""
 
 msgid "Failed to download replay: %s"
@@ -361,6 +376,9 @@ msgstr "Lento"
 
 msgid "Sound"
 msgstr "Sonido"
+
+msgid "Source:"
+msgstr ""
 
 msgid "Speed"
 msgstr "Velocidad"

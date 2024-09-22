@@ -29,6 +29,9 @@ msgstr ""
 msgid "%s wins!"
 msgstr "%s kazandı!"
 
+msgid "About"
+msgstr ""
+
 msgid "Accept"
 msgstr "Kabul et"
 
@@ -91,6 +94,9 @@ msgstr "Bağlan"
 msgid "Connecting..."
 msgstr "Bağlanılıyor..."
 
+msgid "Contact:"
+msgstr ""
+
 msgid "Create"
 msgstr "Oluştur"
 
@@ -110,11 +116,17 @@ msgstr "Oyun oluştur"
 msgid "Create new match"
 msgstr "Yeni oyun oluştur"
 
+msgid "Created by %s"
+msgstr ""
+
 msgid "Current"
 msgstr "Şu anki"
 
 msgid "Date"
 msgstr "Tarih"
+
+msgid "Donate:"
+msgstr ""
 
 msgid "Double"
 msgstr "Çift"
@@ -133,6 +145,9 @@ msgid "Email"
 msgstr "E-posta"
 
 msgid "Exit Boxcars?"
+msgstr ""
+
+msgid "FAQ:"
 msgstr ""
 
 msgid "Failed to download replay: %s"
@@ -366,6 +381,9 @@ msgid "Slow"
 msgstr "Yavaş"
 
 msgid "Sound"
+msgstr ""
+
+msgid "Source:"
 msgstr ""
 
 msgid "Speed"
