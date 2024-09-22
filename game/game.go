@@ -39,7 +39,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.1"
+	AppVersion           = "v1.4.2"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -782,10 +782,13 @@ func (g *Game) initialize() {
 		fontMutex.Lock()
 		lineHeight := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics().Height.Round()
 		fontMutex.Unlock()
-		mainStatusHeight = lineHeight * 2
+		mainStatusHeight = lineHeight
 	}
 
-	mainScreen := func(subGrid *etk.Grid, rows int, buttons int, header string, info string) *etk.Grid {
+	mainScreen := func(subGrid *etk.Grid, fields int, buttons int, header string, info string) *etk.Grid {
+		if ShowServerSettings {
+			fields++
+		}
 		var wgt etk.Widget
 		wgt = subGrid
 		if !smallScreen {
@@ -796,16 +799,19 @@ func (g *Game) initialize() {
 		}
 		headerHeight := etk.Scale(60)
 		headerLabel := newCenteredText(header)
-		if smallScreen {
-			headerHeight = etk.Scale(20)
-			headerLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumLargeFontSize))
-		}
 		infoLabel := newCenteredText(info)
 		infoLabel.SetVertical(etk.AlignStart)
+		infoLabel.SetAutoResize(false)
+		if smallScreen {
+			headerHeight = etk.Scale(20)
+			headerLabel.SetHorizontal(etk.AlignCenter)
+			headerLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
+			infoLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
+		}
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(int(g.board.horizontalBorderSize / 2))
-		grid.SetRowSizes(headerHeight, rows*fieldHeight+buttons*etk.Scale(baseButtonHeight)+yPadding*(rows+1)+yPadding*buttons, -1, mainStatusHeight, aboutHeight)
+		grid.SetRowSizes(headerHeight, fields*fieldHeight+buttons*etk.Scale(baseButtonHeight)+yPadding*(fields+1)+yPadding*buttons, -1, mainStatusHeight, aboutHeight)
 		grid.AddChildAt(headerLabel, 0, 0, 1, 1)
 		grid.AddChildAt(wgt, 0, 1, 1, 1)
 		grid.AddChildAt(infoLabel, 0, 2, 1, 1)
@@ -1007,8 +1013,9 @@ func (g *Game) initialize() {
 			subGrid.AddChildAt(cancelButton, 0, 0, 1, 1)
 			subGrid.AddChildAt(submitButton, 2, 0, 1, 1)
 			grid.AddChildAt(subGrid, 1, y, 3, 1)
+			y++
 		}
-		grid.AddChildAt(g.resetInfo, 1, y+1, 3, 1)
+		grid.AddChildAt(g.resetInfo, 1, y, 3, 1)
 		resetGrid = grid
 
 		header := gotext.Get("Reset Password")
@@ -1076,6 +1083,7 @@ func (g *Game) initialize() {
 			subGrid.AddChildAt(connectButton, 0, 0, 1, 1)
 			subGrid.AddChildAt(registerButton, 2, 0, 1, 1)
 			grid.AddChildAt(subGrid, 1, g.connectGridY, 3, 1)
+			g.connectGridY++
 		}
 		{
 			subGrid := etk.NewGrid()
@@ -1083,7 +1091,7 @@ func (g *Game) initialize() {
 			subGrid.SetRowSizes(-1, yPadding, -1)
 			subGrid.AddChildAt(resetButton, 0, 0, 1, 1)
 			subGrid.AddChildAt(offlineButton, 2, 0, 1, 1)
-			grid.AddChildAt(subGrid, 1, g.connectGridY+1, 3, 1)
+			grid.AddChildAt(subGrid, 1, g.connectGridY, 3, 1)
 		}
 		connectGrid = grid
 
@@ -1189,22 +1197,35 @@ func (g *Game) initialize() {
 		variantFlex.AddChild(aceyDeuceyGrid)
 		variantFlex.AddChild(tabulaGrid)
 
+		variantFrame := etk.NewFrame(variantLabel)
+		variantFrame.SetPositionChildren(true)
+		variantFrame.SetMaxHeight(fieldHeight)
+
+		subGrid := etk.NewGrid()
+		subGrid.SetRowPadding(yPadding)
+		subGrid.SetRowSizes(fieldHeight, fieldHeight, fieldHeight, -1)
+		subGrid.SetColumnSizes(xPadding, labelWidth, -1, xPadding)
+		subGrid.AddChildAt(nameLabel, 1, 0, 1, 1)
+		subGrid.AddChildAt(g.lobby.createGameName, 2, 0, 1, 1)
+		subGrid.AddChildAt(pointsLabel, 1, 1, 1, 1)
+		subGrid.AddChildAt(g.lobby.createGamePoints, 2, 1, 1, 1)
+		subGrid.AddChildAt(passwordLabel, 1, 2, 1, 1)
+		subGrid.AddChildAt(g.lobby.createGamePassword, 2, 2, 1, 1)
+		subGrid.AddChildAt(variantFrame, 1, 3, 1, 1)
+		subGrid.AddChildAt(variantFlex, 2, 3, 1, 1)
+
+		subFrame := etk.NewFrame(subGrid)
+		subFrame.SetPositionChildren(true)
+		subFrame.SetMaxWidth(1024)
+
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
 		grid.SetColumnSizes(xPadding, labelWidth, -1, xPadding)
-		grid.SetRowSizes(60, fieldHeight, fieldHeight, fieldHeight, fieldHeight)
+		grid.SetRowSizes(60, -1, fieldHeight)
 		grid.AddChildAt(headerLabel, 0, 0, 3, 1)
 		grid.AddChildAt(etk.NewBox(), 3, 0, 1, 1)
-		grid.AddChildAt(nameLabel, 1, 1, 1, 1)
-		grid.AddChildAt(g.lobby.createGameName, 2, 1, 1, 1)
-		grid.AddChildAt(pointsLabel, 1, 2, 1, 1)
-		grid.AddChildAt(g.lobby.createGamePoints, 2, 2, 1, 1)
-		grid.AddChildAt(passwordLabel, 1, 3, 1, 1)
-		grid.AddChildAt(g.lobby.createGamePassword, 2, 3, 1, 1)
-		grid.AddChildAt(variantLabel, 1, 4, 1, 1)
-		grid.AddChildAt(variantFlex, 2, 4, 1, 1)
-		grid.AddChildAt(etk.NewBox(), 0, 5, 1, 1)
+		grid.AddChildAt(subFrame, 1, 1, 3, 1)
 		createGameGrid = grid
 
 		createGameContainer = etk.NewGrid()
@@ -1230,15 +1251,25 @@ func (g *Game) initialize() {
 		centerInput(g.lobby.joinGamePassword)
 		g.lobby.joinGamePassword.SetMask('*')
 
+		subGrid := etk.NewGrid()
+		subGrid.SetRowPadding(yPadding)
+		subGrid.SetRowSizes(fieldHeight, fieldHeight, fieldHeight, -1)
+		subGrid.SetColumnSizes(xPadding, labelWidth, -1, xPadding)
+		subGrid.AddChildAt(passwordLabel, 1, 0, 1, 1)
+		subGrid.AddChildAt(g.lobby.joinGamePassword, 2, 0, 1, 1)
+
+		subFrame := etk.NewFrame(subGrid)
+		subFrame.SetPositionChildren(true)
+		subFrame.SetMaxWidth(1024)
+
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(yPadding)
 		grid.SetColumnSizes(xPadding, labelWidth, -1, xPadding)
-		grid.SetRowSizes(60, fieldHeight, fieldHeight)
+		grid.SetRowSizes(60, -1)
 		grid.AddChildAt(g.lobby.joinGameLabel, 0, 0, 3, 1)
 		grid.AddChildAt(etk.NewBox(), 3, 0, 1, 1)
-		grid.AddChildAt(passwordLabel, 1, 1, 1, 1)
-		grid.AddChildAt(g.lobby.joinGamePassword, 2, 1, 1, 1)
+		grid.AddChildAt(subFrame, 1, 1, 2, 1)
 		joinGameGrid = grid
 
 		joinGameContainer = etk.NewGrid()
