@@ -11,7 +11,7 @@ require (
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240820025521-91065b63f1be
 	github.com/coder/websocket v1.8.12
-	github.com/hajimehoshi/ebiten/v2 v2.8.0-alpha.8.0.20240922042725-1260d779994b
+	github.com/hajimehoshi/ebiten/v2 v2.8.0-rc.1
 	github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	golang.org/x/image v0.20.0
@@ -29,8 +29,8 @@ require (
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/ebitengine/gomobile v0.0.0-20240911145611-4856209ac325 // indirect
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
-	github.com/ebitengine/oto/v3 v3.3.0-alpha.4 // indirect
-	github.com/ebitengine/purego v0.8.0-alpha.6 // indirect
+	github.com/ebitengine/oto/v3 v3.4.0-alpha // indirect
+	github.com/ebitengine/purego v0.9.0-alpha // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect

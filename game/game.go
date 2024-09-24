@@ -761,6 +761,7 @@ func (g *Game) initialize() {
 	var aboutHeight int
 	{
 		versionInfo := etk.NewText("Boxcars " + AppVersion)
+		versionInfo.SetAutoResize(true)
 		versionInfo.SetVertical(etk.AlignCenter)
 		aboutLabel := gotext.Get("About")
 		bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), aboutLabel)

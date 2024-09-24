@@ -270,6 +270,9 @@ func NewBoard() *board {
 	b.opponentPipCount.SetHorizontal(etk.AlignEnd)
 	b.playerPipCount.SetHorizontal(etk.AlignStart)
 
+	b.opponentForcedLabel.SetAutoResize(true)
+	b.playerForcedLabel.SetAutoResize(true)
+
 	b.opponentPipCount.SetAutoResize(true)
 	b.playerPipCount.SetAutoResize(true)
 
@@ -350,14 +353,6 @@ func (b *board) fontUpdated() {
 
 	b.timerLabel.SetFont(etk.Style.TextFont, etk.Scale(b.fontSize))
 	b.clockLabel.SetFont(etk.Style.TextFont, etk.Scale(b.fontSize))
-
-	if smallScreen {
-		b.opponentForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
-		b.playerForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
-	} else {
-		b.opponentForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
-		b.playerForcedLabel.SetFont(etk.Style.TextFont, etk.Scale(extraSmallFontSize))
-	}
 
 	b.opponentMovesLabel.SetFont(etk.Style.TextFont, game.bufferFontSize)
 	b.playerMovesLabel.SetFont(etk.Style.TextFont, game.bufferFontSize)
@@ -1722,13 +1717,6 @@ func (b *board) setRect(x, y, w, h int) {
 	}
 	rematchHeight := rematchWidth / 2
 	b.rematchButton.SetRect(image.Rect(int(b.horizontalBorderSize)+b.innerW/2-rematchWidth/2, int(b.verticalBorderSize*2), int(b.horizontalBorderSize)+b.innerW/2+rematchWidth/2, int(b.verticalBorderSize*2)+rematchHeight))
-	if rematchWidth >= etk.Scale(160) {
-		b.rematchButton.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
-	} else if rematchWidth >= etk.Scale(140) {
-		b.rematchButton.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
-	} else {
-		b.rematchButton.SetFont(etk.Style.TextFont, etk.Scale(smallFontSize))
-	}
 
 	b.updateOpponentLabel()
 	b.updatePlayerLabel()
