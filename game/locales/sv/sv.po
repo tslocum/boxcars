@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-07-26 16:26+0000\n"
-"Last-Translator: \"T Bergkvist (Vevhus)\" <t.bergkvist@gmail.com>\n"
+"PO-Revision-Date: 2024-09-28 20:24+0000\n"
+"Last-Translator: Trevor Slocum <trevor@rocketnine.space>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/bgammon/boxcars/"
 "sv/>\n"
 "Language: sv\n"
@@ -9,13 +9,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.7-dev\n"
+"X-Generator: Weblate 5.8-dev\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Gratis Backgammon Online"
 
 msgid "%s joined the match."
-msgstr "%s kom in i spelet."
+msgstr "%s gick med i matchen."
 
 msgid "%s left the match."
 msgstr "%s lämnade spelet."
@@ -30,7 +30,7 @@ msgid "%s wins!"
 msgstr "%s vann spelet!"
 
 msgid "About"
-msgstr ""
+msgstr "Om"
 
 msgid "Accept"
 msgstr "Acceptera"
@@ -54,7 +54,7 @@ msgid "Backgammon"
 msgstr "Backgammon"
 
 msgid "Bear Off"
-msgstr ""
+msgstr "Bära ut"
 
 msgid "Bearing Off"
 msgstr "bära av"
@@ -76,7 +76,7 @@ msgid "Change password"
 msgstr "Ändra lösenord"
 
 msgid "Chat"
-msgstr ""
+msgstr "Chatta"
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -92,7 +92,7 @@ msgid "Connecting..."
 msgstr "Ansluter..."
 
 msgid "Contact:"
-msgstr ""
+msgstr "Kontakt:"
 
 msgid "Create"
 msgstr "Skapa"
@@ -114,7 +114,7 @@ msgid "Create new match"
 msgstr "Skapa ny match"
 
 msgid "Created by %s"
-msgstr ""
+msgstr "Skapad av %s"
 
 msgid "Current"
 msgstr "Aktuellt"
@@ -123,7 +123,7 @@ msgid "Date"
 msgstr "Datum"
 
 msgid "Donate:"
-msgstr ""
+msgstr "Donera:"
 
 msgid "Double"
 msgstr "Dubbla"
@@ -143,10 +143,10 @@ msgid "Email"
 msgstr "Epost"
 
 msgid "Exit Boxcars?"
-msgstr ""
+msgstr "Avsluta Boxcars?"
 
 msgid "FAQ:"
-msgstr ""
+msgstr "Vanliga frågor:"
 
 msgid "Failed to download replay: %s"
 msgstr "Nedladdning av repris %s avbruten"
@@ -179,10 +179,10 @@ msgid "Forced"
 msgstr "Tvingad"
 
 msgid "Go"
-msgstr ""
+msgstr "Gå"
 
 msgid "Go to page:"
-msgstr ""
+msgstr "Gå till sida:"
 
 msgid "Good Luck, Have Fun"
 msgstr "Lycka till, ha kul"
@@ -200,7 +200,7 @@ msgid "Join"
 msgstr "Gå med"
 
 msgid "Join/Leave"
-msgstr ""
+msgstr "Gå med/Lämna"
 
 msgid "Join match"
 msgstr "Öppna match"
@@ -209,7 +209,7 @@ msgid "Join match: %s"
 msgstr "Öppna match: %s"
 
 msgid "Joining..."
-msgstr ""
+msgstr "Går med..."
 
 msgid "Leave"
 msgstr "Lämna"
@@ -245,7 +245,7 @@ msgid "Menu"
 msgstr "Meny"
 
 msgid "Move"
-msgstr ""
+msgstr "Flytta"
 
 msgid "Multi"
 msgstr "Multi"
@@ -260,7 +260,7 @@ msgid "New"
 msgstr "Ny"
 
 msgid "Next"
-msgstr ""
+msgstr "Nästa"
 
 msgid "No"
 msgstr "Nej"
@@ -298,7 +298,7 @@ msgid "Press back to toggle the keyboard."
 msgstr "Backa för att visa tangentbordet."
 
 msgid "Previous"
-msgstr ""
+msgstr "Föregående"
 
 msgid "Private"
 msgstr "Privat"
@@ -346,7 +346,7 @@ msgid "Roll"
 msgstr "Slå"
 
 msgid "Roll Dice"
-msgstr ""
+msgstr "Slå Tärning"
 
 msgid "Search"
 msgstr "Sök"
@@ -376,7 +376,7 @@ msgid "Sound"
 msgstr "Ljud"
 
 msgid "Source:"
-msgstr ""
+msgstr "Källa:"
 
 msgid "Speed"
 msgstr "Hastighet"
