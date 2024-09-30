@@ -7,7 +7,6 @@ import (
 
 	"code.rocket9labs.com/tslocum/etk"
 	"code.rocket9labs.com/tslocum/gotext"
-	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type tutorialWidget struct {
@@ -26,11 +25,15 @@ func NewTutorialWidget() *tutorialWidget {
 	w.Frame.AddChild(w.grid)
 
 	w.setPage(0)
-
 	return w
 }
 
-func (w *tutorialWidget) hide() {
+func (w *tutorialWidget) nextPage() error {
+	w.setPage(w.page + 1)
+	return nil
+}
+
+func (w *tutorialWidget) hide() error {
 	game.lobby.showCreateGame = false
 	game.setRoot(listGamesFrame)
 	etk.SetFocus(nil)
@@ -38,18 +41,7 @@ func (w *tutorialWidget) hide() {
 	game.board.gameState.PlayerNumber = 0
 	game.savedUsername = "a"
 	w.grid.Clear()
-}
-
-func (w *tutorialWidget) dialogText(message string) *tutorialDialog {
-	t := etk.NewText(message)
-	t.SetPadding(10)
-	t.SetBackground(bufferBackgroundColor)
-	return &tutorialDialog{
-		Text: t,
-		handler: func() {
-			w.setPage(w.page + 1)
-		},
-	}
+	return nil
 }
 
 func (w *tutorialWidget) newTutorialBox() *tutorialBox {
@@ -59,20 +51,44 @@ func (w *tutorialWidget) newTutorialBox() *tutorialBox {
 	}
 }
 
+func (w *tutorialWidget) newDialog(title string, message string) *Dialog {
+	titleLabel := resizeText(title)
+	titleLabel.SetHorizontal(etk.AlignCenter)
+	titleLabel.SetVertical(etk.AlignCenter)
+
+	messageLabel := etk.NewText(message)
+
+	grid := etk.NewGrid()
+	grid.SetBackground(color.RGBA{40, 24, 9, 255})
+	grid.SetColumnSizes(20, -1, -1, 20)
+	grid.SetRowSizes(72, 20, -1, etk.Scale(20), etk.Scale(baseButtonHeight))
+	grid.AddChildAt(titleLabel, 1, 0, 2, 1)
+	grid.AddChildAt(messageLabel, 1, 2, 2, 1)
+	grid.AddChildAt(etk.NewBox(), 1, 3, 1, 1)
+	columns := 2
+	if w.page == 5 {
+		columns = 4
+	}
+	grid.AddChildAt(etk.NewButton(gotext.Get("Dismiss"), w.hide), 0, 4, columns, 1)
+	if w.page < 5 {
+		grid.AddChildAt(etk.NewButton(gotext.Get("Next"), w.nextPage), 2, 4, 2, 1)
+	}
+	return &Dialog{grid}
+}
+
 func (w *tutorialWidget) setPage(page int) {
 	if time.Since(w.lastClick) < 250*time.Millisecond {
 		return
 	}
 	w.lastClick = time.Now()
 	w.page = page
-	w.grid.Clear()
 
 	var title string
 	var message string
 	switch w.page {
 	case 0:
 		title = gotext.Get("Tutorial")
-		message = gotext.Get("Welcome to the guided tutorial. Click anywhere outside of this message box to close the tutorial. Click anywhere inside of this message box to view the next page.")
+		message = gotext.Get("Welcome to the guided tutorial. This program (Boxcars) is the official bgammon.org client. bgammon.org is a free and open source backgammon server.")
 	case 1:
 		title = gotext.Get("Matches List")
 		message = gotext.Get("This screen lists the matches that are currently available. A few bots are always available to play against. You can also spectate ongoing public matches.")
@@ -98,49 +114,23 @@ func (w *tutorialWidget) setPage(page int) {
 		message = gotext.Get("Double click a checker to bear it off. Bear off all 15 checkers to win.")
 	case 5:
 		title = gotext.Get("Good Luck, Have Fun")
-		message = gotext.Get("This concludes the tutorial. To share feedback and chat with other players visit %s", "bgammon.org/community")
+		message = gotext.Get("This concludes the tutorial. Learn how to play backgammon at bgammon.org/faq and share your feedback at bgammon.org/community")
 	case 6:
 		w.hide()
 		return
 	}
-	message = title + "\n\n" + message
 
-	w.grid.SetColumnSizes(-1, -1, -1, -1, -1, -1)
-	w.grid.SetRowSizes(-1, -1, -1, -1)
+	w.grid.Clear()
 	w.grid.AddChildAt(w.newTutorialBox(), 0, 0, 6, 1)
 	w.grid.AddChildAt(w.newTutorialBox(), 0, 1, 1, 2)
-	w.grid.AddChildAt(w.dialogText(message), 1, 1, 4, 2)
+	w.grid.AddChildAt(w.newDialog(title, message), 1, 1, 4, 2)
 	w.grid.AddChildAt(w.newTutorialBox(), 5, 1, 1, 2)
 	w.grid.AddChildAt(w.newTutorialBox(), 0, 3, 6, 1)
 }
 
-type tutorialDialog struct {
-	*etk.Text
-	handler func()
-}
-
-func (d *tutorialDialog) Draw(screen *ebiten.Image) error {
-	r := d.Rect()
-	borderColor := color.RGBA{0, 0, 0, 255}
-	const borderSize = 2
-	screen.SubImage(image.Rect(r.Min.X, r.Min.Y-borderSize, r.Min.X-borderSize, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
-	screen.SubImage(image.Rect(r.Min.X-borderSize, r.Min.Y, r.Max.X+borderSize, r.Min.Y-borderSize)).(*ebiten.Image).Fill(borderColor)
-	screen.SubImage(image.Rect(r.Max.X+borderSize, r.Min.Y, r.Max.X, r.Max.Y+borderSize)).(*ebiten.Image).Fill(borderColor)
-	screen.SubImage(image.Rect(r.Min.X-borderSize, r.Max.Y+borderSize, r.Max.X, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
-	return d.Text.Draw(screen)
-}
-
-func (d *tutorialDialog) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
-	if !cursor.In(d.Rect()) || !clicked {
-		return false, nil
-	}
-	d.handler()
-	return true, nil
-}
-
 type tutorialBox struct {
 	*etk.Box
-	handler func()
+	handler func() error
 }
 
 func (b *tutorialBox) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
