@@ -1723,8 +1723,6 @@ func (b *board) setRect(x, y, w, h int) {
 
 	b.recreateButtonGrid()
 
-	b.menuGrid.SetColumnSizes(-1, etk.Scale(10), -1, etk.Scale(10), -1)
-
 	var padding int
 	if b.w >= 600 {
 		padding = 20

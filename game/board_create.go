@@ -47,12 +47,11 @@ func (b *board) createForcedLabels() {
 }
 
 func (b *board) createMenu() {
-	b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.hideMenu), 0, 0, 1, 1)
-	b.menuGrid.AddChildAt(etk.NewBox(), 1, 0, 1, 1)
-	b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Settings"), b.showSettings), 2, 0, 1, 1)
-	b.menuGrid.AddChildAt(etk.NewBox(), 3, 0, 1, 1)
-	b.menuGrid.AddChildAt(etk.NewButton(gotext.Get("Leave"), b.leaveMatch), 4, 0, 1, 1)
-	b.menuGrid.SetVisible(false)
+	grid := b.menuGrid
+	grid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.hideMenu), 0, 0, 1, 1)
+	grid.AddChildAt(etk.NewButton(gotext.Get("Settings"), b.showSettings), 1, 0, 1, 1)
+	grid.AddChildAt(etk.NewButton(gotext.Get("Leave"), b.leaveMatch), 2, 0, 1, 1)
+	grid.SetVisible(false)
 }
 
 func (b *board) createChangePasswordDialog() {
