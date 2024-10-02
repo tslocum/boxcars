@@ -122,6 +122,9 @@ msgstr "Actual"
 msgid "Date"
 msgstr "Fecha"
 
+msgid "Dismiss"
+msgstr ""
+
 msgid "Donate:"
 msgstr ""
 
@@ -395,15 +398,10 @@ msgstr "Enviar"
 msgid "Tabula"
 msgstr "Tabula"
 
-msgid "Tap to dismiss this pop-up."
-msgstr "Presione para omitir está notificación."
-
 msgid ""
-"This concludes the tutorial. To share feedback and chat with other players "
-"visit %s"
+"This concludes the tutorial. Learn how to play backgammon at bgammon.org/faq "
+"and share your feedback at bgammon.org/community"
 msgstr ""
-"Esto concluye el tutorial. Para enviar comentarios y hablar con otros "
-"jugadores vaya a %s"
 
 msgid ""
 "This screen lists the matches that are currently available. A few bots are "
@@ -449,13 +447,9 @@ msgid "Warning: Received unrecognized event from server."
 msgstr "Precaución: se recibió un evento desconocido desde el servidor."
 
 msgid ""
-"Welcome to the guided tutorial. Click anywhere outside of this message box "
-"to close the tutorial. Click anywhere inside of this message box to view the "
-"next page."
+"Welcome to the guided tutorial. This program (Boxcars) is the official "
+"bgammon.org client. bgammon.org is a free and open source backgammon server."
 msgstr ""
-"Bienvenido al tutorial guiado. Presione en cualquier lugar fuera de este "
-"mensaje para cerrar el tutorial. Presione en cualquier lugar de este mensaje "
-"para ver la siguiente página."
 
 msgid "Welcome, %s. There are %d clients playing %d matches."
 msgstr "Bienvenido, %s. Hay %d clientes jugabdo %d partidas."

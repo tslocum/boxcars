@@ -122,6 +122,9 @@ msgstr "Aktuale"
 msgid "Date"
 msgstr "Datë"
 
+msgid "Dismiss"
+msgstr ""
+
 msgid "Donate:"
 msgstr ""
 
@@ -395,14 +398,10 @@ msgstr "Dërgo"
 msgid "Tabula"
 msgstr "Tabela"
 
-msgid "Tap to dismiss this pop-up."
-msgstr "Preke për ta shperfillur pop-up."
-
 msgid ""
-"This concludes the tutorial. To share feedback and chat with other players "
-"visit %s"
+"This concludes the tutorial. Learn how to play backgammon at bgammon.org/faq "
+"and share your feedback at bgammon.org/community"
 msgstr ""
-"Këtu mbaron mësimi. Për të japur reagim ose të flasësh me tjerë, vizito: %s"
 
 msgid ""
 "This screen lists the matches that are currently available. A few bots are "
@@ -447,12 +446,9 @@ msgid "Warning: Received unrecognized event from server."
 msgstr "Paralajmërim: Pranim i një ngjarje të panjohur nga sherbyesi."
 
 msgid ""
-"Welcome to the guided tutorial. Click anywhere outside of this message box "
-"to close the tutorial. Click anywhere inside of this message box to view the "
-"next page."
+"Welcome to the guided tutorial. This program (Boxcars) is the official "
+"bgammon.org client. bgammon.org is a free and open source backgammon server."
 msgstr ""
-"Mirëseerdhe në mesimin. Kliko kudo jashtë këtij mesazhi për të ndaluar "
-"mësimin. Kliko kudo brenda mesazhit për të vazhduar në faqen tjetër."
 
 msgid "Welcome, %s. There are %d clients playing %d matches."
 msgstr ""
@@ -483,6 +479,3 @@ msgstr "Të vynë për ta përmirësuar klientin."
 
 msgid "from %s to %s"
 msgstr "prej %s në %s"
-
-#~ msgid "Type %s to offer a rematch."
-#~ msgstr "Shkruaj %s për të ofruar një riluajtje."

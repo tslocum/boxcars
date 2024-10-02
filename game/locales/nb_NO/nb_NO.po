@@ -126,6 +126,9 @@ msgstr "Nåværende"
 msgid "Date"
 msgstr "Dato"
 
+msgid "Dismiss"
+msgstr ""
+
 msgid "Donate:"
 msgstr ""
 
@@ -415,15 +418,10 @@ msgstr "Send inn"
 msgid "Tabula"
 msgstr ""
 
-msgid "Tap to dismiss this pop-up."
-msgstr "Trykk for å forkaste dette oppsprettet."
-
 msgid ""
-"This concludes the tutorial. To share feedback and chat with other players "
-"visit %s"
+"This concludes the tutorial. Learn how to play backgammon at bgammon.org/faq "
+"and share your feedback at bgammon.org/community"
 msgstr ""
-"Veiledningen er over. Del tilbakemeldinger og sludre med andre spillere på "
-"%s."
 
 msgid ""
 "This screen lists the matches that are currently available. A few bots are "
@@ -467,12 +465,9 @@ msgid "Warning: Received unrecognized event from server."
 msgstr "Advarsel: Mottok ugjenkjennbar begivenhet fra tjeneren."
 
 msgid ""
-"Welcome to the guided tutorial. Click anywhere outside of this message box "
-"to close the tutorial. Click anywhere inside of this message box to view the "
-"next page."
+"Welcome to the guided tutorial. This program (Boxcars) is the official "
+"bgammon.org client. bgammon.org is a free and open source backgammon server."
 msgstr ""
-"Velkommen til veiledingen. Klikk utenfor meldingen for å lukke veiledningen. "
-"Klikk i meldingen for å vise neste side."
 
 msgid "Welcome, %s. There are %d clients playing %d matches."
 msgstr ""
@@ -506,6 +501,3 @@ msgstr "Det kan hende du må installere en nyere versjon av programmet."
 
 msgid "from %s to %s"
 msgstr "fra %s til %s"
-
-#~ msgid "Type %s to offer a rematch."
-#~ msgstr "Skriv «%s» for å tilby omkamp."
