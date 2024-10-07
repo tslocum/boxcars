@@ -10,6 +10,11 @@ builds:
     goarch:
       - amd64
       - wasm
+    env:
+      - >-
+        {{- if eq .Os "windows" }}
+          GOFLAGS=-ldflags=-H=windowsgui
+        {{- end }}
 archives:
   -
     id: boxcars
