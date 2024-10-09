@@ -55,8 +55,6 @@ type lobby struct {
 
 	lastClick time.Time
 
-	selected int
-
 	c *Client
 
 	showCreateGame           bool
@@ -142,6 +140,7 @@ func NewLobby() *lobby {
 
 	matchList := etk.NewList(game.itemHeight(), l.selectMatch)
 	matchList.SetSelectionMode(etk.SelectRow)
+	matchList.SetConfirmedFunc(l.confirmSelectMatch)
 	matchList.SetColumnSizes(indentA, indentB-indentA, indentB-indentA, -1)
 	matchList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
 	matchList.AddChildAt(loadingText, 0, 0)
@@ -253,6 +252,10 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 		}
 	}
 }
+func (l *lobby) selected() int {
+	_, y := l.availableMatchesList.SelectedItem()
+	return y
+}
 
 func (l *lobby) getButtons() []string {
 	if l.showCreateGame {
@@ -273,7 +276,7 @@ func (l *lobby) cancelCreateGame() {
 	game.lobby.createGamePassword.SetText("")
 	l.rebuildButtonsGrid()
 	game.setRoot(listGamesFrame)
-	etk.SetFocus(nil)
+	etk.SetFocus(game.lobby.availableMatchesList)
 }
 
 func (l *lobby) confirmCreateGame() {
@@ -321,7 +324,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 					game.setRoot(game.board.frame)
 				} else {
 					game.setRoot(listGamesFrame)
-					etk.SetFocus(nil)
+					etk.SetFocus(game.lobby.availableMatchesList)
 				}
 			} else {
 				l.confirmJoinGame()
@@ -333,7 +336,7 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 				l.showHistory = false
 				l.rebuildButtonsGrid()
 				game.setRoot(listGamesFrame)
-				etk.SetFocus(nil)
+				etk.SetFocus(game.lobby.availableMatchesList)
 			case lobbyButtonHistoryDownload:
 				if game.downloadReplay != 0 {
 					return nil
@@ -380,20 +383,21 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 			l.rebuildButtonsGrid()
 			scheduleFrame()
 		case lobbyButtonJoin:
-			if l.selected < 0 || l.selected >= len(l.games) {
+			selected := l.selected()
+			if selected < 0 || selected >= len(l.games) {
 				return nil
 			}
 
-			if l.games[l.selected].Password {
+			if l.games[selected].Password {
 				l.showJoinGame = true
 				game.setRoot(joinGameFrame)
 				etk.SetFocus(l.joinGamePassword)
-				l.joinGameLabel.SetText(gotext.Get("Join match: %s", l.games[l.selected].Name))
+				l.joinGameLabel.SetText(gotext.Get("Join match: %s", l.games[selected].Name))
 				l.joinGamePassword.SetText("")
-				l.joinGameID = l.games[l.selected].ID
+				l.joinGameID = l.games[selected].ID
 				l.rebuildButtonsGrid()
 			} else {
-				l.joiningGameID = l.games[l.selected].ID
+				l.joiningGameID = l.games[selected].ID
 				l.joiningGamePassword = ""
 				l.rebuildButtonsGrid()
 				scheduleFrame()
@@ -426,35 +430,29 @@ func (l *lobby) rebuildButtonsGrid() {
 	l.buttonsGrid.SetRect(r)
 }
 
-func (l *lobby) selectMatch(index int) bool {
-	if index < 0 || index >= len(l.games) {
-		return false
+func (l *lobby) confirmSelectMatch(index int) {
+	selected := l.selected()
+	if selected < 0 || selected >= len(l.games) {
+		return
 	}
-	const doubleClickDuration = 200 * time.Millisecond
-	if l.selected == index && l.selected >= 0 && l.selected < len(l.games) {
-		if time.Since(l.lastClick) <= doubleClickDuration {
-			entry := l.games[l.selected]
-			if entry.Password {
-				l.showJoinGame = true
-				game.setRoot(joinGameFrame)
-				etk.SetFocus(l.joinGamePassword)
-				l.joinGameLabel.SetText(gotext.Get("Join match: %s", entry.Name))
-				l.joinGamePassword.SetText("")
-				l.joinGameID = entry.ID
-				l.rebuildButtonsGrid()
-			} else {
-				l.joiningGameID = entry.ID
-				l.joiningGamePassword = ""
-				l.rebuildButtonsGrid()
-				scheduleFrame()
-			}
-			l.lastClick = time.Time{}
-			return true
-		}
+	entry := l.games[selected]
+	if entry.Password {
+		l.showJoinGame = true
+		game.setRoot(joinGameFrame)
+		etk.SetFocus(l.joinGamePassword)
+		l.joinGameLabel.SetText(gotext.Get("Join match: %s", entry.Name))
+		l.joinGamePassword.SetText("")
+		l.joinGameID = entry.ID
+		l.rebuildButtonsGrid()
+	} else {
+		l.joiningGameID = entry.ID
+		l.joiningGamePassword = ""
+		l.rebuildButtonsGrid()
+		scheduleFrame()
 	}
+}
 
-	l.lastClick = time.Now()
-	l.selected = index
+func (l *lobby) selectMatch(index int) bool {
 	return true
 }
 

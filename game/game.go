@@ -472,7 +472,7 @@ func setViewBoard(view bool) {
 			game.setRoot(historyFrame)
 		} else {
 			game.setRoot(listGamesFrame)
-			etk.SetFocus(nil)
+			etk.SetFocus(game.lobby.availableMatchesList)
 		}
 
 		game.board.menuGrid.SetVisible(false)
@@ -2023,7 +2023,7 @@ func (g *Game) Connect() {
 	}
 
 	g.setRoot(listGamesFrame)
-	etk.SetFocus(nil)
+	etk.SetFocus(game.lobby.availableMatchesList)
 
 	address := g.ServerAddress
 	if address == "" {
@@ -2076,7 +2076,7 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 	ls("*** " + gotext.Get("Playing offline."))
 
 	g.setRoot(listGamesFrame)
-	etk.SetFocus(nil)
+	etk.SetFocus(game.lobby.availableMatchesList)
 
 	g.client = newClient("", g.Username, g.Password, false)
 	g.lobby.c = g.client
@@ -2365,20 +2365,20 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					g.lobby.showHistory = false
 					g.lobby.rebuildButtonsGrid()
 					g.setRoot(listGamesFrame)
-					etk.SetFocus(nil)
+					etk.SetFocus(game.lobby.availableMatchesList)
 					return nil
 				}
 			} else if g.lobby.showCreateGame {
 				g.lobby.showCreateGame = false
 				g.lobby.rebuildButtonsGrid()
 				g.setRoot(listGamesFrame)
-				etk.SetFocus(nil)
+				etk.SetFocus(game.lobby.availableMatchesList)
 				return nil
 			} else if g.lobby.showJoinGame {
 				g.lobby.showJoinGame = false
 				g.lobby.rebuildButtonsGrid()
 				g.setRoot(listGamesFrame)
-				etk.SetFocus(nil)
+				etk.SetFocus(game.lobby.availableMatchesList)
 				return nil
 			} else {
 				g.showMainMenu(true)

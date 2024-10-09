@@ -36,7 +36,7 @@ func (w *tutorialWidget) nextPage() error {
 func (w *tutorialWidget) hide() error {
 	game.lobby.showCreateGame = false
 	game.setRoot(listGamesFrame)
-	etk.SetFocus(nil)
+	etk.SetFocus(game.lobby.availableMatchesList)
 	setViewBoard(false)
 	game.board.gameState.PlayerNumber = 0
 	game.savedUsername = "a"
@@ -101,7 +101,7 @@ func (w *tutorialWidget) setPage(page int) {
 	case 3:
 		game.lobby.showCreateGame = false
 		game.setRoot(listGamesFrame)
-		etk.SetFocus(nil)
+		etk.SetFocus(game.lobby.availableMatchesList)
 		game.board.gameState.PlayerNumber = 1
 		if game.needLayoutBoard {
 			game.layoutBoard()
