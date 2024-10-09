@@ -6,7 +6,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	"code.rocket9labs.com/tslocum/bgammon"
 	"code.rocket9labs.com/tslocum/etk"
@@ -53,8 +52,6 @@ type lobby struct {
 	loaded bool
 	games  []bgammon.GameListing
 
-	lastClick time.Time
-
 	c *Client
 
 	showCreateGame           bool
@@ -74,8 +71,6 @@ type lobby struct {
 	joiningGameShown    bool
 
 	showHistory                         bool
-	historySelected                     int
-	historyLastClick                    time.Time
 	historyMatches                      []*bgammon.HistoryMatch
 	historyUsername                     *Input
 	historyList                         *etk.List
@@ -138,7 +133,7 @@ func NewLobby() *lobby {
 
 	indentA, indentB := etk.Scale(lobbyIndentA), etk.Scale(lobbyIndentB)
 
-	matchList := etk.NewList(game.itemHeight(), l.selectMatch)
+	matchList := etk.NewList(game.itemHeight(), nil)
 	matchList.SetSelectionMode(etk.SelectRow)
 	matchList.SetConfirmedFunc(l.confirmSelectMatch)
 	matchList.SetColumnSizes(indentA, indentB-indentA, indentB-indentA, -1)
@@ -430,8 +425,7 @@ func (l *lobby) rebuildButtonsGrid() {
 	l.buttonsGrid.SetRect(r)
 }
 
-func (l *lobby) confirmSelectMatch(index int) {
-	selected := l.selected()
+func (l *lobby) confirmSelectMatch(selected int) {
 	if selected < 0 || selected >= len(l.games) {
 		return
 	}
@@ -452,25 +446,10 @@ func (l *lobby) confirmSelectMatch(index int) {
 	}
 }
 
-func (l *lobby) selectMatch(index int) bool {
-	return true
-}
-
-func (l *lobby) selectHistory(index int) bool {
-	if index < 0 || index >= len(l.historyMatches) {
-		return false
+func (l *lobby) confirmSelectHistory(selected int) {
+	if selected < 0 || selected >= len(l.historyMatches) {
+		return
 	}
-	const doubleClickDuration = 200 * time.Millisecond
-	if l.historySelected == index && l.historySelected >= 0 && l.historySelected < len(l.historyMatches) {
-		if time.Since(l.historyLastClick) <= doubleClickDuration {
-			match := l.historyMatches[l.historySelected]
-			l.c.Out <- []byte(fmt.Sprintf("replay %d", match.ID))
-			l.historyLastClick = time.Time{}
-			return true
-		}
-	}
-
-	l.historyLastClick = time.Now()
-	l.historySelected = index
-	return true
+	match := l.historyMatches[selected]
+	l.c.Out <- []byte(fmt.Sprintf("replay %d", match.ID))
 }

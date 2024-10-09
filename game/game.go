@@ -470,6 +470,7 @@ func setViewBoard(view bool) {
 			game.setRoot(joinGameFrame)
 		} else if game.lobby.showHistory {
 			game.setRoot(historyFrame)
+			etk.SetFocus(game.lobby.historyUsername)
 		} else {
 			game.setRoot(listGamesFrame)
 			etk.SetFocus(game.lobby.availableMatchesList)
@@ -1322,7 +1323,8 @@ func (g *Game) initialize() {
 		if smallScreen {
 			historyItemHeight /= 2
 		}
-		g.lobby.historyList = etk.NewList(historyItemHeight, g.lobby.selectHistory)
+		g.lobby.historyList = etk.NewList(historyItemHeight, nil)
+		g.lobby.historyList.SetConfirmedFunc(g.lobby.confirmSelectHistory)
 		g.lobby.historyList.SetColumnSizes(int(float64(indentA)*1.25), int(float64(indentB)*1.25)-int(float64(indentA)*1.25), -1)
 		g.lobby.historyList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
 
