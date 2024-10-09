@@ -5,18 +5,18 @@ go 1.23
 toolchain go1.23.0
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20240918192230-0a4b5e9b0923
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20241009082832-27b4288e1db8
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e
 	code.rocket9labs.com/tslocum/etk v0.0.0-20240922034952-af0a6c2c30b3
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240820025521-91065b63f1be
 	github.com/coder/websocket v1.8.12
-	github.com/hajimehoshi/ebiten/v2 v2.8.0
+	github.com/hajimehoshi/ebiten/v2 v2.8.1
 	github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	golang.org/x/image v0.20.0
-	golang.org/x/sys v0.25.0
-	golang.org/x/text v0.18.0
+	golang.org/x/image v0.21.0
+	golang.org/x/sys v0.26.0
+	golang.org/x/text v0.19.0
 )
 
 require (
@@ -27,9 +27,9 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.0 // indirect
 	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
-	github.com/ebitengine/gomobile v0.0.0-20240911145611-4856209ac325 // indirect
+	github.com/ebitengine/gomobile v0.0.0-20241001034212-22433622d8a5 // indirect
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
-	github.com/ebitengine/oto/v3 v3.4.0-alpha // indirect
+	github.com/ebitengine/oto/v3 v3.4.0-alpha.1 // indirect
 	github.com/ebitengine/purego v0.9.0-alpha // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -55,7 +55,7 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.21.0 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
-	golang.org/x/net v0.29.0 // indirect
+	golang.org/x/crypto v0.28.0 // indirect
+	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 )

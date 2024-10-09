@@ -25,6 +25,9 @@ msgstr ""
 msgid "%s wins!"
 msgstr ""
 
+msgid "%[1]s wins %[2]d points!"
+msgstr ""
+
 msgid "About"
 msgstr ""
 

@@ -1923,7 +1923,16 @@ func (g *Game) handleEvent(e interface{}) {
 		ls("*** " + gotext.Get("Failed to submit moves: %s", ev.Reason))
 	case *bgammon.EventWin:
 		g.board.Lock()
-		lg(gotext.Get("%s wins!", ev.Player))
+		var message string
+		if ev.Points <= 1 {
+			message = gotext.Get("%s wins!", ev.Player)
+		} else {
+			message = gotext.Get("%[1]s wins %[2]d points!", ev.Player, ev.Points)
+		}
+		if ev.Rating != 0 {
+			message += fmt.Sprintf(" (+%d)", ev.Rating)
+		}
+		lg(message)
 		if (g.board.gameState.Player1.Points >= g.board.gameState.Points || g.board.gameState.Player2.Points >= g.board.gameState.Points) && !g.board.gameState.Spectating {
 			g.board.rematchButton.SetVisible(true)
 		}
