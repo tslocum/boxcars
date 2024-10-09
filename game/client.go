@@ -15,6 +15,8 @@ import (
 	"github.com/coder/websocket"
 )
 
+const clientTimeout = 40 * time.Second
+
 type Client struct {
 	Address       string
 	Username      string
@@ -94,6 +96,13 @@ func (c *Client) connectWebSocket() {
 	connectTime := time.Now()
 	reconnect := func() {
 		if c.resetPassword || time.Since(connectTime) < 20*time.Second {
+			if !c.resetPassword {
+				address := c.Address
+				if address == "" {
+					address = DefaultServerAddress
+				}
+				ls(fmt.Sprintf("*** %s", gotext.Get("Failed to connect to %s", address)))
+			}
 			c.connecting = false
 			return
 		}
@@ -169,7 +178,9 @@ func (c *Client) handleWebSocketWrite(conn *websocket.Conn) {
 
 func (c *Client) handleWebSocketRead(conn *websocket.Conn) {
 	for {
-		msgType, msg, err := conn.Read(context.Background())
+		ctx, cancel := context.WithTimeout(context.Background(), clientTimeout)
+		msgType, msg, err := conn.Read(ctx)
+		cancel()
 		if err != nil || msgType != websocket.MessageText {
 			conn.Close(websocket.StatusNormalClosure, gotext.Get("Read error"))
 			return
@@ -208,6 +219,13 @@ func (c *Client) connectTCP(conn net.Conn) {
 	connectTime := time.Now()
 	reconnect := func() {
 		if c.resetPassword || time.Since(connectTime) < 20*time.Second {
+			if !c.resetPassword {
+				address := c.Address
+				if address == "" {
+					address = DefaultServerAddress
+				}
+				ls(fmt.Sprintf("*** %s", gotext.Get("Failed to connect to %s", address)))
+			}
 			c.connecting = false
 			return
 		}
@@ -298,7 +316,7 @@ func (c *Client) handleTCPWrite(conn net.Conn) {
 }
 
 func (c *Client) handleTCPRead(conn net.Conn) {
-	conn.SetReadDeadline(time.Now().Add(40 * time.Second))
+	conn.SetReadDeadline(time.Now().Add(clientTimeout))
 
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
@@ -325,6 +343,6 @@ func (c *Client) handleTCPRead(conn net.Conn) {
 			log.Printf("<- %s", scanner.Bytes())
 		}
 
-		conn.SetReadDeadline(time.Now().Add(40 * time.Second))
+		conn.SetReadDeadline(time.Now().Add(clientTimeout))
 	}
 }

@@ -136,6 +136,9 @@ msgstr ""
 msgid "FAQ:"
 msgstr ""
 
+msgid "Failed to connect to %s"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr ""
 
