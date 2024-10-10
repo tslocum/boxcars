@@ -33,13 +33,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/nfnt/resize"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/text/language"
 )
 
 const (
-	AppVersion           = "v1.4.2"
+	AppVersion           = "v1.4.3"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -195,6 +194,30 @@ var (
 	cubesImageSize     = 0.0
 )
 
+func resizeImage(source *ebiten.Image, size int) *ebiten.Image {
+	if size == 0 {
+		size = 1
+	}
+	bounds := source.Bounds()
+	if bounds.Dx() == size && bounds.Dy() == size {
+		return source
+	}
+	scale, yScale := float64(size)/float64(bounds.Dx()), float64(size)/float64(bounds.Dy())
+	if yScale < scale {
+		scale = yScale
+	}
+	op := &ebiten.DrawImageOptions{}
+	op.Filter = ebiten.FilterLinear
+	op.GeoM.Scale(scale, scale)
+	dx := float64(size) - float64(bounds.Dx())*scale
+	op.GeoM.Translate(dx/2, 0)
+	dy := float64(size) - float64(bounds.Dy())*scale
+	op.GeoM.Translate(0, dy/2)
+	img := ebiten.NewImage(size, size)
+	img.DrawImage(source, op)
+	return img
+}
+
 func loadImageAssets(width int) {
 	if width == loadedCheckerWidth {
 		return
@@ -206,7 +229,7 @@ func loadImageAssets(width int) {
 	imgCheckerSideLight = loadAsset("asset/image/checker_side_light.png", width)
 	imgCheckerSideDark = loadAsset("asset/image/checker_side_dark.png", width)
 
-	resizeDice := func(img image.Image, scale float64) *ebiten.Image {
+	resizeDice := func(img *ebiten.Image, scale float64) *ebiten.Image {
 		if game == nil {
 			panic("nil game")
 		}
@@ -228,24 +251,24 @@ func loadImageAssets(width int) {
 		} else {
 			cubesImageSize = float64(diceSize) * scale
 		}
-		return ebiten.NewImageFromImage(resize.Resize(uint(float64(diceSize)*scale), 0, img, resize.Lanczos3))
+		return resizeImage(img, int(float64(diceSize)*scale))
 	}
 
 	const size = 184
 	imgDice = ebiten.NewImageFromImage(loadImage("asset/image/dice.png"))
-	imgDice1 = resizeDice(imgDice.SubImage(image.Rect(0, 0, size*1, size*1)), 1)
-	imgDice2 = resizeDice(imgDice.SubImage(image.Rect(size*1, 0, size*2, size*1)), 1)
-	imgDice3 = resizeDice(imgDice.SubImage(image.Rect(size*2, 0, size*3, size*1)), 1)
-	imgDice4 = resizeDice(imgDice.SubImage(image.Rect(0, size*1, size*1, size*2)), 1)
-	imgDice5 = resizeDice(imgDice.SubImage(image.Rect(size*1, size*1, size*2, size*2)), 1)
-	imgDice6 = resizeDice(imgDice.SubImage(image.Rect(size*2, size*1, size*3, size*2)), 1)
+	imgDice1 = resizeDice(imgDice.SubImage(image.Rect(0, 0, size*1, size*1)).(*ebiten.Image), 1)
+	imgDice2 = resizeDice(imgDice.SubImage(image.Rect(size*1, 0, size*2, size*1)).(*ebiten.Image), 1)
+	imgDice3 = resizeDice(imgDice.SubImage(image.Rect(size*2, 0, size*3, size*1)).(*ebiten.Image), 1)
+	imgDice4 = resizeDice(imgDice.SubImage(image.Rect(0, size*1, size*1, size*2)).(*ebiten.Image), 1)
+	imgDice5 = resizeDice(imgDice.SubImage(image.Rect(size*1, size*1, size*2, size*2)).(*ebiten.Image), 1)
+	imgDice6 = resizeDice(imgDice.SubImage(image.Rect(size*2, size*1, size*3, size*2)).(*ebiten.Image), 1)
 	imgCubes = ebiten.NewImageFromImage(loadImage("asset/image/cubes.png"))
-	imgCubes2 = resizeDice(imgCubes.SubImage(image.Rect(0, 0, size*1, size*1)), 0.6)
-	imgCubes4 = resizeDice(imgCubes.SubImage(image.Rect(size*1, 0, size*2, size*1)), 0.6)
-	imgCubes8 = resizeDice(imgCubes.SubImage(image.Rect(size*2, 0, size*3, size*1)), 0.6)
-	imgCubes16 = resizeDice(imgCubes.SubImage(image.Rect(0, size*1, size*1, size*2)), 0.6)
-	imgCubes32 = resizeDice(imgCubes.SubImage(image.Rect(size*1, size*1, size*2, size*2)), 0.6)
-	imgCubes64 = resizeDice(imgCubes.SubImage(image.Rect(size*2, size*1, size*3, size*2)), 0.6)
+	imgCubes2 = resizeDice(imgCubes.SubImage(image.Rect(0, 0, size*1, size*1)).(*ebiten.Image), 0.6)
+	imgCubes4 = resizeDice(imgCubes.SubImage(image.Rect(size*1, 0, size*2, size*1)).(*ebiten.Image), 0.6)
+	imgCubes8 = resizeDice(imgCubes.SubImage(image.Rect(size*2, 0, size*3, size*1)).(*ebiten.Image), 0.6)
+	imgCubes16 = resizeDice(imgCubes.SubImage(image.Rect(0, size*1, size*1, size*2)).(*ebiten.Image), 0.6)
+	imgCubes32 = resizeDice(imgCubes.SubImage(image.Rect(size*1, size*1, size*2, size*2)).(*ebiten.Image), 0.6)
+	imgCubes64 = resizeDice(imgCubes.SubImage(image.Rect(size*2, size*1, size*3, size*2)).(*ebiten.Image), 0.6)
 
 	imgProfileBirthday1 = ebiten.NewImageFromImage(loadImage("asset/image/profile_birthday_1.png"))
 
@@ -306,7 +329,7 @@ func loadAudioAssets() {
 	randomizeByteSlice(homeMultiSounds)
 }
 
-func loadImage(assetPath string) image.Image {
+func loadImage(assetPath string) *ebiten.Image {
 	f, err := assetFS.Open(assetPath)
 	if err != nil {
 		panic(err)
@@ -317,17 +340,15 @@ func loadImage(assetPath string) image.Image {
 		log.Fatal(err)
 	}
 
-	return img
+	return ebiten.NewImageFromImage(img)
 }
 
 func loadAsset(assetPath string, width int) *ebiten.Image {
 	img := loadImage(assetPath)
-
 	if width > 0 {
-		imgResized := resize.Resize(uint(width), 0, img, resize.Lanczos3)
-		return ebiten.NewImageFromImage(imgResized)
+		return resizeImage(img, width)
 	}
-	return ebiten.NewImageFromImage(img)
+	return img
 }
 
 func LoadBytes(p string) []byte {

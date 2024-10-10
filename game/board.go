@@ -1382,25 +1382,24 @@ func (b *board) Draw(screen *ebiten.Image) {
 	}
 
 	dividerHeight := float64(etk.Scale(15))
-
-	r := b.spaceRects[bgammon.SpaceHomePlayer]
-	checkerY := float64(b.y+int(b.verticalBorderSize)+r[1]+r[3]) + 3
 	checkerHeight := (b.spaceWidth + b.overlapSize*4 - dividerHeight*2) / 15
+
+	checkerY := float64(b.y+b.h-int(b.verticalBorderSize)) - checkerHeight - float64(etk.Scale(4))
 	checkers := len(b.spaceSprites[bgammon.SpaceHomePlayer])
 	var checkerOffset float64
 	for i := 0; i < checkers; i++ {
 		checkerOffset = 0
 		if i >= 10 {
-			checkerOffset = dividerHeight * 2
+			checkerOffset = dividerHeight*2 - float64(etk.Scale(2))
 		} else if i >= 5 {
-			checkerOffset = dividerHeight
+			checkerOffset = dividerHeight - float64(etk.Scale(2))
 		} else {
 			checkerOffset = 0
 		}
 		b.drawChecker(screen, imgCheckerSideLight, float64(b.x+b.w)-b.spaceWidth, checkerY-checkerHeight*float64(i+1)-checkerOffset, b.flipBoard, true)
 	}
 
-	checkerY = float64(b.y+int(b.verticalBorderSize)) + 1
+	checkerY = float64(b.y+int(b.verticalBorderSize)) - checkerHeight - 3
 	checkers = len(b.spaceSprites[bgammon.SpaceHomeOpponent])
 	for i := 0; i < checkers; i++ {
 		checkerOffset = 0

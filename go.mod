@@ -13,7 +13,6 @@ require (
 	github.com/coder/websocket v1.8.12
 	github.com/hajimehoshi/ebiten/v2 v2.8.1
 	github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195
-	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	golang.org/x/image v0.21.0
 	golang.org/x/sys v0.26.0
 	golang.org/x/text v0.19.0
