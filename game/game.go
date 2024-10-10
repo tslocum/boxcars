@@ -1730,16 +1730,9 @@ func (g *Game) handleEvent(e interface{}) {
 			go saveCredentials(username, password)
 		}
 
-		var msg string
-		if ev.Clients == 1 && ev.Games == 1 {
-			msg = gotext.Get("Welcome, %s. There is 1 client playing 1 match.", ev.PlayerName)
-		} else if ev.Clients == 1 {
-			msg = gotext.Get("Welcome, %s. There is 1 client playing %d matches.", ev.PlayerName, ev.Games)
-		} else if ev.Games == 1 {
-			msg = gotext.Get("Welcome, %s. There are %d clients playing 1 match.", ev.PlayerName, ev.Clients)
-		} else {
-			msg = gotext.Get("Welcome, %s. There are %d clients playing %d matches.", ev.PlayerName, ev.Clients, ev.Games)
-		}
+		clients := gotext.GetN("There is %d client", "There are %d clients", ev.Clients, ev.Clients)
+		matches := gotext.GetN("%d match", "%d matches", ev.Games, ev.Games)
+		msg := gotext.Get("Welcome, %[1]s. %[2]s playing %[3]s.", ev.PlayerName, clients, matches)
 		ls(fmt.Sprintf("*** " + msg))
 
 		if strings.HasPrefix(g.client.Username, "Guest_") && g.savedUsername == "" {
@@ -1950,7 +1943,7 @@ func (g *Game) handleEvent(e interface{}) {
 		if ev.Points <= 1 {
 			message = gotext.Get("%s wins!", ev.Player)
 		} else {
-			message = gotext.Get("%[1]s wins %[2]d points!", ev.Player, ev.Points)
+			message = gotext.GetN("%[1]s wins %[2]d point!", "%[1]s wins %[2]d points!", int(ev.Points), ev.Player, ev.Points)
 		}
 		if ev.Rating != 0 {
 			message += fmt.Sprintf(" (+%d)", ev.Rating)
