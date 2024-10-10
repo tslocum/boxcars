@@ -1424,8 +1424,8 @@ func (g *Game) initialize() {
 		historyContainer.AddChildAt(headerGrid, 0, 0, 1, 1)
 		historyContainer.AddChildAt(dividerLine, 0, 1, 1, 1)
 		historyContainer.AddChildAt(g.lobby.historyList, 0, 2, 1, 1)
-		historyContainer.AddChildAt(pageControlGrid, 0, 3, 1, 1)
-		historyContainer.AddChildAt(historyRatingGrid, 0, 4, 1, 1)
+		historyContainer.AddChildAt(historyRatingGrid, 0, 3, 1, 1)
+		historyContainer.AddChildAt(pageControlGrid, 0, 4, 1, 1)
 		historyContainer.AddChildAt(statusBuffer, 0, 5, 1, 1)
 		historyContainer.AddChildAt(g.lobby.buttonsGrid, 0, 6, 1, 1)
 
@@ -1689,7 +1689,7 @@ func (g *Game) setBufferRects() {
 
 	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
 	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
-	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, g.lobby.buttonBarHeight, historyRatingHeight, statusBufferHeight, g.lobby.buttonBarHeight)
+	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, historyRatingHeight, g.lobby.buttonBarHeight, statusBufferHeight, g.lobby.buttonBarHeight)
 	listHeaderHeight := g.itemHeight()
 	if smallScreen {
 		listHeaderHeight /= 2
