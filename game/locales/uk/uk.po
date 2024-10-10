@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-09-24 09:15+0000\n"
-"Last-Translator: \"Andrew \\\"EGYT\\\"\" <hitechni134@gmail.com>\n"
+"PO-Revision-Date: 2024-10-10 18:06+0000\n"
+"Last-Translator: \"Andrew \\\"EGYT\\\"\" <egyttheguy@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/bgammon/"
 "boxcars/uk/>\n"
 "Language: uk\n"
@@ -29,6 +29,12 @@ msgstr "%s кидає %s"
 
 msgid "%s wins!"
 msgstr "%s перемагає!"
+
+msgid "%[1]s wins %[2]d point!"
+msgid_plural "%[1]s wins %[2]d points!"
+msgstr[0] "%[1]s виграє %[2]d бал!"
+msgstr[1] "%[1]s виграє %[2]d бали!"
+msgstr[2] "%[1]s виграє %[2]d балів!"
 
 msgid "About"
 msgstr "Про Boxcars"
@@ -124,7 +130,7 @@ msgid "Date"
 msgstr "Дата"
 
 msgid "Dismiss"
-msgstr ""
+msgstr "Відхилити"
 
 msgid "Donate:"
 msgstr "Підтримати:"
@@ -151,6 +157,9 @@ msgstr "Вийти з Boxcars?"
 
 msgid "FAQ:"
 msgstr "ЧаПи:"
+
+msgid "Failed to connect to %s"
+msgstr "Не вдалося приєднатися до %s"
 
 msgid "Failed to download replay: %s"
 msgstr "Не вдалося завантажити повтор: %s"
@@ -403,6 +412,8 @@ msgid ""
 "This concludes the tutorial. Learn how to play backgammon at bgammon.org/faq "
 "and share your feedback at bgammon.org/community"
 msgstr ""
+"На цьому посібник завершено. Навчитися грати в нарди ви можете за посиланням:"
+" bgammon.org. Зворотній зв'язок: bgammon.org/community"
 
 msgid ""
 "This screen lists the matches that are currently available. A few bots are "
@@ -449,22 +460,23 @@ msgid ""
 "Welcome to the guided tutorial. This program (Boxcars) is the official "
 "bgammon.org client. bgammon.org is a free and open source backgammon server."
 msgstr ""
+"Вітаємо у посібнику. Ця програма (Boxcars) — офіційний клієнт для "
+"bgammon.org — вільного і відкритого сервера для гри в нарди."
 
-#, fuzzy
-msgid "Welcome, %s. There are %d clients playing %d matches."
-msgstr "Вітаємо, %s. Зараз %d гравців грають %d матчів."
+msgid "Welcome, %[1]s. %[2]s playing %[3]s."
+msgstr "Вітаємо, %[1]s. %[2]s грають %[3]s."
 
-#, fuzzy
-msgid "Welcome, %s. There are %d clients playing 1 match."
-msgstr "Вітаємо, %s. Зараз %d гравців грають 1 матч."
+msgid "There is %d client"
+msgid_plural "There are %d clients"
+msgstr[0] "%d гравець"
+msgstr[1] "%d гравці"
+msgstr[2] "%d гравців"
 
-#, fuzzy
-msgid "Welcome, %s. There is 1 client playing %d matches."
-msgstr "Вітаємо, %s. Зараз 1 гравець грає %d матчів."
-
-#, fuzzy
-msgid "Welcome, %s. There is 1 client playing 1 match."
-msgstr "Вітаємо, %s. Зараз 1 гравець грає 1 матч."
+msgid "%d match"
+msgid_plural "%d matches"
+msgstr[0] "%d матч"
+msgstr[1] "%d матчі"
+msgstr[2] "%d матчів"
 
 msgid "Write error"
 msgstr "Помилка запису"

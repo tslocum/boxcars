@@ -29,6 +29,11 @@ msgstr "% rolou %"
 msgid "%s wins!"
 msgstr "%s venceu!"
 
+msgid "%[1]s wins %[2]d point!"
+msgid_plural "%[1]s wins %[2]d points!"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "About"
 msgstr ""
 
@@ -147,6 +152,9 @@ msgid "Exit Boxcars?"
 msgstr ""
 
 msgid "FAQ:"
+msgstr ""
+
+msgid "Failed to connect to %s"
 msgstr ""
 
 msgid "Failed to download replay: %s"
@@ -449,17 +457,18 @@ msgid ""
 "bgammon.org client. bgammon.org is a free and open source backgammon server."
 msgstr ""
 
-msgid "Welcome, %s. There are %d clients playing %d matches."
-msgstr "Bem vindo, %s. Há %d usuários jogando %d partidas."
+msgid "Welcome, %[1]s. %[2]s playing %[3]s."
+msgstr ""
 
-msgid "Welcome, %s. There are %d clients playing 1 match."
-msgstr "Bem vindo, %s. Há %d usuários jogando 1 partida."
+msgid "There is %d client"
+msgid_plural "There are %d clients"
+msgstr[0] ""
+msgstr[1] ""
 
-msgid "Welcome, %s. There is 1 client playing %d matches."
-msgstr "Bem vindo, %s. Há 1 usuário jogando %d partidas."
-
-msgid "Welcome, %s. There is 1 client playing 1 match."
-msgstr "Bem vindo, %s. Há 1 usuário jogando 1 partida."
+msgid "%d match"
+msgid_plural "%d matches"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Write error"
 msgstr "Escrever erro"

@@ -29,6 +29,11 @@ msgstr ""
 msgid "%s wins!"
 msgstr "%s kazandı!"
 
+msgid "%[1]s wins %[2]d point!"
+msgid_plural "%[1]s wins %[2]d points!"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "About"
 msgstr ""
 
@@ -151,6 +156,9 @@ msgid "Exit Boxcars?"
 msgstr ""
 
 msgid "FAQ:"
+msgstr ""
+
+msgid "Failed to connect to %s"
 msgstr ""
 
 msgid "Failed to download replay: %s"
@@ -457,17 +465,18 @@ msgid ""
 "bgammon.org client. bgammon.org is a free and open source backgammon server."
 msgstr ""
 
-msgid "Welcome, %s. There are %d clients playing %d matches."
+msgid "Welcome, %[1]s. %[2]s playing %[3]s."
 msgstr ""
 
-msgid "Welcome, %s. There are %d clients playing 1 match."
-msgstr ""
+msgid "There is %d client"
+msgid_plural "There are %d clients"
+msgstr[0] ""
+msgstr[1] ""
 
-msgid "Welcome, %s. There is 1 client playing %d matches."
-msgstr ""
-
-msgid "Welcome, %s. There is 1 client playing 1 match."
-msgstr ""
+msgid "%d match"
+msgid_plural "%d matches"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Write error"
 msgstr "Yazma hatası"
