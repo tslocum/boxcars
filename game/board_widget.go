@@ -319,6 +319,21 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 	return handled, nil
 }
 
+type BoardBackgroundWidget struct {
+	*etk.Box
+}
+
+func NewBoardBackgroundWidget() *BoardBackgroundWidget {
+	return &BoardBackgroundWidget{
+		Box: etk.NewBox(),
+	}
+}
+
+func (w *BoardBackgroundWidget) Draw(screen *ebiten.Image) error {
+	game.board.Draw(screen)
+	return nil
+}
+
 type BoardMovingWidget struct {
 	*etk.Box
 }

@@ -2634,10 +2634,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			log.Fatal(err)
 		}
 	} else { // Draw lobby and board.
-		if viewBoard {
-			g.board.Draw(screen)
-		}
-
 		err := etk.Draw(screen)
 		if err != nil {
 			log.Fatal(err)

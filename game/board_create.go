@@ -530,7 +530,7 @@ func (b *board) createSelectRollDialog() {
 
 func (b *board) createFrame() {
 	b.frame.SetPositionChildren(true)
-
+	b.frame.AddChild(NewBoardBackgroundWidget())
 	b.frame.AddChild(NewBoardMovingWidget())
 
 	f := etk.NewFrame()

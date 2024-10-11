@@ -958,19 +958,33 @@ func (b *board) updateBackgroundImage() {
 	}
 	frameW := b.w - int((b.horizontalBorderSize-borderSize)*2)
 
+	var screenW, screenH int
+	monitor := ebiten.Monitor()
+	if monitor != nil {
+		screenW, screenH = monitor.Size()
+	}
+	if screenW == 0 || screenH == 0 {
+		screenW, screenH = ebiten.ScreenSizeInFullscreen() // Fallback.
+	}
+	if b.w > screenW {
+		screenW = b.w
+	}
+	if b.h > screenH {
+		screenH = b.h
+	}
+
 	if b.backgroundImage == nil {
-		b.backgroundImage = ebiten.NewImage(b.w, b.h)
-		b.baseImage = image.NewRGBA(image.Rect(0, 0, b.w, b.h))
+		b.backgroundImage = ebiten.NewImage(screenW, screenH)
+		b.baseImage = image.NewRGBA(image.Rect(0, 0, screenW, screenH))
 	} else {
 		bounds := b.backgroundImage.Bounds()
-		if bounds.Dx() != b.w || bounds.Dy() != b.h {
-			b.backgroundImage = ebiten.NewImage(b.w, b.h)
-			b.baseImage = image.NewRGBA(image.Rect(0, 0, b.w, b.h))
+		if bounds.Dx() != screenW || bounds.Dy() != screenH {
+			b.backgroundImage = ebiten.NewImage(screenW, screenH)
+			b.baseImage = image.NewRGBA(image.Rect(0, 0, screenW, screenH))
 		}
 	}
 
-	// Draw table.
-	b.backgroundImage.Fill(tableColor)
+	b.backgroundImage.Clear()
 
 	// Draw frame.
 	{
@@ -1322,7 +1336,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 	{
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(float64(b.x), float64(b.y))
-		screen.DrawImage(b.backgroundImage, op)
+		screen.SubImage(image.Rect(b.x, b.y, b.w, b.h)).(*ebiten.Image).DrawImage(b.backgroundImage, op)
 	}
 
 	ff := etk.FontFace(etk.Style.TextFont, etk.Scale(b.fontSize))
