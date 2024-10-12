@@ -456,8 +456,12 @@ func (b *board) createMatchStatus() {
 		b.showMenuButton.SetBorderSize(etk.Scale(etk.Style.ButtonBorderSize / 2))
 	}
 
+	var padding int
+	if !mobileDevice {
+		padding = int(b.verticalBorderSize / 4)
+	}
 	b.matchStatusGrid = etk.NewGrid()
-	b.matchStatusGrid.SetColumnSizes(int(b.verticalBorderSize/4), -1, -1, -1, int(b.verticalBorderSize/4))
+	b.matchStatusGrid.SetColumnSizes(padding, -1, -1, -1, padding)
 	b.matchStatusGrid.AddChildAt(b.timerLabel, 1, 0, 1, 1)
 	b.matchStatusGrid.AddChildAt(b.clockLabel, 2, 0, 1, 1)
 	b.matchStatusGrid.AddChildAt(b.showMenuButton, 3, 0, 1, 1)
@@ -486,10 +490,13 @@ func (b *board) createReplayList() {
 
 func (b *board) recreateUIGrid() {
 	b.uiGrid.Clear()
-	b.uiGrid.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
-	b.uiGrid.AddChildAt(b.matchStatusGrid, 0, 1, 1, 1)
-	b.uiGrid.AddChildAt(etk.NewBox(), 0, 2, 1, 1)
-	gridY := 3
+	var gridY int
+	if !mobileDevice || game.replay {
+		b.uiGrid.AddChildAt(etk.NewBox(), 0, 0, 1, 1)
+		b.uiGrid.AddChildAt(b.matchStatusGrid, 0, 1, 1, 1)
+		b.uiGrid.AddChildAt(etk.NewBox(), 0, 2, 1, 1)
+		gridY = 3
+	}
 	if game.replay {
 		g := etk.NewGrid()
 		g.SetRowSizes(etk.Scale(baseButtonHeight), int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), etk.Scale(baseButtonHeight*2))
@@ -508,7 +515,10 @@ func (b *board) recreateUIGrid() {
 		b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY+1, 1, 1)
 		b.uiGrid.AddChildAt(gameBuffer, 0, gridY+2, 1, 1)
 		gridY += 3
-		if !mobileDevice {
+		if mobileDevice {
+			b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY, 1, 1)
+			b.uiGrid.AddChildAt(b.matchStatusGrid, 0, gridY+1, 1, 1)
+		} else {
 			b.uiGrid.AddChildAt(etk.NewBox(), 0, gridY, 1, 1)
 			b.uiGrid.AddChildAt(b.inputGrid, 0, gridY+1, 1, 1)
 		}
@@ -551,11 +561,8 @@ func (b *board) createFrame() {
 	b.frame.AddChild(f)
 
 	b.frame.AddChild(b.widget)
-
 	b.frame.AddChild(b.buttonsGrid)
-
 	b.frame.AddChild(etk.NewFrame(b.selectRollGrid))
-
 	b.frame.AddChild(NewBoardDraggedWidget())
 
 	f = etk.NewFrame()

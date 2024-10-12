@@ -1660,8 +1660,8 @@ func (b *board) setRect(x, y, w, h int) {
 	b.processState()
 
 	matchStatus := etk.Scale(36)
-	if mobileDevice {
-		b.uiGrid.SetRowSizes(int(b.verticalBorderSize/2), matchStatus, int(b.verticalBorderSize/2), fieldHeight, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), -1)
+	if mobileDevice && !game.replay {
+		b.uiGrid.SetRowSizes(fieldHeight, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), matchStatus)
 	} else {
 		b.uiGrid.SetRowSizes(int(b.verticalBorderSize/2), matchStatus, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), -1, int(b.verticalBorderSize/2), fieldHeight)
 	}
