@@ -4,8 +4,10 @@ code.rocket9labs.com/tslocum/bgammon v0.0.0-20241010190144-e2561c68ceb9 h1:PQJ4T
 code.rocket9labs.com/tslocum/bgammon v0.0.0-20241010190144-e2561c68ceb9/go.mod h1:NdFbXA9jP9y9HjHMAT4AHGC7BcoASvtzaGssczHZLLg=
 code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e h1:5DSsHaB/xrD57Gmu/1YaWMRFLiTVvVmcZRa9/EJZuZo=
 code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e/go.mod h1:mZA8T+w1qkH5tzFfDQb87wCms+qlulyT9Q8deuK1ApQ=
-code.rocket9labs.com/tslocum/etk v0.0.0-20241011233507-3b7070ba7e19 h1:lENEdbmQqfNevSfS0+c6grLA4YT/Y1iQZ5l/ZKHgnS8=
-code.rocket9labs.com/tslocum/etk v0.0.0-20241011233507-3b7070ba7e19/go.mod h1:D/EQ+U26XCBrnVGuVWp3TkCOZxn+OjB5GDvsKudjeos=
+code.rocket9labs.com/tslocum/clipboard v0.0.0-20241012025701-2c0fb515daab h1:0sF/YYnb3/GaPMKALyNVXS0Ku5JoulpC4GWdTcP1v+Q=
+code.rocket9labs.com/tslocum/clipboard v0.0.0-20241012025701-2c0fb515daab/go.mod h1:v2cql+mNoahFvZ1U/KQmDDqPmD0H0l1jyistVAgg8YA=
+code.rocket9labs.com/tslocum/etk v0.0.0-20241012030500-ec4f094f57d2 h1:xXkjEW8q7LbG2WmtLBn25bEfardcWF7IbT4olSihaeo=
+code.rocket9labs.com/tslocum/etk v0.0.0-20241012030500-ec4f094f57d2/go.mod h1:Tmq3MjpY8TZ7To6u/NL8nq2DOQYV8A9OR+oQFSFD7rg=
 code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b h1:KSdR7VPoftY5Bt+osGRBbtHlCWxhe1QbOuf58CG7ieI=
 code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b/go.mod h1:ZkYZ/IF/ebzhUL2bNp4ALROsuH9iCztUWvUJBWsHXRU=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240820025521-91065b63f1be h1:awgpl3vS+d7vciw7X5z+joGSPZHB1OOTpkPKW3mPGDs=
@@ -137,8 +139,6 @@ github.com/vanng822/go-premailer v1.22.0 h1:5gG92q3nG3BwcfUUDzrSDbYDbpwYC/lri4nb
 github.com/vanng822/go-premailer v1.22.0/go.mod h1:K7DxRBW6AxdZUTqmW9jU6041CtfAWiP9uSXm2WmMB1k=
 github.com/vanng822/r2router v0.0.0-20150523112421-1023140a4f30/go.mod h1:1BVq8p2jVr55Ost2PkZWDrG86PiJ/0lxqcXoAcGxvWU=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-golang.design/x/clipboard v0.7.0 h1:4Je8M/ys9AJumVnl8m+rZnIvstSnYj1fvzqYrU3TXvo=
-golang.design/x/clipboard v0.7.0/go.mod h1:PQIvqYO9GP29yINEfsEn5zSQKAz3UgXmZKzDA6dnq2E=
 golang.org/x/crypto v0.0.0-20181029175232-7e6ffbd03851/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=

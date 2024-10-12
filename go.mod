@@ -7,7 +7,7 @@ toolchain go1.23.0
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20241010190144-e2561c68ceb9
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e
-	code.rocket9labs.com/tslocum/etk v0.0.0-20241011233507-3b7070ba7e19
+	code.rocket9labs.com/tslocum/etk v0.0.0-20241012030500-ec4f094f57d2
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20240820025521-91065b63f1be
 	github.com/coder/websocket v1.8.12
@@ -20,6 +20,7 @@ require (
 
 require (
 	code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b // indirect
+	code.rocket9labs.com/tslocum/clipboard v0.0.0-20241012025701-2c0fb515daab // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
@@ -54,7 +55,6 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.22.0 // indirect
-	golang.design/x/clipboard v0.7.0 // indirect
 	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/exp/shiny v0.0.0-20241009180824-f66d83c29e7c // indirect
 	golang.org/x/mobile v0.0.0-20241004191011-08a83c5af9f8 // indirect
