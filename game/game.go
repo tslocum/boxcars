@@ -80,7 +80,8 @@ var (
 
 	imgProfileBirthday1 *ebiten.Image
 
-	imgIcon *ebiten.Image
+	imgIcon    *ebiten.Image
+	ImgIconAlt image.Image
 
 	fontMutex = &sync.Mutex{}
 )
@@ -162,6 +163,9 @@ var (
 
 func init() {
 	gotext.SetDomain("boxcars")
+
+	ImgIconAlt = _loadImage("asset/image/icon.png")
+	imgIcon = ebiten.NewImageFromImage(ImgIconAlt)
 }
 
 func ls(s string) {
@@ -271,8 +275,6 @@ func loadImageAssets(width int) {
 	imgCubes64 = resizeDice(imgCubes.SubImage(image.Rect(size*2, size*1, size*3, size*2)).(*ebiten.Image), 0.6)
 
 	imgProfileBirthday1 = ebiten.NewImageFromImage(loadImage("asset/image/profile_birthday_1.png"))
-
-	imgIcon = ebiten.NewImageFromImage(loadImage("asset/image/icon.png"))
 }
 
 func loadAudioAssets() {
@@ -329,7 +331,7 @@ func loadAudioAssets() {
 	randomizeByteSlice(homeMultiSounds)
 }
 
-func loadImage(assetPath string) *ebiten.Image {
+func _loadImage(assetPath string) image.Image {
 	f, err := assetFS.Open(assetPath)
 	if err != nil {
 		panic(err)
@@ -339,8 +341,11 @@ func loadImage(assetPath string) *ebiten.Image {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return img
+}
 
-	return ebiten.NewImageFromImage(img)
+func loadImage(assetPath string) *ebiten.Image {
+	return ebiten.NewImageFromImage(_loadImage(assetPath))
 }
 
 func loadAsset(assetPath string, width int) *ebiten.Image {

@@ -1,3 +1,6 @@
+1.4.4:
+- Add window icon
+
 1.4.3:
 - Print error message when connection fails
 - Support navigating lists using arrow keys

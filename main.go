@@ -3,11 +3,13 @@ package main
 //go:generate xgotext -no-locations -default boxcars -in . -out game/locales
 
 import (
+	"image"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"code.rocket9labs.com/tslocum/boxcars/game"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -20,6 +22,7 @@ func main() {
 	ebiten.SetWindowTitle("bgammon.org - Free Online Backgammon")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+	ebiten.SetWindowIcon([]image.Image{game.ImgIconAlt})
 
 	g := parseFlags()
 
