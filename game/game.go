@@ -120,6 +120,11 @@ var (
 	statusLogged bool
 	gameLogged   bool
 
+	newGameLogMessage   bool
+	lastGameLogTime     string
+	incomingGameLogRoll bool
+	incomingGameLogMove bool
+
 	Debug int8
 
 	game *Game
@@ -181,7 +186,12 @@ func ls(s string) {
 }
 
 func lg(s string) {
-	m := time.Now().Format("[3:04]") + " " + s
+	t := time.Now().Format("[3:04]")
+	m := t + " " + s
+	newGameLogMessage = true
+	incomingGameLogRoll = false
+	incomingGameLogMove = false
+	lastGameLogTime = t
 	if gameLogged {
 		_, _ = gameBuffer.Write([]byte("\n" + m))
 		scheduleFrame()
@@ -1591,6 +1601,9 @@ func (g *Game) clearBuffers() {
 
 	statusLogged = false
 	gameLogged = false
+	newGameLogMessage = true
+	incomingGameLogRoll = false
+	incomingGameLogMove = false
 }
 
 func (g *Game) showMainMenu(clearBuffers bool) {
@@ -1785,6 +1798,9 @@ func (g *Game) handleEvent(e interface{}) {
 		if ev.Player == g.client.Username {
 			gameBuffer.SetText("")
 			gameLogged = false
+			newGameLogMessage = true
+			incomingGameLogRoll = false
+			incomingGameLogMove = false
 			g.board.rematchButton.SetVisible(false)
 		} else {
 			lg(gotext.Get("%s joined the match.", ev.Player))
@@ -1860,6 +1876,46 @@ func (g *Game) handleEvent(e interface{}) {
 		g.board.processState()
 		g.board.Unlock()
 
+		if incomingGameLogRoll {
+			roll := formatRoll(g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3)
+
+			var extra string
+			if g.board.gameState.Turn != 0 {
+				tabulaBoard := tabulaBoard(g.board.gameState.Game, g.board.gameState.Game.Board)
+				available, _ := tabulaBoard.Available(g.board.gameState.Turn)
+				if len(available) > 0 {
+					extra = ":"
+				}
+			}
+
+			name := g.board.gameState.Player1.Name
+			if game.board.gameState.Turn == 2 {
+				name = g.board.gameState.Player2.Name
+			}
+
+			lg(name + " " + roll + extra)
+			newGameLogMessage = false
+			incomingGameLogRoll = false
+		}
+
+		if incomingGameLogMove {
+			name := g.board.gameState.Player1.Name
+			if game.board.gameState.Turn == 2 {
+				name = g.board.gameState.Player2.Name
+			}
+			msg := name + " " + formatRoll(g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3) + ": " + string(bgammon.FormatMoves(g.board.gameState.Moves))
+			if !newGameLogMessage {
+				if lastGameLogTime == "" {
+					lastGameLogTime = time.Now().Format("[3:04]")
+				}
+				gameBuffer.SetLast(lastGameLogTime + " " + msg)
+				gameLogged = true
+			} else {
+				lg(msg)
+			}
+			incomingGameLogMove = false
+		}
+
 		setViewBoard(true)
 	case *bgammon.EventRolled:
 		g.board.Lock()
@@ -1867,14 +1923,14 @@ func (g *Game) handleEvent(e interface{}) {
 		g.board.gameState.Roll1 = ev.Roll1
 		g.board.gameState.Roll2 = ev.Roll2
 		g.board.gameState.Roll3 = ev.Roll3
-		var diceFormatted string
+		var roll string
 		if g.board.gameState.Turn == 0 {
 			if g.board.gameState.Player1.Name == ev.Player {
-				diceFormatted = fmt.Sprintf("%d", g.board.gameState.Roll1)
+				roll = formatRoll(g.board.gameState.Roll1, 0, 0)
 				g.board.playerRoll1 = g.board.gameState.Roll1
 				g.board.playerRollStale = false
 			} else {
-				diceFormatted = fmt.Sprintf("%d", g.board.gameState.Roll2)
+				roll = formatRoll(0, g.board.gameState.Roll2, 0)
 				g.board.opponentRoll2 = g.board.gameState.Roll2
 				g.board.opponentRollStale = false
 			}
@@ -1883,16 +1939,13 @@ func (g *Game) handleEvent(e interface{}) {
 			}
 			g.board.availableStale = false
 		} else {
-			diceFormatted = fmt.Sprintf("%d-%d", g.board.gameState.Roll1, g.board.gameState.Roll2)
+			roll = formatRoll(g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3)
 			if g.board.gameState.Player1.Name == ev.Player {
 				g.board.playerRoll1, g.board.playerRoll2, g.board.playerRoll3 = g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3
 				g.board.playerRollStale = false
 			} else {
 				g.board.opponentRoll1, g.board.opponentRoll2, g.board.opponentRoll3 = g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3
 				g.board.opponentRollStale = false
-			}
-			if g.board.gameState.Roll3 != 0 {
-				diceFormatted += fmt.Sprintf("-%d", g.board.gameState.Roll3)
 			}
 			if !ev.Selected {
 				playSoundEffect(effectDice)
@@ -1903,15 +1956,18 @@ func (g *Game) handleEvent(e interface{}) {
 		g.board.processState()
 		g.board.Unlock()
 		scheduleFrame()
-		lg(gotext.Get("%s rolled %s", ev.Player, diceFormatted))
+
+		if g.board.gameState.Turn == 0 {
+			lg(ev.Player + " " + roll)
+		}
+		if g.board.gameState.Roll1 == 0 || g.board.gameState.Roll2 == 0 {
+			return
+		}
+		incomingGameLogRoll = true
 	case *bgammon.EventFailedRoll:
 		ls(fmt.Sprintf("*** %s: %s", gotext.Get("Failed to roll"), ev.Reason))
 	case *bgammon.EventMoved:
-		moves := ev.Moves
-		if g.board.gameState.Turn == 2 && game.board.traditional {
-			moves = bgammon.FlipMoves(moves, 2, g.board.gameState.Variant)
-		}
-		lg(gotext.Get("%s moved %s", ev.Player, bgammon.FormatMoves(moves)))
+		incomingGameLogMove = true
 		if ev.Player == g.client.Username && !g.board.gameState.Spectating && !g.board.gameState.Forced {
 			return
 		}

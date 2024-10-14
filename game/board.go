@@ -2751,3 +2751,19 @@ func romanNumerals(i int) string {
 	}
 	return roman
 }
+
+func formatRoll(r1, r2, r3 int8) string {
+	var dice string
+	haveR1, haveR2 := r1 != 0, r2 != 0
+	if haveR1 && haveR2 {
+		dice = fmt.Sprintf("%d-%d", r1, r2)
+		if r3 != 0 {
+			dice += fmt.Sprintf("-%d", r3)
+		}
+	} else if haveR1 {
+		dice = fmt.Sprintf("%d", r1)
+	} else if haveR2 {
+		dice = fmt.Sprintf("%d", r2)
+	}
+	return dice
+}
