@@ -660,6 +660,8 @@ type Game struct {
 
 	localServer chan net.Conn
 
+	lastTermination time.Time
+
 	*sync.Mutex
 }
 
@@ -810,7 +812,7 @@ func (g *Game) initialize() {
 		fontMutex.Lock()
 		lineHeight := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics().Height.Round()
 		fontMutex.Unlock()
-		mainStatusHeight = lineHeight
+		mainStatusHeight = lineHeight * 2
 	}
 
 	mainScreen := func(subGrid *etk.Grid, fields int, buttons int, header string, info string) *etk.Grid {
@@ -1744,6 +1746,9 @@ func (g *Game) handleEvent(e interface{}) {
 			g.tutorialFrame.AddChild(NewTutorialWidget())
 		}
 	case *bgammon.EventNotice:
+		if strings.HasPrefix(ev.Message, "Connection terminated") {
+			g.lastTermination = time.Now()
+		}
 		ls(fmt.Sprintf("*** %s", ev.Message))
 	case *bgammon.EventSay:
 		ls(fmt.Sprintf("<%s> %s", ev.Player, ev.Message))

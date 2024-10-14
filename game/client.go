@@ -96,7 +96,7 @@ func (c *Client) connectWebSocket() {
 	connectTime := time.Now()
 	reconnect := func() {
 		if c.resetPassword || time.Since(connectTime) < 20*time.Second {
-			if !c.resetPassword {
+			if !c.resetPassword && time.Since(game.lastTermination) > 5*time.Second {
 				address := c.Address
 				if address == "" {
 					address = DefaultServerAddress
@@ -219,7 +219,7 @@ func (c *Client) connectTCP(conn net.Conn) {
 	connectTime := time.Now()
 	reconnect := func() {
 		if c.resetPassword || time.Since(connectTime) < 20*time.Second {
-			if !c.resetPassword {
+			if !c.resetPassword && time.Since(game.lastTermination) > 5*time.Second {
 				address := c.Address
 				if address == "" {
 					address = DefaultServerAddress
