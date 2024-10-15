@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.3"
+	AppVersion           = "v1.4.4"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -1903,7 +1903,11 @@ func (g *Game) handleEvent(e interface{}) {
 			if game.board.gameState.Turn == 2 {
 				name = g.board.gameState.Player2.Name
 			}
-			msg := name + " " + formatRoll(g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3) + ": " + string(bgammon.FormatMoves(g.board.gameState.Moves))
+			var moves string
+			if len(g.board.gameState.Moves) > 0 {
+				moves = string(bgammon.FormatMoves(g.board.gameState.Moves))
+			}
+			msg := name + " " + formatRoll(g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3) + ": " + moves
 			if !newGameLogMessage {
 				if lastGameLogTime == "" {
 					lastGameLogTime = time.Now().Format("[3:04]")
@@ -1959,12 +1963,16 @@ func (g *Game) handleEvent(e interface{}) {
 		scheduleFrame()
 
 		if g.board.gameState.Turn == 0 {
-			lg(ev.Player + " " + roll)
+			lg(gotext.Get("%s rolled %s", ev.Player, roll))
+		} else {
+			newGameLogMessage = true
 		}
 		if g.board.gameState.Roll1 == 0 || g.board.gameState.Roll2 == 0 {
 			return
 		}
-		incomingGameLogRoll = true
+		if g.board.gameState.Variant == bgammon.VariantBackgammon || g.board.gameState.Turn != 0 {
+			incomingGameLogRoll = true
+		}
 	case *bgammon.EventFailedRoll:
 		ls(fmt.Sprintf("*** %s: %s", gotext.Get("Failed to roll"), ev.Reason))
 	case *bgammon.EventMoved:

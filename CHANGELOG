@@ -1,5 +1,7 @@
 1.4.4:
 - Add window icon
+- Support additional plural forms in translations
+- Move match status info to bottom of screen on mobile devices
 
 1.4.3:
 - Print error message when connection fails
