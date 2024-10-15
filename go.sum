@@ -6,8 +6,8 @@ code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e 
 code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e/go.mod h1:mZA8T+w1qkH5tzFfDQb87wCms+qlulyT9Q8deuK1ApQ=
 code.rocket9labs.com/tslocum/clipboard v0.0.0-20241012025701-2c0fb515daab h1:0sF/YYnb3/GaPMKALyNVXS0Ku5JoulpC4GWdTcP1v+Q=
 code.rocket9labs.com/tslocum/clipboard v0.0.0-20241012025701-2c0fb515daab/go.mod h1:v2cql+mNoahFvZ1U/KQmDDqPmD0H0l1jyistVAgg8YA=
-code.rocket9labs.com/tslocum/etk v0.0.0-20241014200906-8aa49057b75a h1:Vs1DyoOBlrw7mbKnW0dtL5sTyzWT3m3YLEjHH7z3vgs=
-code.rocket9labs.com/tslocum/etk v0.0.0-20241014200906-8aa49057b75a/go.mod h1:Tmq3MjpY8TZ7To6u/NL8nq2DOQYV8A9OR+oQFSFD7rg=
+code.rocket9labs.com/tslocum/etk v0.0.0-20241015194020-a4a591ea391d h1:y+olyzzE/0sk5SPltVz+OnUX8A2+GpOvt9XAGInr8A8=
+code.rocket9labs.com/tslocum/etk v0.0.0-20241015194020-a4a591ea391d/go.mod h1:Tmq3MjpY8TZ7To6u/NL8nq2DOQYV8A9OR+oQFSFD7rg=
 code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b h1:KSdR7VPoftY5Bt+osGRBbtHlCWxhe1QbOuf58CG7ieI=
 code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b/go.mod h1:ZkYZ/IF/ebzhUL2bNp4ALROsuH9iCztUWvUJBWsHXRU=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20240820025521-91065b63f1be h1:awgpl3vS+d7vciw7X5z+joGSPZHB1OOTpkPKW3mPGDs=

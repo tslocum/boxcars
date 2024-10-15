@@ -92,7 +92,7 @@ var (
 
 const maxStatusWidthRatio = 0.5
 
-const bufferCharacterWidth = 21
+const bufferCharacterWidth = 16
 
 const (
 	minWidth  = 320
@@ -101,7 +101,7 @@ const (
 
 var (
 	extraSmallFontSize  = 14
-	smallFontSize       = 20
+	smallFontSize       = 18
 	mediumFontSize      = 24
 	mediumLargeFontSize = 32
 	largeFontSize       = 36
@@ -1913,6 +1913,7 @@ func (g *Game) handleEvent(e interface{}) {
 			} else {
 				lg(msg)
 			}
+			newGameLogMessage = false
 			incomingGameLogMove = false
 		}
 

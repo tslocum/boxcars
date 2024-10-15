@@ -17,6 +17,7 @@ type Label struct {
 	active      bool
 	activeColor color.RGBA
 	lastActive  bool
+	lastSize    int
 	bg          *ebiten.Image
 }
 
@@ -50,19 +51,29 @@ func (l *Label) updateBackground() {
 	} else {
 		l.bg = ebiten.NewImage(r.Dx(), r.Dy())
 	}
+	l.bg.Clear()
+
+	bounds := l.bg.Bounds()
+	fontSize := l.FontSize()
+	r = image.Rect(bounds.Min.X, bounds.Min.Y+bounds.Dy()/2-fontSize, bounds.Max.X, bounds.Min.Y+bounds.Dy()/2+fontSize)
+	if r.Min.Y < 0 {
+		r.Min.Y = 0
+	}
+	if r.Max.Y > bounds.Dy() {
+		r.Max.Y = bounds.Dy()
+	}
 
 	bgColor := color.RGBA{0, 0, 0, 20}
-	borderSize := 2
 	if l.active {
-		l.bg.Fill(l.activeColor)
-
-		bounds := l.bg.Bounds()
-		l.bg.SubImage(image.Rect(0, 0, bounds.Dx(), bounds.Dy()).Inset(borderSize)).(*ebiten.Image).Fill(bgColor)
+		const borderSize = 2
+		l.bg.SubImage(r).(*ebiten.Image).Fill(l.activeColor)
+		l.bg.SubImage(r.Inset(borderSize)).(*ebiten.Image).Fill(bgColor)
 	} else {
-		l.bg.Fill(bgColor)
+		l.bg.SubImage(r).(*ebiten.Image).Fill(bgColor)
 	}
 
 	l.lastActive = l.active
+	l.lastSize = fontSize
 }
 
 func (l *Label) SetRect(r image.Rectangle) {
@@ -93,7 +104,8 @@ func (l *Label) Draw(screen *ebiten.Image) error {
 	if l.bg == nil {
 		return nil
 	}
-	if l.active != l.lastActive {
+	size := l.FontSize()
+	if size != l.lastSize || l.active != l.lastActive {
 		l.updateBackground()
 	}
 	op := &ebiten.DrawImageOptions{}
