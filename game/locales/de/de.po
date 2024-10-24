@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-07-29 14:09+0000\n"
-"Last-Translator: Coxcopi70f00b67b61542fe <hn_vogel@gmx.net>\n"
+"PO-Revision-Date: 2024-10-23 02:15+0000\n"
+"Last-Translator: Ettore Atalan <atalanttore@googlemail.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/bgammon/boxcars/"
 "de/>\n"
 "Language: de\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.7-dev\n"
+"X-Generator: Weblate 5.8.2-dev\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Kostenloses Online Backgammon"
@@ -35,7 +35,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "About"
-msgstr ""
+msgstr "Über"
 
 msgid "Accept"
 msgstr "Akzeptiert"
@@ -81,7 +81,7 @@ msgid "Change password"
 msgstr "Passwort ändern"
 
 msgid "Chat"
-msgstr ""
+msgstr "Chat"
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -97,7 +97,7 @@ msgid "Connecting..."
 msgstr "Verbinde..."
 
 msgid "Contact:"
-msgstr ""
+msgstr "Kontakt:"
 
 msgid "Create"
 msgstr "Erstellen"
@@ -119,7 +119,7 @@ msgid "Create new match"
 msgstr "Neues Spiel erstellen"
 
 msgid "Created by %s"
-msgstr ""
+msgstr "Erstellt von %s"
 
 msgid "Current"
 msgstr "Aktueller"
@@ -128,10 +128,10 @@ msgid "Date"
 msgstr "Datum"
 
 msgid "Dismiss"
-msgstr ""
+msgstr "Ablehnen"
 
 msgid "Donate:"
-msgstr ""
+msgstr "Spenden:"
 
 msgid "Double"
 msgstr "Pasch"
@@ -154,7 +154,7 @@ msgid "Exit Boxcars?"
 msgstr ""
 
 msgid "FAQ:"
-msgstr ""
+msgstr "FAQ:"
 
 msgid "Failed to connect to %s"
 msgstr ""
@@ -190,7 +190,7 @@ msgid "Forced"
 msgstr "Erzwungen"
 
 msgid "Go"
-msgstr ""
+msgstr "Los"
 
 msgid "Go to page:"
 msgstr ""
@@ -211,7 +211,7 @@ msgid "Join"
 msgstr "Beitreten"
 
 msgid "Join/Leave"
-msgstr ""
+msgstr "Beitreten/Verlassen"
 
 msgid "Join match"
 msgstr "Spiel beitreten"
@@ -359,7 +359,7 @@ msgid "Roll"
 msgstr "Würfeln"
 
 msgid "Roll Dice"
-msgstr ""
+msgstr "Würfeln"
 
 msgid "Search"
 msgstr "Suche"
@@ -389,7 +389,7 @@ msgid "Sound"
 msgstr "Geräusche"
 
 msgid "Source:"
-msgstr ""
+msgstr "Quelle:"
 
 msgid "Speed"
 msgstr "Geschwindigkeit"
