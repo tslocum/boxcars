@@ -1,13 +1,13 @@
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b h1:Y0a14Kf/hSYepSmp4ZfDeE4CZZGBGBS97CNjCbKJm0c=
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b/go.mod h1:tS60/VNAJphKvDBkSLQhKALa15msIAuWWfEKNc4oFZc=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20241024041057-5e3185eec80f h1:MzSDVE3pATxDCUyQ+YGQ95U8Q5cj12NhvFZK0uuevIQ=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20241024041057-5e3185eec80f/go.mod h1:grziVnDYSzVKGIv1x7nqrH9DHn7dIzQmriX/Dg1utCw=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20241030032547-b8da22213525 h1:MD1OVn+Dtjikm4DQ58uH49kkWWBwYnmxnWZz4fU7okk=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20241030032547-b8da22213525/go.mod h1:grziVnDYSzVKGIv1x7nqrH9DHn7dIzQmriX/Dg1utCw=
 code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e h1:5DSsHaB/xrD57Gmu/1YaWMRFLiTVvVmcZRa9/EJZuZo=
 code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e/go.mod h1:mZA8T+w1qkH5tzFfDQb87wCms+qlulyT9Q8deuK1ApQ=
 code.rocket9labs.com/tslocum/clipboard v0.0.0-20241012025701-2c0fb515daab h1:0sF/YYnb3/GaPMKALyNVXS0Ku5JoulpC4GWdTcP1v+Q=
 code.rocket9labs.com/tslocum/clipboard v0.0.0-20241012025701-2c0fb515daab/go.mod h1:v2cql+mNoahFvZ1U/KQmDDqPmD0H0l1jyistVAgg8YA=
-code.rocket9labs.com/tslocum/etk v0.0.0-20241024050530-9b001db91688 h1:b1OBdkFKzCjjz5xYvmepQddliiqS+ppFgy6fAOGatoc=
-code.rocket9labs.com/tslocum/etk v0.0.0-20241024050530-9b001db91688/go.mod h1:h6Y8JS/gOm3QJzTSXBQUsz1rX2H26jhDNhKAUuWtZeQ=
+code.rocket9labs.com/tslocum/etk v0.0.0-20241030032509-5d97949a864b h1:jNcFLjFrh3kemzLElCs9NnuzN9nrgTSJ4SbEz6IL4I0=
+code.rocket9labs.com/tslocum/etk v0.0.0-20241030032509-5d97949a864b/go.mod h1:90D/t3eW3NtIu9OS4kiwInE/DBcYahjaOj6xRKCwtZc=
 code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b h1:KSdR7VPoftY5Bt+osGRBbtHlCWxhe1QbOuf58CG7ieI=
 code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b/go.mod h1:ZkYZ/IF/ebzhUL2bNp4ALROsuH9iCztUWvUJBWsHXRU=
 code.rocket9labs.com/tslocum/tabula v0.0.0-20241024013344-d112a9463c51 h1:JkjRKoSSmtHFSVIOAZV6e+Z+7r0mIxClsDpJxC/ZlOs=
