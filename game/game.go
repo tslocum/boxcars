@@ -697,7 +697,7 @@ func NewGame() *Game {
 		log.Fatal(err)
 	}
 
-	etk.DebounceResize = 0
+	etk.ResizeDebounce = 0
 
 	etk.Style.TextFont = fnt
 	etk.Style.TextSize = largeFontSize
