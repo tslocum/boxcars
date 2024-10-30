@@ -2324,17 +2324,12 @@ func (b *board) processState() {
 	for i := range available {
 		var moves [][2]int8
 		for _, m := range available[i] {
-			if m[0] == 0 && m[1] == 0 || ((m[1] == bgammon.SpaceHomePlayer || m[1] == bgammon.SpaceHomeOpponent) && !mayBearOff) {
+			if (m[0] == 0 && m[1] == 0) || ((m[1] == bgammon.SpaceHomePlayer || m[1] == bgammon.SpaceHomeOpponent) && !mayBearOff) {
 				break
 			}
 			moves = append(moves, m)
 		}
-		sort.Slice(moves, func(i, j int) bool {
-			if moves[i][0] != moves[j][0] {
-				return moves[i][0] > moves[j][0]
-			}
-			return moves[i][1] > moves[j][1]
-		})
+		sort.Slice(moves, sortMovesFunc(moves, b.gameState.Variant))
 
 		originalFrom := int8(-1)
 		lastFrom := int8(-1)
@@ -2766,4 +2761,21 @@ func formatRoll(r1, r2, r3 int8) string {
 		dice = fmt.Sprintf("%d", r2)
 	}
 	return dice
+}
+
+func sortMovesFunc(moves [][2]int8, variant int8) func(int, int) bool {
+	if variant == bgammon.VariantTabula {
+		return func(i int, j int) bool {
+			if moves[i][0] != moves[j][0] {
+				return moves[i][0] < moves[j][0]
+			}
+			return moves[i][1] < moves[j][1]
+		}
+	}
+	return func(i int, j int) bool {
+		if moves[i][0] != moves[j][0] {
+			return moves[i][0] > moves[j][0]
+		}
+		return moves[i][1] > moves[j][1]
+	}
 }

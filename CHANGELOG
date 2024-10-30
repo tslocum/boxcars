@@ -1,3 +1,6 @@
+1.4.5:
+- Fix highlighting available spaces when playing Tabula
+
 1.4.4:
 - Add window icon
 - Support additional plural forms in translations
