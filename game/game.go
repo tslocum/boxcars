@@ -709,18 +709,20 @@ func NewGame() *Game {
 	etk.Style.ScrollAreaColor = color.RGBA{26, 15, 6, 255}
 	etk.Style.ScrollHandleColor = color.RGBA{180, 154, 108, 255}
 
-	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
-	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
-
-	etk.Style.ButtonBorderLeft = color.RGBA{233, 207, 170, 255}
-	etk.Style.ButtonBorderTop = color.RGBA{233, 207, 170, 255}
-
 	etk.Style.InputBorderSize = 1
 	etk.Style.InputBorderFocused = color.RGBA{0, 0, 0, 255}
 	etk.Style.InputBorderUnfocused = color.RGBA{0, 0, 0, 255}
 
 	etk.Style.ScrollBorderLeft = color.RGBA{210, 182, 135, 255}
 	etk.Style.ScrollBorderTop = color.RGBA{210, 182, 135, 255}
+
+	etk.Style.ButtonTextColor = color.RGBA{0, 0, 0, 255}
+	etk.Style.ButtonBgColor = color.RGBA{225, 188, 125, 255}
+
+	etk.Style.ButtonBorderLeft = color.RGBA{233, 207, 170, 255}
+	etk.Style.ButtonBorderTop = color.RGBA{233, 207, 170, 255}
+
+	etk.Style.CheckboxBgColor = color.RGBA{40, 24, 9, 255}
 
 	g := &Game{
 		keyboard:      etk.NewKeyboard(),
