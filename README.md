@@ -1,5 +1,5 @@
 # boxcars - Graphical client for [bgammon.org](https://bgammon.org)
-[![Translate](https://hosted.weblate.org/widgets/meditation-assistant/-/svg-badge.svg)](https://hosted.weblate.org/projects/bgammon/boxcars/)
+[![Translate](https://translate.codeberg.org/widget/bgammon/client/svg-badge.svg)](https://translate.codeberg.org/projects/bgammon/)
 [![Donate via LiberaPay](https://img.shields.io/liberapay/receives/rocket9labs.com.svg?logo=liberapay)](https://liberapay.com/rocket9labs.com)
 
 ## Play
@@ -32,7 +32,7 @@ Run `~/go/bin/boxcars` to play.
 
 ## Translate
 
-Translation is handled [online](https://hosted.weblate.org/projects/bgammon/).
+Translation is handled [online](https://translate.codeberg.org/projects/bgammon/).
 
 ## Support
 
