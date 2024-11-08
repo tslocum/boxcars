@@ -1927,6 +1927,7 @@ func (g *Game) handleEvent(e interface{}) {
 
 		setViewBoard(true)
 	case *bgammon.EventRolled:
+		playSound := SoundEffect(-1)
 		g.board.Lock()
 		g.board.stateLock.Lock()
 		g.board.gameState.Roll1 = ev.Roll1
@@ -1944,7 +1945,7 @@ func (g *Game) handleEvent(e interface{}) {
 				g.board.opponentRollStale = false
 			}
 			if !ev.Selected {
-				playSoundEffect(effectDie)
+				playSound = effectDie
 			}
 			g.board.availableStale = false
 		} else {
@@ -1957,7 +1958,7 @@ func (g *Game) handleEvent(e interface{}) {
 				g.board.opponentRollStale = false
 			}
 			if !ev.Selected {
-				playSoundEffect(effectDice)
+				playSound = effectDice
 			}
 			g.board.availableStale = true
 		}
@@ -1970,6 +1971,11 @@ func (g *Game) handleEvent(e interface{}) {
 			lg(gotext.Get("%s rolled %s", ev.Player, roll))
 		} else {
 			newGameLogMessage = true
+		}
+		// Play the sound effect after processing the board state to avoid
+		// audio issues when running in a single-threaded environment.
+		if playSound != -1 {
+			playSoundEffect(playSound)
 		}
 		if g.board.gameState.Roll1 == 0 || g.board.gameState.Roll2 == 0 {
 			return
