@@ -1,62 +1,62 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-10-26 18:15+0000\n"
-"Last-Translator: josjojo <josjojo@gmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/bgammon/boxcars/nl/"
-">\n"
+"PO-Revision-Date: 2024-11-15 20:42+0000\n"
+"Last-Translator: tslocum <tslocum@users.noreply.translate.codeberg.org>\n"
+"Language-Team: Dutch <https://translate.codeberg.org/projects/bgammon/client/"
+"nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.8.2-dev\n"
+"X-Generator: Weblate 5.8.1\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Gratis Online Backgammon"
 
 msgid "%s joined the match."
-msgstr ""
+msgstr "%s schoof bij het spel aan"
 
 msgid "%s left the match."
-msgstr ""
+msgstr "%s verliet het spel"
 
 msgid "%s moved %s"
-msgstr ""
+msgstr "%s verplaatsde %s"
 
 msgid "%s rolled %s"
-msgstr ""
+msgstr "%s gooide %s"
 
 msgid "%s wins!"
-msgstr ""
+msgstr "%s wint!"
 
 msgid "%[1]s wins %[2]d point!"
 msgid_plural "%[1]s wins %[2]d points!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%[1]s wint %[2]d punt!"
+msgstr[1] "%[1]s wint %[2]d punten!"
 
 msgid "About"
-msgstr ""
+msgstr "Over"
 
 msgid "Accept"
-msgstr ""
+msgstr "Accepteer"
 
 msgid "Account"
-msgstr ""
+msgstr "Account"
 
 msgid "Acey-deucey"
-msgstr ""
+msgstr "Acey-deucey"
 
 msgid "Advanced movement"
-msgstr ""
+msgstr "Geavanceerde verplaatsing"
 
 msgid "Auto-play forced moves"
-msgstr ""
+msgstr "Speel gedwongen zetten automatisch"
 
 msgid "Available"
-msgstr ""
+msgstr "Beschikbaar"
 
 msgid "Backgammon"
-msgstr ""
+msgstr "Backgammon"
 
 msgid "Bear Off"
 msgstr ""

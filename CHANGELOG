@@ -1,3 +1,7 @@
+1.4.6:
+- Improve quality of text rendering
+- Reduce memory usage when playing sounds
+
 1.4.5:
 - Fix highlighting available spaces when playing Tabula
 
