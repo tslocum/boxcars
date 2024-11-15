@@ -1388,7 +1388,6 @@ func (b *board) Draw(screen *ebiten.Image) {
 				fontMutex.Lock()
 				{
 					op := &text.DrawOptions{}
-					op.GeoM.Translate(0, float64(bounds.Dy()))
 					op.ColorScale.ScaleWithColor(labelColor)
 					text.Draw(overlayImage, overlayText, ff, op)
 				}
