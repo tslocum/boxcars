@@ -1793,7 +1793,7 @@ func (b *board) updateOpponentLabel() {
 		bounds.Max.X = bounds.Min.X + maxWidth
 	}
 
-	padding := 13
+	padding := etk.Scale(7)
 	innerCenter := b.innerBoardCenter(false)
 	x := innerCenter - bounds.Dx()/2
 	y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
@@ -1875,7 +1875,7 @@ func (b *board) updatePlayerLabel() {
 		bounds.Max.X = bounds.Min.X + maxWidth
 	}
 
-	padding := 13
+	padding := etk.Scale(7)
 	innerCenter := b.innerBoardCenter(true)
 	x := innerCenter - int(float64(bounds.Dx()/2))
 	y := b.y + (b.innerH / 2) - (bounds.Dy() / 2) + int(b.verticalBorderSize)
