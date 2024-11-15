@@ -806,7 +806,10 @@ func (g *Game) initialize() {
 		versionInfo.SetVertical(etk.AlignCenter)
 		aboutLabel := gotext.Get("About")
 		bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), aboutLabel)
-		aboutHeight = bounds.Dy() * 2
+		aboutHeight = bounds.Dy() + etk.Scale(5)*2
+		if aboutHeight < etk.Scale(baseButtonHeight) {
+			aboutHeight = etk.Scale(baseButtonHeight)
+		}
 		aboutButton := etk.NewButton(aboutLabel, g.showAboutDialog)
 		aboutGrid = etk.NewGrid()
 		aboutGrid.SetRowSizes(-1, aboutHeight)
