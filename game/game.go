@@ -33,12 +33,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"golang.org/x/image/font/opentype"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"golang.org/x/text/language"
 )
 
 const (
-	AppVersion           = "v1.4.5"
+	AppVersion           = "v1.4.5p1"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -692,14 +692,14 @@ func NewGame() *Game {
 		largeFontSize /= 2
 	}
 
-	fnt, err := opentype.Parse(LoadBytes("asset/font/mplus-1p-regular.ttf"))
+	faceSource, err := text.NewGoTextFaceSource(bytes.NewReader(LoadBytes("asset/font/mplus-1p-regular.ttf")))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	etk.ResizeDebounce = 0
 
-	etk.Style.TextFont = fnt
+	etk.Style.TextFont = faceSource
 	etk.Style.TextSize = largeFontSize
 
 	etk.Style.TextColorLight = triangleA
@@ -771,10 +771,8 @@ func (g *Game) initialize() {
 	inputBuffer.SetBackground(bufferBackgroundColor)
 	inputBuffer.SetSuffix("")
 
-	fieldHeight = etk.Scale(50)
-	if smallScreen {
-		fieldHeight = etk.Scale(32)
-	}
+	bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), "A")
+	fieldHeight = bounds.Dy() + etk.Scale(5)*2
 
 	displayFrame = etk.NewFrame()
 	displayFrame.SetPositionChildren(true)
@@ -824,7 +822,8 @@ func (g *Game) initialize() {
 	var mainStatusHeight int
 	{
 		fontMutex.Lock()
-		lineHeight := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics().Height.Round()
+		m := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics()
+		lineHeight := int(m.HAscent + m.HDescent)
 		fontMutex.Unlock()
 		mainStatusHeight = lineHeight * 2
 	}
@@ -1703,7 +1702,8 @@ func (g *Game) setRoot(w etk.Widget) {
 
 func (g *Game) setBufferRects() {
 	fontMutex.Lock()
-	lineHeight := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics().Height.Round()
+	m := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics()
+	lineHeight := int(m.HAscent + m.HDescent)
 	fontMutex.Unlock()
 	statusBufferHeight := lineHeight * 3
 	historyRatingHeight := etk.Scale(200)
@@ -2768,7 +2768,7 @@ func (g *Game) layoutConnect() {
 	{
 		fontMutex.Lock()
 		m := etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)).Metrics()
-		lineHeight := m.Height.Round()
+		lineHeight := int(m.HAscent + m.HDescent)
 		fontMutex.Unlock()
 
 		dialogWidth := etk.Scale(800)

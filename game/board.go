@@ -20,7 +20,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/colorm"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/text"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/llgcode/draw2d/draw2dimg"
 )
 
@@ -331,8 +331,11 @@ func NewBoard() *board {
 func (b *board) fontUpdated() {
 	fontMutex.Lock()
 	m := etk.FontFace(etk.Style.TextFont, etk.Scale(b.fontSize)).Metrics()
-	b.lineHeight = m.Height.Round()
-	b.lineOffset = m.Ascent.Round()
+	b.lineHeight = int(m.HAscent + m.HDescent)
+	b.lineOffset = int(m.CapHeight)
+	if b.lineOffset < 0 {
+		b.lineOffset *= -1
+	}
 	fontMutex.Unlock()
 
 	if smallScreen {
@@ -1206,7 +1209,10 @@ func (b *board) updateBackgroundImage() {
 			y = b.h - int(b.verticalBorderSize)
 		}
 		fontMutex.Lock()
-		text.Draw(b.backgroundImage, sp, ff, x, y+(int(b.verticalBorderSize)-b.lineHeight)/2+b.lineOffset, spaceLabelColor)
+		op := &text.DrawOptions{}
+		op.GeoM.Translate(float64(x), float64(y+(int(b.verticalBorderSize)-b.lineHeight)/2))
+		op.ColorScale.ScaleWithColor(spaceLabelColor)
+		text.Draw(b.backgroundImage, sp, ff, op)
 		fontMutex.Unlock()
 	}
 
@@ -1380,7 +1386,12 @@ func (b *board) Draw(screen *ebiten.Image) {
 				bounds := etk.BoundString(ff, overlayText)
 				overlayImage := ebiten.NewImage(bounds.Dx()*2, bounds.Dy()*2)
 				fontMutex.Lock()
-				text.Draw(overlayImage, overlayText, ff, 0, bounds.Dy(), labelColor)
+				{
+					op := &text.DrawOptions{}
+					op.GeoM.Translate(0, float64(bounds.Dy()))
+					op.ColorScale.ScaleWithColor(labelColor)
+					text.Draw(overlayImage, overlayText, ff, op)
+				}
 				fontMutex.Unlock()
 
 				x, y, w, h := b.stackSpaceRect(space, numPieces-1)
