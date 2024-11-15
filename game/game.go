@@ -1384,6 +1384,7 @@ func (g *Game) initialize() {
 			t := etk.NewText(text)
 			t.SetVertical(etk.AlignCenter)
 			t.SetHorizontal(horizontal)
+			t.SetAutoResize(true)
 			return t
 		}
 
