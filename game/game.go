@@ -157,13 +157,13 @@ const sampleRate = 44100
 var (
 	audioContext *audio.Context
 
-	SoundDie1, SoundDie2, SoundDie3                []byte
-	SoundDice1, SoundDice2, SoundDice3, SoundDice4 []byte
-	SoundMove1, SoundMove2, SoundMove3             []byte
-	SoundHomeSingle                                []byte
-	SoundHomeMulti1, SoundHomeMulti2               []byte
-	SoundJoinLeave                                 []byte
-	SoundSay                                       []byte
+	SoundDie1, SoundDie2, SoundDie3                *audio.Player
+	SoundDice1, SoundDice2, SoundDice3, SoundDice4 *audio.Player
+	SoundMove1, SoundMove2, SoundMove3             *audio.Player
+	SoundHomeSingle                                *audio.Player
+	SoundHomeMulti1, SoundHomeMulti2               *audio.Player
+	SoundJoinLeave                                 *audio.Player
+	SoundSay                                       *audio.Player
 )
 
 func init() {
@@ -291,54 +291,54 @@ func loadAudioAssets() {
 	audioContext = audio.NewContext(sampleRate)
 	p := "asset/audio/"
 
-	SoundDie1 = LoadBytes(p + "die1.ogg")
-	SoundDie2 = LoadBytes(p + "die2.ogg")
-	SoundDie3 = LoadBytes(p + "die3.ogg")
+	SoundDie1 = LoadOGG(audioContext, p+"die1.ogg")
+	SoundDie2 = LoadOGG(audioContext, p+"die2.ogg")
+	SoundDie3 = LoadOGG(audioContext, p+"die3.ogg")
 
-	SoundDice1 = LoadBytes(p + "dice1.ogg")
-	SoundDice2 = LoadBytes(p + "dice2.ogg")
-	SoundDice3 = LoadBytes(p + "dice3.ogg")
-	SoundDice4 = LoadBytes(p + "dice4.ogg")
+	SoundDice1 = LoadOGG(audioContext, p+"dice1.ogg")
+	SoundDice2 = LoadOGG(audioContext, p+"dice2.ogg")
+	SoundDice3 = LoadOGG(audioContext, p+"dice3.ogg")
+	SoundDice4 = LoadOGG(audioContext, p+"dice4.ogg")
 
-	SoundMove1 = LoadBytes(p + "move1.ogg")
-	SoundMove2 = LoadBytes(p + "move2.ogg")
-	SoundMove3 = LoadBytes(p + "move3.ogg")
+	SoundMove1 = LoadOGG(audioContext, p+"move1.ogg")
+	SoundMove2 = LoadOGG(audioContext, p+"move2.ogg")
+	SoundMove3 = LoadOGG(audioContext, p+"move3.ogg")
 
-	SoundHomeSingle = LoadBytes(p + "homesingle.ogg")
+	SoundHomeSingle = LoadOGG(audioContext, p+"homesingle.ogg")
 
-	SoundHomeMulti1 = LoadBytes(p + "homemulti1.ogg")
-	SoundHomeMulti2 = LoadBytes(p + "homemulti2.ogg")
+	SoundHomeMulti1 = LoadOGG(audioContext, p+"homemulti1.ogg")
+	SoundHomeMulti2 = LoadOGG(audioContext, p+"homemulti2.ogg")
 
-	SoundJoinLeave = LoadBytes(p + "joinleave.ogg")
-	SoundSay = LoadBytes(p + "say.ogg")
+	SoundJoinLeave = LoadOGG(audioContext, p+"joinleave.ogg")
+	SoundSay = LoadOGG(audioContext, p+"say.ogg")
 
-	dieSounds = [][]byte{
+	dieSounds = []*audio.Player{
 		SoundDie1,
 		SoundDie2,
 		SoundDie3,
 	}
-	randomizeByteSlice(dieSounds)
+	randomizeSounds(dieSounds)
 
-	diceSounds = [][]byte{
+	diceSounds = []*audio.Player{
 		SoundDice1,
 		SoundDice2,
 		SoundDice3,
 		SoundDice4,
 	}
-	randomizeByteSlice(diceSounds)
+	randomizeSounds(diceSounds)
 
-	moveSounds = [][]byte{
+	moveSounds = []*audio.Player{
 		SoundMove1,
 		SoundMove2,
 		SoundMove3,
 	}
-	randomizeByteSlice(moveSounds)
+	randomizeSounds(moveSounds)
 
-	homeMultiSounds = [][]byte{
+	homeMultiSounds = []*audio.Player{
 		SoundHomeMulti1,
 		SoundHomeMulti2,
 	}
-	randomizeByteSlice(homeMultiSounds)
+	randomizeSounds(homeMultiSounds)
 }
 
 func _loadImage(assetPath string) image.Image {
@@ -3010,13 +3010,13 @@ const (
 )
 
 var (
-	dieSounds           [][]byte
+	dieSounds           []*audio.Player
 	dieSoundPlays       int
-	diceSounds          [][]byte
+	diceSounds          []*audio.Player
 	diceSoundPlays      int
-	moveSounds          [][]byte
+	moveSounds          []*audio.Player
 	moveSoundPlays      int
-	homeMultiSounds     [][]byte
+	homeMultiSounds     []*audio.Player
 	homeMultiSoundPlays int
 )
 
@@ -3025,65 +3025,65 @@ func playSoundEffect(effect SoundEffect) {
 		return
 	}
 
-	var b []byte
+	var p *audio.Player
 	switch effect {
 	case effectSay:
 		if game.board.muteChat {
 			return
 		}
-		b = SoundSay
+		p = SoundSay
 	case effectJoinLeave:
 		if game.board.muteJoinLeave {
 			return
 		}
-		b = SoundJoinLeave
+		p = SoundJoinLeave
 	case effectDie:
 		if game.board.muteRoll {
 			return
 		}
-		b = dieSounds[dieSoundPlays]
+		p = dieSounds[dieSoundPlays]
 
 		dieSoundPlays++
 		if dieSoundPlays == len(dieSounds)-1 {
-			randomizeByteSlice(dieSounds)
+			randomizeSounds(dieSounds)
 			dieSoundPlays = 0
 		}
 	case effectDice:
 		if game.board.muteRoll {
 			return
 		}
-		b = diceSounds[diceSoundPlays]
+		p = diceSounds[diceSoundPlays]
 
 		diceSoundPlays++
 		if diceSoundPlays == len(diceSounds)-1 {
-			randomizeByteSlice(diceSounds)
+			randomizeSounds(diceSounds)
 			diceSoundPlays = 0
 		}
 	case effectMove:
 		if game.board.muteMove {
 			return
 		}
-		b = moveSounds[moveSoundPlays]
+		p = moveSounds[moveSoundPlays]
 
 		moveSoundPlays++
 		if moveSoundPlays == len(moveSounds)-1 {
-			randomizeByteSlice(moveSounds)
+			randomizeSounds(moveSounds)
 			moveSoundPlays = 0
 		}
 	case effectHomeSingle:
 		if game.board.muteBearOff {
 			return
 		}
-		b = SoundHomeSingle
+		p = SoundHomeSingle
 	case effectHomeMulti:
 		if game.board.muteBearOff {
 			return
 		}
-		b = homeMultiSounds[homeMultiSoundPlays]
+		p = homeMultiSounds[homeMultiSoundPlays]
 
 		homeMultiSoundPlays++
 		if homeMultiSoundPlays == len(homeMultiSounds)-1 {
-			randomizeByteSlice(homeMultiSounds)
+			randomizeSounds(homeMultiSounds)
 			homeMultiSoundPlays = 0
 		}
 	default:
@@ -3091,31 +3091,22 @@ func playSoundEffect(effect SoundEffect) {
 		return
 	}
 
-	stream, err := vorbis.DecodeWithoutResampling(bytes.NewReader(b))
-	if err != nil {
-		panic(err)
-	}
-
-	player, err := audioContext.NewPlayer(&oggStream{stream})
-	if err != nil {
-		panic(err)
-	}
-
+	p.Pause()
 	if effect == effectHomeSingle || effect == effectHomeMulti {
-		player.SetVolume(game.volume / 6)
+		p.SetVolume(game.volume / 6)
 	} else if effect == effectSay {
-		player.SetVolume(game.volume / 2)
+		p.SetVolume(game.volume / 2)
 	} else {
-		player.SetVolume(game.volume)
+		p.SetVolume(game.volume)
 	}
-
-	player.Play()
+	p.Rewind()
+	p.Play()
 }
 
-func randomizeByteSlice(b [][]byte) {
-	for i := range b {
+func randomizeSounds(s []*audio.Player) {
+	for i := range s {
 		j := rand.Intn(i + 1)
-		b[i], b[j] = b[j], b[i]
+		s[i], s[j] = s[j], s[i]
 	}
 }
 
