@@ -1,7 +1,7 @@
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b h1:Y0a14Kf/hSYepSmp4ZfDeE4CZZGBGBS97CNjCbKJm0c=
 code.rocket9labs.com/tslocum/bei v0.0.0-20240108012722-6db380cc190b/go.mod h1:tS60/VNAJphKvDBkSLQhKALa15msIAuWWfEKNc4oFZc=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20241108024559-f08ac95eeb96 h1:pGz5pjnYHLHjjpkfeBIOjS/grkSJwvoJIZRrCGvamFQ=
-code.rocket9labs.com/tslocum/bgammon v0.0.0-20241108024559-f08ac95eeb96/go.mod h1:grziVnDYSzVKGIv1x7nqrH9DHn7dIzQmriX/Dg1utCw=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20241116035306-7944c5fd252b h1:/w89G3jQ3O6qgTy0I3E0BhbfFGIBSjg6vYsTf+OSrRw=
+code.rocket9labs.com/tslocum/bgammon v0.0.0-20241116035306-7944c5fd252b/go.mod h1:FzdCJoZoG/6nkxLl6OufdfFTXggr5ZArtl7eJ/CCcj0=
 code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e h1:5DSsHaB/xrD57Gmu/1YaWMRFLiTVvVmcZRa9/EJZuZo=
 code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e/go.mod h1:mZA8T+w1qkH5tzFfDQb87wCms+qlulyT9Q8deuK1ApQ=
 code.rocket9labs.com/tslocum/clipboard v0.0.0-20241012025701-2c0fb515daab h1:0sF/YYnb3/GaPMKALyNVXS0Ku5JoulpC4GWdTcP1v+Q=

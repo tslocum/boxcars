@@ -828,7 +828,7 @@ func (g *Game) initialize() {
 		m := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics()
 		lineHeight := int(m.HAscent + m.HDescent)
 		fontMutex.Unlock()
-		mainStatusHeight = lineHeight * 2
+		mainStatusHeight = lineHeight*2 + g.bufferPadding()*2
 	}
 
 	mainScreen := func(subGrid *etk.Grid, fields int, buttons int, header string, info string) *etk.Grid {
@@ -1709,7 +1709,7 @@ func (g *Game) setBufferRects() {
 	m := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics()
 	lineHeight := int(m.HAscent + m.HDescent)
 	fontMutex.Unlock()
-	statusBufferHeight := lineHeight * 3
+	statusBufferHeight := lineHeight*3 + g.bufferPadding()*2
 	historyRatingHeight := etk.Scale(200)
 	if smallScreen {
 		historyRatingHeight /= 2
