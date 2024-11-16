@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.5p1"
+	AppVersion           = "v1.4.6"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"

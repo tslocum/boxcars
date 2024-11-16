@@ -1764,6 +1764,13 @@ func (b *board) setRect(x, y, w, h int) {
 	b.playerPipCount.SetPadding(padding)
 }
 
+func (b *board) nameLabelFontSize() int {
+	if b.w >= 1024 {
+		return largeFontSize
+	}
+	return mediumFontSize
+}
+
 func (b *board) updateOpponentLabel() {
 	player := b.gameState.OpponentPlayer()
 	label := b.opponentLabel
@@ -1785,7 +1792,7 @@ func (b *board) updateOpponentLabel() {
 	label.active = b.gameState.Turn == player.Number
 	label.Text.SetForeground(label.activeColor)
 
-	bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), text)
+	bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(b.nameLabelFontSize())), text)
 
 	maxWidth := int(b.spaceWidth)*3 - label.Padding()*2
 	if bounds.Dx() > maxWidth {
@@ -1867,7 +1874,7 @@ func (b *board) updatePlayerLabel() {
 	label.active = b.gameState.Turn == player.Number
 	label.Text.SetForeground(label.activeColor)
 
-	bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)), text)
+	bounds := etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(b.nameLabelFontSize())), text)
 
 	maxWidth := int(b.spaceWidth)*3 - label.Padding()*2
 	if bounds.Dx() > maxWidth {
