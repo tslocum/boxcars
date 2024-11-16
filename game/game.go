@@ -2985,7 +2985,14 @@ func acceptInput(text string) (handled bool) {
 }
 
 func (g *Game) itemHeight() int {
-	return etk.Scale(48)
+	if mobileDevice {
+		return etk.Scale(baseButtonHeight)
+	}
+	fontSize := largeFontSize
+	if smallScreen {
+		fontSize = mediumFontSize
+	}
+	return etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(fontSize)), "(Ag").Dy() + etk.Scale(5)
 }
 
 func (g *Game) Exit() {
