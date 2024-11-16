@@ -798,6 +798,10 @@ func (g *Game) initialize() {
 		return false
 	})}
 
+	g.mainStatusGrid = etk.NewGrid()
+	g.mainStatusGrid.AddChildAt(statusBuffer, 0, 0, 1, 1)
+	g.mainStatusGrid.SetVisible(false)
+
 	var aboutGrid *etk.Grid
 	var aboutHeight int
 	{
@@ -815,20 +819,8 @@ func (g *Game) initialize() {
 		aboutGrid.SetRowSizes(-1, aboutHeight)
 		aboutGrid.SetColumnSizes(-1, bounds.Dx()+etk.Scale(50))
 		aboutGrid.AddChildAt(versionInfo, 0, 1, 1, 1)
+		aboutGrid.AddChildAt(g.mainStatusGrid, 0, 1, 1, 1)
 		aboutGrid.AddChildAt(aboutButton, 1, 1, 1, 1)
-	}
-
-	g.mainStatusGrid = etk.NewGrid()
-	g.mainStatusGrid.AddChildAt(statusBuffer, 0, 0, 1, 1)
-	g.mainStatusGrid.SetVisible(false)
-
-	var mainStatusHeight int
-	{
-		fontMutex.Lock()
-		m := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics()
-		lineHeight := int(m.HAscent + m.HDescent)
-		fontMutex.Unlock()
-		mainStatusHeight = lineHeight*2 + g.bufferPadding()*2
 	}
 
 	mainScreen := func(subGrid *etk.Grid, fields int, buttons int, header string, info string) *etk.Grid {
@@ -857,12 +849,11 @@ func (g *Game) initialize() {
 		grid := etk.NewGrid()
 		grid.SetColumnPadding(int(g.board.horizontalBorderSize / 2))
 		grid.SetRowPadding(int(g.board.horizontalBorderSize / 2))
-		grid.SetRowSizes(headerHeight, fields*fieldHeight+buttons*etk.Scale(baseButtonHeight)+yPadding*(fields+1)+yPadding*buttons, -1, mainStatusHeight, aboutHeight)
+		grid.SetRowSizes(headerHeight, fields*fieldHeight+buttons*etk.Scale(baseButtonHeight)+yPadding*(fields+1)+yPadding*buttons, -1, aboutHeight)
 		grid.AddChildAt(headerLabel, 0, 0, 1, 1)
 		grid.AddChildAt(wgt, 0, 1, 1, 1)
 		grid.AddChildAt(infoLabel, 0, 2, 1, 1)
-		grid.AddChildAt(g.mainStatusGrid, 0, 3, 1, 1)
-		grid.AddChildAt(aboutGrid, 0, 4, 1, 1)
+		grid.AddChildAt(aboutGrid, 0, 3, 1, 1)
 		return grid
 	}
 
