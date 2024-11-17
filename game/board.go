@@ -1447,17 +1447,19 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	// Draw space hover overlay when dragging.
 	if dragging != nil {
-		for i := range highlightSpaces[b.draggingSpace] {
-			m := highlightSpaces[b.draggingSpace][i]
-			x, y, _, _ := b.spaceRect(m)
-			x, y = b.offsetPosition(m, x, y)
-			if b.bottomRow(m) {
-				y += b.h/2 - int(b.overlapSize*5) - int(b.verticalBorderSize) - 4
+		if highlightSpaces != nil {
+			for i := range highlightSpaces[b.draggingSpace] {
+				m := highlightSpaces[b.draggingSpace][i]
+				x, y, _, _ := b.spaceRect(m)
+				x, y = b.offsetPosition(m, x, y)
+				if b.bottomRow(m) {
+					y += b.h/2 - int(b.overlapSize*5) - int(b.verticalBorderSize) - 4
+				}
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Translate(float64(x), float64(y))
+				op.ColorScale.Scale(0.2, 0.2, 0.2, 0.2)
+				screen.DrawImage(b.spaceHighlight, op)
 			}
-			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(x), float64(y))
-			op.ColorScale.Scale(0.2, 0.2, 0.2, 0.2)
-			screen.DrawImage(b.spaceHighlight, op)
 		}
 
 		dx, dy := b.dragX, b.dragY
