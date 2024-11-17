@@ -7,7 +7,7 @@ toolchain go1.23.0
 require (
 	code.rocket9labs.com/tslocum/bgammon v0.0.0-20241116035306-7944c5fd252b
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e
-	code.rocket9labs.com/tslocum/etk v0.0.0-20241116230036-6e8a37f28768
+	code.rocket9labs.com/tslocum/etk v0.0.0-20241116233322-2f31177e6a4a
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20241024013344-d112a9463c51
 	github.com/coder/websocket v1.8.12

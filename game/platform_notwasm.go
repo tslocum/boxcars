@@ -6,7 +6,6 @@ import (
 	"bufio"
 	"os"
 	"path"
-	"path/filepath"
 
 	"github.com/coder/websocket"
 )
@@ -49,6 +48,6 @@ func saveCredentials(username string, password string) {
 	if configDir == "" {
 		return
 	}
-	_ = os.MkdirAll(filepath.Dir(configDir), 0700)
+	_ = os.MkdirAll(configDir, 0700)
 	_ = os.WriteFile(path.Join(configDir, "config"), []byte(username+"\n"+password), 0600)
 }
