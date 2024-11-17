@@ -860,8 +860,8 @@ func (g *Game) initialize() {
 	{
 		g.aboutDialog = &Dialog{etk.NewGrid()}
 		d := g.aboutDialog
-		d.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, -1, -1, etk.Scale(baseButtonHeight))
-		d.SetColumnSizes(etk.Scale(10), labelWidth, -1, 144, etk.Scale(10))
+		d.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, -1, etk.Scale(20), etk.Scale(baseButtonHeight))
+		d.SetColumnSizes(etk.Scale(10), etk.Scale(150), -1, 144, etk.Scale(10))
 		d.SetBackground(color.RGBA{40, 24, 9, 255})
 
 		var y int
@@ -2771,7 +2771,7 @@ func (g *Game) layoutConnect() {
 		lineHeight := int(m.HAscent + m.HDescent)
 		fontMutex.Unlock()
 
-		dialogWidth := etk.Scale(800)
+		dialogWidth := etk.Scale(650)
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
