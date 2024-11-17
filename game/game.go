@@ -1754,7 +1754,7 @@ func (g *Game) handleEvent(e interface{}) {
 		msg := gotext.Get("Welcome, %[1]s. %[2]s playing %[3]s.", ev.PlayerName, clients, matches)
 		ls(fmt.Sprintf("*** " + msg))
 
-		if strings.HasPrefix(g.client.Username, "Guest_") && g.savedUsername == "" {
+		if strings.HasPrefix(g.client.Username, "Guest_") && g.savedUsername == "" && g.JoinGame == 0 {
 			g.tutorialFrame.AddChild(NewTutorialWidget())
 		}
 	case *bgammon.EventNotice:
