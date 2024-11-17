@@ -2444,7 +2444,12 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					g.board.selectSpeed.SetMenuVisible(false)
 					return nil
 				} else if g.board.changePasswordDialog.Visible() {
-					g.board.hideMenu()
+					g.board.changePasswordDialog.SetVisible(false)
+					g.board.settingsDialog.SetVisible(true)
+					return nil
+				} else if g.board.muteSoundsDialog.Visible() {
+					g.board.muteSoundsDialog.SetVisible(false)
+					g.board.settingsDialog.SetVisible(true)
 					return nil
 				} else if g.board.leaveMatchDialog.Visible() {
 					g.board.leaveMatchDialog.SetVisible(false)
