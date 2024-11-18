@@ -1,6 +1,7 @@
 package game
 
 import (
+	"image"
 	"image/color"
 	"log"
 
@@ -104,14 +105,16 @@ func (b *board) createChangePasswordDialog() {
 	grid := etk.NewGrid()
 	grid.SetBackground(color.RGBA{40, 24, 9, 255})
 	grid.SetColumnSizes(20, -1, -1, 20)
-	grid.SetRowSizes(72, fieldHeight+20+fieldHeight, -1, etk.Scale(baseButtonHeight))
+	grid.SetRowSizes(72, fieldHeight+20+fieldHeight, -1)
 	grid.AddChildAt(headerLabel, 1, 0, 2, 1)
 	grid.AddChildAt(fieldGrid, 1, 1, 2, 1)
 	grid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
-	grid.AddChildAt(etk.NewButton(gotext.Get("Cancel"), b.hideMenu), 0, 3, 2, 1)
-	grid.AddChildAt(etk.NewButton(gotext.Get("Submit"), b.selectChangePassword), 2, 3, 2, 1)
 
-	b.changePasswordDialog = &Dialog{grid}
+	b.changePasswordDialog = newDialog(etk.NewGrid())
+	b.changePasswordDialog.SetRowSizes(-1, etk.Scale(baseButtonHeight))
+	b.changePasswordDialog.AddChildAt(&withDialogBorder{grid, image.Rectangle{}}, 0, 0, 2, 1)
+	b.changePasswordDialog.AddChildAt(etk.NewButton(gotext.Get("Cancel"), b.hideMenu), 0, 1, 1, 1)
+	b.changePasswordDialog.AddChildAt(etk.NewButton(gotext.Get("Submit"), b.selectChangePassword), 1, 1, 1, 1)
 	b.changePasswordDialog.SetVisible(false)
 }
 
@@ -219,13 +222,15 @@ func (b *board) createMuteSoundsDialog() {
 	grid := etk.NewGrid()
 	grid.SetBackground(color.RGBA{40, 24, 9, 255})
 	grid.SetColumnSizes(20, -1, -1, 20)
-	grid.SetRowSizes(72, fieldHeight+((fieldHeight+20)*(rowCount-1)), -1, etk.Scale(baseButtonHeight))
+	grid.SetRowSizes(72, fieldHeight+((fieldHeight+20)*(rowCount-1)), -1)
 	grid.AddChildAt(headerLabel, 1, 0, 2, 1)
 	grid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
 	grid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
-	grid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.showSettings), 0, 3, 4, 1)
 
-	b.muteSoundsDialog = &Dialog{grid}
+	b.muteSoundsDialog = newDialog(etk.NewGrid())
+	b.muteSoundsDialog.SetRowSizes(-1, etk.Scale(baseButtonHeight))
+	b.muteSoundsDialog.AddChildAt(&withDialogBorder{grid, image.Rectangle{}}, 0, 0, 1, 1)
+	b.muteSoundsDialog.AddChildAt(etk.NewButton(gotext.Get("Return"), b.showSettings), 0, 1, 1, 1)
 	b.muteSoundsDialog.SetVisible(false)
 }
 
@@ -333,21 +338,19 @@ func (b *board) createSettingsDialog() {
 
 	b.recreateAccountGrid()
 
-	checkboxGrid := etk.NewGrid()
-	checkboxGrid.SetColumnSizes(72, 20, -1)
-	if !enableOnScreenKeyboard {
-		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
-	} else {
-		checkboxGrid.SetRowSizes(-1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1, 20, -1)
-	}
+	grid := etk.NewGrid()
+	grid.SetBackground(color.RGBA{40, 24, 9, 255})
+
+	var gridY int
+	grid.AddChildAt(settingsLabel, 0, gridY, 5, 1)
+	gridY++
 	{
 		accountLabel := resizeText(gotext.Get("Account"))
 		accountLabel.SetVertical(etk.AlignCenter)
 
-		grid := etk.NewGrid()
-		grid.AddChildAt(accountLabel, 0, 0, 1, 1)
-		grid.AddChildAt(b.accountGrid, 1, 0, 2, 1)
-		checkboxGrid.AddChildAt(grid, 0, 0, 3, 1)
+		grid.AddChildAt(accountLabel, 0, gridY, 2, 1)
+		grid.AddChildAt(b.accountGrid, 2, gridY, 3, 1)
+		gridY++
 	}
 	{
 		muteLabel := resizeText(gotext.Get("Sound"))
@@ -356,10 +359,9 @@ func (b *board) createSettingsDialog() {
 		openMute := etk.NewButton(gotext.Get("Mute Sounds"), b.showMuteSounds)
 		openMute.SetHorizontal(etk.AlignStart)
 
-		grid := etk.NewGrid()
-		grid.AddChildAt(muteLabel, 0, 0, 1, 1)
-		grid.AddChildAt(openMute, 1, 0, 2, 1)
-		checkboxGrid.AddChildAt(grid, 0, 2, 3, 1)
+		grid.AddChildAt(muteLabel, 0, gridY, 2, 1)
+		grid.AddChildAt(openMute, 2, gridY, 3, 1)
+		gridY++
 	}
 	{
 		speedLabel := resizeText(gotext.Get("Speed"))
@@ -373,49 +375,54 @@ func (b *board) createSettingsDialog() {
 		b.selectSpeed.AddOption(gotext.Get("Instant"))
 		b.selectSpeed.SetSelectedItem(int(bgammon.SpeedMedium))
 
-		grid := etk.NewGrid()
-		grid.AddChildAt(speedLabel, 0, 0, 1, 1)
-		grid.AddChildAt(b.selectSpeed, 1, 0, 2, 1)
-		checkboxGrid.AddChildAt(grid, 0, 4, 3, 1)
+		grid.AddChildAt(speedLabel, 0, gridY, 2, 1)
+		grid.AddChildAt(b.selectSpeed, 2, gridY, 3, 1)
+		gridY++
 	}
-	gridY := 6
-	checkboxGrid.AddChildAt(cGrid(b.highlightCheckbox), 0, gridY, 1, 1)
-	checkboxGrid.AddChildAt(highlightLabel, 2, gridY, 1, 1)
-	gridY += 2
-	checkboxGrid.AddChildAt(cGrid(b.showPipCountCheckbox), 0, gridY, 1, 1)
-	checkboxGrid.AddChildAt(pipCountLabel, 2, gridY, 1, 1)
-	gridY += 2
-	checkboxGrid.AddChildAt(cGrid(b.showMovesCheckbox), 0, gridY, 1, 1)
-	checkboxGrid.AddChildAt(movesLabel, 2, gridY, 1, 1)
-	gridY += 2
-	checkboxGrid.AddChildAt(cGrid(b.flipBoardCheckbox), 0, gridY, 1, 1)
-	checkboxGrid.AddChildAt(flipBoardLabel, 2, gridY, 1, 1)
-	gridY += 2
-	checkboxGrid.AddChildAt(cGrid(b.traditionalCheckbox), 0, gridY, 1, 1)
-	checkboxGrid.AddChildAt(traditionalLabel, 2, gridY, 1, 1)
-	gridY += 2
+	grid.AddChildAt(cGrid(b.highlightCheckbox), 1, gridY, 1, 1)
+	grid.AddChildAt(highlightLabel, 2, gridY, 3, 1)
+	gridY++
+	grid.AddChildAt(cGrid(b.showPipCountCheckbox), 1, gridY, 1, 1)
+	grid.AddChildAt(pipCountLabel, 2, gridY, 3, 1)
+	gridY++
+	grid.AddChildAt(cGrid(b.showMovesCheckbox), 1, gridY, 1, 1)
+	grid.AddChildAt(movesLabel, 2, gridY, 3, 1)
+	gridY++
+	grid.AddChildAt(cGrid(b.flipBoardCheckbox), 1, gridY, 1, 1)
+	grid.AddChildAt(flipBoardLabel, 2, gridY, 3, 1)
+	gridY++
+	grid.AddChildAt(cGrid(b.traditionalCheckbox), 1, gridY, 1, 1)
+	grid.AddChildAt(traditionalLabel, 2, gridY, 3, 1)
+	gridY++
 	if enableRightClick {
-		checkboxGrid.AddChildAt(cGrid(b.advancedMovementCheckbox), 0, gridY, 1, 1)
-		checkboxGrid.AddChildAt(advancedMovementLabel, 2, gridY, 1, 1)
-		gridY += 2
+		grid.AddChildAt(cGrid(b.advancedMovementCheckbox), 1, gridY, 1, 1)
+		grid.AddChildAt(advancedMovementLabel, 2, gridY, 3, 1)
+		gridY++
 	}
-	checkboxGrid.AddChildAt(cGrid(b.autoPlayCheckbox), 0, gridY, 1, 1)
-	checkboxGrid.AddChildAt(autoPlayLabel, 2, gridY, 1, 1)
+	grid.AddChildAt(cGrid(b.autoPlayCheckbox), 1, gridY, 1, 1)
+	grid.AddChildAt(autoPlayLabel, 2, gridY, 3, 1)
+	gridY++
 
-	gridSize := 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72
-	if enableRightClick {
-		gridSize += 20 + 72
+	rowSizes := make([]int, gridY)
+	for i := 0; i < gridY; i++ {
+		size := -1
+		if i == 0 {
+			size = 72
+		}
+		rowSizes[i] = size
 	}
-	grid := etk.NewGrid()
-	grid.SetBackground(color.RGBA{40, 24, 9, 255})
-	grid.SetColumnSizes(20, -1, -1, 20)
-	grid.SetRowSizes(72, -1, 20, etk.Scale(baseButtonHeight))
-	grid.AddChildAt(settingsLabel, 1, 0, 2, 1)
-	grid.AddChildAt(checkboxGrid, 1, 1, 2, 1)
-	grid.AddChildAt(etk.NewBox(), 1, 2, 1, 1)
-	grid.AddChildAt(etk.NewButton(gotext.Get("Return"), b.hideMenu), 0, 3, 4, 1)
+	log.Println(rowSizes)
+	grid.SetRowSizes(rowSizes...)
 
-	b.settingsDialog = &Dialog{grid}
+	grid.SetColumnSizes(72, 72, -1, -1, 72, 72)
+
+	grid.SetRowPadding(10)
+	grid.SetColumnPadding(10)
+
+	b.settingsDialog = newDialog(etk.NewGrid())
+	b.settingsDialog.SetRowSizes(-1, etk.Scale(baseButtonHeight))
+	b.settingsDialog.AddChildAt(&withDialogBorder{grid, image.Rectangle{}}, 0, 0, 1, 1)
+	b.settingsDialog.AddChildAt(etk.NewButton(gotext.Get("Return"), b.hideMenu), 0, 1, 1, 1)
 	b.settingsDialog.SetVisible(false)
 }
 
@@ -425,12 +432,12 @@ func (b *board) createLeaveMatchDialog() {
 	label.SetVertical(etk.AlignCenter)
 
 	grid := etk.NewGrid()
-	grid.SetBackground(color.RGBA{40, 24, 9, 255})
-	grid.AddChildAt(label, 0, 0, 2, 1)
-	grid.AddChildAt(etk.NewButton(gotext.Get("No"), b.cancelLeaveMatch), 0, 1, 1, 1)
-	grid.AddChildAt(etk.NewButton(gotext.Get("Yes"), b.confirmLeaveMatch), 1, 1, 1, 1)
+	grid.AddChildAt(label, 0, 0, 1, 1)
 
-	b.leaveMatchDialog = &Dialog{grid}
+	b.leaveMatchDialog = newDialog(etk.NewGrid())
+	b.leaveMatchDialog.AddChildAt(&withDialogBorder{grid, image.Rectangle{}}, 0, 0, 2, 1)
+	b.leaveMatchDialog.AddChildAt(etk.NewButton(gotext.Get("No"), b.cancelLeaveMatch), 0, 1, 1, 1)
+	b.leaveMatchDialog.AddChildAt(etk.NewButton(gotext.Get("Yes"), b.confirmLeaveMatch), 1, 1, 1, 1)
 	b.leaveMatchDialog.SetVisible(false)
 }
 

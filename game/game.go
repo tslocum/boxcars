@@ -858,19 +858,14 @@ func (g *Game) initialize() {
 	}
 
 	{
-		g.aboutDialog = &Dialog{etk.NewGrid()}
-		d := g.aboutDialog
-		d.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, -1, etk.Scale(20), etk.Scale(baseButtonHeight))
-		d.SetColumnSizes(etk.Scale(10), etk.Scale(150), -1, 144, etk.Scale(10))
-		d.SetBackground(color.RGBA{40, 24, 9, 255})
-
+		gr := etk.NewGrid()
 		var y int
 		{
 			label := resizeText("Boxcars")
 			label.SetHorizontal(etk.AlignCenter)
 			label.SetVertical(etk.AlignCenter)
 			label.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
-			d.AddChildAt(label, 0, y, 5, 1)
+			gr.AddChildAt(label, 0, y, 5, 1)
 			y++
 		}
 
@@ -879,7 +874,7 @@ func (g *Game) initialize() {
 			label.SetHorizontal(etk.AlignCenter)
 			label.SetVertical(etk.AlignStart)
 			label.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
-			d.AddChildAt(label, 1, y, 3, 1)
+			gr.AddChildAt(label, 1, y, 3, 1)
 			y++
 		}
 
@@ -891,9 +886,9 @@ func (g *Game) initialize() {
 			iconSprite := etk.NewSprite(imgIcon)
 			iconSprite.SetHorizontal(etk.AlignEnd)
 			iconSprite.SetVertical(etk.AlignStart)
-			d.AddChildAt(ll, 1, y, 1, 1)
-			d.AddChildAt(rl, 2, y, 1, 1)
-			d.AddChildAt(iconSprite, 3, y, 1, 3)
+			gr.AddChildAt(ll, 1, y, 1, 1)
+			gr.AddChildAt(rl, 2, y, 1, 1)
+			gr.AddChildAt(iconSprite, 3, y, 1, 3)
 			y++
 		}
 
@@ -902,8 +897,8 @@ func (g *Game) initialize() {
 			ll.SetVertical(etk.AlignCenter)
 			rl := resizeText("bgammon.org/code")
 			rl.SetVertical(etk.AlignCenter)
-			d.AddChildAt(ll, 1, y, 1, 1)
-			d.AddChildAt(rl, 2, y, 1, 1)
+			gr.AddChildAt(ll, 1, y, 1, 1)
+			gr.AddChildAt(rl, 2, y, 1, 1)
 			y++
 		}
 
@@ -912,8 +907,8 @@ func (g *Game) initialize() {
 			ll.SetVertical(etk.AlignCenter)
 			rl := resizeText("bgammon.org/donate")
 			rl.SetVertical(etk.AlignCenter)
-			d.AddChildAt(ll, 1, y, 1, 1)
-			d.AddChildAt(rl, 2, y, 1, 1)
+			gr.AddChildAt(ll, 1, y, 1, 1)
+			gr.AddChildAt(rl, 2, y, 1, 1)
 			y++
 		}
 
@@ -922,12 +917,21 @@ func (g *Game) initialize() {
 			ll.SetVertical(etk.AlignCenter)
 			rl := resizeText("bgammon.org/community")
 			rl.SetVertical(etk.AlignCenter)
-			d.AddChildAt(ll, 1, y, 1, 1)
-			d.AddChildAt(rl, 2, y, 2, 1)
+			gr.AddChildAt(ll, 1, y, 1, 1)
+			gr.AddChildAt(rl, 2, y, 2, 1)
 			y++
 		}
 
-		d.AddChildAt(etk.NewButton(gotext.Get("Return"), func() error { g.aboutDialog.SetVisible(false); return nil }), 0, y+1, 5, 1)
+		gr.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, -1, etk.Scale(20))
+		gr.SetColumnSizes(etk.Scale(10), etk.Scale(150), -1, 144, etk.Scale(10))
+
+		g.aboutDialog = newDialog(etk.NewGrid())
+
+		d := g.aboutDialog
+		d.SetRowSizes(-1, etk.Scale(baseButtonHeight))
+		d.SetBackground(color.RGBA{40, 24, 9, 255})
+		d.AddChildAt(&withDialogBorder{gr, image.Rectangle{}}, 0, 0, 1, 1)
+		d.AddChildAt(etk.NewButton(gotext.Get("Return"), func() error { g.aboutDialog.SetVisible(false); return nil }), 0, 1, 1, 1)
 		d.SetVisible(false)
 	}
 
@@ -1133,14 +1137,17 @@ func (g *Game) initialize() {
 		connectGrid = grid
 
 		{
-			g.quitDialog = &Dialog{etk.NewGrid()}
 			label := resizeText(gotext.Get("Exit Boxcars?"))
 			label.SetHorizontal(etk.AlignCenter)
 			label.SetVertical(etk.AlignCenter)
 
+			grid := etk.NewGrid()
+			grid.AddChildAt(label, 0, 0, 1, 1)
+
+			g.quitDialog = newDialog(etk.NewGrid())
 			d := g.quitDialog
 			d.SetBackground(color.RGBA{40, 24, 9, 255})
-			d.AddChildAt(label, 0, 0, 2, 1)
+			d.AddChildAt(&withDialogBorder{grid, image.Rectangle{}}, 0, 0, 2, 1)
 			d.AddChildAt(etk.NewButton(gotext.Get("No"), func() error { g.quitDialog.SetVisible(false); return nil }), 0, 1, 1, 1)
 			d.AddChildAt(etk.NewButton(gotext.Get("Yes"), func() error { g.Exit(); return nil }), 1, 1, 1, 1)
 			d.SetVisible(false)
@@ -3177,20 +3184,40 @@ type Dialog struct {
 	*etk.Grid
 }
 
+func newDialog(grid *etk.Grid) *Dialog {
+	return &Dialog{
+		Grid: grid,
+	}
+}
+
 func (d *Dialog) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
 	_, err = d.Grid.HandleMouse(cursor, pressed, clicked)
 	return true, err
 }
 
-func (d *Dialog) Draw(screen *ebiten.Image) error {
-	err := d.Grid.Draw(screen)
-	r := d.Rect()
+type withDialogBorder struct {
+	*etk.Grid
+	r image.Rectangle
+}
+
+func (w *withDialogBorder) Rect() image.Rectangle {
+	return w.r
+}
+
+func (w *withDialogBorder) SetRect(r image.Rectangle) {
+	const borderSize = 4
+	w.r = r
+	w.Grid.SetRect(image.Rect(r.Min.X+borderSize, r.Min.Y+borderSize, r.Max.X-borderSize, r.Max.Y))
+}
+
+func (w *withDialogBorder) Draw(screen *ebiten.Image) error {
 	const borderSize = 4
 	borderColor := color.RGBA{0, 0, 0, 255}
+	err := w.Grid.Draw(screen)
+	r := w.Rect()
 	screen.SubImage(image.Rect(r.Min.X, r.Min.Y, r.Min.X+borderSize, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
 	screen.SubImage(image.Rect(r.Min.X, r.Min.Y, r.Max.X, r.Min.Y+borderSize)).(*ebiten.Image).Fill(borderColor)
 	screen.SubImage(image.Rect(r.Max.X-borderSize, r.Min.Y, r.Max.X, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
-	screen.SubImage(image.Rect(r.Min.X, r.Max.Y-borderSize, r.Max.X, r.Max.Y)).(*ebiten.Image).Fill(borderColor)
 	return err
 }
 

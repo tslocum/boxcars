@@ -65,15 +65,19 @@ func (w *tutorialWidget) newDialog(title string, message string) *Dialog {
 	grid.AddChildAt(titleLabel, 1, 0, 2, 1)
 	grid.AddChildAt(messageLabel, 1, 2, 2, 1)
 	grid.AddChildAt(etk.NewBox(), 1, 3, 1, 1)
-	columns := 2
+
+	cols := 2
 	if w.page == 5 {
-		columns = 4
+		cols = 1
 	}
-	grid.AddChildAt(etk.NewButton(gotext.Get("Dismiss"), w.hide), 0, 4, columns, 1)
+	d := newDialog(etk.NewGrid())
+	d.SetRowSizes(-1, etk.Scale(baseButtonHeight))
+	d.AddChildAt(&withDialogBorder{grid, image.Rectangle{}}, 0, 0, cols, 1)
+	d.AddChildAt(etk.NewButton(gotext.Get("Dismiss"), w.hide), 0, 1, 1, 1)
 	if w.page < 5 {
-		grid.AddChildAt(etk.NewButton(gotext.Get("Next"), w.nextPage), 2, 4, 2, 1)
+		d.AddChildAt(etk.NewButton(gotext.Get("Next"), w.nextPage), 1, 1, 1, 1)
 	}
-	return &Dialog{grid}
+	return d
 }
 
 func (w *tutorialWidget) setPage(page int) {
