@@ -156,6 +156,9 @@ msgstr ""
 msgid "Failed to move checker%s: %s"
 msgstr ""
 
+msgid "illegal move"
+msgstr ""
+
 msgid "Failed to roll"
 msgstr ""
 

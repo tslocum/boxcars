@@ -2580,6 +2580,7 @@ func (b *board) finishDrag(x int, y int, click bool) {
 			return
 		}
 
+		var found bool
 		var processed bool
 		if index >= 0 && b.client != nil {
 			space := b.draggingSpace
@@ -2597,6 +2598,7 @@ func (b *board) finishDrag(x int, y int, click bool) {
 					}
 					b.processState()
 					scheduleFrame()
+					found = true
 					processed = true
 					b.client.Out <- []byte(fmt.Sprintf("mv %d/%d", space, index))
 				}
@@ -2614,11 +2616,11 @@ func (b *board) finishDrag(x int, y int, click bool) {
 						} else {
 							playSoundEffect(effectHomeMulti)
 						}
+						found = true
 						b.client.Out <- []byte(fmt.Sprintf("mv %d/off", index))
 					}
 				}
 			} else if time.Since(b.lastDragClick) < 500*time.Millisecond && space == bgammon.SpaceHomePlayer && !b.gameState.Player1.Entered {
-				var found bool
 				for _, m := range b.gameState.Available {
 					if m[0] == bgammon.SpaceHomePlayer && bgammon.SpaceDiff(m[0], m[1], b.gameState.Variant) == b.gameState.Roll1 {
 						b.client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
@@ -2630,10 +2632,17 @@ func (b *board) finishDrag(x int, y int, click bool) {
 					for _, m := range b.gameState.Available {
 						if m[0] == bgammon.SpaceHomePlayer {
 							b.client.Out <- []byte(fmt.Sprintf("mv %d/%d", m[0], m[1]))
+							found = true
 							break
 						}
 					}
 				}
+			} else {
+				found = true
+			}
+			if !found {
+				ls("*** " + gotext.Get("Failed to move checker%s: %s", "", gotext.Get("illegal move")+"."))
+				ls("*** " + gotext.Get("Legal moves: %s", bgammon.FormatMoves(b.gameState.Available)))
 			}
 		}
 		if !processed {
