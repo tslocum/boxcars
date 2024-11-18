@@ -22,6 +22,9 @@ msgstr ""
 msgid "%s rolled %s"
 msgstr ""
 
+msgid "%s resigned."
+msgstr ""
+
 msgid "%s wins!"
 msgstr ""
 

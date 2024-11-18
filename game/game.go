@@ -2019,6 +2019,9 @@ func (g *Game) handleEvent(e interface{}) {
 		ls("*** " + gotext.Get("Failed to submit moves: %s", ev.Reason))
 	case *bgammon.EventWin:
 		g.board.Lock()
+		if ev.Resigned != "" {
+			lg(gotext.Get("%s resigned.", ev.Resigned))
+		}
 		var message string
 		if ev.Points <= 1 {
 			message = gotext.Get("%s wins!", ev.Player)
