@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.6p1"
+	AppVersion           = "v1.4.6"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -2365,6 +2365,7 @@ func (g *Game) cancelHistoryPage() error {
 	g.lobby.historyPageDialog.SetVisible(false)
 	return nil
 }
+
 func (g *Game) handleInput(keys []ebiten.Key) error {
 	if len(keys) == 0 {
 		return nil

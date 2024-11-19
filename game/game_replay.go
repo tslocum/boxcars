@@ -115,6 +115,9 @@ func (g *Game) _handleReplay(gs *bgammon.GameState, line []byte, lineNumber int,
 		if bytes.Equal(split[0], []byte("2")) {
 			player = 2
 		}
+		for i := range split {
+			split[i] = bytes.ReplaceAll(split[i], []byte(","), nil)
+		}
 		switch {
 		case bytes.Equal(split[1], []byte("d")):
 			if len(split) < 4 {
@@ -421,6 +424,17 @@ func (g *Game) HandleReplay(replay []byte) {
 				}
 			}
 
+			var mv []byte
+			var last byte
+			for _, r := range move {
+				if r == ' ' && last != ',' {
+					mv = append(mv, []byte(", ")...)
+				} else {
+					mv = append(mv, r)
+				}
+				last = r
+			}
+
 			var x int
 			if player == 1 {
 				x = 1
@@ -445,7 +459,7 @@ func (g *Game) HandleReplay(replay []byte) {
 			rollLabel.SetVertical(etk.AlignCenter)
 			rollLabel.SetAutoResize(true)
 			rollLabel.SetForeground(etk.Style.ButtonTextColor)
-			moveLabel := etk.NewText(string(move))
+			moveLabel := etk.NewText(string(mv))
 			moveLabel.SetPadding(etk.Scale(etk.Style.ButtonBorderSize + 2))
 			moveLabel.SetVertical(etk.AlignCenter)
 			moveLabel.SetAutoResize(true)
