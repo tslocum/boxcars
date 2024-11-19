@@ -103,7 +103,6 @@ func (b *board) createChangePasswordDialog() {
 	fieldGrid.AddChildAt(b.changePasswordNew, 1, 2, 2, 1)
 
 	grid := etk.NewGrid()
-	grid.SetBackground(color.RGBA{40, 24, 9, 255})
 	grid.SetColumnSizes(20, -1, -1, 20)
 	grid.SetRowSizes(72, fieldHeight+20+fieldHeight, -1)
 	grid.AddChildAt(headerLabel, 1, 0, 2, 1)
@@ -220,7 +219,6 @@ func (b *board) createMuteSoundsDialog() {
 	checkboxGrid.AddChildAt(muteBearOffLabel, 2, gridY, 1, 1)
 
 	grid := etk.NewGrid()
-	grid.SetBackground(color.RGBA{40, 24, 9, 255})
 	grid.SetColumnSizes(20, -1, -1, 20)
 	grid.SetRowSizes(72, fieldHeight+((fieldHeight+20)*(rowCount-1)), -1)
 	grid.AddChildAt(headerLabel, 1, 0, 2, 1)
@@ -339,7 +337,6 @@ func (b *board) createSettingsDialog() {
 	b.recreateAccountGrid()
 
 	grid := etk.NewGrid()
-	grid.SetBackground(color.RGBA{40, 24, 9, 255})
 
 	var gridY int
 	grid.AddChildAt(settingsLabel, 0, gridY, 5, 1)
@@ -411,7 +408,6 @@ func (b *board) createSettingsDialog() {
 		}
 		rowSizes[i] = size
 	}
-	log.Println(rowSizes)
 	grid.SetRowSizes(rowSizes...)
 
 	grid.SetColumnSizes(72, 72, -1, -1, 72, 72)

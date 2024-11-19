@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.6"
+	AppVersion           = "v1.4.6p1"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -929,7 +929,6 @@ func (g *Game) initialize() {
 
 		d := g.aboutDialog
 		d.SetRowSizes(-1, etk.Scale(baseButtonHeight))
-		d.SetBackground(color.RGBA{40, 24, 9, 255})
 		d.AddChildAt(&withDialogBorder{gr, image.Rectangle{}}, 0, 0, 1, 1)
 		d.AddChildAt(etk.NewButton(gotext.Get("Return"), func() error { g.aboutDialog.SetVisible(false); return nil }), 0, 1, 1, 1)
 		d.SetVisible(false)
@@ -1146,7 +1145,6 @@ func (g *Game) initialize() {
 
 			g.quitDialog = newDialog(etk.NewGrid())
 			d := g.quitDialog
-			d.SetBackground(color.RGBA{40, 24, 9, 255})
 			d.AddChildAt(&withDialogBorder{grid, image.Rectangle{}}, 0, 0, 2, 1)
 			d.AddChildAt(etk.NewButton(gotext.Get("No"), func() error { g.quitDialog.SetVisible(false); return nil }), 0, 1, 1, 1)
 			d.AddChildAt(etk.NewButton(gotext.Get("Yes"), func() error { g.Exit(); return nil }), 1, 1, 1, 1)
@@ -1419,7 +1417,6 @@ func (g *Game) initialize() {
 			label.SetVertical(etk.AlignCenter)
 
 			d := g.lobby.historyPageDialog
-			d.SetBackground(color.RGBA{40, 24, 9, 255})
 			d.AddChildAt(label, 0, 0, 2, 1)
 			d.AddChildAt(g.lobby.historyPageDialogInput, 0, 1, 2, 1)
 			d.AddChildAt(etk.NewButton(gotext.Get("Cancel"), g.cancelHistoryPage), 0, 2, 1, 1)
@@ -3188,6 +3185,10 @@ func newDialog(grid *etk.Grid) *Dialog {
 	return &Dialog{
 		Grid: grid,
 	}
+}
+
+func (d *Dialog) Background() color.RGBA {
+	return color.RGBA{40, 24, 9, 255}
 }
 
 func (d *Dialog) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {

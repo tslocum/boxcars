@@ -2,7 +2,6 @@ package game
 
 import (
 	"image"
-	"image/color"
 	"time"
 
 	"code.rocket9labs.com/tslocum/etk"
@@ -59,7 +58,6 @@ func (w *tutorialWidget) newDialog(title string, message string) *Dialog {
 	messageLabel := etk.NewText(message)
 
 	grid := etk.NewGrid()
-	grid.SetBackground(color.RGBA{40, 24, 9, 255})
 	grid.SetColumnSizes(20, -1, -1, 20)
 	grid.SetRowSizes(72, 20, -1, etk.Scale(20), etk.Scale(baseButtonHeight))
 	grid.AddChildAt(titleLabel, 1, 0, 2, 1)
