@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.6"
+	AppVersion           = "v1.4.6p1"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -797,6 +797,8 @@ func (g *Game) initialize() {
 		g.selectConnect()
 		return false
 	})}
+	centerInput(g.connectServer)
+	g.connectServer.SetAutoResize(true)
 
 	g.mainStatusGrid = etk.NewGrid()
 	g.mainStatusGrid.AddChildAt(statusBuffer, 0, 0, 1, 1)
@@ -835,13 +837,13 @@ func (g *Game) initialize() {
 			f.SetMaxWidth(1024)
 			wgt = f
 		}
-		headerHeight := etk.Scale(60)
+		headerHeight := fieldHeight
 		headerLabel := newCenteredText(header)
+		headerLabel.SetAutoResize(true)
 		infoLabel := newCenteredText(info)
 		infoLabel.SetVertical(etk.AlignStart)
 		infoLabel.SetAutoResize(false)
 		if smallScreen {
-			headerHeight = etk.Scale(20)
 			headerLabel.SetHorizontal(etk.AlignCenter)
 			headerLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
 			infoLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
@@ -986,7 +988,6 @@ func (g *Game) initialize() {
 		grid.AddChildAt(g.registerPassword, 2, 2, 2, 1)
 		y := 3
 		if ShowServerSettings {
-			centerInput(g.connectServer)
 			grid.AddChildAt(serverLabel, 1, y, 2, 1)
 			grid.AddChildAt(g.connectServer, 2, y, 2, 1)
 			y++
@@ -1042,7 +1043,6 @@ func (g *Game) initialize() {
 		grid.AddChildAt(g.resetEmail, 2, 0, 2, 1)
 		y := 1
 		if ShowServerSettings {
-			centerInput(g.connectServer)
 			grid.AddChildAt(serverLabel, 1, y, 2, 1)
 			grid.AddChildAt(g.connectServer, 2, y, 2, 1)
 			y++
@@ -1111,7 +1111,6 @@ func (g *Game) initialize() {
 		grid.AddChildAt(g.connectPassword, 2, 1, 2, 1)
 		g.connectGridY = 2
 		if ShowServerSettings {
-			centerInput(g.connectServer)
 			grid.AddChildAt(serverLabel, 1, g.connectGridY, 2, 1)
 			grid.AddChildAt(g.connectServer, 2, g.connectGridY, 2, 1)
 			g.connectGridY++

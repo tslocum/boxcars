@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"code.rocket9labs.com/tslocum/boxcars/game"
+	"code.rocket9labs.com/tslocum/gotext"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -19,12 +20,12 @@ const (
 )
 
 func main() {
-	ebiten.SetWindowTitle("bgammon.org - Free Online Backgammon")
+	g := parseFlags()
+
+	ebiten.SetWindowTitle(gotext.Get("%s - Free Online Backgammon", "bgammon.org"))
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowIcon([]image.Image{game.ImgIconAlt})
-
-	g := parseFlags()
 
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,
