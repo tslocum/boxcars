@@ -1774,7 +1774,13 @@ func (g *Game) handleEvent(e interface{}) {
 		if !viewBoard {
 			scheduleFrame()
 		}
+	case *bgammon.EventFailedCreate:
+		g.lobby.createGamePending, g.lobby.createGameShown = false, false
+		g.lobby.rebuildButtonsGrid()
+
+		ls("*** " + gotext.Get("Failed to create match: %s", ev.Reason))
 	case *bgammon.EventJoined:
+		g.lobby.createGamePending, g.lobby.createGameShown = false, false
 		g.lobby.joiningGameID, g.lobby.joiningGamePassword, g.lobby.joiningGameShown = 0, "", false
 		g.lobby.rebuildButtonsGrid()
 
@@ -2731,9 +2737,28 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			log.Fatal(err)
 		}
 
-		if g.lobby.joiningGameID != 0 && drawScreen == 0 && !g.lobby.joiningGameShown {
-			g.lobby.joiningGameShown = true
-			g.lobby.c.Out <- []byte(fmt.Sprintf("j %d %s", g.lobby.joiningGameID, g.lobby.joiningGamePassword))
+		if drawScreen == 0 {
+			if g.lobby.createGamePending && !g.lobby.createGameShown {
+				typeAndPassword := "public"
+				if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
+					typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
+				}
+				points, err := strconv.Atoi(game.lobby.createGamePoints.Text())
+				if err != nil {
+					points = 1
+				}
+				var variant int8
+				if game.lobby.createGameAceyCheckbox.Selected() {
+					variant = bgammon.VariantAceyDeucey
+				} else if game.lobby.createGameTabulaCheckbox.Selected() {
+					variant = bgammon.VariantTabula
+				}
+				g.lobby.c.Out <- []byte(fmt.Sprintf("c %s %d %d %s", typeAndPassword, points, variant, game.lobby.createGameName.Text()))
+				g.lobby.createGameShown = true
+			} else if g.lobby.joiningGameID != 0 && !g.lobby.joiningGameShown {
+				g.lobby.c.Out <- []byte(fmt.Sprintf("j %d %s", g.lobby.joiningGameID, g.lobby.joiningGamePassword))
+				g.lobby.joiningGameShown = true
+			}
 		}
 	}
 

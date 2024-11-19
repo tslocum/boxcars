@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image/color"
 	"sort"
-	"strconv"
 	"strings"
 
 	"code.rocket9labs.com/tslocum/bgammon"
@@ -60,6 +59,9 @@ type lobby struct {
 	createGamePassword       *Input
 	createGameAceyCheckbox   *etk.Checkbox
 	createGameTabulaCheckbox *etk.Checkbox
+
+	createGamePending bool
+	createGameShown   bool
 
 	showJoinGame     bool
 	joinGameID       int
@@ -276,21 +278,9 @@ func (l *lobby) cancelCreateGame() {
 
 func (l *lobby) confirmCreateGame() {
 	go hideKeyboard()
-	typeAndPassword := "public"
-	if len(strings.TrimSpace(game.lobby.createGamePassword.Text())) > 0 {
-		typeAndPassword = fmt.Sprintf("private %s", strings.ReplaceAll(game.lobby.createGamePassword.Text(), " ", "_"))
-	}
-	points, err := strconv.Atoi(game.lobby.createGamePoints.Text())
-	if err != nil {
-		points = 1
-	}
-	var variant int8
-	if game.lobby.createGameAceyCheckbox.Selected() {
-		variant = bgammon.VariantAceyDeucey
-	} else if game.lobby.createGameTabulaCheckbox.Selected() {
-		variant = bgammon.VariantTabula
-	}
-	l.c.Out <- []byte(fmt.Sprintf("c %s %d %d %s", typeAndPassword, points, variant, game.lobby.createGameName.Text()))
+	l.createGamePending = true
+	l.rebuildButtonsGrid()
+	scheduleFrame()
 }
 
 func (l *lobby) confirmJoinGame() {
@@ -407,10 +397,12 @@ func (l *lobby) rebuildButtonsGrid() {
 	l.buttonsGrid.Clear()
 
 	buttons := l.getButtons()
-	if l.joiningGameID != 0 {
+	if l.createGamePending || l.joiningGameID != 0 {
 		btns := make([]string, len(buttons))
 		for i, label := range buttons {
-			if label == gotext.Get("Join match") || label == gotext.Get("Join") {
+			if l.createGamePending && (label == gotext.Get("Create match") || label == gotext.Get("Create")) {
+				btns[i] = gotext.Get("Creating...")
+			} else if l.joiningGameID != 0 && (label == gotext.Get("Join match") || label == gotext.Get("Join")) {
 				btns[i] = gotext.Get("Joining...")
 			} else {
 				btns[i] = label
