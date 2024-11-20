@@ -1407,19 +1407,24 @@ func (g *Game) initialize() {
 		g.lobby.historyPageButton = etk.NewButton("1/1", g.selectHistoryPage)
 
 		{
-			g.lobby.historyPageDialog = etk.NewGrid()
+			g.lobby.historyPageDialog = newDialog(etk.NewGrid())
 			g.lobby.historyPageDialogInput = &NumericInput{etk.NewInput("", g.confirmHistoryPage)}
 			centerNumericInput(g.lobby.historyPageDialogInput)
 			g.lobby.historyPageDialogInput.SetBorderSize(0)
+			g.lobby.historyPageDialogInput.SetAutoResize(true)
 			label := resizeText(gotext.Get("Go to page:"))
 			label.SetHorizontal(etk.AlignCenter)
 			label.SetVertical(etk.AlignCenter)
 
+			grid := etk.NewGrid()
+			grid.AddChildAt(label, 0, 0, 1, 1)
+			grid.AddChildAt(g.lobby.historyPageDialogInput, 0, 1, 1, 1)
+
 			d := g.lobby.historyPageDialog
-			d.AddChildAt(label, 0, 0, 2, 1)
-			d.AddChildAt(g.lobby.historyPageDialogInput, 0, 1, 2, 1)
-			d.AddChildAt(etk.NewButton(gotext.Get("Cancel"), g.cancelHistoryPage), 0, 2, 1, 1)
-			d.AddChildAt(etk.NewButton(gotext.Get("Go"), func() error { g.confirmHistoryPage(g.lobby.historyPageDialogInput.Text()); return nil }), 1, 2, 1, 1)
+			d.SetRowSizes(-1, etk.Scale(baseButtonHeight))
+			d.AddChildAt(&withDialogBorder{grid, image.Rectangle{}}, 0, 0, 2, 1)
+			d.AddChildAt(etk.NewButton(gotext.Get("Cancel"), g.cancelHistoryPage), 0, 1, 1, 1)
+			d.AddChildAt(etk.NewButton(gotext.Get("Go"), func() error { g.confirmHistoryPage(g.lobby.historyPageDialogInput.Text()); return nil }), 1, 1, 1, 1)
 			d.SetVisible(false)
 		}
 
@@ -1480,7 +1485,6 @@ func (g *Game) initialize() {
 		}
 
 		g.lobby.historyButton = etk.NewButton(gotext.Get("History"), game.selectHistory)
-		g.lobby.historyButton.SetVisible(false)
 
 		indentA, indentB := etk.Scale(lobbyIndentA), etk.Scale(lobbyIndentB)
 
@@ -2125,10 +2129,6 @@ func (g *Game) Connect() {
 
 	g.clearBuffers()
 	ls("*** " + gotext.Get("Connecting..."))
-
-	if g.Password != "" {
-		g.lobby.historyButton.SetVisible(true)
-	}
 
 	g.setRoot(listGamesFrame)
 	etk.SetFocus(game.lobby.availableMatchesList)
