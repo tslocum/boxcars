@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.6p1"
+	AppVersion           = "v1.4.7"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -3144,9 +3144,15 @@ func playSoundEffect(effect SoundEffect) {
 }
 
 func randomizeSounds(s []*audio.Player) {
-	for i := range s {
-		j := rand.Intn(i + 1)
-		s[i], s[j] = s[j], s[i]
+	last := s[len(s)-1]
+	for {
+		for i := range s {
+			j := rand.Intn(i + 1)
+			s[i], s[j] = s[j], s[i]
+		}
+		if s[0] != last {
+			return
+		}
 	}
 }
 

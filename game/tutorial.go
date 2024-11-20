@@ -10,21 +10,46 @@ import (
 
 type tutorialWidget struct {
 	*etk.Frame
-	grid      *etk.Grid
+	outerBox  *tutorialBox
+	content   *etk.Frame
 	page      int
 	lastClick time.Time
 }
 
 func NewTutorialWidget() *tutorialWidget {
 	w := &tutorialWidget{
-		Frame: etk.NewFrame(),
-		grid:  etk.NewGrid(),
+		Frame:   etk.NewFrame(),
+		content: etk.NewFrame(),
 	}
+	w.outerBox = w.newTutorialBox()
+
 	w.Frame.SetPositionChildren(true)
-	w.Frame.AddChild(w.grid)
+	w.Frame.AddChild(w.outerBox)
+	w.Frame.AddChild(w.content)
+
+	w.content.SetPositionChildren(true)
+	w.content.SetHorizontal(etk.AlignCenter)
+	w.content.SetVertical(etk.AlignCenter)
 
 	w.setPage(0)
 	return w
+}
+
+func (w *tutorialWidget) SetRect(r image.Rectangle) {
+	maxWidth, maxHeight := etk.Scale(800), etk.Scale(400)
+	if smallScreen {
+		maxHeight = maxHeight / 3 * 2
+	}
+	if maxWidth > game.screenW/3*2 {
+		maxWidth = game.screenW / 3 * 2
+	}
+	if maxHeight > game.screenH/3*2 {
+		maxHeight = game.screenH / 3 * 2
+	}
+	w.content.SetMaxWidth(maxWidth)
+	w.content.SetMaxHeight(maxHeight)
+
+	w.Frame.SetRect(r)
 }
 
 func (w *tutorialWidget) nextPage() error {
@@ -39,7 +64,7 @@ func (w *tutorialWidget) hide() error {
 	setViewBoard(false)
 	game.board.gameState.PlayerNumber = 0
 	game.savedUsername = "a"
-	w.grid.Clear()
+	w.Clear()
 	return nil
 }
 
@@ -56,6 +81,7 @@ func (w *tutorialWidget) newDialog(title string, message string) *Dialog {
 	titleLabel.SetVertical(etk.AlignCenter)
 
 	messageLabel := etk.NewText(message)
+	messageLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumLargeFontSize))
 
 	grid := etk.NewGrid()
 	grid.SetColumnSizes(20, -1, -1, 20)
@@ -122,12 +148,8 @@ func (w *tutorialWidget) setPage(page int) {
 		return
 	}
 
-	w.grid.Clear()
-	w.grid.AddChildAt(w.newTutorialBox(), 0, 0, 6, 1)
-	w.grid.AddChildAt(w.newTutorialBox(), 0, 1, 1, 2)
-	w.grid.AddChildAt(w.newDialog(title, message), 1, 1, 4, 2)
-	w.grid.AddChildAt(w.newTutorialBox(), 5, 1, 1, 2)
-	w.grid.AddChildAt(w.newTutorialBox(), 0, 3, 6, 1)
+	w.content.Clear()
+	w.content.AddChild(w.newDialog(title, message))
 }
 
 type tutorialBox struct {

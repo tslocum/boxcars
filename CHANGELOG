@@ -1,3 +1,6 @@
+1.4.7:
+- Fix user interface issues
+
 1.4.6:
 - Improve quality of text rendering
 - Reduce memory usage when playing sounds
