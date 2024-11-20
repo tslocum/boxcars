@@ -1933,6 +1933,10 @@ func (g *Game) handleEvent(e interface{}) {
 			incomingGameLogMove = false
 		}
 
+		if !g.board.gameState.Spectating && (g.board.gameState.Player1.Points >= g.board.gameState.Points || g.board.gameState.Player2.Points >= g.board.gameState.Points) {
+			g.board.rematchButton.SetVisible(true)
+		}
+
 		setViewBoard(true)
 	case *bgammon.EventRolled:
 		playSound := SoundEffect(-1)
@@ -2045,9 +2049,6 @@ func (g *Game) handleEvent(e interface{}) {
 			message += fmt.Sprintf(" (+%d)", ev.Rating)
 		}
 		lg(message)
-		if (g.board.gameState.Player1.Points >= g.board.gameState.Points || g.board.gameState.Player2.Points >= g.board.gameState.Points) && !g.board.gameState.Spectating {
-			g.board.rematchButton.SetVisible(true)
-		}
 		g.board.Unlock()
 	case *bgammon.EventSettings:
 		g.board.stateLock.Lock()

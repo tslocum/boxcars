@@ -5,13 +5,13 @@ go 1.23
 toolchain go1.23.0
 
 require (
-	code.rocket9labs.com/tslocum/bgammon v0.0.0-20241119003936-1ea81e724209
+	code.rocket9labs.com/tslocum/bgammon v0.0.0-20241119105320-bdceb0644748
 	code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20240917031657-2648772e515e
-	code.rocket9labs.com/tslocum/etk v0.0.0-20241119084953-59a6f9c83cc3
+	code.rocket9labs.com/tslocum/etk v0.0.0-20241119085405-e8f49c56416a
 	code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b
 	code.rocket9labs.com/tslocum/tabula v0.0.0-20241024013344-d112a9463c51
 	github.com/coder/websocket v1.8.12
-	github.com/hajimehoshi/ebiten/v2 v2.8.4
+	github.com/hajimehoshi/ebiten/v2 v2.8.5
 	github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195
 	golang.org/x/sys v0.27.0
 	golang.org/x/text v0.20.0
