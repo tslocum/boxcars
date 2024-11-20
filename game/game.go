@@ -1583,8 +1583,11 @@ func (g *Game) playOffline() {
 		beiClient := bot.NewLocalBEIClient(<-beiConns, false)
 
 		// Start the local bgammon server.
-		server := server.NewServer("", "", "", "", "", "", "", "", "", "", false, true, false)
-		g.localServer = server.ListenLocal()
+		op := &server.Options{
+			Verbose: true,
+		}
+		s := server.NewServer(op)
+		g.localServer = s.ListenLocal()
 
 		// Connect the bots.
 		go bot.NewLocalClient(<-g.localServer, "", "BOT_tabula", "", 1, bgammon.VariantBackgammon, false, beiClient)
@@ -2187,7 +2190,7 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 	g.setRoot(listGamesFrame)
 	etk.SetFocus(game.lobby.availableMatchesList)
 
-	g.client = newClient("", g.Username, g.Password, false)
+	g.client = newClient("", g.connectUsername.Text(), "", false)
 	g.lobby.c = g.client
 	g.board.client = g.client
 
