@@ -2173,9 +2173,6 @@ func (g *Game) Connect() {
 	}()
 
 	go c.Connect()
-
-	// TODO
-
 }
 
 func (g *Game) ConnectLocal(conn net.Conn) {

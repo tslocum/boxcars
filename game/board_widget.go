@@ -310,7 +310,6 @@ func (bw *BoardWidget) HandleMouse(cursor image.Point, pressed bool, clicked boo
 			return false, nil
 		}
 
-		// TODO allow grabbing multiple pieces by grabbing further down the stack
 		if !handled && b.playerTurn() && clicked && (b.lastDragClick.IsZero() || time.Since(b.lastDragClick) >= 50*time.Millisecond) {
 			s, space := b.spriteAt(cx, cy)
 			if s != nil && s.colorWhite == (b.flipBoard || b.gameState.PlayerNumber == 2) && space != bgammon.SpaceHomeOpponent && (game.board.gameState.Variant == bgammon.VariantBackgammon || space != bgammon.SpaceHomePlayer || !game.board.gameState.Player1.Entered) {

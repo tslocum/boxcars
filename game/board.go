@@ -264,6 +264,11 @@ func NewBoard() *board {
 	centerText(b.opponentPipCount)
 	centerText(b.playerPipCount)
 
+	b.playerRatingLabel.SetPadding(0)
+	b.playerRatingShadowLabel.SetPadding(0)
+	b.opponentRatingLabel.SetPadding(0)
+	b.opponentRatingShadowLabel.SetPadding(0)
+
 	b.opponentMovesLabel.SetHorizontal(etk.AlignStart)
 	b.playerMovesLabel.SetHorizontal(etk.AlignEnd)
 
@@ -1169,12 +1174,13 @@ func (b *board) updateBackgroundImage() {
 
 	// Doubling cube.
 	if b.gameState.Points > 1 {
+		const cubePadding = 10
 		var cubeY float64
 		switch b.gameState.DoublePlayer {
 		case 1:
-			cubeY = float64(b.h) - b.verticalBorderSize - b.overlapSize*5 - 2 - float64(etk.Scale(mediumFontSize)) - 2 - cubesImageSize
+			cubeY = float64(b.h) - b.verticalBorderSize - b.overlapSize*5 - cubesImageSize - float64(etk.Scale(cubePadding))
 		case 2:
-			cubeY = b.verticalBorderSize + b.overlapSize*5 + 2 + float64(etk.Scale(mediumFontSize)) + 2
+			cubeY = b.verticalBorderSize + b.overlapSize*5 + float64(etk.Scale(cubePadding))
 		default:
 			cubeY = float64(b.h)/2 - cubesImageSize/2
 		}
@@ -1830,8 +1836,8 @@ func (b *board) updateOpponentLabel() {
 		b.opponentPipCount.SetRect(newRect)
 	}
 	{
-		x, y := b.w-int(b.spaceWidth), int(b.verticalBorderSize)+int(b.spaceWidth)+int(b.overlapSize*4)
-		newRect := image.Rect(x, y, x+int(b.spaceWidth), y+200)
+		x := b.w - int(b.spaceWidth)
+		newRect := image.Rect(x, 0, x+int(b.spaceWidth), int(b.verticalBorderSize))
 		b.opponentRatingLabel.SetRect(newRect)
 		b.opponentRatingShadowLabel.SetRect(newRect.Add(image.Point{etk.Scale(2), etk.Scale(2)}))
 	}
@@ -1913,8 +1919,8 @@ func (b *board) updatePlayerLabel() {
 		}
 	}
 	{
-		x, y := b.w-int(b.spaceWidth), b.h-int(b.verticalBorderSize)-int(b.spaceWidth)-int(b.overlapSize*4)
-		newRect := image.Rect(x, y-200, x+int(b.spaceWidth), y)
+		x := b.w - int(b.spaceWidth)
+		newRect := image.Rect(x, b.h-int(b.verticalBorderSize), x+int(b.spaceWidth), b.h)
 		b.playerRatingLabel.SetRect(newRect)
 		b.playerRatingShadowLabel.SetRect(newRect.Add(image.Point{etk.Scale(2), etk.Scale(2)}))
 	}
