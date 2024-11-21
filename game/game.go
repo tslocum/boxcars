@@ -1892,47 +1892,51 @@ func (g *Game) handleEvent(e interface{}) {
 		g.board.Unlock()
 
 		if incomingGameLogRoll {
-			roll := formatRoll(g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3)
+			if g.board.gameState.Roll1 != 0 && g.board.gameState.Roll2 != 0 {
+				roll := formatRoll(g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3)
 
-			var extra string
-			if g.board.gameState.Turn != 0 {
-				tabulaBoard := tabulaBoard(g.board.gameState.Game, g.board.gameState.Game.Board)
-				available, _ := tabulaBoard.Available(g.board.gameState.Turn)
-				if len(available) > 0 {
-					extra = ":"
+				var extra string
+				if g.board.gameState.Turn != 0 {
+					tabulaBoard := tabulaBoard(g.board.gameState.Game, g.board.gameState.Game.Board)
+					available, _ := tabulaBoard.Available(g.board.gameState.Turn)
+					if len(available) > 0 {
+						extra = ":"
+					}
 				}
-			}
 
-			name := g.board.gameState.Player1.Name
-			if game.board.gameState.Turn == 2 {
-				name = g.board.gameState.Player2.Name
-			}
+				name := g.board.gameState.Player1.Name
+				if game.board.gameState.Turn == 2 {
+					name = g.board.gameState.Player2.Name
+				}
 
-			lg(name + " " + roll + extra)
-			newGameLogMessage = false
+				lg(name + " " + roll + extra)
+				newGameLogMessage = false
+			}
 			incomingGameLogRoll = false
 		}
 
 		if incomingGameLogMove {
-			name := g.board.gameState.Player1.Name
-			if game.board.gameState.Turn == 2 {
-				name = g.board.gameState.Player2.Name
-			}
-			var moves string
-			if len(g.board.gameState.Moves) > 0 {
-				moves = string(bgammon.FormatMoves(g.board.gameState.Moves))
-			}
-			msg := name + " " + formatRoll(g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3) + ": " + moves
-			if !newGameLogMessage {
-				if lastGameLogTime == "" {
-					lastGameLogTime = time.Now().Format("[3:04]")
+			if g.board.gameState.Roll1 != 0 && g.board.gameState.Roll2 != 0 {
+				name := g.board.gameState.Player1.Name
+				if game.board.gameState.Turn == 2 {
+					name = g.board.gameState.Player2.Name
 				}
-				gameBuffer.SetLast(lastGameLogTime + " " + msg)
-				gameLogged = true
-			} else {
-				lg(msg)
+				var moves string
+				if len(g.board.gameState.Moves) > 0 {
+					moves = string(bgammon.FormatMoves(g.board.gameState.Moves))
+				}
+				msg := name + " " + formatRoll(g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3) + ": " + moves
+				if !newGameLogMessage {
+					if lastGameLogTime == "" {
+						lastGameLogTime = time.Now().Format("[3:04]")
+					}
+					gameBuffer.SetLast(lastGameLogTime + " " + msg)
+					gameLogged = true
+				} else {
+					lg(msg)
+				}
+				newGameLogMessage = false
 			}
-			newGameLogMessage = false
 			incomingGameLogMove = false
 		}
 
