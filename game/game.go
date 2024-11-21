@@ -1383,21 +1383,19 @@ func (g *Game) initialize() {
 			return t
 		}
 
-		g.lobby.historyRatingCasualBackgammonSingle = newLabel("...", etk.AlignStart)
-		g.lobby.historyRatingCasualBackgammonMulti = newLabel("...", etk.AlignStart)
-		g.lobby.historyRatingCasualAceySingle = newLabel("...", etk.AlignStart)
-		g.lobby.historyRatingCasualAceyMulti = newLabel("...", etk.AlignStart)
-		g.lobby.historyRatingCasualTabulaSingle = newLabel("...", etk.AlignStart)
-		g.lobby.historyRatingCasualTabulaMulti = newLabel("...", etk.AlignStart)
+		g.lobby.historyRatingCasualBackgammonSingle = newLabel("...", etk.AlignEnd)
+		g.lobby.historyRatingCasualBackgammonMulti = newLabel("...", etk.AlignEnd)
+		g.lobby.historyRatingCasualAceySingle = newLabel("...", etk.AlignEnd)
+		g.lobby.historyRatingCasualAceyMulti = newLabel("...", etk.AlignEnd)
+		g.lobby.historyRatingCasualTabulaSingle = newLabel("...", etk.AlignEnd)
+		g.lobby.historyRatingCasualTabulaMulti = newLabel("...", etk.AlignEnd)
 
 		ratingGrid := func(singleLabel *etk.Text, multiLabel *etk.Text) *etk.Grid {
-			const dividerSize = 10
 			g := etk.NewGrid()
-			g.SetColumnSizes(-1, dividerSize, -1)
-			g.AddChildAt(newLabel(gotext.Get("Single"), etk.AlignEnd), 0, 0, 1, 1)
-			g.AddChildAt(singleLabel, 2, 0, 1, 1)
-			g.AddChildAt(newLabel(gotext.Get("Multi"), etk.AlignEnd), 0, 1, 1, 1)
-			g.AddChildAt(multiLabel, 2, 1, 1, 1)
+			g.AddChildAt(singleLabel, 0, 0, 1, 1)
+			g.AddChildAt(newLabel(gotext.Get("Single"), etk.AlignStart), 1, 0, 1, 1)
+			g.AddChildAt(multiLabel, 0, 1, 1, 1)
+			g.AddChildAt(newLabel(gotext.Get("Multi"), etk.AlignStart), 1, 1, 1, 1)
 			return g
 		}
 
@@ -1706,14 +1704,21 @@ func (g *Game) setRoot(w etk.Widget) {
 }
 
 func (g *Game) setBufferRects() {
-	fontMutex.Lock()
-	m := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics()
-	lineHeight := int(m.HAscent + m.HDescent)
-	fontMutex.Unlock()
-	statusBufferHeight := lineHeight*3 + g.bufferPadding()*2
-	historyRatingHeight := etk.Scale(200)
-	if smallScreen {
-		historyRatingHeight /= 2
+	var statusBufferHeight int
+	{
+		fontMutex.Lock()
+		m := etk.FontFace(etk.Style.TextFont, g.bufferFontSize).Metrics()
+		lineHeight := int(m.HAscent + m.HDescent)
+		fontMutex.Unlock()
+		statusBufferHeight = lineHeight*3 + g.bufferPadding()*2
+	}
+	var historyRatingHeight int
+	{
+		fontMutex.Lock()
+		m := etk.FontFace(etk.Style.TextFont, etk.Scale(largeFontSize)).Metrics()
+		lineHeight := int(m.HAscent + m.HDescent)
+		fontMutex.Unlock()
+		historyRatingHeight = lineHeight*3 + etk.Scale(5)*3
 	}
 
 	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
