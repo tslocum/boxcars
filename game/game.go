@@ -885,11 +885,14 @@ func (g *Game) initialize() {
 			ll.SetVertical(etk.AlignCenter)
 			rl := resizeText("bgammon.org/faq")
 			rl.SetVertical(etk.AlignCenter)
+			link := &ClickableText{rl, func() {
+				etk.Open("https://bgammon.org/faq")
+			}}
 			iconSprite := etk.NewSprite(imgIcon)
 			iconSprite.SetHorizontal(etk.AlignEnd)
 			iconSprite.SetVertical(etk.AlignStart)
 			gr.AddChildAt(ll, 1, y, 1, 1)
-			gr.AddChildAt(rl, 2, y, 1, 1)
+			gr.AddChildAt(link, 2, y, 1, 1)
 			gr.AddChildAt(iconSprite, 3, y, 1, 3)
 			y++
 		}
@@ -899,8 +902,11 @@ func (g *Game) initialize() {
 			ll.SetVertical(etk.AlignCenter)
 			rl := resizeText("bgammon.org/code")
 			rl.SetVertical(etk.AlignCenter)
+			link := &ClickableText{rl, func() {
+				etk.Open("https://bgammon.org/code")
+			}}
 			gr.AddChildAt(ll, 1, y, 1, 1)
-			gr.AddChildAt(rl, 2, y, 1, 1)
+			gr.AddChildAt(link, 2, y, 1, 1)
 			y++
 		}
 
@@ -909,8 +915,11 @@ func (g *Game) initialize() {
 			ll.SetVertical(etk.AlignCenter)
 			rl := resizeText("bgammon.org/donate")
 			rl.SetVertical(etk.AlignCenter)
+			link := &ClickableText{rl, func() {
+				etk.Open("https://bgammon.org/donate")
+			}}
 			gr.AddChildAt(ll, 1, y, 1, 1)
-			gr.AddChildAt(rl, 2, y, 1, 1)
+			gr.AddChildAt(link, 2, y, 1, 1)
 			y++
 		}
 
@@ -919,8 +928,11 @@ func (g *Game) initialize() {
 			ll.SetVertical(etk.AlignCenter)
 			rl := resizeText("bgammon.org/community")
 			rl.SetVertical(etk.AlignCenter)
+			link := &ClickableText{rl, func() {
+				etk.Open("https://bgammon.org/community")
+			}}
 			gr.AddChildAt(ll, 1, y, 1, 1)
-			gr.AddChildAt(rl, 2, y, 2, 1)
+			gr.AddChildAt(link, 2, y, 2, 1)
 			y++
 		}
 
