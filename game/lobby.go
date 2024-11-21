@@ -217,6 +217,11 @@ func (l *lobby) setGameList(games []bgammon.GameListing) {
 
 	var status, rating string
 	l.availableMatchesList.Clear()
+	if len(l.games) == 0 {
+		noMatchesText := newCenteredText(gotext.Get("No matches found."))
+		l.availableMatchesList.AddChildAt(noMatchesText, 0, 0)
+		return
+	}
 	for i, entry := range l.games {
 		if entry.Password {
 			status = gotext.Get("Private")

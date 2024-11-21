@@ -270,6 +270,12 @@ msgstr ""
 msgid "No"
 msgstr ""
 
+msgid "No matches found."
+msgstr ""
+
+msgid "No replays found."
+msgstr ""
+
 msgid "None"
 msgstr ""
 

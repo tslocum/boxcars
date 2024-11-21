@@ -2091,6 +2091,8 @@ func (g *Game) handleEvent(e interface{}) {
 		list.Clear()
 		list.SetSelectionMode(etk.SelectRow)
 		if len(ev.Matches) == 0 {
+			noReplaysText := newCenteredText(gotext.Get("No replays found."))
+			list.AddChildAt(noReplaysText, 0, 0)
 			scheduleFrame()
 			return
 		}
