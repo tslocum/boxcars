@@ -865,7 +865,7 @@ func (g *Game) initialize() {
 		{
 			label := resizeText("Boxcars")
 			label.SetHorizontal(etk.AlignCenter)
-			label.SetVertical(etk.AlignCenter)
+			label.SetVertical(etk.AlignEnd)
 			label.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
 			gr.AddChildAt(label, 0, y, 5, 1)
 			y++
@@ -936,12 +936,14 @@ func (g *Game) initialize() {
 			y++
 		}
 
+		gr.AddChildAt(etk.NewBox(), 0, y, 5, 1)
+
 		labelWidth := etk.Scale(150)
 		if smallScreen {
 			labelWidth /= 2
 		}
 
-		gr.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, -1, etk.Scale(20))
+		gr.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, -1, etk.Scale(10))
 		gr.SetColumnSizes(etk.Scale(10), labelWidth, -1, 144, etk.Scale(10))
 
 		g.aboutDialog = newDialog(etk.NewGrid())
