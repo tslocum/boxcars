@@ -2162,6 +2162,8 @@ func (g *Game) Connect() {
 	g.clearBuffers()
 	ls("*** " + gotext.Get("Connecting..."))
 
+	g.lobby.historyButton.SetVisible(true)
+
 	g.setRoot(listGamesFrame)
 	etk.SetFocus(game.lobby.availableMatchesList)
 
@@ -2211,6 +2213,8 @@ func (g *Game) ConnectLocal(conn net.Conn) {
 
 	g.clearBuffers()
 	ls("*** " + gotext.Get("Playing offline."))
+
+	g.lobby.historyButton.SetVisible(false)
 
 	g.setRoot(listGamesFrame)
 	etk.SetFocus(game.lobby.availableMatchesList)
