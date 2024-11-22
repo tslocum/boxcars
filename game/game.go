@@ -1593,7 +1593,9 @@ func (g *Game) playOffline() {
 
 	if g.localServer == nil {
 		// Start the local BEI server.
-		beiServer := &tabula.BEIServer{}
+		beiServer := &tabula.BEIServer{
+			Verbose: true,
+		}
 		beiConns := beiServer.ListenLocal()
 
 		// Connect to the local BEI server.
