@@ -936,8 +936,13 @@ func (g *Game) initialize() {
 			y++
 		}
 
+		labelWidth := etk.Scale(150)
+		if smallScreen {
+			labelWidth /= 2
+		}
+
 		gr.SetRowSizes(etk.Scale(baseButtonHeight), -1, -1, -1, -1, -1, etk.Scale(20))
-		gr.SetColumnSizes(etk.Scale(10), etk.Scale(150), -1, 144, etk.Scale(10))
+		gr.SetColumnSizes(etk.Scale(10), labelWidth, -1, 144, etk.Scale(10))
 
 		g.aboutDialog = newDialog(etk.NewGrid())
 
