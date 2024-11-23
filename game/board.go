@@ -98,10 +98,8 @@ type board struct {
 	opponentLabel *Label
 	playerLabel   *Label
 
-	opponentRatingLabel       *etk.Text
-	playerRatingLabel         *etk.Text
-	opponentRatingShadowLabel *etk.Text
-	playerRatingShadowLabel   *etk.Text
+	opponentRatingLabel *etk.Text
+	playerRatingLabel   *etk.Text
 
 	opponentForcedLabel *etk.Text
 	playerForcedLabel   *etk.Text
@@ -213,41 +211,39 @@ func NewBoard() *board {
 		gameState: &bgammon.GameState{
 			Game: bgammon.NewGame(bgammon.VariantBackgammon),
 		},
-		highlightSpaces:           make([][]int8, 28),
-		spaceHighlight:            ebiten.NewImage(1, 1),
-		foundMoves:                make(map[int]bool),
-		opponentLabel:             NewLabel(colorWhite),
-		playerLabel:               NewLabel(colorBlack),
-		opponentRatingLabel:       etk.NewText(""),
-		playerRatingLabel:         etk.NewText(""),
-		opponentRatingShadowLabel: etk.NewText(""),
-		playerRatingShadowLabel:   etk.NewText(""),
-		opponentForcedLabel:       etk.NewText(fmt.Sprintf("*%s*", gotext.Get("Forced"))),
-		playerForcedLabel:         etk.NewText(fmt.Sprintf("*%s*", gotext.Get("Forced"))),
-		opponentMovesLabel:        etk.NewText(""),
-		playerMovesLabel:          etk.NewText(""),
-		opponentPipCount:          etk.NewText("0"),
-		playerPipCount:            etk.NewText("0"),
-		buttonsGrid:               etk.NewGrid(),
-		buttonsOnlyRollGrid:       etk.NewGrid(),
-		buttonsOnlyUndoGrid:       etk.NewGrid(),
-		buttonsOnlyOKGrid:         etk.NewGrid(),
-		buttonsDoubleRollGrid:     etk.NewGrid(),
-		buttonsResignAcceptGrid:   etk.NewGrid(),
-		buttonsUndoOKGrid:         etk.NewGrid(),
-		selectRollGrid:            etk.NewGrid(),
-		menuGrid:                  etk.NewGrid(),
-		accountGrid:               etk.NewGrid(),
-		uiGrid:                    etk.NewGrid(),
-		frame:                     etk.NewFrame(),
-		speed:                     bgammon.SpeedMedium,
-		showPipCount:              true,
-		highlightAvailable:        true,
-		widget:                    NewBoardWidget(),
-		fontSize:                  mediumFontSize,
-		repositionLock:            &sync.Mutex{},
-		stateLock:                 &sync.Mutex{},
-		Mutex:                     &sync.Mutex{},
+		highlightSpaces:         make([][]int8, 28),
+		spaceHighlight:          ebiten.NewImage(1, 1),
+		foundMoves:              make(map[int]bool),
+		opponentLabel:           NewLabel(colorWhite),
+		playerLabel:             NewLabel(colorBlack),
+		opponentRatingLabel:     etk.NewText(""),
+		playerRatingLabel:       etk.NewText(""),
+		opponentForcedLabel:     etk.NewText(fmt.Sprintf("*%s*", gotext.Get("Forced"))),
+		playerForcedLabel:       etk.NewText(fmt.Sprintf("*%s*", gotext.Get("Forced"))),
+		opponentMovesLabel:      etk.NewText(""),
+		playerMovesLabel:        etk.NewText(""),
+		opponentPipCount:        etk.NewText("0"),
+		playerPipCount:          etk.NewText("0"),
+		buttonsGrid:             etk.NewGrid(),
+		buttonsOnlyRollGrid:     etk.NewGrid(),
+		buttonsOnlyUndoGrid:     etk.NewGrid(),
+		buttonsOnlyOKGrid:       etk.NewGrid(),
+		buttonsDoubleRollGrid:   etk.NewGrid(),
+		buttonsResignAcceptGrid: etk.NewGrid(),
+		buttonsUndoOKGrid:       etk.NewGrid(),
+		selectRollGrid:          etk.NewGrid(),
+		menuGrid:                etk.NewGrid(),
+		accountGrid:             etk.NewGrid(),
+		uiGrid:                  etk.NewGrid(),
+		frame:                   etk.NewFrame(),
+		speed:                   bgammon.SpeedMedium,
+		showPipCount:            true,
+		highlightAvailable:      true,
+		widget:                  NewBoardWidget(),
+		fontSize:                mediumFontSize,
+		repositionLock:          &sync.Mutex{},
+		stateLock:               &sync.Mutex{},
+		Mutex:                   &sync.Mutex{},
 	}
 
 	b.createRatingLabels()
@@ -264,10 +260,14 @@ func NewBoard() *board {
 	centerText(b.opponentPipCount)
 	centerText(b.playerPipCount)
 
+	centerText(b.playerRatingLabel)
+	centerText(b.opponentRatingLabel)
+
+	b.playerRatingLabel.SetHorizontal(etk.AlignCenter)
+	b.opponentRatingLabel.SetHorizontal(etk.AlignCenter)
+
 	b.playerRatingLabel.SetPadding(0)
-	b.playerRatingShadowLabel.SetPadding(0)
 	b.opponentRatingLabel.SetPadding(0)
-	b.opponentRatingShadowLabel.SetPadding(0)
 
 	b.opponentMovesLabel.SetHorizontal(etk.AlignStart)
 	b.playerMovesLabel.SetHorizontal(etk.AlignEnd)
@@ -281,11 +281,11 @@ func NewBoard() *board {
 	b.opponentPipCount.SetAutoResize(true)
 	b.playerPipCount.SetAutoResize(true)
 
-	b.opponentRatingLabel.SetForeground(color.RGBA{255, 255, 255, 255})
-	b.playerRatingLabel.SetForeground(color.RGBA{0, 0, 0, 255})
+	b.playerRatingLabel.SetAutoResize(true)
+	b.opponentRatingLabel.SetAutoResize(true)
 
-	b.opponentRatingShadowLabel.SetForeground(color.RGBA{0, 0, 0, 255})
-	b.playerRatingShadowLabel.SetForeground(ratingShadowColor)
+	b.opponentRatingLabel.SetForeground(color.RGBA{121, 96, 60, 255})
+	b.playerRatingLabel.SetForeground(color.RGBA{121, 96, 60, 255})
 
 	b.opponentForcedLabel.SetForeground(color.RGBA{255, 255, 255, 255})
 	b.playerForcedLabel.SetForeground(color.RGBA{0, 0, 0, 255})
@@ -1838,8 +1838,9 @@ func (b *board) updateOpponentLabel() {
 	{
 		x := b.w - int(b.spaceWidth)
 		newRect := image.Rect(x, 0, x+int(b.spaceWidth), int(b.verticalBorderSize))
+		newRect = newRect.Inset(-4).Add(image.Point{0, 1})
+		newRect.Min.X, newRect.Max.X = x, x+int(b.spaceWidth)
 		b.opponentRatingLabel.SetRect(newRect)
-		b.opponentRatingShadowLabel.SetRect(newRect.Add(image.Point{etk.Scale(2), etk.Scale(2)}))
 	}
 
 	var moves []byte
@@ -1921,8 +1922,9 @@ func (b *board) updatePlayerLabel() {
 	{
 		x := b.w - int(b.spaceWidth)
 		newRect := image.Rect(x, b.h-int(b.verticalBorderSize), x+int(b.spaceWidth), b.h)
+		newRect = newRect.Add(image.Point{0, 1}).Inset(-4)
+		newRect.Min.X, newRect.Max.X = x, x+int(b.spaceWidth)
 		b.playerRatingLabel.SetRect(newRect)
-		b.playerRatingShadowLabel.SetRect(newRect.Add(image.Point{etk.Scale(2), etk.Scale(2)}))
 	}
 
 	var moves []byte
@@ -2147,8 +2149,6 @@ func (b *board) processState() {
 			b.opponentForcedLabel.SetForeground(colorBlack)
 			b.opponentPipCount.SetForeground(colorBlack)
 			b.opponentMovesLabel.SetForeground(colorBlack)
-			b.opponentRatingLabel.SetForeground(colorBlack)
-			b.opponentRatingShadowLabel.SetForeground(ratingShadowColor)
 			b.opponentLabel.lastActive = !b.opponentLabel.active
 			b.opponentLabel.updateBackground()
 		}
@@ -2158,8 +2158,6 @@ func (b *board) processState() {
 			b.playerForcedLabel.SetForeground(colorWhite)
 			b.playerPipCount.SetForeground(colorWhite)
 			b.playerMovesLabel.SetForeground(colorWhite)
-			b.playerRatingLabel.SetForeground(colorWhite)
-			b.playerRatingShadowLabel.SetForeground(colorBlack)
 			b.playerLabel.lastActive = !b.opponentLabel.active
 			b.playerLabel.updateBackground()
 		}
@@ -2170,8 +2168,6 @@ func (b *board) processState() {
 			b.opponentForcedLabel.SetForeground(colorWhite)
 			b.opponentPipCount.SetForeground(colorWhite)
 			b.opponentMovesLabel.SetForeground(colorWhite)
-			b.opponentRatingLabel.SetForeground(colorWhite)
-			b.opponentRatingShadowLabel.SetForeground(colorBlack)
 			b.opponentLabel.lastActive = !b.opponentLabel.active
 			b.opponentLabel.updateBackground()
 		}
@@ -2181,8 +2177,6 @@ func (b *board) processState() {
 			b.playerForcedLabel.SetForeground(colorBlack)
 			b.playerPipCount.SetForeground(colorBlack)
 			b.playerMovesLabel.SetForeground(colorBlack)
-			b.playerRatingLabel.SetForeground(colorBlack)
-			b.playerRatingShadowLabel.SetForeground(ratingShadowColor)
 			b.playerLabel.lastActive = !b.opponentLabel.active
 			b.playerLabel.updateBackground()
 		}
@@ -2190,14 +2184,10 @@ func (b *board) processState() {
 
 	if b.gameState.Player1.Rating != 0 && b.gameState.Player2.Rating != 0 {
 		b.opponentRatingLabel.SetText(strconv.Itoa(b.gameState.Player2.Rating))
-		b.opponentRatingShadowLabel.SetText(strconv.Itoa(b.gameState.Player2.Rating))
 		b.playerRatingLabel.SetText(strconv.Itoa(b.gameState.Player1.Rating))
-		b.playerRatingShadowLabel.SetText(strconv.Itoa(b.gameState.Player1.Rating))
 	} else {
 		b.opponentRatingLabel.SetText("")
-		b.opponentRatingShadowLabel.SetText("")
 		b.playerRatingLabel.SetText("")
-		b.playerRatingShadowLabel.SetText("")
 	}
 
 	b.opponentForcedLabel.SetVisible(b.gameState.Forced && b.gameState.Turn != b.gameState.PlayerNumber)

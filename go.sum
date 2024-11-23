@@ -6,12 +6,12 @@ code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20241120222708-b6040779885c 
 code.rocket9labs.com/tslocum/bgammon-bei-bot v0.0.0-20241120222708-b6040779885c/go.mod h1:mLO3RS7pFRMANSVcaMGNy4kTuka8y178I/wlktckz4Q=
 code.rocket9labs.com/tslocum/clipboard v0.0.0-20241012025701-2c0fb515daab h1:0sF/YYnb3/GaPMKALyNVXS0Ku5JoulpC4GWdTcP1v+Q=
 code.rocket9labs.com/tslocum/clipboard v0.0.0-20241012025701-2c0fb515daab/go.mod h1:v2cql+mNoahFvZ1U/KQmDDqPmD0H0l1jyistVAgg8YA=
-code.rocket9labs.com/tslocum/etk v0.0.0-20241122060205-37ba426f3129 h1:t0ETahXpod8o9UFHG6UpSpxQYe8fsJ7drDvWJfZWR8Q=
-code.rocket9labs.com/tslocum/etk v0.0.0-20241122060205-37ba426f3129/go.mod h1:1k8NwD/Yq44tpryBYz8Xwc4z5UoaUsRo14D1rI1bR3c=
+code.rocket9labs.com/tslocum/etk v0.0.0-20241123190838-067aa2c1973f h1:pTNWfri7e3wuqNOxfZeGplaVANLNFp2E15mVwcCMoTM=
+code.rocket9labs.com/tslocum/etk v0.0.0-20241123190838-067aa2c1973f/go.mod h1:1k8NwD/Yq44tpryBYz8Xwc4z5UoaUsRo14D1rI1bR3c=
 code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b h1:KSdR7VPoftY5Bt+osGRBbtHlCWxhe1QbOuf58CG7ieI=
 code.rocket9labs.com/tslocum/gotext v0.0.0-20240728181248-46f419ff143b/go.mod h1:ZkYZ/IF/ebzhUL2bNp4ALROsuH9iCztUWvUJBWsHXRU=
-code.rocket9labs.com/tslocum/tabula v0.0.0-20241122084240-2be040d10ce5 h1:k0GRCgajyOnU4sddDEzMsRZt//66zo+tB7qtRs2hj4c=
-code.rocket9labs.com/tslocum/tabula v0.0.0-20241122084240-2be040d10ce5/go.mod h1:+yChyzCoVWgw6wMQrfh/9EQsB3bMkM21i/33C9e72+c=
+code.rocket9labs.com/tslocum/tabula v0.0.0-20241123064436-a9529056c6e2 h1:yqzMXKgBx+3/e4DbZNwcuNNjVpRTGF0+FKvO55F81og=
+code.rocket9labs.com/tslocum/tabula v0.0.0-20241123064436-a9529056c6e2/go.mod h1:+yChyzCoVWgw6wMQrfh/9EQsB3bMkM21i/33C9e72+c=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
 github.com/Masterminds/goutils v1.1.1/go.mod h1:8cTjp+g8YejhMuvIA5y2vz3BpJxksy863GQaJW2MFNU=
 github.com/Masterminds/semver v1.4.2/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=

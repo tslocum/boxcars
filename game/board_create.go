@@ -11,26 +11,20 @@ import (
 )
 
 func (b *board) createRatingLabels() {
-	for i := 0; i < 2; i++ {
-		o := b.opponentRatingLabel
-		p := b.playerRatingLabel
-		if i == 1 {
-			o = b.opponentRatingShadowLabel
-			p = b.playerRatingShadowLabel
-		}
+	o := b.opponentRatingLabel
+	p := b.playerRatingLabel
 
-		o.SetHorizontal(etk.AlignCenter)
-		o.SetVertical(etk.AlignStart)
-		o.SetScrollBarVisible(false)
-		o.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
-		o.SetAutoResize(true)
+	o.SetHorizontal(etk.AlignCenter)
+	o.SetVertical(etk.AlignStart)
+	o.SetScrollBarVisible(false)
+	o.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+	o.SetAutoResize(true)
 
-		p.SetHorizontal(etk.AlignCenter)
-		p.SetVertical(etk.AlignEnd)
-		p.SetScrollBarVisible(false)
-		p.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
-		p.SetAutoResize(true)
-	}
+	p.SetHorizontal(etk.AlignCenter)
+	p.SetVertical(etk.AlignEnd)
+	p.SetScrollBarVisible(false)
+	p.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
+	p.SetAutoResize(true)
 }
 
 func (b *board) createForcedLabels() {
@@ -547,7 +541,6 @@ func (b *board) createFrame() {
 	b.frame.AddChild(NewBoardMovingWidget())
 
 	f := etk.NewFrame()
-	f.AddChild(b.opponentRatingShadowLabel)
 	f.AddChild(b.opponentRatingLabel)
 	f.AddChild(b.opponentForcedLabel)
 	f.AddChild(b.opponentMovesLabel)
@@ -557,7 +550,6 @@ func (b *board) createFrame() {
 	f.AddChild(b.playerPipCount)
 	f.AddChild(b.playerMovesLabel)
 	f.AddChild(b.playerForcedLabel)
-	f.AddChild(b.playerRatingShadowLabel)
 	f.AddChild(b.playerRatingLabel)
 	f.AddChild(b.uiGrid)
 	f.AddChild(b.rematchButton)
