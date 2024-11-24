@@ -2278,7 +2278,7 @@ func (b *board) processState() {
 	b.updateOpponentLabel()
 	b.updatePlayerLabel()
 
-	if b.gameState.Turn != b.gameState.PlayerNumber {
+	if b.gameState.Spectating || b.gameState.Turn != b.gameState.PlayerNumber {
 		return
 	}
 

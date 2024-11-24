@@ -1922,12 +1922,8 @@ func (g *Game) handleEvent(e interface{}) {
 				roll := formatRoll(g.board.gameState.Roll1, g.board.gameState.Roll2, g.board.gameState.Roll3)
 
 				var extra string
-				if g.board.gameState.Turn != 0 {
-					tabulaBoard := tabulaBoard(g.board.gameState.Game, g.board.gameState.Game.Board)
-					available, _ := tabulaBoard.Available(g.board.gameState.Turn)
-					if len(available) > 0 {
-						extra = ":"
-					}
+				if g.board.gameState.Turn != 0 && len(g.board.gameState.Available) > 0 {
+					extra = ":"
 				}
 
 				name := g.board.gameState.Player1.Name
