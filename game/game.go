@@ -1487,8 +1487,11 @@ func (g *Game) initialize() {
 
 		g.lobby.rebuildButtonsGrid()
 
-		dividerLine := etk.NewBox()
-		dividerLine.SetBackground(triangleA)
+		dividerLineTop := etk.NewBox()
+		dividerLineTop.SetBackground(triangleA)
+
+		dividerLineBottom := etk.NewBox()
+		dividerLineBottom.SetBackground(triangleA)
 
 		backgroundBox := etk.NewBox()
 		backgroundBox.SetBackground(bufferBackgroundColor)
@@ -1527,10 +1530,11 @@ func (g *Game) initialize() {
 
 		listGamesContainer = etk.NewGrid()
 		listGamesContainer.AddChildAt(headerGrid, 0, 0, 1, 1)
-		listGamesContainer.AddChildAt(dividerLine, 0, 1, 1, 1)
+		listGamesContainer.AddChildAt(dividerLineTop, 0, 1, 1, 1)
 		listGamesContainer.AddChildAt(g.lobby.availableMatchesList, 0, 2, 1, 1)
-		listGamesContainer.AddChildAt(statusBuffer, 0, 3, 1, 1)
-		listGamesContainer.AddChildAt(g.lobby.buttonsGrid, 0, 4, 1, 1)
+		listGamesContainer.AddChildAt(dividerLineBottom, 0, 3, 1, 1)
+		listGamesContainer.AddChildAt(statusBuffer, 0, 4, 1, 1)
+		listGamesContainer.AddChildAt(g.lobby.buttonsGrid, 0, 5, 1, 1)
 
 		listGamesFrame.SetPositionChildren(true)
 		listGamesFrame.AddChild(listGamesContainer)
@@ -1761,7 +1765,7 @@ func (g *Game) setBufferRects() {
 	if smallScreen {
 		listHeaderHeight /= 2
 	}
-	listGamesContainer.SetRowSizes(listHeaderHeight, 2, -1, statusBufferHeight, g.lobby.buttonBarHeight)
+	listGamesContainer.SetRowSizes(listHeaderHeight, 2, -1, 2, statusBufferHeight, g.lobby.buttonBarHeight)
 }
 
 func (g *Game) handleAutoRefresh() {
