@@ -21,7 +21,7 @@ import (
 )
 
 func fetchMatches(matches []*bgammon.GameListing) []*bgammon.GameListing {
-	url := "https://api.bgammon.org:1338/matches.json"
+	url := "https://bgammon.org/api/matches.json"
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

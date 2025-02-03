@@ -135,7 +135,7 @@ func NewLobby() *lobby {
 
 	indentA, indentB := etk.Scale(lobbyIndentA), etk.Scale(lobbyIndentB)
 
-	matchList := etk.NewList(game.itemHeight(), nil)
+	matchList := etk.NewList(game.itemHeight(), l.selectMatch)
 	matchList.SetSelectionMode(etk.SelectRow)
 	matchList.SetConfirmedFunc(l.confirmSelectMatch)
 	matchList.SetColumnSizes(indentA, indentB-indentA, indentB-indentA, -1)
@@ -401,10 +401,14 @@ func (l *lobby) rebuildButtonsGrid() {
 	r := l.buttonsGrid.Rect()
 	l.buttonsGrid.Clear()
 
-	buttons := l.getButtons()
+	var btns []string
+	{
+		buttons := l.getButtons()
+		btns = make([]string, len(buttons))
+		copy(btns, buttons)
+	}
 	if l.createGamePending || l.joiningGameID != 0 {
-		btns := make([]string, len(buttons))
-		for i, label := range buttons {
+		for i, label := range btns {
 			if l.createGamePending && (label == gotext.Get("Create match") || label == gotext.Get("Create")) {
 				btns[i] = gotext.Get("Creating...")
 			} else if l.joiningGameID != 0 && (label == gotext.Get("Join match") || label == gotext.Get("Join")) {
@@ -413,13 +417,16 @@ func (l *lobby) rebuildButtonsGrid() {
 				btns[i] = label
 			}
 		}
-		buttons = btns
 	}
-	for i, label := range buttons {
+	for i, label := range btns {
 		l.buttonsGrid.AddChildAt(etk.NewButton(label, l.selectButton(i)), i, 0, 1, 1)
 	}
 
 	l.buttonsGrid.SetRect(r)
+}
+
+func (l *lobby) selectMatch(selected int) bool {
+	return true
 }
 
 func (l *lobby) confirmSelectMatch(selected int) {
