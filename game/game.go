@@ -1521,7 +1521,7 @@ func (g *Game) initialize() {
 
 		headerGrid := etk.NewGrid()
 		headerGrid.SetColumnSizes(indentA, indentB-indentA, indentB-indentA, -1, 200)
-		headerGrid.AddChildAt(backgroundBox, 0, 0, 4, 1)
+		headerGrid.AddChildAt(backgroundBox, 0, 0, 5, 1)
 		headerGrid.AddChildAt(statusLabel, 0, 0, 1, 1)
 		headerGrid.AddChildAt(ratingLabel, 1, 0, 1, 1)
 		headerGrid.AddChildAt(pointsLabel, 2, 0, 1, 1)
