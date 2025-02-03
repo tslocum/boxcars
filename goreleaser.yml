@@ -23,7 +23,7 @@ archives:
     wrap_in_directory: boxcars
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [ 'zip' ]
     files:
       - ./*.md
       - LICENSE
