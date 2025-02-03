@@ -1351,16 +1351,16 @@ func (g *Game) initialize() {
 		dividerLine := etk.NewBox()
 		dividerLine.SetBackground(bufferTextColor)
 
+		backgroundBox := etk.NewBox()
+		backgroundBox.SetBackground(bufferBackgroundColor)
+
 		dateLabel := newCenteredText(gotext.Get("Date"))
-		dateLabel.SetBackground(bufferBackgroundColor)
 		dateLabel.SetFollow(false)
 		dateLabel.SetScrollBarVisible(false)
 		resultLabel := newCenteredText(gotext.Get("Result"))
-		resultLabel.SetBackground(bufferBackgroundColor)
 		resultLabel.SetFollow(false)
 		resultLabel.SetScrollBarVisible(false)
 		opponentLabel := newCenteredText(gotext.Get("Opponent"))
-		opponentLabel.SetBackground(bufferBackgroundColor)
 		opponentLabel.SetFollow(false)
 		opponentLabel.SetScrollBarVisible(false)
 		if smallScreen {
@@ -1391,6 +1391,7 @@ func (g *Game) initialize() {
 
 		headerGrid := etk.NewGrid()
 		headerGrid.SetColumnSizes(int(float64(indentA)*1.25), int(float64(indentB)*1.25)-int(float64(indentA)*1.25), -1, 400, 200)
+		headerGrid.AddChildAt(backgroundBox, 0, 0, 3, 1)
 		headerGrid.AddChildAt(dateLabel, 0, 0, 1, 1)
 		headerGrid.AddChildAt(resultLabel, 1, 0, 1, 1)
 		headerGrid.AddChildAt(opponentLabel, 2, 0, 1, 1)
@@ -1453,9 +1454,13 @@ func (g *Game) initialize() {
 		pageControlGrid.AddChildAt(g.lobby.historyPageButton, 1, 0, 1, 1)
 		pageControlGrid.AddChildAt(etk.NewButton(gotext.Get("Next")+" ->", g.selectHistoryNext), 2, 0, 1, 1)
 
+		historyRatingBackground := etk.NewBox()
+		historyRatingBackground.SetBackground(bufferBackgroundColor)
+
 		historyRatingGrid := etk.NewGrid()
 		historyRatingGrid.SetRowSizes(2, -1, -1, -1)
 		historyRatingGrid.AddChildAt(historyDividerLine, 0, 0, 3, 1)
+		historyRatingGrid.AddChildAt(historyRatingBackground, 0, 1, 3, 3)
 		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Backgammon"), etk.AlignCenter), 0, 1, 1, 1)
 		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualBackgammonSingle, g.lobby.historyRatingCasualBackgammonMulti), 0, 2, 1, 2)
 		historyRatingGrid.AddChildAt(newLabel(gotext.Get("Acey-deucey"), etk.AlignCenter), 1, 1, 1, 1)
@@ -1485,20 +1490,19 @@ func (g *Game) initialize() {
 		dividerLine := etk.NewBox()
 		dividerLine.SetBackground(triangleA)
 
+		backgroundBox := etk.NewBox()
+		backgroundBox.SetBackground(bufferBackgroundColor)
+
 		statusLabel := newCenteredText(gotext.Get("Status"))
-		statusLabel.SetBackground(bufferBackgroundColor)
 		statusLabel.SetFollow(false)
 		statusLabel.SetScrollBarVisible(false)
 		ratingLabel := newCenteredText(gotext.Get("Rating"))
-		ratingLabel.SetBackground(bufferBackgroundColor)
 		ratingLabel.SetFollow(false)
 		ratingLabel.SetScrollBarVisible(false)
 		pointsLabel := newCenteredText(gotext.Get("Points"))
-		pointsLabel.SetBackground(bufferBackgroundColor)
 		pointsLabel.SetFollow(false)
 		pointsLabel.SetScrollBarVisible(false)
 		nameLabel := newCenteredText(gotext.Get("Match Name"))
-		nameLabel.SetBackground(bufferBackgroundColor)
 		nameLabel.SetFollow(false)
 		nameLabel.SetScrollBarVisible(false)
 		if smallScreen {
@@ -1514,6 +1518,7 @@ func (g *Game) initialize() {
 
 		headerGrid := etk.NewGrid()
 		headerGrid.SetColumnSizes(indentA, indentB-indentA, indentB-indentA, -1, 200)
+		headerGrid.AddChildAt(backgroundBox, 0, 0, 4, 1)
 		headerGrid.AddChildAt(statusLabel, 0, 0, 1, 1)
 		headerGrid.AddChildAt(ratingLabel, 1, 0, 1, 1)
 		headerGrid.AddChildAt(pointsLabel, 2, 0, 1, 1)
