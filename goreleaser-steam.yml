@@ -1,0 +1,30 @@
+version: 2
+project_name: boxcars
+builds:
+  -
+    id: boxcars
+    goos:
+      - linux
+      - windows
+    goarch:
+      - amd64
+    env:
+      - >-
+        {{- if eq .Os "windows" }}
+          GOFLAGS=-ldflags=-H=windowsgui
+        {{- end }}
+archives:
+  -
+    id: boxcars
+    builds:
+      - boxcars
+    format_overrides:
+      - goos: linux
+        formats: [ 'zip' ]
+      - goos: windows
+        formats: [ 'zip' ]
+    files:
+      - ./*.md
+      - LICENSE
+checksum:
+  name_template: 'checksums.txt'
