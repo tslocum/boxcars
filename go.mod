@@ -13,8 +13,8 @@ require (
 	github.com/coder/websocket v1.8.12
 	github.com/hajimehoshi/ebiten/v2 v2.8.6
 	github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195
-	golang.org/x/sys v0.29.0
-	golang.org/x/text v0.21.0
+	golang.org/x/sys v0.30.0
+	golang.org/x/text v0.22.0
 )
 
 require (
@@ -60,5 +60,5 @@ require (
 	golang.org/x/image v0.23.0 // indirect
 	golang.org/x/mobile v0.0.0-20250106192035-c31d5b91ecc3 // indirect
 	golang.org/x/net v0.34.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
 )

@@ -37,3 +37,7 @@ func ReplayDir() string {
 	}
 	return path.Join(homeDir, "boxcars")
 }
+
+func isSteamDeck() bool {
+	return false
+}

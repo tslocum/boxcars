@@ -68,3 +68,7 @@ func DefaultFullscreen() bool {
 func ReplayDir() string {
 	return ""
 }
+
+func isSteamDeck() bool {
+	return false
+}

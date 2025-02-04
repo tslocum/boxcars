@@ -1,3 +1,9 @@
+1.4.8:
+- Fix duplicate line issue in rolls and moves log
+- Reduce resource usage when spectating matches
+- Restyle various user interface elements
+- Open Steam Deck on-screen keyboard automatically
+
 1.4.7:
 - Fix user interface issues
 

@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.7"
+	AppVersion           = "v1.4.8"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -3417,7 +3417,10 @@ func saveReplay(id int, content []byte) error {
 }
 
 func showKeyboard() {
-	if !enableOnScreenKeyboard {
+	if isSteamDeck() {
+		etk.Open("steam://open/keyboard")
+		return
+	} else if !enableOnScreenKeyboard {
 		return
 	}
 	game.keyboard.SetVisible(true)
@@ -3425,7 +3428,10 @@ func showKeyboard() {
 }
 
 func hideKeyboard() {
-	if !enableOnScreenKeyboard {
+	if isSteamDeck() {
+		etk.Open("steam://close/keyboard")
+		return
+	} else if !enableOnScreenKeyboard {
 		return
 	}
 	game.keyboard.SetVisible(false)
