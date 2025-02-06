@@ -1288,10 +1288,14 @@ func (g *Game) initialize() {
 		grid.AddChildAt(subFrame, 1, 1, 3, 1)
 		createGameGrid = grid
 
+		dividerLine := etk.NewBox()
+		dividerLine.SetBackground(bufferTextColor)
+
 		createGameContainer = etk.NewGrid()
 		createGameContainer.AddChildAt(createGameGrid, 0, 0, 1, 1)
-		createGameContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
-		createGameContainer.AddChildAt(g.lobby.buttonsGrid, 0, 2, 1, 1)
+		createGameContainer.AddChildAt(dividerLine, 0, 1, 1, 1)
+		createGameContainer.AddChildAt(statusBuffer, 0, 2, 1, 1)
+		createGameContainer.AddChildAt(g.lobby.buttonsGrid, 0, 3, 1, 1)
 
 		createGameFrame = etk.NewFrame()
 		createGameFrame.SetPositionChildren(true)
@@ -1332,10 +1336,14 @@ func (g *Game) initialize() {
 		grid.AddChildAt(subFrame, 1, 1, 2, 1)
 		joinGameGrid = grid
 
+		dividerLine := etk.NewBox()
+		dividerLine.SetBackground(bufferTextColor)
+
 		joinGameContainer = etk.NewGrid()
 		joinGameContainer.AddChildAt(joinGameGrid, 0, 0, 1, 1)
-		joinGameContainer.AddChildAt(statusBuffer, 0, 1, 1, 1)
-		joinGameContainer.AddChildAt(g.lobby.buttonsGrid, 0, 2, 1, 1)
+		joinGameContainer.AddChildAt(dividerLine, 0, 1, 1, 1)
+		joinGameContainer.AddChildAt(statusBuffer, 0, 2, 1, 1)
+		joinGameContainer.AddChildAt(g.lobby.buttonsGrid, 0, 3, 1, 1)
 
 		joinGameFrame = etk.NewFrame()
 		joinGameFrame.SetPositionChildren(true)
@@ -1488,10 +1496,10 @@ func (g *Game) initialize() {
 		g.lobby.rebuildButtonsGrid()
 
 		dividerLineTop := etk.NewBox()
-		dividerLineTop.SetBackground(triangleA)
+		dividerLineTop.SetBackground(bufferTextColor)
 
 		dividerLineBottom := etk.NewBox()
-		dividerLineBottom.SetBackground(triangleA)
+		dividerLineBottom.SetBackground(bufferTextColor)
 
 		backgroundBox := etk.NewBox()
 		backgroundBox.SetBackground(bufferBackgroundColor)
@@ -1758,8 +1766,8 @@ func (g *Game) setBufferRects() {
 		historyRatingHeight = lineHeight*3 + etk.Scale(5)*3
 	}
 
-	createGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
-	joinGameContainer.SetRowSizes(-1, statusBufferHeight, g.lobby.buttonBarHeight)
+	createGameContainer.SetRowSizes(-1, 2, statusBufferHeight, g.lobby.buttonBarHeight)
+	joinGameContainer.SetRowSizes(-1, 2, statusBufferHeight, g.lobby.buttonBarHeight)
 	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, historyRatingHeight, g.lobby.buttonBarHeight, statusBufferHeight, g.lobby.buttonBarHeight)
 	listHeaderHeight := g.itemHeight()
 	if smallScreen {
