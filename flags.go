@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"code.rocket9labs.com/tslocum/bgammon"
-	"code.rocket9labs.com/tslocum/boxcars/game"
+	"codeberg.org/tslocum/bgammon"
+	"codeberg.org/tslocum/boxcars/game"
 	"github.com/hajimehoshi/ebiten/v2"
 	"golang.org/x/text/language"
 )

@@ -4,8 +4,8 @@ import (
 	"image"
 	"time"
 
-	"code.rocket9labs.com/tslocum/etk"
-	"code.rocket9labs.com/tslocum/gotext"
+	"codeberg.org/tslocum/etk"
+	"codeberg.org/tslocum/gotext"
 )
 
 type tutorialWidget struct {

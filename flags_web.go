@@ -3,7 +3,7 @@
 package main
 
 import (
-	"code.rocket9labs.com/tslocum/boxcars/game"
+	"codeberg.org/tslocum/boxcars/game"
 	"golang.org/x/text/language"
 )
 

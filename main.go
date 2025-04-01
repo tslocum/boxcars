@@ -9,8 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"code.rocket9labs.com/tslocum/boxcars/game"
-	"code.rocket9labs.com/tslocum/gotext"
+	"codeberg.org/tslocum/boxcars/game"
+	"codeberg.org/tslocum/gotext"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

@@ -6,9 +6,9 @@ import (
 	"sort"
 	"strings"
 
-	"code.rocket9labs.com/tslocum/bgammon"
-	"code.rocket9labs.com/tslocum/etk"
-	"code.rocket9labs.com/tslocum/gotext"
+	"codeberg.org/tslocum/bgammon"
+	"codeberg.org/tslocum/etk"
+	"codeberg.org/tslocum/gotext"
 )
 
 const (

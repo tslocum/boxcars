@@ -18,7 +18,7 @@ Download Boxcars via [F-Droid](https://f-droid.org/packages/com.rocket9labs.boxc
 
 ## Screenshot
 
-[![Screenshot](https://code.rocket9labs.com/tslocum/boxcars/raw/branch/main/screenshot.png)](https://code.rocket9labs.com/tslocum/boxcars/src/branch/main/screenshot.png)
+[![Screenshot](https://codeberg.org/tslocum/boxcars/raw/branch/main/screenshot.png)](https://codeberg.org/tslocum/boxcars/src/branch/main/screenshot.png)
 
 ## Build
 
@@ -26,7 +26,7 @@ Download Boxcars via [F-Droid](https://f-droid.org/packages/com.rocket9labs.boxc
 
 Run the following command:
 
-`go install code.rocket9labs.com/tslocum/boxcars@latest`
+`go install codeberg.org/tslocum/boxcars@latest`
 
 Run `~/go/bin/boxcars` to play.
 
@@ -36,12 +36,12 @@ Translation is handled [online](https://translate.codeberg.org/projects/bgammon/
 
 ## Support
 
-Please share issues and suggestions [here](https://code.rocket9labs.com/tslocum/boxcars/issues).
+Please share issues and suggestions [here](https://codeberg.org/tslocum/boxcars/issues).
 
 ## Dependencies
 
 - [ebitengine](https://github.com/hajimehoshi/ebiten) - Game engine
-- [etk](https://code.rocket9labs.com/tslocum/etk) - User interface tool kit
+- [etk](https://codeberg.org/tslocum/etk) - User interface tool kit
 - [draw2d](https://github.com/llgcode/draw2d) - Shape drawing
 - [resize](https://github.com/nfnt/resize) - Image resizing
-- [tabula](https://code.rocket9labs.com/tslocum/tabula) - Backgammon AI
+- [tabula](https://codeberg.org/tslocum/tabula) - Backgammon AI

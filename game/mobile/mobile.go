@@ -1,7 +1,7 @@
 package mobile
 
 import (
-	"code.rocket9labs.com/tslocum/boxcars/game"
+	"codeberg.org/tslocum/boxcars/game"
 	"github.com/hajimehoshi/ebiten/v2/mobile"
 )
 
