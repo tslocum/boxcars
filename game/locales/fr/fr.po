@@ -26,6 +26,9 @@ msgstr "%s a déplacé %s"
 msgid "%s rolled %s"
 msgstr "%s a obtenu un %s"
 
+msgid "%s resigned."
+msgstr ""
+
 msgid "%s wins!"
 msgstr "%s a gagné !"
 
@@ -121,6 +124,9 @@ msgstr "Créer une nouvelle partie"
 msgid "Created by %s"
 msgstr ""
 
+msgid "Creating..."
+msgstr ""
+
 msgid "Current"
 msgstr "Courant"
 
@@ -159,6 +165,9 @@ msgstr ""
 msgid "Failed to connect to %s"
 msgstr ""
 
+msgid "Failed to create match: %s"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr "Impossible de télécharger le replay : %s"
 
@@ -170,6 +179,9 @@ msgstr "Impossible de quitter la partie : %s"
 
 msgid "Failed to move checker%s: %s"
 msgstr "Impossible de déplacer le pion %s : %s"
+
+msgid "illegal move"
+msgstr ""
 
 msgid "Failed to roll"
 msgstr "Impossible de lancer le dé"
@@ -276,6 +288,12 @@ msgstr ""
 
 msgid "No"
 msgstr "Non"
+
+msgid "No matches found."
+msgstr ""
+
+msgid "No replays found."
+msgstr ""
 
 msgid "None"
 msgstr "Aucun"

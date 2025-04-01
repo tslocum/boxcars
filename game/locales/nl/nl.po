@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-11-15 20:42+0000\n"
-"Last-Translator: tslocum <tslocum@users.noreply.translate.codeberg.org>\n"
+"PO-Revision-Date: 2025-02-10 13:21+0000\n"
+"Last-Translator: Vistaus <vistaus@users.noreply.translate.codeberg.org>\n"
 "Language-Team: Dutch <https://translate.codeberg.org/projects/bgammon/client/"
 "nl/>\n"
 "Language: nl\n"
@@ -9,36 +9,39 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.8.1\n"
+"X-Generator: Weblate 5.9.2\n"
 
 msgid "%s - Free Online Backgammon"
-msgstr "%s - Gratis Online Backgammon"
+msgstr "%s - Gratis online-backgammon"
 
 msgid "%s joined the match."
-msgstr "%s schoof bij het spel aan"
+msgstr "%s neemt deel aan het spel."
 
 msgid "%s left the match."
-msgstr "%s verliet het spel"
+msgstr "%s heeft het spel verlaten."
 
 msgid "%s moved %s"
-msgstr "%s verplaatsde %s"
+msgstr "%s heeft %s verplaatst"
 
 msgid "%s rolled %s"
 msgstr "%s gooide %s"
 
+msgid "%s resigned."
+msgstr "%s heeft opgegeven."
+
 msgid "%s wins!"
-msgstr "%s wint!"
+msgstr "%s heeft gewonnen!"
 
 msgid "%[1]s wins %[2]d point!"
 msgid_plural "%[1]s wins %[2]d points!"
-msgstr[0] "%[1]s wint %[2]d punt!"
-msgstr[1] "%[1]s wint %[2]d punten!"
+msgstr[0] "%[1]s heeft %[2]d punt gewonnen!"
+msgstr[1] "%[1]s heeft %[2]d punten gewonnen!"
 
 msgid "About"
 msgstr "Over"
 
 msgid "Accept"
-msgstr "Accepteer"
+msgstr "Accepteren"
 
 msgid "Account"
 msgstr "Account"
@@ -50,7 +53,7 @@ msgid "Advanced movement"
 msgstr "Geavanceerde verplaatsing"
 
 msgid "Auto-play forced moves"
-msgstr "Speel gedwongen zetten automatisch"
+msgstr "Gedwongen zetten automatiseren"
 
 msgid "Available"
 msgstr "Beschikbaar"
@@ -115,6 +118,9 @@ msgstr ""
 msgid "Created by %s"
 msgstr ""
 
+msgid "Creating..."
+msgstr ""
+
 msgid "Current"
 msgstr ""
 
@@ -151,6 +157,9 @@ msgstr ""
 msgid "Failed to connect to %s"
 msgstr ""
 
+msgid "Failed to create match: %s"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr ""
 
@@ -161,6 +170,9 @@ msgid "Failed to leave match: %s"
 msgstr ""
 
 msgid "Failed to move checker%s: %s"
+msgstr ""
+
+msgid "illegal move"
 msgstr ""
 
 msgid "Failed to roll"
@@ -266,6 +278,12 @@ msgid "Next"
 msgstr ""
 
 msgid "No"
+msgstr ""
+
+msgid "No matches found."
+msgstr ""
+
+msgid "No replays found."
 msgstr ""
 
 msgid "None"

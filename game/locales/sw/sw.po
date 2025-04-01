@@ -22,6 +22,9 @@ msgstr ""
 msgid "%s rolled %s"
 msgstr ""
 
+msgid "%s resigned."
+msgstr ""
+
 msgid "%s wins!"
 msgstr ""
 
@@ -111,6 +114,9 @@ msgstr ""
 msgid "Created by %s"
 msgstr ""
 
+msgid "Creating..."
+msgstr ""
+
 msgid "Current"
 msgstr ""
 
@@ -147,6 +153,9 @@ msgstr ""
 msgid "Failed to connect to %s"
 msgstr ""
 
+msgid "Failed to create match: %s"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr ""
 
@@ -157,6 +166,9 @@ msgid "Failed to leave match: %s"
 msgstr ""
 
 msgid "Failed to move checker%s: %s"
+msgstr ""
+
+msgid "illegal move"
 msgstr ""
 
 msgid "Failed to roll"
@@ -262,6 +274,12 @@ msgid "Next"
 msgstr ""
 
 msgid "No"
+msgstr ""
+
+msgid "No matches found."
+msgstr ""
+
+msgid "No replays found."
 msgstr ""
 
 msgid "None"

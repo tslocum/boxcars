@@ -27,6 +27,9 @@ msgstr ""
 msgid "%s rolled %s"
 msgstr ""
 
+msgid "%s resigned."
+msgstr ""
+
 msgid "%s wins!"
 msgstr "%s wygrywa!"
 
@@ -118,6 +121,9 @@ msgstr ""
 msgid "Created by %s"
 msgstr ""
 
+msgid "Creating..."
+msgstr ""
+
 msgid "Current"
 msgstr ""
 
@@ -154,6 +160,9 @@ msgstr ""
 msgid "Failed to connect to %s"
 msgstr ""
 
+msgid "Failed to create match: %s"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr ""
 
@@ -165,6 +174,9 @@ msgstr "Nie udało się opuścić meczu: %s"
 
 msgid "Failed to move checker%s: %s"
 msgstr "Nie udało się poruszyć szachownicy%s: %s"
+
+msgid "illegal move"
+msgstr ""
 
 msgid "Failed to roll"
 msgstr ""
@@ -270,6 +282,12 @@ msgstr ""
 
 msgid "No"
 msgstr "Nie"
+
+msgid "No matches found."
+msgstr ""
+
+msgid "No replays found."
+msgstr ""
 
 msgid "None"
 msgstr ""

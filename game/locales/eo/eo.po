@@ -26,6 +26,9 @@ msgstr ""
 msgid "%s rolled %s"
 msgstr ""
 
+msgid "%s resigned."
+msgstr ""
+
 msgid "%s wins!"
 msgstr "%s gajnis la ludon!"
 
@@ -117,6 +120,9 @@ msgstr "Krei novan partion"
 msgid "Created by %s"
 msgstr ""
 
+msgid "Creating..."
+msgstr ""
+
 msgid "Current"
 msgstr "Aktuala"
 
@@ -153,6 +159,9 @@ msgstr ""
 msgid "Failed to connect to %s"
 msgstr ""
 
+msgid "Failed to create match: %s"
+msgstr ""
+
 msgid "Failed to download replay: %s"
 msgstr ""
 
@@ -164,6 +173,9 @@ msgstr "Malsukcesis forlasi partion: %s"
 
 msgid "Failed to move checker%s: %s"
 msgstr "Malsukcesis movi diskon %s: %s"
+
+msgid "illegal move"
+msgstr ""
 
 msgid "Failed to roll"
 msgstr ""
@@ -269,6 +281,12 @@ msgstr "Sekven"
 
 msgid "No"
 msgstr "Ne"
+
+msgid "No matches found."
+msgstr ""
+
+msgid "No replays found."
+msgstr ""
 
 msgid "None"
 msgstr "Nenio"

@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-01-09 18:19+0000\n"
-"Last-Translator: Francesco Ariis <fa-ml@ariis.it>\n"
-"Language-Team: Italian <https://hosted.weblate.org/projects/bgammon/boxcars/"
-"it/>\n"
+"PO-Revision-Date: 2024-12-13 01:42+0000\n"
+"Last-Translator: fitopot <fitopot@users.noreply.translate.codeberg.org>\n"
+"Language-Team: Italian <https://translate.codeberg.org/projects/bgammon/"
+"client/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.8.4\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Backgammon online, libero e aperto"
@@ -21,21 +21,26 @@ msgid "%s left the match."
 msgstr "%s ha lasciato la partita."
 
 msgid "%s moved %s"
-msgstr ""
+msgstr "%s ha mosso %s"
 
+#, fuzzy
 msgid "%s rolled %s"
-msgstr ""
+msgstr "%s ha tirato %s"
+
+msgid "%s resigned."
+msgstr "%s si è ritirato."
 
 msgid "%s wins!"
 msgstr "%s è il vincitore!"
 
 msgid "%[1]s wins %[2]d point!"
 msgid_plural "%[1]s wins %[2]d points!"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%[1]s guadagna %[2]d punto!"
+msgstr[1] "%[1]s guadagna %[2]d punti!"
 
+#, fuzzy
 msgid "About"
-msgstr ""
+msgstr "Riguardo a"
 
 msgid "Accept"
 msgstr "Accetta"
@@ -46,20 +51,22 @@ msgstr "Profilo"
 msgid "Acey-deucey"
 msgstr "Acey-deucey"
 
+#, fuzzy
 msgid "Advanced movement"
-msgstr ""
+msgstr "Mossa avanzata"
 
 msgid "Auto-play forced moves"
-msgstr ""
+msgstr "Gioca automaticamente mosse obbligatorie"
 
 msgid "Available"
 msgstr "Disponibile"
 
 msgid "Backgammon"
-msgstr ""
+msgstr "Backgammon"
 
+#, fuzzy
 msgid "Bear Off"
-msgstr ""
+msgstr "Rimozione"
 
 msgid "Bearing Off"
 msgstr "Levata"
@@ -81,7 +88,7 @@ msgid "Change password"
 msgstr "Cambia password"
 
 msgid "Chat"
-msgstr ""
+msgstr "Chat"
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
@@ -96,11 +103,12 @@ msgstr "Connettiti"
 msgid "Connecting..."
 msgstr "Connessione..."
 
+#, fuzzy
 msgid "Contact:"
-msgstr ""
+msgstr "Contatto:"
 
 msgid "Create"
-msgstr ""
+msgstr "Crea"
 
 msgid "Create Match"
 msgstr "Crea una partita"
@@ -119,7 +127,10 @@ msgid "Create new match"
 msgstr "Crea una nuova partita"
 
 msgid "Created by %s"
-msgstr ""
+msgstr "Creato da %s"
+
+msgid "Creating..."
+msgstr "In creazione..."
 
 msgid "Current"
 msgstr "Attuale"
@@ -128,10 +139,10 @@ msgid "Date"
 msgstr "Data"
 
 msgid "Dismiss"
-msgstr ""
+msgstr "Scarta"
 
 msgid "Donate:"
-msgstr ""
+msgstr "Dona:"
 
 msgid "Double"
 msgstr "Raddoppia"
@@ -151,13 +162,16 @@ msgid "Email"
 msgstr "Email"
 
 msgid "Exit Boxcars?"
-msgstr ""
+msgstr "Chiudi Boxcars?"
 
 msgid "FAQ:"
-msgstr ""
+msgstr "FAQ:"
 
 msgid "Failed to connect to %s"
-msgstr ""
+msgstr "Non è possibile connettersi a %s"
+
+msgid "Failed to create match: %s"
+msgstr "Impossibile creare una partita: %s"
 
 msgid "Failed to download replay: %s"
 msgstr "Errore (scarica partita): %s"
@@ -171,6 +185,9 @@ msgstr "Errore (esci dalla partita): %s"
 msgid "Failed to move checker%s: %s"
 msgstr "Errore nella mossa%s: %s"
 
+msgid "illegal move"
+msgstr "Mossa non concessa"
+
 msgid "Failed to roll"
 msgstr "Errore nel lancio dei dadi"
 
@@ -178,7 +195,7 @@ msgid "Failed to submit moves: %s"
 msgstr "Errore nella trasmissione delle mosse: %s"
 
 msgid "Fast"
-msgstr ""
+msgstr "Veloce"
 
 msgid "Flip board"
 msgstr "Gira tavoliere"
@@ -187,13 +204,13 @@ msgid "Flip opp. space numbers"
 msgstr ""
 
 msgid "Forced"
-msgstr ""
+msgstr "Obbligato"
 
 msgid "Go"
-msgstr ""
+msgstr "Vai"
 
 msgid "Go to page:"
-msgstr ""
+msgstr "Vai a pagina:"
 
 msgid "Good Luck, Have Fun"
 msgstr "In bocca al lupo, buon divertimento!"
@@ -205,13 +222,13 @@ msgid "History"
 msgstr "Registro"
 
 msgid "Instant"
-msgstr ""
+msgstr "Istantaneo"
 
 msgid "Join"
-msgstr ""
+msgstr "Unisciti"
 
 msgid "Join/Leave"
-msgstr ""
+msgstr "Unisciti/Lascia"
 
 msgid "Join match"
 msgstr "Entra nella partita"
@@ -220,7 +237,7 @@ msgid "Join match: %s"
 msgstr "Entra in partita: %s"
 
 msgid "Joining..."
-msgstr ""
+msgstr "Accesso in corso..."
 
 msgid "Leave"
 msgstr "Esci"
@@ -241,7 +258,7 @@ msgid "Logged in as guest"
 msgstr "Connesso come ospite"
 
 msgid "Long press back to exit the application."
-msgstr ""
+msgstr "Premi a lungo per uscire dall'applicazione."
 
 msgid "Match Name"
 msgstr "Nome della partita"
@@ -250,19 +267,19 @@ msgid "Matches List"
 msgstr "Lista delle partite"
 
 msgid "Medium"
-msgstr ""
+msgstr "Medio"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menù"
 
 msgid "Move"
-msgstr ""
+msgstr "Mossa"
 
 msgid "Multi"
-msgstr ""
+msgstr "Multi"
 
 msgid "Mute Sounds"
-msgstr ""
+msgstr "Muta suoni"
 
 msgid "Name"
 msgstr "Nome"
@@ -271,13 +288,19 @@ msgid "New"
 msgstr "Nuovo"
 
 msgid "Next"
-msgstr ""
+msgstr "Prossimo"
 
 msgid "No"
 msgstr "No"
 
-msgid "None"
+msgid "No matches found."
 msgstr ""
+
+msgid "No replays found."
+msgstr ""
+
+msgid "None"
+msgstr "Nessuno"
 
 msgid "OK"
 msgstr "Ok"
@@ -308,16 +331,16 @@ msgid "Points"
 msgstr "Punti"
 
 msgid "Press back to toggle the keyboard."
-msgstr ""
+msgstr "Premi il tasto indietro per far comparire la tastiera."
 
 msgid "Previous"
-msgstr ""
+msgstr "Precedente"
 
 msgid "Private"
 msgstr "Privato"
 
 msgid "Rating"
-msgstr ""
+msgstr "Punteggio"
 
 msgid "Read error"
 msgstr "Errore in lettura"
@@ -326,7 +349,7 @@ msgid "Reconnecting"
 msgstr "Riconnessione"
 
 msgid "Refresh"
-msgstr ""
+msgstr "Ricarica"
 
 msgid "Refresh matches"
 msgstr "Aggiorna partite"
@@ -335,7 +358,7 @@ msgid "Register"
 msgstr "Registrati"
 
 msgid "Rematch"
-msgstr ""
+msgstr "Rigioca"
 
 msgid "Replay download already in progress."
 msgstr "Scaricamento della partita già in corso."
@@ -359,7 +382,7 @@ msgid "Roll"
 msgstr "Lancia"
 
 msgid "Roll Dice"
-msgstr ""
+msgstr "Tira i dadi"
 
 msgid "Search"
 msgstr "Cerca"
@@ -380,19 +403,19 @@ msgid "Show pip count"
 msgstr "Mostra punteggio"
 
 msgid "Single"
-msgstr ""
+msgstr "Singola"
 
 msgid "Slow"
-msgstr ""
+msgstr "Lento"
 
 msgid "Sound"
-msgstr ""
+msgstr "Suono"
 
 msgid "Source:"
-msgstr ""
+msgstr "Fonte:"
 
 msgid "Speed"
-msgstr ""
+msgstr "Velocità"
 
 msgid "Started"
 msgstr "Iniziata"
@@ -410,12 +433,17 @@ msgid ""
 "This concludes the tutorial. Learn how to play backgammon at bgammon.org/faq "
 "and share your feedback at bgammon.org/community"
 msgstr ""
+"Questo conclude il tutorial. Impara a giocare a backgammon su bgammon.org/"
+"faq e condividi il tuo feedback su bgammon.org/community"
 
 msgid ""
 "This screen lists the matches that are currently available. A few bots are "
 "always available to play against. You can also spectate ongoing public "
 "matches."
 msgstr ""
+"Qui la lista delle partite disponibili. Un paio di bot sono sempre "
+"disponibili per giocare. Puoi anche assistere alle partite pubbliche in "
+"corso."
 
 msgid "To download this replay visit"
 msgstr "Per scaricare questa partita, vai a"
@@ -455,19 +483,23 @@ msgid ""
 "Welcome to the guided tutorial. This program (Boxcars) is the official "
 "bgammon.org client. bgammon.org is a free and open source backgammon server."
 msgstr ""
+"Benvenuto al tutorial guidato. Questo programma (Boxcars) è il client "
+"ufficiale del sito bgammon.org. bgammon.org è un server backgammon libero e "
+"open source."
 
+#, fuzzy
 msgid "Welcome, %[1]s. %[2]s playing %[3]s."
-msgstr ""
+msgstr "Benvenuto, %[1]s. %[2]s gioca %[3]s."
 
 msgid "There is %d client"
 msgid_plural "There are %d clients"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "C'è %d client."
+msgstr[1] "Ci sono %d client."
 
 msgid "%d match"
 msgid_plural "%d matches"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d partita"
+msgstr[1] "%d partite"
 
 msgid "Write error"
 msgstr "Errore in scrittura"
