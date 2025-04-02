@@ -697,8 +697,6 @@ func NewGame() *Game {
 		log.Fatal(err)
 	}
 
-	etk.ResizeDebounce = 0
-
 	etk.Style.TextFont = faceSource
 	etk.Style.TextSize = largeFontSize
 
@@ -2974,35 +2972,17 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.initialized = true
 	}
 
-	originalWidth, originalHeight := outsideWidth, outsideHeight
-
-	outsideWidth, outsideHeight = etk.Scale(outsideWidth), etk.Scale(outsideHeight)
-	if outsideWidth < minWidth {
-		outsideWidth = minWidth
+	scaledWidth, scaledHeight := etk.Layout(outsideWidth, outsideHeight)
+	if scaledWidth == g.screenW && scaledHeight == g.screenH {
+		return g.screenW, g.screenH
 	}
-	if outsideHeight < minHeight {
-		outsideHeight = minHeight
-	}
-	if !g.forceLayout {
-		if g.screenW == outsideWidth && g.screenH == outsideHeight {
-			return outsideWidth, outsideHeight
-		} else if !g.lastResize.IsZero() && time.Since(g.lastResize) < resizeDuration && g.screenW != 0 && g.screenH != 0 {
-			return g.screenW, g.screenH
-		}
-	} else {
-		g.forceLayout = false
-	}
-
-	g.screenW, g.screenH = outsideWidth, outsideHeight
-	g.lastResize = time.Now()
+	g.screenW, g.screenH = scaledWidth, scaledHeight
 	scheduleFrame()
 
 	g.bufferWidth = etk.BoundString(etk.FontFace(etk.Style.TextFont, etk.Scale(g.board.fontSize)), strings.Repeat("A", bufferCharacterWidth)).Dx()
 	if g.bufferWidth > int(float64(g.screenW)*maxStatusWidthRatio) {
 		g.bufferWidth = int(float64(g.screenW) * maxStatusWidthRatio)
 	}
-
-	etk.Layout(originalWidth, originalHeight)
 
 	g.needLayoutConnect = true
 	g.needLayoutLobby = true
@@ -3034,7 +3014,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 		g.LoadReplay = nil
 	}
 
-	return outsideWidth, outsideHeight
+	return g.screenW, g.screenH
 }
 
 func acceptInput(text string) (handled bool) {
