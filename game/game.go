@@ -757,6 +757,9 @@ func (g *Game) initialize() {
 	gameBuffer = etk.NewText("")
 	inputBuffer = &Input{etk.NewInput("", acceptInput)}
 
+	statusBuffer.SetFollow(true)
+	gameBuffer.SetFollow(true)
+
 	inputBuffer.SetBorderSize(0)
 
 	statusBuffer.SetForeground(bufferTextColor)
