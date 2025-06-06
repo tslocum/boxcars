@@ -1,6 +1,6 @@
 # boxcars - Graphical client for [bgammon.org](https://bgammon.org)
 [![Translate](https://translate.codeberg.org/widget/bgammon/client/svg-badge.svg)](https://translate.codeberg.org/projects/bgammon/)
-[![Donate via LiberaPay](https://img.shields.io/liberapay/receives/rocket9labs.com.svg?logo=liberapay)](https://liberapay.com/rocket9labs.com)
+[![Donate](https://img.shields.io/liberapay/receives/rocket9labs.com.svg?logo=liberapay)](https://liberapay.com/rocket9labs.com)
 
 ## Play
 
@@ -10,7 +10,7 @@ Visit https://play.bgammon.org
 
 ### Desktop
 
-Download Boxcars at https://bgammon.org/boxcars
+Download Boxcars for Windows and Linux [here](https://codeberg.org/tslocum/boxcars/releases)
 
 ### Android
 

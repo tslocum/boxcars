@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-03 09:21+0000\n"
+"PO-Revision-Date: 2025-04-28 14:53+0000\n"
 "Last-Translator: Dirk <dirk@noreply.codeberg.org>\n"
 "Language-Team: German <https://translate.codeberg.org/projects/bgammon/"
 "client/de/>\n"
@@ -166,7 +166,7 @@ msgid "Failed to connect to %s"
 msgstr "Verbindung zu %s fehlgeschlagen"
 
 msgid "Failed to create match: %s"
-msgstr "Fehler beim erstellen der Partie: %s"
+msgstr "Konnte Partie nicht erstellen: %s"
 
 msgid "Failed to download replay: %s"
 msgstr "Replay Download fehlgeschlagen: %s"

@@ -135,9 +135,8 @@ func NewLobby() *lobby {
 
 	indentA, indentB := etk.Scale(lobbyIndentA), etk.Scale(lobbyIndentB)
 
-	matchList := etk.NewList(game.itemHeight(), l.selectMatch)
+	matchList := etk.NewList(game.itemHeight(), l.selectMatch, l.confirmSelectMatch)
 	matchList.SetSelectionMode(etk.SelectRow)
-	matchList.SetConfirmedFunc(l.confirmSelectMatch)
 	matchList.SetColumnSizes(indentA, indentB-indentA, indentB-indentA, -1)
 	matchList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
 	matchList.AddChildAt(loadingText, 0, 0)

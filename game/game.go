@@ -1393,8 +1393,7 @@ func (g *Game) initialize() {
 		if smallScreen {
 			historyItemHeight /= 2
 		}
-		g.lobby.historyList = etk.NewList(historyItemHeight, nil)
-		g.lobby.historyList.SetConfirmedFunc(g.lobby.confirmSelectHistory)
+		g.lobby.historyList = etk.NewList(historyItemHeight, nil, g.lobby.confirmSelectHistory)
 		g.lobby.historyList.SetColumnSizes(int(float64(indentA)*1.25), int(float64(indentB)*1.25)-int(float64(indentA)*1.25), -1)
 		g.lobby.historyList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
 
