@@ -18,7 +18,7 @@ builds:
 archives:
   -
     id: boxcars
-    builds:
+    ids:
       - boxcars
     wrap_in_directory: boxcars
     format_overrides:
