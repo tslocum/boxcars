@@ -755,7 +755,7 @@ func (g *Game) initialize() {
 
 	statusBuffer = etk.NewText("")
 	gameBuffer = etk.NewText("")
-	inputBuffer = &Input{etk.NewInput("", acceptInput)}
+	inputBuffer = &Input{etk.NewInput("", nil, acceptInput)}
 
 	statusBuffer.SetFollow(true)
 	gameBuffer.SetFollow(true)
@@ -794,7 +794,7 @@ func (g *Game) initialize() {
 	if connectAddress == "" {
 		connectAddress = DefaultServerAddress
 	}
-	g.connectServer = &Input{etk.NewInput(connectAddress, func(text string) (handled bool) {
+	g.connectServer = &Input{etk.NewInput(connectAddress, nil, func(text string) (handled bool) {
 		g.selectConnect()
 		return false
 	})}
@@ -962,22 +962,18 @@ func (g *Game) initialize() {
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
 
-		g.registerEmail = &Input{etk.NewInput("", func(text string) (handled bool) {
+		onConfirm := func(text string) (handled bool) {
 			g.selectConfirmRegister()
 			return false
-		})}
+		}
+
+		g.registerEmail = &Input{etk.NewInput("", nil, onConfirm)}
 		centerInput(g.registerEmail)
 
-		g.registerUsername = &Input{etk.NewInput("", func(text string) (handled bool) {
-			g.selectConfirmRegister()
-			return false
-		})}
+		g.registerUsername = &Input{etk.NewInput("", nil, onConfirm)}
 		centerInput(g.registerUsername)
 
-		g.registerPassword = &Input{etk.NewInput("", func(text string) (handled bool) {
-			g.selectConfirmRegister()
-			return false
-		})}
+		g.registerPassword = &Input{etk.NewInput("", nil, onConfirm)}
 		centerInput(g.registerPassword)
 		g.registerPassword.SetMask('*')
 
@@ -1032,7 +1028,7 @@ func (g *Game) initialize() {
 		emailLabel := newCenteredText(gotext.Get("Email"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
 
-		g.resetEmail = &Input{etk.NewInput("", func(text string) (handled bool) {
+		g.resetEmail = &Input{etk.NewInput("", nil, func(text string) (handled bool) {
 			g.selectConfirmReset()
 			return false
 		})}
@@ -1089,16 +1085,15 @@ func (g *Game) initialize() {
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		serverLabel := newCenteredText(gotext.Get("Server"))
 
-		g.connectUsername = &Input{etk.NewInput("", func(text string) (handled bool) {
+		onConfirm := func(text string) (handled bool) {
 			g.selectConnect()
 			return false
-		})}
+		}
+
+		g.connectUsername = &Input{etk.NewInput("", nil, onConfirm)}
 		centerInput(g.connectUsername)
 
-		g.connectPassword = &Input{etk.NewInput("", func(text string) (handled bool) {
-			g.selectConnect()
-			return false
-		})}
+		g.connectPassword = &Input{etk.NewInput("", nil, onConfirm)}
 		centerInput(g.connectPassword)
 		g.connectPassword.SetMask('*')
 
@@ -1187,22 +1182,18 @@ func (g *Game) initialize() {
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 		variantLabel := newCenteredText(gotext.Get("Variant"))
 
-		g.lobby.createGameName = &Input{etk.NewInput("", func(text string) (handled bool) {
+		onConfirm := func(text string) (handled bool) {
 			g.lobby.confirmCreateGame()
 			return false
-		})}
+		}
+
+		g.lobby.createGameName = &Input{etk.NewInput("", nil, onConfirm)}
 		centerInput(g.lobby.createGameName)
 
-		g.lobby.createGamePoints = &NumericInput{etk.NewInput("", func(text string) (handled bool) {
-			g.lobby.confirmCreateGame()
-			return false
-		})}
+		g.lobby.createGamePoints = &NumericInput{etk.NewInput("", nil, onConfirm)}
 		centerNumericInput(g.lobby.createGamePoints)
 
-		g.lobby.createGamePassword = &Input{etk.NewInput("", func(text string) (handled bool) {
-			g.lobby.confirmCreateGame()
-			return false
-		})}
+		g.lobby.createGamePassword = &Input{etk.NewInput("", nil, onConfirm)}
 		centerInput(g.lobby.createGamePassword)
 		g.lobby.createGamePassword.SetMask('*')
 
@@ -1309,7 +1300,7 @@ func (g *Game) initialize() {
 
 		passwordLabel := newCenteredText(gotext.Get("Password"))
 
-		g.lobby.joinGamePassword = &Input{etk.NewInput("", func(text string) (handled bool) {
+		g.lobby.joinGamePassword = &Input{etk.NewInput("", nil, func(text string) (handled bool) {
 			g.lobby.confirmJoinGame()
 			return false
 		})}
@@ -1378,7 +1369,7 @@ func (g *Game) initialize() {
 			opponentLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 		}
 
-		g.lobby.historyUsername = &Input{etk.NewInput("", func(text string) (handled bool) {
+		g.lobby.historyUsername = &Input{etk.NewInput("", nil, func(text string) (handled bool) {
 			g.selectHistorySearch()
 			return false
 		})}
@@ -1437,7 +1428,7 @@ func (g *Game) initialize() {
 
 		{
 			g.lobby.historyPageDialog = newDialog(etk.NewGrid())
-			g.lobby.historyPageDialogInput = &NumericInput{etk.NewInput("", g.confirmHistoryPage)}
+			g.lobby.historyPageDialogInput = &NumericInput{etk.NewInput("", nil, g.confirmHistoryPage)}
 			centerNumericInput(g.lobby.historyPageDialogInput)
 			g.lobby.historyPageDialogInput.SetBorderSize(0)
 			g.lobby.historyPageDialogInput.SetAutoResize(true)

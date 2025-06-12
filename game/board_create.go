@@ -63,10 +63,12 @@ func (b *board) createChangePasswordDialog() {
 	}
 	oldLabel.SetVertical(etk.AlignCenter)
 
-	b.changePasswordOld = &Input{etk.NewInput("", func(text string) (handled bool) {
+	onConfirm := func(text string) (handled bool) {
 		b.selectChangePassword()
 		return false
-	})}
+	}
+
+	b.changePasswordOld = &Input{etk.NewInput("", nil, onConfirm)}
 	b.changePasswordOld.SetBackground(frameColor)
 	centerInput(b.changePasswordOld)
 	b.changePasswordOld.SetMask('*')
@@ -80,10 +82,7 @@ func (b *board) createChangePasswordDialog() {
 	}
 	newLabel.SetVertical(etk.AlignCenter)
 
-	b.changePasswordNew = &Input{etk.NewInput("", func(text string) (handled bool) {
-		b.selectChangePassword()
-		return false
-	})}
+	b.changePasswordNew = &Input{etk.NewInput("", nil, onConfirm)}
 	b.changePasswordNew.SetBackground(frameColor)
 	centerInput(b.changePasswordNew)
 	b.changePasswordNew.SetMask('*')

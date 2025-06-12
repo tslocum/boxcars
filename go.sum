@@ -1,11 +1,11 @@
 codeberg.org/tslocum/bei v0.0.0-20250401032128-99c6d4509aa6 h1:STq1vOZrfjgyC10tJ18doR5eCpkZTD57+kIEONANYl8=
 codeberg.org/tslocum/bei v0.0.0-20250401032128-99c6d4509aa6/go.mod h1:kbIJaAFiTrKZzYefo0+O0QTENgDLxBcepN9PCFn9nxI=
-codeberg.org/tslocum/bgammon v0.0.0-20250401035415-e124dfd29727 h1:JaKfpa7L2N38XGIYbo75jK33igZXZpOarVsgdiVjaYM=
-codeberg.org/tslocum/bgammon v0.0.0-20250401035415-e124dfd29727/go.mod h1:jtcI7PMaBYIqC5Ju6HqtXqawGnGhsx2b1+SfOt9Frn8=
+codeberg.org/tslocum/bgammon v0.0.0-20250612191431-a3c47d420896 h1:SYbD7bvqLQctTnNb98Em8QpwMYZ2hp7mPXO5vMzvsOA=
+codeberg.org/tslocum/bgammon v0.0.0-20250612191431-a3c47d420896/go.mod h1:mWv+bS89Evnq/F1RveLMc7d8+qH2j6k7lao7AJ4zU5s=
 codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9 h1:1EF83VgZtqnfn5aE7Nuq3mop5is49yHYzCPDGKkQLiM=
 codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9/go.mod h1:3KMZyJ54RRurCUf9nX8qhP8Uk8zTAMKBQGmnqcDvONo=
-codeberg.org/tslocum/etk v0.0.0-20250605210133-1adcf2f84744 h1:FiaVmjoocBXtmPtpz9mXBd143rtrOKdFvMzFchfyenY=
-codeberg.org/tslocum/etk v0.0.0-20250605210133-1adcf2f84744/go.mod h1:EubW4cYQOuhae3xT4T2SiCV975U0X0B0KCe3P0lv20o=
+codeberg.org/tslocum/etk v0.0.0-20250610180341-a2bc82da0d49 h1:+hFpgd3Ow/3rFVcvxPOm/M5yjsboU9QuOYflWdqG/Co=
+codeberg.org/tslocum/etk v0.0.0-20250610180341-a2bc82da0d49/go.mod h1:EubW4cYQOuhae3xT4T2SiCV975U0X0B0KCe3P0lv20o=
 codeberg.org/tslocum/gotext v0.0.0-20250401033345-fc2bcce10286 h1:lznXx5iGKE0TRicYiP2WMuaGsuGeYeGyIicCWlKs6Ww=
 codeberg.org/tslocum/gotext v0.0.0-20250401033345-fc2bcce10286/go.mod h1:MUKb9J18hxyy9dQ+Hbx2qCmcjTyx7igy3w01LHZthzI=
 codeberg.org/tslocum/tabula v0.0.0-20250401032642-84c7ebdd87e2 h1:udUBQ2fqpr1+udiNIPOsXWJvYq5Ao+lt+CcrvD0w6Zc=
@@ -38,8 +38,8 @@ github.com/ebitengine/hideconsole v1.0.0 h1:5J4U0kXF+pv/DhiXt5/lTz0eO5ogJ1iXb8Yj
 github.com/ebitengine/hideconsole v1.0.0/go.mod h1:hTTBTvVYWKBuxPr7peweneWdkUwEuHuB3C1R/ielR1A=
 github.com/ebitengine/oto/v3 v3.4.0-alpha.7 h1:0rd2hzmixykApKPnLn0x39UWV3+mu/iNzfZ8YJfJBW8=
 github.com/ebitengine/oto/v3 v3.4.0-alpha.7/go.mod h1:poYRm0BcahJ49XN646C6Yg7wMc0gcwQNiC5ASQDCNnU=
-github.com/ebitengine/purego v0.9.0-alpha.6 h1:ePI8nFRfHEhVa3Bpm9rkheA3WynRBZkEU3bh1Sux6eg=
-github.com/ebitengine/purego v0.9.0-alpha.6/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
+github.com/ebitengine/purego v0.9.0-alpha.7 h1:jvLN906GKVONohlBOCr34BxW+4KeAk1K1wfWdRRsl7Y=
+github.com/ebitengine/purego v0.9.0-alpha.7/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 github.com/fatih/color v1.18.0 h1:S8gINlzdQ840/4pfAwic/ZE0djQEH3wM94VfqLTZcOM=
 github.com/fatih/color v1.18.0/go.mod h1:4FelSpRwEGDpQ12mAdzqdOukCy4u8WUtOY6lkT/6HfU=
 github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df/go.mod h1:GJr+FCSXshIwgHBtLglIg9M2l2kQSi6QjVAngtzI08Y=
@@ -137,8 +137,8 @@ github.com/vanng822/css v0.0.0-20190504095207-a21e860bcd04/go.mod h1:tcnB1voG49Q
 github.com/vanng822/css v1.0.1 h1:10yiXc4e8NI8ldU6mSrWmSWMuyWgPr9DZ63RSlsgDw8=
 github.com/vanng822/css v1.0.1/go.mod h1:tcnB1voG49QhCrwq1W0w5hhGasvOg+VQp9i9H1rCM1w=
 github.com/vanng822/go-premailer v0.0.0-20191214114701-be27abe028fe/go.mod h1:JTFJA/t820uFDoyPpErFQ3rb3amdZoPtxcKervG0OE4=
-github.com/vanng822/go-premailer v1.24.0 h1:b4MpHLVdlA7QOwk5OJIEvWnIpCCdEhEDQpJ/AkEYcpo=
-github.com/vanng822/go-premailer v1.24.0/go.mod h1:gjLku4P5inmyu+MM7544lOjhaW8F3TdIqboFVcZGwZE=
+github.com/vanng822/go-premailer v1.25.0 h1:hGHKfroCXrCDTyGVR8o4HCON5/HWvc7C1uocS+VnaZs=
+github.com/vanng822/go-premailer v1.25.0/go.mod h1:8WJKIPZtegxqSOA8+eDFx7QNesKmMYfGEIodLTJqrtM=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 golang.design/x/clipboard v0.7.0 h1:4Je8M/ys9AJumVnl8m+rZnIvstSnYj1fvzqYrU3TXvo=
 golang.design/x/clipboard v0.7.0/go.mod h1:PQIvqYO9GP29yINEfsEn5zSQKAz3UgXmZKzDA6dnq2E=

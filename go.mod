@@ -5,9 +5,9 @@ go 1.23.0
 toolchain go1.24.1
 
 require (
-	codeberg.org/tslocum/bgammon v0.0.0-20250401035415-e124dfd29727
+	codeberg.org/tslocum/bgammon v0.0.0-20250612191431-a3c47d420896
 	codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9
-	codeberg.org/tslocum/etk v0.0.0-20250605210133-1adcf2f84744
+	codeberg.org/tslocum/etk v0.0.0-20250610180341-a2bc82da0d49
 	codeberg.org/tslocum/gotext v0.0.0-20250401033345-fc2bcce10286
 	codeberg.org/tslocum/tabula v0.0.0-20250401032642-84c7ebdd87e2
 	github.com/coder/websocket v1.8.13
@@ -28,7 +28,7 @@ require (
 	github.com/ebitengine/gomobile v0.0.0-20250329061421-6d0a8e981e4c // indirect
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
 	github.com/ebitengine/oto/v3 v3.4.0-alpha.7 // indirect
-	github.com/ebitengine/purego v0.9.0-alpha.6 // indirect
+	github.com/ebitengine/purego v0.9.0-alpha.7 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/go-text/typesetting v0.3.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
@@ -58,7 +58,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/vanng822/css v1.0.1 // indirect
-	github.com/vanng822/go-premailer v1.24.0 // indirect
+	github.com/vanng822/go-premailer v1.25.0 // indirect
 	golang.design/x/clipboard v0.7.0 // indirect
 	golang.org/x/crypto v0.39.0 // indirect
 	golang.org/x/exp/shiny v0.0.0-20250606033433-dcc06ee1d476 // indirect
