@@ -85,6 +85,8 @@ type lobby struct {
 	historyRatingCasualAceyMulti        *etk.Text
 	historyRatingCasualTabulaSingle     *etk.Text
 	historyRatingCasualTabulaMulti      *etk.Text
+	historyAchievementsGrid             *etk.Grid
+	historyAchievementsFlex             *etk.Flex
 
 	historyPageDialog      *Dialog
 	historyPageDialogInput *NumericInput
@@ -322,6 +324,11 @@ func (l *lobby) selectButton(buttonIndex int) func() error {
 		} else if l.showHistory {
 			switch buttonIndex {
 			case lobbyButtonCreateCancel:
+				if game.rootWidget == achievementsFrame {
+					game.setRoot(historyFrame)
+					etk.SetFocus(game.lobby.availableMatchesList)
+					return nil
+				}
 				l.showHistory = false
 				l.rebuildButtonsGrid()
 				game.setRoot(listGamesFrame)

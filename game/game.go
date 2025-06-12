@@ -15,6 +15,8 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"slices"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -38,7 +40,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.8"
+	AppVersion           = "v1.4.9"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -137,19 +139,21 @@ var (
 	createGameGrid *etk.Grid
 	joinGameGrid   *etk.Grid
 
-	createGameContainer *etk.Grid
-	joinGameContainer   *etk.Grid
-	historyContainer    *etk.Grid
-	listGamesContainer  *etk.Grid
+	createGameContainer   *etk.Grid
+	joinGameContainer     *etk.Grid
+	historyContainer      *etk.Grid
+	achievementsContainer *etk.Grid
+	listGamesContainer    *etk.Grid
 
-	displayFrame    *etk.Frame
-	connectFrame    *etk.Frame
-	registerFrame   *etk.Frame
-	resetFrame      *etk.Frame
-	createGameFrame *etk.Frame
-	joinGameFrame   *etk.Frame
-	historyFrame    *etk.Frame
-	listGamesFrame  *etk.Frame
+	displayFrame      *etk.Frame
+	connectFrame      *etk.Frame
+	registerFrame     *etk.Frame
+	resetFrame        *etk.Frame
+	createGameFrame   *etk.Frame
+	joinGameFrame     *etk.Frame
+	historyFrame      *etk.Frame
+	achievementsFrame *etk.Frame
+	listGamesFrame    *etk.Frame
 )
 
 const sampleRate = 44100
@@ -1387,6 +1391,7 @@ func (g *Game) initialize() {
 		g.lobby.historyList = etk.NewList(historyItemHeight, nil, g.lobby.confirmSelectHistory)
 		g.lobby.historyList.SetColumnSizes(int(float64(indentA)*1.25), int(float64(indentB)*1.25)-int(float64(indentA)*1.25), -1)
 		g.lobby.historyList.SetHighlightColor(color.RGBA{79, 55, 30, 255})
+		g.lobby.historyList.SetBackground(frameColor)
 
 		headerGrid := etk.NewGrid()
 		headerGrid.SetColumnSizes(int(float64(indentA)*1.25), int(float64(indentB)*1.25)-int(float64(indentA)*1.25), -1, 400, 200)
@@ -1411,6 +1416,15 @@ func (g *Game) initialize() {
 		g.lobby.historyRatingCasualAceyMulti = newLabel("...", etk.AlignEnd)
 		g.lobby.historyRatingCasualTabulaSingle = newLabel("...", etk.AlignEnd)
 		g.lobby.historyRatingCasualTabulaMulti = newLabel("...", etk.AlignEnd)
+
+		g.lobby.historyAchievementsGrid = etk.NewGrid()
+		g.lobby.historyAchievementsGrid.SetRowPadding(etk.Scale(10))
+		g.lobby.historyAchievementsGrid.SetColumnPadding(etk.Scale(10))
+
+		g.lobby.historyAchievementsFlex = etk.NewFlex()
+		g.lobby.historyAchievementsFlex.SetBackground(frameColor)
+		g.lobby.historyAchievementsFlex.SetChildSize(etk.Scale(300), etk.Scale(150))
+		g.lobby.historyAchievementsFlex.SetGaps(etk.Scale(10), etk.Scale(10))
 
 		ratingGrid := func(singleLabel *etk.Text, multiLabel *etk.Text) *etk.Grid {
 			g := etk.NewGrid()
@@ -1468,17 +1482,51 @@ func (g *Game) initialize() {
 		historyRatingGrid.AddChildAt(ratingGrid(g.lobby.historyRatingCasualTabulaSingle, g.lobby.historyRatingCasualTabulaMulti), 2, 2, 1, 2)
 
 		historyContainer = etk.NewGrid()
+		historyContainer.SetBackground(bufferBackgroundColor)
 		historyContainer.AddChildAt(headerGrid, 0, 0, 1, 1)
 		historyContainer.AddChildAt(dividerLine, 0, 1, 1, 1)
 		historyContainer.AddChildAt(g.lobby.historyList, 0, 2, 1, 1)
 		historyContainer.AddChildAt(historyRatingGrid, 0, 3, 1, 1)
-		historyContainer.AddChildAt(pageControlGrid, 0, 4, 1, 1)
-		historyContainer.AddChildAt(statusBuffer, 0, 5, 1, 1)
-		historyContainer.AddChildAt(g.lobby.buttonsGrid, 0, 6, 1, 1)
+		historyContainer.AddChildAt(g.lobby.historyAchievementsGrid, 0, 4, 1, 1)
+		historyContainer.AddChildAt(pageControlGrid, 0, 5, 1, 1)
+		historyContainer.AddChildAt(statusBuffer, 0, 6, 1, 1)
+		historyContainer.AddChildAt(g.lobby.buttonsGrid, 0, 7, 1, 1)
 
 		historyFrame.SetPositionChildren(true)
 		historyFrame.AddChild(historyContainer)
 		historyFrame.AddChild(etk.NewFrame(g.lobby.historyPageDialog))
+
+		dividerA := etk.NewBox()
+		dividerA.SetBackground(bufferTextColor)
+
+		dividerB := etk.NewBox()
+		dividerB.SetBackground(bufferTextColor)
+
+		achievementsLabel := newLabel("Achievements", etk.AlignStart)
+
+		achievementsHeader := etk.NewGrid()
+		achievementsHeader.SetColumnSizes(-1, 400, 200)
+		achievementsHeader.AddChildAt(backgroundBox, 0, 0, 3, 1)
+		achievementsHeader.AddChildAt(achievementsLabel, 0, 0, 1, 1)
+		achievementsHeader.AddChildAt(g.lobby.historyUsername, 1, 0, 1, 1)
+		achievementsHeader.AddChildAt(searchButton, 2, 0, 1, 1)
+
+		flexGrid := etk.NewGrid()
+		flexGrid.SetRowPadding(etk.Scale(5))
+		flexGrid.SetColumnPadding(etk.Scale(5))
+		flexGrid.AddChildAt(g.lobby.historyAchievementsFlex, 0, 0, 1, 1)
+
+		achievementsContainer = etk.NewGrid()
+		achievementsContainer.AddChildAt(achievementsHeader, 0, 0, 1, 1)
+		achievementsContainer.AddChildAt(dividerA, 0, 1, 1, 1)
+		achievementsContainer.AddChildAt(flexGrid, 0, 2, 1, 1)
+		achievementsContainer.AddChildAt(dividerB, 0, 3, 1, 1)
+		achievementsContainer.AddChildAt(statusBuffer, 0, 4, 1, 1)
+		achievementsContainer.AddChildAt(g.lobby.buttonsGrid, 0, 5, 1, 1)
+
+		achievementsFrame = etk.NewFrame()
+		achievementsFrame.SetPositionChildren(true)
+		achievementsFrame.AddChild(achievementsContainer)
 	}
 
 	{
@@ -1759,7 +1807,8 @@ func (g *Game) setBufferRects() {
 
 	createGameContainer.SetRowSizes(-1, 2, statusBufferHeight, g.lobby.buttonBarHeight)
 	joinGameContainer.SetRowSizes(-1, 2, statusBufferHeight, g.lobby.buttonBarHeight)
-	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, historyRatingHeight, g.lobby.buttonBarHeight, statusBufferHeight, g.lobby.buttonBarHeight)
+	historyContainer.SetRowSizes(g.itemHeight(), 2, -1, historyRatingHeight, etk.Scale(120), g.lobby.buttonBarHeight, statusBufferHeight, g.lobby.buttonBarHeight)
+	achievementsContainer.SetRowSizes(g.itemHeight(), 2, -1, 2, statusBufferHeight, g.lobby.buttonBarHeight)
 	listHeaderHeight := g.itemHeight()
 	if smallScreen {
 		listHeaderHeight /= 2
@@ -2119,6 +2168,47 @@ func (g *Game) handleEvent(e interface{}) {
 		game.lobby.historyRatingCasualAceyMulti.SetText(fmt.Sprintf("%d", ev.CasualAceyDeuceyMulti))
 		game.lobby.historyRatingCasualTabulaSingle.SetText(fmt.Sprintf("%d", ev.CasualTabulaSingle))
 		game.lobby.historyRatingCasualTabulaMulti.SetText(fmt.Sprintf("%d", ev.CasualTabulaMulti))
+
+		var ids []int
+		achieved := make(map[int]bgammon.HistoryAchievement)
+		for i := len(ev.Achievements) - 1; i >= 0; i-- {
+			achievement := ev.Achievements[i]
+			ids = append(ids, achievement.ID)
+			achieved[achievement.ID] = *achievement
+		}
+		var allIDs []int
+		for id := range server.Achievements {
+			allIDs = append(allIDs, id)
+		}
+		sort.Ints(allIDs)
+		for _, id := range allIDs {
+			if !slices.Contains(ids, id) {
+				ids = append(ids, id)
+			}
+		}
+		game.lobby.historyAchievementsFlex.Clear()
+		for _, id := range ids {
+			info := server.Achievements[id]
+			achievement := achieved[id]
+			w := newAchievementWidget(info[0], info[1], achievement.Replay, achievement.Timestamp)
+			game.lobby.historyAchievementsFlex.AddChild(w)
+		}
+		game.lobby.historyAchievementsGrid.Clear()
+		for i := 0; i < 3; i++ {
+			id := ids[i]
+			info := server.Achievements[id]
+			achievement := achieved[id]
+			w := newAchievementWidget(info[0], info[1], achievement.Replay, achievement.Timestamp)
+			game.lobby.historyAchievementsGrid.AddChildAt(w, i, 0, 1, 1)
+		}
+		buttonGrid := etk.NewGrid()
+		buttonGrid.SetRowPadding(etk.Scale(2))
+		buttonGrid.SetColumnPadding(etk.Scale(2))
+		buttonGrid.AddChildAt(etk.NewButton("Achievements", func() error {
+			g.setRoot(achievementsFrame)
+			return nil
+		}), 0, 0, 1, 1)
+		game.lobby.historyAchievementsGrid.AddChildAt(buttonGrid, 3, 0, 1, 1)
 		list := game.lobby.historyList
 		list.Clear()
 		list.SetSelectionMode(etk.SelectRow)
@@ -3417,6 +3507,70 @@ func hideKeyboard() {
 	}
 	game.keyboard.SetVisible(false)
 	scheduleFrame()
+}
+
+type achievementWidget struct {
+	*etk.WithoutMouse
+	replay int
+}
+
+func newAchievementWidget(name string, description string, replay int, timestamp int64) *achievementWidget {
+	if timestamp != 0 {
+		name += fmt.Sprintf("  (%s)", time.Unix(timestamp, 0).Format("2006-01-02"))
+	}
+
+	nameLabel := etk.NewText(name)
+	nameLabel.SetAutoResize(true)
+	nameLabel.SetVertical(etk.AlignCenter)
+	nameLabel.SetFont(etk.Style.TextFont, largeFontSize)
+
+	descriptionLabel := etk.NewText(description)
+	descriptionLabel.SetAutoResize(true)
+	descriptionLabel.SetVertical(etk.AlignCenter)
+	descriptionLabel.SetFont(etk.Style.TextFont, mediumFontSize)
+
+	leftBorder := etk.NewBox()
+	leftBorder.SetBackground(bufferTextColor)
+
+	rightBorder := etk.NewBox()
+	rightBorder.SetBackground(bufferTextColor)
+
+	topBorder := etk.NewBox()
+	topBorder.SetBackground(bufferTextColor)
+
+	bottomBorder := etk.NewBox()
+	bottomBorder.SetBackground(bufferTextColor)
+
+	borderSize := etk.Scale(2)
+
+	g := etk.NewGrid()
+	g.SetBackground(bufferBackgroundColor)
+	g.SetRowSizes(borderSize, -1, -1, -1, -1, -1, borderSize)
+	g.SetColumnSizes(borderSize, -1, borderSize)
+	g.AddChildAt(&etk.WithoutMouse{nameLabel}, 1, 1, 1, 3)
+	g.AddChildAt(&etk.WithoutMouse{descriptionLabel}, 1, 3, 1, 4)
+	g.AddChildAt(&etk.WithoutMouse{leftBorder}, 0, 0, 1, 7)
+	g.AddChildAt(&etk.WithoutMouse{rightBorder}, 2, 0, 1, 7)
+	g.AddChildAt(&etk.WithoutMouse{topBorder}, 0, 0, 3, 1)
+	g.AddChildAt(&etk.WithoutMouse{bottomBorder}, 0, 6, 3, 1)
+	return &achievementWidget{
+		WithoutMouse: &etk.WithoutMouse{g},
+		replay:       replay,
+	}
+}
+
+func (w *achievementWidget) Cursor() ebiten.CursorShapeType {
+	if w.replay > 0 {
+		return ebiten.CursorShapePointer
+	}
+	return -1
+}
+
+func (w *achievementWidget) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
+	if clicked && w.replay > 0 {
+		game.client.Out <- []byte(fmt.Sprintf("replay %d", w.replay))
+	}
+	return true, nil
 }
 
 // Short description.

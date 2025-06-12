@@ -1,7 +1,7 @@
 codeberg.org/tslocum/bei v0.0.0-20250401032128-99c6d4509aa6 h1:STq1vOZrfjgyC10tJ18doR5eCpkZTD57+kIEONANYl8=
 codeberg.org/tslocum/bei v0.0.0-20250401032128-99c6d4509aa6/go.mod h1:kbIJaAFiTrKZzYefo0+O0QTENgDLxBcepN9PCFn9nxI=
-codeberg.org/tslocum/bgammon v0.0.0-20250612191431-a3c47d420896 h1:SYbD7bvqLQctTnNb98Em8QpwMYZ2hp7mPXO5vMzvsOA=
-codeberg.org/tslocum/bgammon v0.0.0-20250612191431-a3c47d420896/go.mod h1:mWv+bS89Evnq/F1RveLMc7d8+qH2j6k7lao7AJ4zU5s=
+codeberg.org/tslocum/bgammon v0.0.0-20250612225217-766487890d88 h1:+Nql2FKrwkbSnWkmC25cBzvM4aIizEtbKauMuiJvnEo=
+codeberg.org/tslocum/bgammon v0.0.0-20250612225217-766487890d88/go.mod h1:mWv+bS89Evnq/F1RveLMc7d8+qH2j6k7lao7AJ4zU5s=
 codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9 h1:1EF83VgZtqnfn5aE7Nuq3mop5is49yHYzCPDGKkQLiM=
 codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9/go.mod h1:3KMZyJ54RRurCUf9nX8qhP8Uk8zTAMKBQGmnqcDvONo=
 codeberg.org/tslocum/etk v0.0.0-20250610180341-a2bc82da0d49 h1:+hFpgd3Ow/3rFVcvxPOm/M5yjsboU9QuOYflWdqG/Co=

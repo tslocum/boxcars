@@ -1,3 +1,6 @@
+1.4.9:
+- Add achievements
+
 1.4.8:
 - Fix duplicate line issue in rolls and moves log
 - Reduce resource usage when spectating matches
