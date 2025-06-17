@@ -1,13 +1,13 @@
 module codeberg.org/tslocum/boxcars
 
-go 1.23.0
+go 1.24
 
-toolchain go1.24.1
+toolchain go1.24.2
 
 require (
-	codeberg.org/tslocum/bgammon v0.0.0-20250612225217-766487890d88
+	codeberg.org/tslocum/bgammon v0.0.0-20250613060146-338f1a71a1db
 	codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9
-	codeberg.org/tslocum/etk v0.0.0-20250610180341-a2bc82da0d49
+	codeberg.org/tslocum/etk v0.0.0-20250617060352-95e175977a61
 	codeberg.org/tslocum/gotext v0.0.0-20250401033345-fc2bcce10286
 	codeberg.org/tslocum/tabula v0.0.0-20250401032642-84c7ebdd87e2
 	github.com/coder/websocket v1.8.13
@@ -59,7 +59,7 @@ require (
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/vanng822/css v1.0.1 // indirect
 	github.com/vanng822/go-premailer v1.25.0 // indirect
-	golang.design/x/clipboard v0.7.0 // indirect
+	golang.design/x/clipboard v0.7.1 // indirect
 	golang.org/x/crypto v0.39.0 // indirect
 	golang.org/x/exp/shiny v0.0.0-20250606033433-dcc06ee1d476 // indirect
 	golang.org/x/image v0.28.0 // indirect

@@ -40,7 +40,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.9"
+	AppVersion           = "v1.4.9p1"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -1423,7 +1423,7 @@ func (g *Game) initialize() {
 
 		g.lobby.historyAchievementsFlex = etk.NewFlex()
 		g.lobby.historyAchievementsFlex.SetBackground(frameColor)
-		g.lobby.historyAchievementsFlex.SetChildSize(etk.Scale(300), etk.Scale(150))
+		g.lobby.historyAchievementsFlex.SetChildSize(etk.Scale(470), etk.Scale(150))
 		g.lobby.historyAchievementsFlex.SetGaps(etk.Scale(10), etk.Scale(10))
 
 		ratingGrid := func(singleLabel *etk.Text, multiLabel *etk.Text) *etk.Grid {
@@ -2190,7 +2190,7 @@ func (g *Game) handleEvent(e interface{}) {
 		for _, id := range ids {
 			info := server.Achievements[id]
 			achievement := achieved[id]
-			w := newAchievementWidget(info[0], info[1], achievement.Replay, achievement.Timestamp)
+			w := newAchievementWidget(info[0], info[1], achievement.Replay, achievement.Timestamp, false)
 			game.lobby.historyAchievementsFlex.AddChild(w)
 		}
 		game.lobby.historyAchievementsGrid.Clear()
@@ -2198,7 +2198,7 @@ func (g *Game) handleEvent(e interface{}) {
 			id := ids[i]
 			info := server.Achievements[id]
 			achievement := achieved[id]
-			w := newAchievementWidget(info[0], info[1], achievement.Replay, achievement.Timestamp)
+			w := newAchievementWidget(info[0], info[1], achievement.Replay, achievement.Timestamp, true)
 			game.lobby.historyAchievementsGrid.AddChildAt(w, i, 0, 1, 1)
 		}
 		buttonGrid := etk.NewGrid()
@@ -3514,20 +3514,26 @@ type achievementWidget struct {
 	replay int
 }
 
-func newAchievementWidget(name string, description string, replay int, timestamp int64) *achievementWidget {
+func newAchievementWidget(name string, description string, replay int, timestamp int64, compact bool) *achievementWidget {
 	if timestamp != 0 {
 		name += fmt.Sprintf("  (%s)", time.Unix(timestamp, 0).Format("2006-01-02"))
 	}
 
 	nameLabel := etk.NewText(name)
 	nameLabel.SetAutoResize(true)
-	nameLabel.SetVertical(etk.AlignCenter)
 	nameLabel.SetFont(etk.Style.TextFont, largeFontSize)
 
 	descriptionLabel := etk.NewText(description)
 	descriptionLabel.SetAutoResize(true)
-	descriptionLabel.SetVertical(etk.AlignCenter)
 	descriptionLabel.SetFont(etk.Style.TextFont, mediumFontSize)
+
+	if compact {
+		nameLabel.SetVertical(etk.AlignCenter)
+		descriptionLabel.SetVertical(etk.AlignCenter)
+	} else {
+		nameLabel.SetVertical(etk.AlignEnd)
+		descriptionLabel.SetVertical(etk.AlignStart)
+	}
 
 	leftBorder := etk.NewBox()
 	leftBorder.SetBackground(bufferTextColor)
@@ -3545,14 +3551,23 @@ func newAchievementWidget(name string, description string, replay int, timestamp
 
 	g := etk.NewGrid()
 	g.SetBackground(bufferBackgroundColor)
-	g.SetRowSizes(borderSize, -1, -1, -1, -1, -1, borderSize)
+	g.SetRowSizes(borderSize, -1, borderSize)
 	g.SetColumnSizes(borderSize, -1, borderSize)
-	g.AddChildAt(&etk.WithoutMouse{nameLabel}, 1, 1, 1, 3)
-	g.AddChildAt(&etk.WithoutMouse{descriptionLabel}, 1, 3, 1, 4)
-	g.AddChildAt(&etk.WithoutMouse{leftBorder}, 0, 0, 1, 7)
-	g.AddChildAt(&etk.WithoutMouse{rightBorder}, 2, 0, 1, 7)
+	container := etk.NewGrid()
+	container.SetColumnPadding(etk.Scale(2))
+	container.SetRowPadding(etk.Scale(2))
+	if compact {
+		container.AddChildAt(&etk.WithoutMouse{nameLabel}, 0, 0, 1, 3)
+		container.AddChildAt(&etk.WithoutMouse{descriptionLabel}, 0, 2, 1, 4)
+	} else {
+		container.AddChildAt(&etk.WithoutMouse{nameLabel}, 0, 0, 1, 2)
+		container.AddChildAt(&etk.WithoutMouse{descriptionLabel}, 0, 2, 1, 3)
+	}
+	g.AddChildAt(&etk.WithoutMouse{container}, 1, 1, 1, 1)
+	g.AddChildAt(&etk.WithoutMouse{leftBorder}, 0, 0, 1, 3)
+	g.AddChildAt(&etk.WithoutMouse{rightBorder}, 2, 0, 1, 3)
 	g.AddChildAt(&etk.WithoutMouse{topBorder}, 0, 0, 3, 1)
-	g.AddChildAt(&etk.WithoutMouse{bottomBorder}, 0, 6, 3, 1)
+	g.AddChildAt(&etk.WithoutMouse{bottomBorder}, 0, 2, 3, 1)
 	return &achievementWidget{
 		WithoutMouse: &etk.WithoutMouse{g},
 		replay:       replay,
