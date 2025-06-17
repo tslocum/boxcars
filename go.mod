@@ -5,9 +5,9 @@ go 1.24
 toolchain go1.24.2
 
 require (
-	codeberg.org/tslocum/bgammon v0.0.0-20250613060146-338f1a71a1db
+	codeberg.org/tslocum/bgammon v0.0.0-20250617152438-3779ecf66aa5
 	codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9
-	codeberg.org/tslocum/etk v0.0.0-20250617060352-95e175977a61
+	codeberg.org/tslocum/etk v0.0.0-20250617160010-cb192748a843
 	codeberg.org/tslocum/gotext v0.0.0-20250401033345-fc2bcce10286
 	codeberg.org/tslocum/tabula v0.0.0-20250401032642-84c7ebdd87e2
 	github.com/coder/websocket v1.8.13

@@ -2441,6 +2441,9 @@ func (g *Game) viewHistory(search string) error {
 	if search == "" {
 		search = g.client.Username
 	}
+	if viewBoard {
+		setViewBoard(false)
+	}
 	go hideKeyboard()
 	g.lobby.showHistory = true
 	g.setRoot(historyFrame)
@@ -3528,11 +3531,11 @@ func newAchievementWidget(name string, description string, replay int, timestamp
 
 	nameLabel := etk.NewText(name)
 	nameLabel.SetAutoResize(true)
-	nameLabel.SetFont(etk.Style.TextFont, largeFontSize)
+	nameLabel.SetFont(etk.Style.TextFont, etk.Scale(largeFontSize))
 
 	descriptionLabel := etk.NewText(description)
 	descriptionLabel.SetAutoResize(true)
-	descriptionLabel.SetFont(etk.Style.TextFont, mediumFontSize)
+	descriptionLabel.SetFont(etk.Style.TextFont, etk.Scale(mediumFontSize))
 
 	if compact {
 		nameLabel.SetVertical(etk.AlignCenter)
