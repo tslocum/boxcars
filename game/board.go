@@ -1784,17 +1784,20 @@ func (b *board) updateOpponentLabel() {
 	label := b.opponentLabel
 
 	var text string
+	var playerName string
 	if b.gameState.Points > 1 && len(player.Name) > 0 {
 		text = fmt.Sprintf("%s (%d)", player.Name, player.Points)
+		playerName = player.Name
 	} else if len(player.Name) > 0 {
 		text = player.Name
+		playerName = player.Name
 	} else if b.gameState.Started == 0 {
 		text = fmt.Sprintf("%s...", gotext.Get("Waiting"))
 	} else {
 		text = gotext.Get("Left match")
 	}
 	if label.Text.Text() != text {
-		label.SetText(text)
+		label.SetText(text, playerName)
 	}
 
 	label.active = b.gameState.Turn == player.Number
@@ -1867,17 +1870,20 @@ func (b *board) updatePlayerLabel() {
 	label := b.playerLabel
 
 	var text string
+	var playerName string
 	if b.gameState.Points > 1 && len(player.Name) > 0 {
 		text = fmt.Sprintf("%s (%d)", player.Name, player.Points)
+		playerName = player.Name
 	} else if len(player.Name) > 0 {
 		text = player.Name
+		playerName = player.Name
 	} else if b.gameState.Started == 0 {
 		text = fmt.Sprintf("%s...", gotext.Get("Waiting"))
 	} else {
 		text = gotext.Get("Left match")
 	}
 	if label.Text.Text() != text {
-		label.SetText(text)
+		label.SetText(text, playerName)
 	}
 
 	label.active = b.gameState.Turn == player.Number

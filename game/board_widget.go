@@ -14,6 +14,7 @@ import (
 
 type Label struct {
 	*etk.Text
+	player      string
 	active      bool
 	activeColor color.RGBA
 	lastActive  bool
@@ -91,13 +92,30 @@ func (l *Label) SetActive(active bool) {
 	l.active = active
 }
 
-func (l *Label) SetText(t string) {
+func (l *Label) SetText(t string, player string) {
+	l.player = player
 	r := l.Rect()
 	if r.Empty() || l.Text.Text() == t {
 		return
 	}
 	l.Text.SetText(t)
 	l.updateBackground()
+}
+
+func (l *Label) Cursor() ebiten.CursorShapeType {
+	if !game.board.gameState.Spectating || l.player == "" {
+		return -1
+	}
+	return ebiten.CursorShapePointer
+}
+
+func (l *Label) HandleMouse(cursor image.Point, pressed bool, clicked bool) (handled bool, err error) {
+	if !game.board.gameState.Spectating || l.player == "" {
+		return false, nil
+	} else if !clicked {
+		return true, nil
+	}
+	return true, game.viewHistory(l.player)
 }
 
 func (l *Label) Draw(screen *ebiten.Image) error {

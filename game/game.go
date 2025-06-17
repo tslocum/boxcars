@@ -2437,15 +2437,22 @@ func (g *Game) searchMatches(username string) {
 	g.client.Out <- []byte(fmt.Sprintf("history %s", username))
 }
 
-func (g *Game) selectHistory() error {
+func (g *Game) viewHistory(search string) error {
+	if search == "" {
+		search = g.client.Username
+	}
 	go hideKeyboard()
 	g.lobby.showHistory = true
 	g.setRoot(historyFrame)
-	g.lobby.historyUsername.SetText(g.client.Username)
-	g.searchMatches(g.client.Username)
+	g.lobby.historyUsername.SetText(search)
+	g.searchMatches(search)
 	etk.SetFocus(g.lobby.historyUsername)
 	g.lobby.rebuildButtonsGrid()
 	return nil
+}
+
+func (g *Game) selectHistory() error {
+	return g.viewHistory("")
 }
 
 func (g *Game) selectHistorySearch() error {
