@@ -11,13 +11,11 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 	"time"
 
 	"codeberg.org/tslocum/bgammon"
 	"codeberg.org/tslocum/boxcars/game"
 	"github.com/hajimehoshi/ebiten/v2"
-	"golang.org/x/text/language"
 )
 
 func fetchMatches(matches []*bgammon.GameListing) []*bgammon.GameListing {
@@ -90,7 +88,6 @@ func parseFlags() *game.Game {
 		fullscreen = true
 	}
 
-	var forceLanguage *language.Tag
 	if locale == "" {
 		var err error
 		locale, err = game.GetLocale()
@@ -98,17 +95,7 @@ func parseFlags() *game.Game {
 			locale = ""
 		}
 	}
-	if locale != "" {
-		dotIndex := strings.IndexByte(locale, '.')
-		if dotIndex != -1 {
-			locale = locale[:dotIndex]
-		}
-		tag, err := language.Parse(locale)
-		if err == nil {
-			forceLanguage = &tag
-		}
-	}
-	game.LoadLocale(forceLanguage)
+	game.LoadLocale(locale)
 
 	g := game.NewGame()
 	g.Username = username

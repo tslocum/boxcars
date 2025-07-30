@@ -8,8 +8,6 @@ import (
 	"os/exec"
 	"strings"
 	"time"
-
-	"golang.org/x/text/language"
 )
 
 const (
@@ -42,11 +40,7 @@ func init() {
 	if err != nil {
 		return
 	}
-	tag, err := language.Parse(strings.TrimSpace(locale))
-	if err != nil {
-		return
-	}
-	LoadLocale(&tag)
+	LoadLocale(locale)
 }
 
 func userConfigDir() string {

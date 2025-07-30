@@ -1502,7 +1502,7 @@ func (g *Game) initialize() {
 		dividerB := etk.NewBox()
 		dividerB.SetBackground(bufferTextColor)
 
-		achievementsLabel := newLabel("Achievements", etk.AlignStart)
+		achievementsLabel := newLabel(gotext.Get("Achievements"), etk.AlignStart)
 
 		achievementsHeader := etk.NewGrid()
 		achievementsHeader.SetColumnSizes(-1, 400, 200)
@@ -2204,7 +2204,7 @@ func (g *Game) handleEvent(e interface{}) {
 		buttonGrid := etk.NewGrid()
 		buttonGrid.SetRowPadding(etk.Scale(2))
 		buttonGrid.SetColumnPadding(etk.Scale(2))
-		buttonGrid.AddChildAt(etk.NewButton("Achievements", func() error {
+		buttonGrid.AddChildAt(etk.NewButton(gotext.Get("Achievements"), func() error {
 			g.setRoot(achievementsFrame)
 			return nil
 		}), 0, 0, 1, 1)
@@ -3285,7 +3285,7 @@ func randomizeSounds(s []*audio.Player) {
 	}
 }
 
-func LoadLocale(forceLanguage *language.Tag) error {
+func LoadLocale(forceLanguage string) error {
 	entries, err := assetFS.ReadDir("locales")
 	if err != nil {
 		return err
@@ -3301,32 +3301,42 @@ func LoadLocale(forceLanguage *language.Tag) error {
 		if !entry.IsDir() {
 			continue
 		}
-		availableTags = append(availableTags, language.MustParse(entry.Name()))
+		var tag language.Tag
+		if !strings.ContainsRune(entry.Name(), '@') {
+			tag = language.MustParse(entry.Name())
+		}
+		availableTags = append(availableTags, tag)
 		availableNames = append(availableNames, entry.Name())
 	}
 
 	var preferred = []language.Tag{}
-	if forceLanguage != nil {
-		preferred = append(preferred, *forceLanguage)
-	} else {
-		systemLocale := os.Getenv("LANG")
-		if systemLocale != "" {
-			tag, err := language.Parse(systemLocale)
-			if err == nil {
-				preferred = append(preferred, tag)
-			}
+	systemLocale := forceLanguage
+	if systemLocale == "" {
+		systemLocale, err = GetLocale()
+		if err != nil {
+			systemLocale = ""
+		}
+	}
+	if systemLocale != "" {
+		tag, err := language.Parse(systemLocale)
+		if err == nil {
+			preferred = append(preferred, tag)
 		}
 	}
 
 	useLanguage, index, _ := language.NewMatcher(availableTags).Match(preferred...)
 	useLanguageCode := useLanguage.String()
-	if index <= 0 || useLanguageCode == "" || strings.HasPrefix(useLanguageCode, "en") {
+	if index <= 0 || useLanguageCode == "" {
 		return nil
 	}
 	useLanguageName := availableNames[index]
 
+	AppLanguage = useLanguageName
+
+	log.Println("LOAD", useLanguageName)
 	b, err := assetFS.ReadFile(fmt.Sprintf("locales/%s/%s.po", useLanguageName, useLanguageName))
 	if err != nil {
+		log.Println("ERROR", err)
 		return nil
 	}
 
@@ -3334,7 +3344,6 @@ func LoadLocale(forceLanguage *language.Tag) error {
 	po.Parse(b)
 	gotext.GetStorage().AddTranslator("boxcars", po)
 
-	AppLanguage = useLanguageName
 	return nil
 }
 
