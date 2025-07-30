@@ -51,6 +51,9 @@ msgstr "Учётная запись"
 msgid "Acey-deucey"
 msgstr "Эйси-Дьюси"
 
+msgid "Achievements"
+msgstr ""
+
 msgid "Advanced movement"
 msgstr "Продвинутый ход"
 

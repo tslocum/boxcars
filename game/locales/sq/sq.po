@@ -49,6 +49,9 @@ msgstr "Llogaria"
 msgid "Acey-deucey"
 msgstr "Pontë"
 
+msgid "Achievements"
+msgstr ""
+
 msgid "Advanced movement"
 msgstr "Lëvizje e avancuar"
 

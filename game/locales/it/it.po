@@ -51,6 +51,9 @@ msgstr "Profilo"
 msgid "Acey-deucey"
 msgstr "Acey-deucey"
 
+msgid "Achievements"
+msgstr ""
+
 #, fuzzy
 msgid "Advanced movement"
 msgstr "Mossa avanzata"

@@ -49,6 +49,9 @@ msgstr "Compte"
 msgid "Acey-deucey"
 msgstr "Acey-deucey"
 
+msgid "Achievements"
+msgstr ""
+
 msgid "Advanced movement"
 msgstr "Déplacement avancé"
 

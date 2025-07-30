@@ -49,6 +49,9 @@ msgstr "Kvanto"
 msgid "Acey-deucey"
 msgstr "Aso-duo"
 
+msgid "Achievements"
+msgstr ""
+
 msgid "Advanced movement"
 msgstr "Malsimpla movo"
 

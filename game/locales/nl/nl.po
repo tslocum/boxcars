@@ -49,6 +49,9 @@ msgstr "Account"
 msgid "Acey-deucey"
 msgstr "Acey-deucey"
 
+msgid "Achievements"
+msgstr ""
+
 msgid "Advanced movement"
 msgstr "Geavanceerde verplaatsing"
 

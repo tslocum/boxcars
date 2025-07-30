@@ -50,6 +50,9 @@ msgstr ""
 msgid "Acey-deucey"
 msgstr ""
 
+msgid "Achievements"
+msgstr ""
+
 msgid "Advanced movement"
 msgstr ""
 

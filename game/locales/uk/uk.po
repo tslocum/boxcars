@@ -51,6 +51,9 @@ msgstr "Акаунт"
 msgid "Acey-deucey"
 msgstr "Ейсі-дусі"
 
+msgid "Achievements"
+msgstr ""
+
 msgid "Advanced movement"
 msgstr "Просунуті ходи"
 
@@ -478,8 +481,8 @@ msgid ""
 "Welcome to the guided tutorial. This program (Boxcars) is the official "
 "bgammon.org client. bgammon.org is a free and open source backgammon server."
 msgstr ""
-"Вітаємо у посібнику. Ця програма (Boxcars) — офіційний клієнт для bgammon."
-"org — вільного і відкритого сервера для гри в нарди."
+"Вітаємо у посібнику. Ця програма (Boxcars) — офіційний клієнт для "
+"bgammon.org — вільного і відкритого сервера для гри в нарди."
 
 msgid "Welcome, %[1]s. %[2]s playing %[3]s."
 msgstr "Вітаємо, %[1]s. %[2]s грають %[3]s."
