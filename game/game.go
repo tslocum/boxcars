@@ -40,7 +40,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.9p1"
+	AppVersion           = "v1.4.9p2"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -3333,10 +3333,8 @@ func LoadLocale(forceLanguage string) error {
 
 	AppLanguage = useLanguageName
 
-	log.Println("LOAD", useLanguageName)
 	b, err := assetFS.ReadFile(fmt.Sprintf("locales/%s/%s.po", useLanguageName, useLanguageName))
 	if err != nil {
-		log.Println("ERROR", err)
 		return nil
 	}
 

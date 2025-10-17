@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/draw"
 	"math"
 	"sort"
 	"strconv"
@@ -21,7 +20,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/colorm"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/llgcode/draw2d/draw2dimg"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type board struct {
@@ -33,7 +32,6 @@ type board struct {
 	innerW, innerH int
 
 	backgroundImage *ebiten.Image
-	baseImage       *image.RGBA
 
 	Sprites *Sprites
 
@@ -983,12 +981,10 @@ func (b *board) updateBackgroundImage() {
 
 	if b.backgroundImage == nil {
 		b.backgroundImage = ebiten.NewImage(screenW, screenH)
-		b.baseImage = image.NewRGBA(image.Rect(0, 0, screenW, screenH))
 	} else {
 		bounds := b.backgroundImage.Bounds()
 		if bounds.Dx() != screenW || bounds.Dy() != screenH {
 			b.backgroundImage = ebiten.NewImage(screenW, screenH)
-			b.baseImage = image.NewRGBA(image.Rect(0, 0, screenW, screenH))
 		}
 	}
 
@@ -1022,9 +1018,40 @@ func (b *board) updateBackgroundImage() {
 		b.backgroundImage.SubImage(image.Rect(x, y, x+w, y+h)).(*ebiten.Image).Fill(frameColor)
 	}
 
+	path := &vector.Path{}
+	moveTo := func(x float64, y float64) {
+		path.Reset()
+		path.MoveTo(float32(x), float32(y))
+	}
+	lineTo := func(x float64, y float64) {
+		path.LineTo(float32(x), float32(y))
+	}
+
+	strokeOp := &vector.StrokeOptions{}
+	strokeOp.LineJoin = vector.LineJoinRound
+	strokeOp.LineCap = vector.LineCapButt
+	strokePathOp := &vector.DrawPathOptions{}
+	strokePathOp.AntiAlias = true
+	stroke := func(c color.RGBA, size int) {
+		strokeOp.Width = float32(size)
+		strokePathOp.ColorScale.Reset()
+		strokePathOp.ColorScale.ScaleWithColor(c)
+		vector.StrokePath(b.backgroundImage, path, strokeOp, strokePathOp)
+	}
+
+	fillOp := &vector.FillOptions{}
+	fillOp.FillRule = vector.FillRuleNonZero
+	fillPathOp := &vector.DrawPathOptions{}
+	fillPathOp.AntiAlias = true
+	fill := func(c color.RGBA) {
+		fillPathOp.ColorScale.Reset()
+		fillPathOp.ColorScale.ScaleWithColor(c)
+		vector.FillPath(b.backgroundImage, path, fillOp, fillPathOp)
+	}
+
+	var fillColor color.RGBA
+
 	// Draw triangles.
-	draw.Draw(b.baseImage, image.Rect(0, 0, b.w, b.h), image.NewUniform(color.RGBA{0, 0, 0, 0}), image.Point{}, draw.Src)
-	gc := draw2dimg.NewGraphicContext(b.baseImage)
 	offsetX, offsetY := float64(b.horizontalBorderSize), float64(b.verticalBorderSize)
 	for i := 0; i < 2; i++ {
 		triangleTip := float64(b.innerH) / 2
@@ -1039,70 +1066,66 @@ func (b *board) updateBackgroundImage() {
 				colorA = !colorA
 			}
 
-			if colorA {
-				gc.SetFillColor(triangleA)
-			} else {
-				gc.SetFillColor(triangleB)
-			}
-
 			tx := b.spaceWidth * float64(j)
 			ty := b.innerH * i
 			if j >= 6 {
 				tx += b.barWidth
 			}
-			gc.MoveTo(offsetX+float64(tx), offsetY+float64(ty))
-			gc.LineTo(offsetX+float64(tx+b.spaceWidth/2), offsetY+triangleTip)
-			gc.LineTo(offsetX+float64(tx+b.spaceWidth), offsetY+float64(ty))
-			gc.Close()
-			gc.Fill()
+			moveTo(offsetX+float64(tx), offsetY+float64(ty))
+			lineTo(offsetX+float64(tx+b.spaceWidth/2), offsetY+triangleTip)
+			lineTo(offsetX+float64(tx+b.spaceWidth), offsetY+float64(ty))
+			path.Close()
+
+			fillColor = triangleA
+			if !colorA {
+				fillColor = triangleB
+			}
+			fill(fillColor)
 		}
 	}
 
 	// Draw border.
-	borderStrokeSize := 2.0
-	gc.SetStrokeColor(borderColor)
+	borderStrokeSize := 2
 	// Center.
-	gc.SetLineWidth(borderStrokeSize)
-	gc.MoveTo(float64(frameW-int(b.spaceWidth))/2-1, float64(0))
-	gc.LineTo(float64(frameW-int(b.spaceWidth))/2-1, float64(b.h))
-	gc.Stroke()
+	moveTo(float64(frameW-int(b.spaceWidth))/2-1, float64(0))
+	lineTo(float64(frameW-int(b.spaceWidth))/2-1, float64(b.h))
+	stroke(borderColor, borderStrokeSize)
 	if !game.portraitView() {
 		// Outside right.
-		gc.MoveTo(float64(frameW), float64(0))
-		gc.LineTo(float64(frameW), float64(b.h))
-		gc.Stroke()
+		moveTo(float64(frameW), float64(0))
+		lineTo(float64(frameW), float64(b.h))
+		stroke(borderColor, borderStrokeSize)
 	}
 	// Inside left.
-	gc.SetLineWidth(borderStrokeSize / 2)
 	edge := float64(((float64(b.innerW) + 2 - b.barWidth) / 2) + borderSize)
-	gc.MoveTo(float64(borderSize), float64(b.verticalBorderSize))
-	gc.LineTo(edge, float64(b.verticalBorderSize))
-	gc.LineTo(edge, float64(b.h-int(b.verticalBorderSize)))
-	gc.LineTo(float64(borderSize), float64(b.h-int(b.verticalBorderSize)))
-	gc.LineTo(float64(borderSize), float64(b.verticalBorderSize))
-	gc.Close()
-	gc.Stroke()
+	moveTo(float64(borderSize), float64(b.verticalBorderSize))
+	lineTo(edge, float64(b.verticalBorderSize))
+	lineTo(edge, float64(b.h-int(b.verticalBorderSize)))
+	lineTo(float64(borderSize), float64(b.h-int(b.verticalBorderSize)))
+	lineTo(float64(borderSize), float64(b.verticalBorderSize))
+	path.Close()
+	stroke(borderColor, borderStrokeSize/2)
 	// Inside right.
 	leftEdge := float64((b.innerW-int(b.barWidth))/2) + borderSize + b.barWidth
 	edge = leftEdge + math.Ceil(float64((b.innerW-int(b.barWidth)))/2)
-	gc.MoveTo(leftEdge, float64(b.verticalBorderSize))
-	gc.LineTo(edge, float64(b.verticalBorderSize))
-	gc.LineTo(edge, float64(b.h-int(b.verticalBorderSize)))
-	gc.LineTo(leftEdge, float64(b.h-int(b.verticalBorderSize)))
-	gc.LineTo(leftEdge, float64(b.verticalBorderSize))
-	gc.Close()
-	gc.Stroke()
+	moveTo(leftEdge, float64(b.verticalBorderSize))
+	lineTo(edge, float64(b.verticalBorderSize))
+	lineTo(edge, float64(b.h-int(b.verticalBorderSize)))
+	lineTo(leftEdge, float64(b.h-int(b.verticalBorderSize)))
+	lineTo(leftEdge, float64(b.verticalBorderSize))
+	path.Close()
+	stroke(borderColor, borderStrokeSize/2)
 	// Home spaces.
 	{
 		edgeStart := b.horizontalBorderSize + float64(b.innerW) + b.horizontalBorderSize
 		edgeEnd := edgeStart + b.spaceWidth
-		gc.MoveTo(float64(edgeStart), float64(b.verticalBorderSize))
-		gc.LineTo(edgeEnd, float64(b.verticalBorderSize))
-		gc.LineTo(edgeEnd, float64(b.h-int(b.verticalBorderSize)))
-		gc.LineTo(float64(edgeStart), float64(b.h-int(b.verticalBorderSize)))
-		gc.LineTo(float64(edgeStart), float64(b.verticalBorderSize))
-		gc.Close()
-		gc.Stroke()
+		moveTo(float64(edgeStart), float64(b.verticalBorderSize))
+		lineTo(edgeEnd, float64(b.verticalBorderSize))
+		lineTo(edgeEnd, float64(b.h-int(b.verticalBorderSize)))
+		lineTo(float64(edgeStart), float64(b.h-int(b.verticalBorderSize)))
+		lineTo(float64(edgeStart), float64(b.verticalBorderSize))
+		path.Close()
+		stroke(borderColor, borderStrokeSize/2)
 	}
 	// Home space center divider.
 	extraSpace := b.h - int(b.verticalBorderSize)*2 - int(b.overlapSize*10) - 4
@@ -1112,20 +1135,19 @@ func (b *board) updateBackgroundImage() {
 		divStart := float64(b.h/2 - (extraSpace / 2))
 		divEnd := float64(b.h/2 + (extraSpace / 2))
 
-		gc.MoveTo(float64(edgeStart)-1, divStart)
-		gc.LineTo(edgeEnd, divStart)
-		gc.LineTo(edgeEnd, divEnd)
-		gc.LineTo(edgeStart-1, divEnd)
-		gc.Close()
-		gc.SetFillColor(frameColor)
-		gc.Fill()
+		moveTo(float64(edgeStart)-1, divStart)
+		lineTo(edgeEnd, divStart)
+		lineTo(edgeEnd, divEnd)
+		lineTo(edgeStart-1, divEnd)
+		path.Close()
+		fill(frameColor)
 
-		gc.MoveTo(float64(edgeStart), divStart)
-		gc.LineTo(edgeEnd, divStart)
-		gc.Stroke()
-		gc.MoveTo(float64(edgeStart), divEnd)
-		gc.LineTo(edgeEnd, divEnd)
-		gc.Stroke()
+		moveTo(float64(edgeStart), divStart)
+		lineTo(edgeEnd, divStart)
+		stroke(borderColor, borderStrokeSize/2)
+		moveTo(float64(edgeStart), divEnd)
+		lineTo(edgeEnd, divEnd)
+		stroke(borderColor, borderStrokeSize/2)
 	}
 	// Home space partitions.
 	{
@@ -1146,31 +1168,29 @@ func (b *board) updateBackgroundImage() {
 					y1, y2 = y1-checkerHeight*5-dividerHeight, y2-checkerHeight*5-dividerHeight
 				}
 
-				gc.MoveTo(x1, y1)
-				gc.LineTo(x2, y1)
-				gc.LineTo(x2, y2)
-				gc.LineTo(x1, y2)
-				gc.Close()
-				gc.SetFillColor(frameColor)
-				gc.Fill()
+				moveTo(x1, y1)
+				lineTo(x2, y1)
+				lineTo(x2, y2)
+				lineTo(x1, y2)
+				path.Close()
+				fill(frameColor)
 
-				gc.MoveTo(x1, y1)
-				gc.LineTo(x2, y1)
-				gc.Stroke()
+				moveTo(x1, y1)
+				lineTo(x2, y1)
+				stroke(borderColor, borderStrokeSize/2)
 
-				gc.MoveTo(x1, y2)
-				gc.LineTo(x2, y2)
-				gc.Stroke()
+				moveTo(x1, y2)
+				lineTo(x2, y2)
+				stroke(borderColor, borderStrokeSize/2)
 			}
 		}
 	}
 	// Bottom.
 	if b.h < game.screenH {
-		gc.MoveTo(0, float64(b.h))
-		gc.LineTo(float64(b.w), float64(b.h))
-		gc.Stroke()
+		moveTo(0, float64(b.h))
+		lineTo(float64(b.w), float64(b.h))
+		stroke(borderColor, borderStrokeSize)
 	}
-	b.backgroundImage.DrawImage(ebiten.NewImageFromImage(b.baseImage), nil)
 
 	// Doubling cube.
 	if b.gameState.Points > 1 {
