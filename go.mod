@@ -7,7 +7,7 @@ toolchain go1.24.9
 require (
 	codeberg.org/tslocum/bgammon v0.0.0-20250730172135-749bbe305dbe
 	codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9
-	codeberg.org/tslocum/etk v0.0.0-20250623174344-133dc17e803f
+	codeberg.org/tslocum/etk v0.0.0-20251020182633-50cd0445bb16
 	codeberg.org/tslocum/gotext v0.0.0-20250401033345-fc2bcce10286
 	codeberg.org/tslocum/tabula v0.0.0-20250401032642-84c7ebdd87e2
 	github.com/coder/websocket v1.8.14
@@ -31,7 +31,6 @@ require (
 	github.com/ebitengine/purego v0.9.0 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/go-text/typesetting v0.3.0 // indirect
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
@@ -45,7 +44,6 @@ require (
 	github.com/jfreymuth/oggvorbis v1.0.5 // indirect
 	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/jlouis/glicko2 v1.0.0 // indirect
-	github.com/llgcode/draw2d v0.0.0-20240627062922-0ed1ff131195 // indirect
 	github.com/matcornic/hermes/v2 v2.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
