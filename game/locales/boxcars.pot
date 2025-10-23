@@ -138,6 +138,9 @@ msgstr ""
 msgid "Downloaded replay"
 msgstr ""
 
+msgid "Drag a checker off the board to bear it off. Bear off all 15 checkers to win."
+msgstr ""
+
 msgid "Email"
 msgstr ""
 
@@ -464,6 +467,9 @@ msgid "Yes"
 msgstr ""
 
 msgid "You have the black checkers. You can move a checker by either clicking it or dragging it."
+msgstr ""
+
+msgid "You have the black checkers. You can move a checker by tapping or dragging the touchscreen."
 msgstr ""
 
 msgid "You may need to upgrade your client."

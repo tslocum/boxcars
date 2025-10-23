@@ -136,10 +136,18 @@ func (w *tutorialWidget) setPage(page int) {
 		}
 		setViewBoard(true)
 		title = gotext.Get("Board")
-		message = gotext.Get("You have the black checkers. You can move a checker by either clicking it or dragging it.")
+		if isSteamDeck() {
+			message = gotext.Get("You have the black checkers. You can move a checker by tapping or dragging the touchscreen.")
+		} else {
+			message = gotext.Get("You have the black checkers. You can move a checker by either clicking it or dragging it.")
+		}
 	case 4:
 		title = gotext.Get("Bearing Off")
-		message = gotext.Get("Double click a checker to bear it off. Bear off all 15 checkers to win.")
+		if isSteamDeck() {
+			message = gotext.Get("Drag a checker off the board to bear it off. Bear off all 15 checkers to win.")
+		} else {
+			message = gotext.Get("Double click a checker to bear it off. Bear off all 15 checkers to win.")
+		}
 	case 5:
 		title = gotext.Get("Good Luck, Have Fun")
 		message = gotext.Get("This concludes the tutorial. Learn how to play backgammon at bgammon.org/faq and share your feedback at bgammon.org/community")
