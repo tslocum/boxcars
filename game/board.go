@@ -65,6 +65,8 @@ type board struct {
 
 	gameState *bgammon.GameState
 
+	cachedRolls []int8
+
 	opponentRoll1, opponentRoll2, opponentRoll3 int8
 	opponentRollStale                           bool
 	playerRoll1, playerRoll2, playerRoll3       int8
@@ -1535,8 +1537,6 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	// Draw opponent dice.
 
-	rolls := b.gameState.DiceRolls()
-
 	const diceFadeAlpha = 0.1
 	diceGap := 10.0
 	if game.screenW < 800 {
@@ -1567,7 +1567,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		op := &ebiten.DrawImageOptions{}
 
 		d1, d2, d3 := b.opponentRoll1, b.opponentRoll2, b.opponentRoll3
-		d1a, d2a, d3a := diceAlphaValues(rolls, d1, d2, d3, alpha, b.dim, false)
+		d1a, d2a, d3a := diceAlphaValues(b.cachedRolls, d1, d2, d3, alpha, b.dim, false)
 
 		if b.gameState.Turn == 0 {
 			if d2 != 0 {
@@ -1641,7 +1641,7 @@ func (b *board) Draw(screen *ebiten.Image) {
 		op := &ebiten.DrawImageOptions{}
 
 		d1, d2, d3 := b.playerRoll1, b.playerRoll2, b.playerRoll3
-		d1a, d2a, d3a := diceAlphaValues(rolls, d1, d2, d3, alpha, b.dim, true)
+		d1a, d2a, d3a := diceAlphaValues(b.cachedRolls, d1, d2, d3, alpha, b.dim, true)
 
 		if b.gameState.Turn == 0 {
 			if d1 != 0 {
@@ -2205,6 +2205,9 @@ func (b *board) stackSpaceRect(space int8, stack int8) (x, y, w, h int) {
 func (b *board) processState() {
 	b.stateLock.Lock()
 	defer b.stateLock.Unlock()
+
+	// Cache available dice rolls, as they are referenced frequently when dimming dice.
+	b.cachedRolls = b.gameState.DiceRolls()
 
 	if b.dragging != nil {
 		return
