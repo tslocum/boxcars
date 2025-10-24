@@ -736,7 +736,6 @@ func NewGame() *Game {
 	etk.Style.CheckboxBgColor = color.RGBA{40, 24, 9, 255}
 
 	g := &Game{
-		keyboard:      etk.NewKeyboard(),
 		keyboardFrame: etk.NewFrame(),
 
 		runeBuffer: make([]rune, 24),
@@ -748,13 +747,7 @@ func NewGame() *Game {
 
 		Mutex: &sync.Mutex{},
 	}
-	g.keyboard.SetScheduleFrameFunc(scheduleFrame)
-	g.keyboard.SetKeys(kibodo.KeysMobileQWERTY)
-	g.keyboard.SetExtendedKeys(kibodo.KeysMobileSymbols)
-	if !enableOnScreenKeyboard {
-		g.keyboard.SetVisible(false)
-	}
-	g.keyboardFrame.AddChild(g.keyboard)
+
 	g.savedUsername, g.savedPassword = loadCredentials()
 	g.tutorialFrame.SetPositionChildren(true)
 	game = g
@@ -790,6 +783,16 @@ func (g *Game) initialize() {
 
 	displayFrame = etk.NewFrame()
 	displayFrame.SetPositionChildren(true)
+
+	// Initialize keyboard.
+	g.keyboard = etk.NewKeyboard()
+	g.keyboard.SetScheduleFrameFunc(scheduleFrame)
+	g.keyboard.SetKeys(kibodo.KeysMobileQWERTY)
+	g.keyboard.SetExtendedKeys(kibodo.KeysMobileSymbols)
+	if !enableOnScreenKeyboard {
+		g.keyboard.SetVisible(false)
+	}
+	g.keyboardFrame.AddChild(g.keyboard)
 
 	g.board = NewBoard()
 	g.lobby = NewLobby()
