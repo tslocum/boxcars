@@ -2897,7 +2897,7 @@ func dimDie(rolls []int8, dieNum int8, dieValue int8) bool {
 }
 
 func diceAlphaValues(rolls []int8, d1 int8, d2 int8, d3 int8, alpha float32, dim int8, player bool) (float32, float32, float32) {
-	if alpha != 1 || dim == bgammon.DimNone || (dim == bgammon.DimPlayer && !player) {
+	if alpha != 1 || dim == bgammon.DimNone || (dim == bgammon.DimPlayer && !player) || game.replay {
 		return alpha, alpha, alpha
 	}
 	const diceFadeTurnAlpha = 0.2
