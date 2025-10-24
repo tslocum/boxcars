@@ -2,6 +2,7 @@ package game
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"image"
 	"image/color"
@@ -176,6 +177,9 @@ type board struct {
 
 	repositionLock *sync.Mutex
 	stateLock      *sync.Mutex
+
+	animationContext context.Context
+	cancelAnimation  context.CancelFunc
 
 	*sync.Mutex
 }
@@ -493,6 +497,10 @@ func (b *board) confirmLeaveMatch() error {
 		}
 		b.recreateUIGrid()
 	} else {
+		game.leavingMatch = true
+		if b.cancelAnimation != nil {
+			b.cancelAnimation()
+		}
 		b.client.Out <- []byte("leave")
 	}
 	return nil
@@ -2480,15 +2488,20 @@ func (b *board) processState() {
 func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause bool) {
 	moveTime := (650 * time.Millisecond) / time.Duration(speed)
 	pauseTime := 250 * time.Millisecond
-	switch b.speed {
-	case bgammon.SpeedSlow:
-		moveTime += moveTime / 2
-	case bgammon.SpeedFast:
-		moveTime -= moveTime / 2
-		pauseTime -= pauseTime / 2
-	case bgammon.SpeedInstant:
+	if game.leavingMatch {
 		moveTime = 0
 		pauseTime = 0
+	} else {
+		switch b.speed {
+		case bgammon.SpeedSlow:
+			moveTime += moveTime / 2
+		case bgammon.SpeedFast:
+			moveTime -= moveTime / 2
+			pauseTime -= pauseTime / 2
+		case bgammon.SpeedInstant:
+			moveTime = 0
+			pauseTime = 0
+		}
 	}
 
 	b.moving = sprite
@@ -2520,7 +2533,12 @@ func (b *board) _movePiece(sprite *Sprite, from int8, to int8, speed int8, pause
 		sprite.toTime = moveTime
 		sprite.toStart = time.Now()
 
-		time.Sleep(moveTime)
+		b.animationContext, b.cancelAnimation = context.WithCancel(context.Background())
+		select {
+		case <-time.After(moveTime):
+		case <-b.animationContext.Done():
+		}
+		b.cancelAnimation()
 	}
 
 	sprite.x = x

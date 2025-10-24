@@ -478,6 +478,10 @@ func setViewBoard(view bool) {
 	}
 	viewBoard = view
 
+	if !viewBoard {
+		game.leavingMatch = false
+	}
+
 	switch {
 	case game.needLayoutConnect && !game.loggedIn:
 		game.layoutConnect()
@@ -672,6 +676,8 @@ type Game struct {
 	replayData   []byte
 	replayFrame  int
 	replayFrames []*replayFrame
+
+	leavingMatch bool
 
 	localServer chan net.Conn
 
@@ -3209,7 +3215,7 @@ func playSoundEffect(effect SoundEffect) {
 		}
 		p = SoundJoinLeave
 	case effectDie:
-		if game.board.muteRoll {
+		if game.board.muteRoll || game.leavingMatch {
 			return
 		}
 		p = dieSounds[dieSoundPlays]
@@ -3220,7 +3226,7 @@ func playSoundEffect(effect SoundEffect) {
 			dieSoundPlays = 0
 		}
 	case effectDice:
-		if game.board.muteRoll {
+		if game.board.muteRoll || game.leavingMatch {
 			return
 		}
 		p = diceSounds[diceSoundPlays]
@@ -3231,7 +3237,7 @@ func playSoundEffect(effect SoundEffect) {
 			diceSoundPlays = 0
 		}
 	case effectMove:
-		if game.board.muteMove {
+		if game.board.muteMove || game.leavingMatch {
 			return
 		}
 		p = moveSounds[moveSoundPlays]
@@ -3242,12 +3248,12 @@ func playSoundEffect(effect SoundEffect) {
 			moveSoundPlays = 0
 		}
 	case effectHomeSingle:
-		if game.board.muteBearOff {
+		if game.board.muteBearOff || game.leavingMatch {
 			return
 		}
 		p = SoundHomeSingle
 	case effectHomeMulti:
-		if game.board.muteBearOff {
+		if game.board.muteBearOff || game.leavingMatch {
 			return
 		}
 		p = homeMultiSounds[homeMultiSoundPlays]
