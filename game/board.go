@@ -1274,16 +1274,13 @@ func (b *board) updateBackgroundImage() {
 	}
 
 	// Draw profile icons.
-	var opponentIcon, playerIcon *ebiten.Image
-	if b.gameState.Player2.Icon == 1 {
-		opponentIcon = imgProfileBirthday1
-	}
-	if b.gameState.Player1.Icon == 1 {
-		playerIcon = imgProfileBirthday1
-	}
+
+	opponentIcon := profileIcon(b.gameState.Player2.Icon)
+	playerIcon := profileIcon(b.gameState.Player1.Icon)
 	if opponentIcon == nil && playerIcon == nil {
 		return
 	}
+
 	drawProfileIcon := func(icon *ebiten.Image, x float64, y float64, scale float64, opacity float64, invert bool) {
 		var c colorm.ColorM
 		if invert {
@@ -1297,10 +1294,12 @@ func (b *board) updateBackgroundImage() {
 		op.GeoM.Translate(x, y)
 		colorm.DrawImage(b.backgroundImage, icon, c, op)
 	}
+
 	scale := b.spaceWidth / float64(232)
 	baseOpacity := 0.1
 	dividerHeight := float64(etk.Scale(15))
 	checkerHeight := (b.spaceWidth + b.overlapSize*4 - dividerHeight*2) / 15
+
 	if opponentIcon != nil {
 		x, y := edge+b.horizontalBorderSize, float64(b.y)+b.verticalBorderSize+dividerHeight+checkerHeight*10+2-b.spaceWidth-1
 		opacity := baseOpacity / 2
@@ -1309,6 +1308,7 @@ func (b *board) updateBackgroundImage() {
 		}
 		drawProfileIcon(opponentIcon, x, y, scale, opacity, !b.flipBoard)
 	}
+
 	if playerIcon != nil {
 		x, y := edge+b.horizontalBorderSize, float64(b.h)-b.verticalBorderSize-b.spaceWidth-dividerHeight-checkerHeight*5+2
 		opacity := baseOpacity
@@ -2931,6 +2931,17 @@ func diceAlphaValues(rolls []int8, d1 int8, d2 int8, d3 int8, alpha float32, dim
 		d3a = diceFadeTurnAlpha
 	}
 	return d1a, d2a, d3a
+}
+
+func profileIcon(id int) *ebiten.Image {
+	switch id {
+	case 1:
+		return imgProfileBirthday1
+	case 2:
+		return imgProfileBirthday2
+	default:
+		return nil
+	}
 }
 
 func sortMovesFunc(moves [][2]int8, variant int8) func(int, int) bool {

@@ -81,6 +81,7 @@ var (
 	imgCubes64 *ebiten.Image
 
 	imgProfileBirthday1 *ebiten.Image
+	imgProfileBirthday2 *ebiten.Image
 
 	imgIcon    *ebiten.Image
 	ImgIconAlt image.Image
@@ -289,6 +290,7 @@ func loadImageAssets(width int) {
 	imgCubes64 = resizeDice(imgCubes.SubImage(image.Rect(size*2, size*1, size*3, size*2)).(*ebiten.Image), 0.6)
 
 	imgProfileBirthday1 = ebiten.NewImageFromImage(loadImage("asset/image/profile_birthday_1.png"))
+	imgProfileBirthday2 = ebiten.NewImageFromImage(loadImage("asset/image/profile_birthday_2.png"))
 }
 
 func loadAudioAssets() {
