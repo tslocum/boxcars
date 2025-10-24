@@ -1252,9 +1252,14 @@ func (b *board) updateBackgroundImage() {
 			sp = romanNumerals(space)
 		}
 		bounds := etk.BoundString(ff, sp)
-		x := r[0] + r[2]/2 + int(b.horizontalBorderSize) - bounds.Dx()/2 - 2
-		if space == 1 || space > 9 {
-			x -= 2
+		x := int(b.horizontalBorderSize) + r[0] + (r[2]-bounds.Dx())/2
+		if len(sp) == 1 {
+			switch sp[0] {
+			case '1', '2', '3', '4', '7':
+				x += 2
+			case '5', '9':
+				x += 1
+			}
 		}
 		y := 0
 		if b.bottomRow(int8(space)) {
