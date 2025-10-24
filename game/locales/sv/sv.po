@@ -55,6 +55,9 @@ msgstr ""
 msgid "Advanced movement"
 msgstr "Avancerad förflyttning"
 
+msgid "All dice"
+msgstr ""
+
 msgid "Auto-play forced moves"
 msgstr "Auto-spela tvingade steg"
 
@@ -136,6 +139,9 @@ msgstr "Aktuellt"
 msgid "Date"
 msgstr "Datum"
 
+msgid "Dim"
+msgstr ""
+
 msgid "Dismiss"
 msgstr ""
 
@@ -155,6 +161,10 @@ msgstr "Ladda ner repris"
 
 msgid "Downloaded replay"
 msgstr "Nerladdad repris"
+
+msgid ""
+"Drag a checker off the board to bear it off. Bear off all 15 checkers to win."
+msgstr ""
 
 msgid "Email"
 msgstr "Epost"
@@ -291,6 +301,9 @@ msgstr "Nästa"
 msgid "No"
 msgstr "Nej"
 
+msgid "No dice"
+msgstr ""
+
 msgid "No matches found."
 msgstr ""
 
@@ -314,6 +327,9 @@ msgstr "Spela offline"
 
 msgid "Play backgammon online via bgammon.org"
 msgstr "Spela backgammon online via bgammon.org"
+
+msgid "Player dice"
+msgstr ""
 
 msgid "Playing offline."
 msgstr "Spelar offline."
@@ -503,6 +519,11 @@ msgid ""
 msgstr ""
 "Du har de svarta pjäserna. Du kan flytta en bricka genom att antingen klicka "
 "på den eller dra den."
+
+msgid ""
+"You have the black checkers. You can move a checker by tapping or dragging "
+"the touchscreen."
+msgstr ""
 
 msgid "You may need to upgrade your client."
 msgstr "Du kan behöva uppgradera din klient."

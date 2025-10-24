@@ -57,6 +57,9 @@ msgstr "Досягнення"
 msgid "Advanced movement"
 msgstr "Просунуті ходи"
 
+msgid "All dice"
+msgstr ""
+
 msgid "Auto-play forced moves"
 msgstr "Автоматичні примусові ходи"
 
@@ -138,6 +141,9 @@ msgstr "Поточний"
 msgid "Date"
 msgstr "Дата"
 
+msgid "Dim"
+msgstr ""
+
 msgid "Dismiss"
 msgstr "Відхилити"
 
@@ -157,6 +163,10 @@ msgstr "Завантажити повтор"
 
 msgid "Downloaded replay"
 msgstr "Завантажений повтор"
+
+msgid ""
+"Drag a checker off the board to bear it off. Bear off all 15 checkers to win."
+msgstr ""
 
 msgid "Email"
 msgstr "Пошта"
@@ -293,6 +303,9 @@ msgstr "Наступна"
 msgid "No"
 msgstr "Ні"
 
+msgid "No dice"
+msgstr ""
+
 msgid "No matches found."
 msgstr "Збігів не знайдено."
 
@@ -316,6 +329,9 @@ msgstr "Грати офлайн"
 
 msgid "Play backgammon online via bgammon.org"
 msgstr "Грайте у нарди онлайн через bgammon.org"
+
+msgid "Player dice"
+msgstr ""
 
 msgid "Playing offline."
 msgstr "Гра офлайн."
@@ -511,6 +527,11 @@ msgid ""
 msgstr ""
 "Ваші шашки - чорні. Ви можете пересунути шашку натисканням на неї або "
 "пересуванням її."
+
+msgid ""
+"You have the black checkers. You can move a checker by tapping or dragging "
+"the touchscreen."
+msgstr ""
 
 msgid "You may need to upgrade your client."
 msgstr "Можливо, потрібно оновити клієнт."

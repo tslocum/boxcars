@@ -55,6 +55,9 @@ msgstr ""
 msgid "Advanced movement"
 msgstr "Gelişmiş hareket"
 
+msgid "All dice"
+msgstr ""
+
 #, fuzzy
 msgid "Auto-play forced moves"
 msgstr "Zorunlu hamleleri otomatik yap"
@@ -139,6 +142,9 @@ msgstr "Şu anki"
 msgid "Date"
 msgstr "Tarih"
 
+msgid "Dim"
+msgstr ""
+
 msgid "Dismiss"
 msgstr ""
 
@@ -157,6 +163,10 @@ msgstr "Yeniden oynatmayı indir"
 
 msgid "Downloaded replay"
 msgstr "Yeniden oynatma indirildi"
+
+msgid ""
+"Drag a checker off the board to bear it off. Bear off all 15 checkers to win."
+msgstr ""
 
 msgid "Email"
 msgstr "E-posta"
@@ -297,6 +307,9 @@ msgstr ""
 msgid "No"
 msgstr "Hayır"
 
+msgid "No dice"
+msgstr ""
+
 msgid "No matches found."
 msgstr ""
 
@@ -320,6 +333,9 @@ msgstr "Çevrim Dışı Oyna"
 
 msgid "Play backgammon online via bgammon.org"
 msgstr "bgammon.org ile çevrimiçi tavla oynayın"
+
+msgid "Player dice"
+msgstr ""
 
 msgid "Playing offline."
 msgstr "Çevrim dışı oynanıyor."
@@ -511,6 +527,11 @@ msgid ""
 msgstr ""
 "Siyah taşlar sizin. Taşları tıklayarak ya da sürükleyerek hareket "
 "ettirebilirsiniz."
+
+msgid ""
+"You have the black checkers. You can move a checker by tapping or dragging "
+"the touchscreen."
+msgstr ""
 
 msgid "You may need to upgrade your client."
 msgstr "İstemcinizi yükseltmeniz gerekebilir."

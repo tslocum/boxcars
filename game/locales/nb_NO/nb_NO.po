@@ -56,6 +56,9 @@ msgstr ""
 msgid "Advanced movement"
 msgstr "Avansert flytting"
 
+msgid "All dice"
+msgstr ""
+
 msgid "Auto-play forced moves"
 msgstr "Auto-spill tvungne trekk"
 
@@ -140,6 +143,9 @@ msgstr "Nåværende"
 msgid "Date"
 msgstr "Dato"
 
+msgid "Dim"
+msgstr ""
+
 msgid "Dismiss"
 msgstr ""
 
@@ -160,6 +166,10 @@ msgstr "Last ned opptak"
 
 msgid "Downloaded replay"
 msgstr "Laster ned opptak"
+
+msgid ""
+"Drag a checker off the board to bear it off. Bear off all 15 checkers to win."
+msgstr ""
 
 msgid "Email"
 msgstr "E-post"
@@ -307,6 +317,9 @@ msgstr ""
 msgid "No"
 msgstr "Nei"
 
+msgid "No dice"
+msgstr ""
+
 msgid "No matches found."
 msgstr ""
 
@@ -330,6 +343,9 @@ msgstr "Spill frakoblet"
 
 msgid "Play backgammon online via bgammon.org"
 msgstr "Spill backgammon på nett via bgammon.org"
+
+msgid "Player dice"
+msgstr ""
 
 msgid "Playing offline."
 msgstr "Spiller frakoblet."
@@ -524,6 +540,11 @@ msgid ""
 msgstr ""
 "Du har de svarte brikkene. Du kan flytte en brikke ved å klikke eller dra "
 "den."
+
+msgid ""
+"You have the black checkers. You can move a checker by tapping or dragging "
+"the touchscreen."
+msgstr ""
 
 #, fuzzy
 msgid "You may need to upgrade your client."

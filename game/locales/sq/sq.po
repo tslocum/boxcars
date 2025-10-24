@@ -55,6 +55,9 @@ msgstr ""
 msgid "Advanced movement"
 msgstr "Lëvizje e avancuar"
 
+msgid "All dice"
+msgstr ""
+
 msgid "Auto-play forced moves"
 msgstr "Auto-luaj lëvizjet e detyruara"
 
@@ -136,6 +139,9 @@ msgstr "Aktuale"
 msgid "Date"
 msgstr "Datë"
 
+msgid "Dim"
+msgstr ""
+
 msgid "Dismiss"
 msgstr ""
 
@@ -155,6 +161,10 @@ msgstr "Ngarko rishikimin"
 
 msgid "Downloaded replay"
 msgstr "Ngarkuar rishikimin"
+
+msgid ""
+"Drag a checker off the board to bear it off. Bear off all 15 checkers to win."
+msgstr ""
 
 msgid "Email"
 msgstr "E-posta"
@@ -291,6 +301,9 @@ msgstr ""
 msgid "No"
 msgstr "Jo"
 
+msgid "No dice"
+msgstr ""
+
 msgid "No matches found."
 msgstr ""
 
@@ -314,6 +327,9 @@ msgstr "Luaj offline"
 
 msgid "Play backgammon online via bgammon.org"
 msgstr "Luaj Tavëll online nëpërmjet bgammon.org"
+
+msgid "Player dice"
+msgstr ""
 
 msgid "Playing offline."
 msgstr "Luaj offline."
@@ -503,6 +519,11 @@ msgid ""
 "dragging it."
 msgstr ""
 "Ti i ke damat e zeza. Mund të lëvizësh damën duke e prekur ose duke e ngre."
+
+msgid ""
+"You have the black checkers. You can move a checker by tapping or dragging "
+"the touchscreen."
+msgstr ""
 
 msgid "You may need to upgrade your client."
 msgstr "Të vynë për ta përmirësuar klientin."

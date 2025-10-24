@@ -57,6 +57,9 @@ msgstr ""
 msgid "Advanced movement"
 msgstr ""
 
+msgid "All dice"
+msgstr ""
+
 msgid "Auto-play forced moves"
 msgstr ""
 
@@ -133,6 +136,9 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
+msgid "Dim"
+msgstr ""
+
 msgid "Dismiss"
 msgstr ""
 
@@ -149,6 +155,10 @@ msgid "Download replay"
 msgstr ""
 
 msgid "Downloaded replay"
+msgstr ""
+
+msgid ""
+"Drag a checker off the board to bear it off. Bear off all 15 checkers to win."
 msgstr ""
 
 msgid "Email"
@@ -286,6 +296,9 @@ msgstr ""
 msgid "No"
 msgstr "Nie"
 
+msgid "No dice"
+msgstr ""
+
 msgid "No matches found."
 msgstr ""
 
@@ -308,6 +321,9 @@ msgid "Play Offline"
 msgstr ""
 
 msgid "Play backgammon online via bgammon.org"
+msgstr ""
+
+msgid "Player dice"
 msgstr ""
 
 msgid "Playing offline."
@@ -494,6 +510,11 @@ msgstr "Tak"
 msgid ""
 "You have the black checkers. You can move a checker by either clicking it or "
 "dragging it."
+msgstr ""
+
+msgid ""
+"You have the black checkers. You can move a checker by tapping or dragging "
+"the touchscreen."
 msgstr ""
 
 msgid "You may need to upgrade your client."

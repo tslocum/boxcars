@@ -1,7 +1,7 @@
 1.5.0:
 - Dim dice as rolls are played
 - Skip pending animations when leaving match
-- View profile when username is clicked while spectating
+- Support viewing profiles when spectating match
 
 1.4.9:
 - Add achievements
