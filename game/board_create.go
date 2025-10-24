@@ -480,16 +480,16 @@ func (b *board) createMatchStatus() {
 }
 
 func (b *board) createReplayControls() {
-	b.replayPauseButton = etk.NewButton("|>", b.selectReplayPause)
+	b.replayPauseButton = etk.NewButton("▶", b.selectReplayPause)
 
 	b.replayGrid = etk.NewGrid()
-	b.replayGrid.AddChildAt(etk.NewButton("|<<", b.selectReplayStart), 0, 0, 1, 1)
-	b.replayGrid.AddChildAt(etk.NewButton("<<", b.selectReplayJumpBack), 1, 0, 1, 1)
-	b.replayGrid.AddChildAt(etk.NewButton("<", b.selectReplayStepBack), 2, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton("⇤", b.selectReplayStart), 0, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton("⇇", b.selectReplayJumpBack), 1, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton("←", b.selectReplayStepBack), 2, 0, 1, 1)
 	b.replayGrid.AddChildAt(b.replayPauseButton, 3, 0, 1, 1)
-	b.replayGrid.AddChildAt(etk.NewButton(">", b.selectReplayStepForward), 4, 0, 1, 1)
-	b.replayGrid.AddChildAt(etk.NewButton(">>", b.selectReplayJumpForward), 5, 0, 1, 1)
-	b.replayGrid.AddChildAt(etk.NewButton(">>|", b.selectReplayEnd), 6, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton("→", b.selectReplayStepForward), 4, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton("⇉", b.selectReplayJumpForward), 5, 0, 1, 1)
+	b.replayGrid.AddChildAt(etk.NewButton("⇥", b.selectReplayEnd), 6, 0, 1, 1)
 }
 
 func (b *board) createReplayList() {

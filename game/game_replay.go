@@ -443,7 +443,7 @@ func (g *Game) HandleReplay(replay []byte) {
 			btn := etk.NewButton("", func() error {
 				if !game.board.replayAuto.IsZero() {
 					game.board.replayAuto = time.Time{}
-					game.board.replayPauseButton.SetText("|>")
+					game.board.replayPauseButton.SetText("▶")
 				}
 				g.showReplayFrame(frame, true)
 				return nil
