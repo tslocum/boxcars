@@ -5,9 +5,9 @@ go 1.24.0
 toolchain go1.24.9
 
 require (
-	codeberg.org/tslocum/bgammon v0.0.0-20250730172135-749bbe305dbe
+	codeberg.org/tslocum/bgammon v0.0.0-20251024032821-d7b947a754ab
 	codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9
-	codeberg.org/tslocum/etk v0.0.0-20251023183557-a313eb340e00
+	codeberg.org/tslocum/etk v0.0.0-20251024034519-8e5757b0ec50
 	codeberg.org/tslocum/gotext v0.0.0-20250401033345-fc2bcce10286
 	codeberg.org/tslocum/tabula v0.0.0-20250401032642-84c7ebdd87e2
 	github.com/coder/websocket v1.8.14
@@ -61,7 +61,7 @@ require (
 	github.com/vanng822/go-premailer v1.25.0 // indirect
 	golang.design/x/clipboard v0.7.1 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
-	golang.org/x/exp/shiny v0.0.0-20251017212417-90e834f514db // indirect
+	golang.org/x/exp/shiny v0.0.0-20251023183803-a4bb9ffd2546 // indirect
 	golang.org/x/image v0.32.0 // indirect
 	golang.org/x/mobile v0.0.0-20251021151156-188f512ec823 // indirect
 	golang.org/x/net v0.46.0 // indirect

@@ -40,7 +40,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.4.9p3"
+	AppVersion           = "v1.4.9p4"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -518,6 +518,7 @@ func setViewBoard(view bool) {
 
 		game.board.menuGrid.SetVisible(false)
 		game.board.settingsDialog.SetVisible(false)
+		game.board.selectDim.SetMenuVisible(false)
 		game.board.selectSpeed.SetMenuVisible(false)
 		game.board.leaveMatchDialog.SetVisible(false)
 
@@ -2602,6 +2603,7 @@ func (g *Game) handleInput(keys []ebiten.Key) error {
 					return nil
 				} else if g.board.settingsDialog.Visible() {
 					g.board.settingsDialog.SetVisible(false)
+					g.board.selectDim.SetMenuVisible(false)
 					g.board.selectSpeed.SetMenuVisible(false)
 					return nil
 				} else if g.board.changePasswordDialog.Visible() {

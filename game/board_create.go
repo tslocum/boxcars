@@ -369,6 +369,21 @@ func (b *board) createSettingsDialog() {
 		grid.AddChildAt(b.selectSpeed, 2, gridY, 3, 1)
 		gridY++
 	}
+	{
+		dimLabel := resizeText(gotext.Get("Dim"))
+		dimLabel.SetVertical(etk.AlignCenter)
+
+		b.selectDim = etk.NewSelect(game.itemHeight(), b.confirmSelectDim)
+		b.selectDim.SetHighlightColor(color.RGBA{191, 156, 94, 255})
+		b.selectDim.AddOption(gotext.Get("No dice"))
+		b.selectDim.AddOption(gotext.Get("Player dice"))
+		b.selectDim.AddOption(gotext.Get("All dice"))
+		b.selectDim.SetSelectedItem(int(bgammon.DimAll))
+
+		grid.AddChildAt(dimLabel, 0, gridY, 2, 1)
+		grid.AddChildAt(b.selectDim, 2, gridY, 3, 1)
+		gridY++
+	}
 	grid.AddChildAt(cGrid(b.highlightCheckbox), 1, gridY, 1, 1)
 	grid.AddChildAt(highlightLabel, 2, gridY, 3, 1)
 	gridY++
@@ -562,7 +577,12 @@ func (b *board) createFrame() {
 	f = etk.NewFrame()
 	f.AddChild(b.menuGrid)
 	f.AddChild(b.settingsDialog)
-	children := b.selectSpeed.Children()
+	children := b.selectDim.Children()
+	if len(children) == 0 {
+		log.Panicf("failed to find dim selection list")
+	}
+	f.AddChild(children[0])
+	children = b.selectSpeed.Children()
 	if len(children) == 0 {
 		log.Panicf("failed to find speed selection list")
 	}

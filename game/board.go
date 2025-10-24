@@ -134,6 +134,7 @@ type board struct {
 	traditionalCheckbox      *etk.Checkbox
 	advancedMovementCheckbox *etk.Checkbox
 	autoPlayCheckbox         *etk.Checkbox
+	selectDim                *etk.Select
 	selectSpeed              *etk.Select
 	accountGrid              *etk.Grid
 	settingsDialog           *Dialog
@@ -155,6 +156,7 @@ type board struct {
 	lineHeight int
 	lineOffset int
 
+	dim                int8
 	speed              int8
 	highlightAvailable bool
 	showPipCount       bool
@@ -234,6 +236,7 @@ func NewBoard() *board {
 		accountGrid:             etk.NewGrid(),
 		uiGrid:                  etk.NewGrid(),
 		frame:                   etk.NewFrame(),
+		dim:                     bgammon.DimAll,
 		speed:                   bgammon.SpeedMedium,
 		showPipCount:            true,
 		highlightAvailable:      true,
@@ -504,6 +507,7 @@ func (b *board) leaveMatch() error {
 func (b *board) showSettings() error {
 	b.menuGrid.SetVisible(false)
 	b.settingsDialog.SetVisible(false)
+	b.selectDim.SetMenuVisible(false)
 	b.selectSpeed.SetMenuVisible(false)
 	b.changePasswordDialog.SetVisible(false)
 	b.muteSoundsDialog.SetVisible(false)
@@ -513,6 +517,7 @@ func (b *board) showSettings() error {
 
 func (b *board) showChangePassword() error {
 	b.settingsDialog.SetVisible(false)
+	b.selectDim.SetMenuVisible(false)
 	b.selectSpeed.SetMenuVisible(false)
 	b.changePasswordDialog.SetVisible(true)
 	etk.SetFocus(b.changePasswordOld)
@@ -521,6 +526,7 @@ func (b *board) showChangePassword() error {
 
 func (b *board) showMuteSounds() error {
 	b.settingsDialog.SetVisible(false)
+	b.selectDim.SetMenuVisible(false)
 	b.selectSpeed.SetMenuVisible(false)
 	b.changePasswordDialog.SetVisible(false)
 	b.muteSoundsDialog.SetVisible(true)
@@ -530,6 +536,7 @@ func (b *board) showMuteSounds() error {
 func (b *board) hideMenu() error {
 	b.menuGrid.SetVisible(false)
 	b.settingsDialog.SetVisible(false)
+	b.selectDim.SetMenuVisible(false)
 	b.selectSpeed.SetMenuVisible(false)
 	b.changePasswordDialog.SetVisible(false)
 	b.changePasswordOld.SetText("")
@@ -619,6 +626,15 @@ func (b *board) selectRematch() error {
 func (b *board) selectChangePassword() error {
 	b.client.Out <- []byte(fmt.Sprintf("password %s %s", strings.ReplaceAll(b.changePasswordOld.Text(), " ", "_"), strings.ReplaceAll(b.changePasswordNew.Text(), " ", "_")))
 	return b.hideMenu()
+}
+
+func (b *board) confirmSelectDim(index int) (accept bool) {
+	if index < int(bgammon.DimNone) || index > int(bgammon.DimAll) {
+		return false
+	}
+	b.dim = int8(index)
+	b.client.Out <- []byte(fmt.Sprintf("set dim %d", b.dim))
+	return true
 }
 
 func (b *board) confirmSelectSpeed(index int) (accept bool) {
@@ -1511,6 +1527,8 @@ func (b *board) Draw(screen *ebiten.Image) {
 
 	// Draw opponent dice.
 
+	rolls := b.gameState.DiceRolls()
+
 	const diceFadeAlpha = 0.1
 	diceGap := 10.0
 	if game.screenW < 800 {
@@ -1539,13 +1557,15 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 
 		op := &ebiten.DrawImageOptions{}
-		op.ColorScale.ScaleAlpha(alpha)
 
 		d1, d2, d3 := b.opponentRoll1, b.opponentRoll2, b.opponentRoll3
+		d1a, d2a, d3a := diceAlphaValues(rolls, d1, d2, d3, alpha, b.dim, false)
 
 		if b.gameState.Turn == 0 {
 			if d2 != 0 {
-				op := &ebiten.DrawImageOptions{}
+				op.ColorScale.Reset()
+				op.ColorScale.ScaleAlpha(alpha)
+				op.GeoM.Reset()
 				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 				screen.DrawImage(diceImage(d2), op)
 			}
@@ -1553,28 +1573,40 @@ func (b *board) Draw(screen *ebiten.Image) {
 			if d1 != 0 && d2 != 0 {
 				if d3 != 0 {
 					{
+						op.ColorScale.Reset()
+						op.ColorScale.ScaleAlpha(d1a)
+						op.GeoM.Reset()
 						op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap-float64(diceSize/2)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 						screen.DrawImage(diceImage(d1), op)
 					}
 
 					{
+						op.ColorScale.Reset()
+						op.ColorScale.ScaleAlpha(d2a)
 						op.GeoM.Reset()
 						op.GeoM.Translate(float64(innerCenter)-float64(diceSize)/2, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 						screen.DrawImage(diceImage(d2), op)
 					}
 
 					{
+						op.ColorScale.Reset()
+						op.ColorScale.ScaleAlpha(d3a)
 						op.GeoM.Reset()
 						op.GeoM.Translate(float64(innerCenter)+diceGap+float64(diceSize/2)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 						screen.DrawImage(diceImage(d3), op)
 					}
 				} else {
 					{
+						op.ColorScale.Reset()
+						op.ColorScale.ScaleAlpha(d1a)
+						op.GeoM.Reset()
 						op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 						screen.DrawImage(diceImage(d1), op)
 					}
 
 					{
+						op.ColorScale.Reset()
+						op.ColorScale.ScaleAlpha(d2a)
 						op.GeoM.Reset()
 						op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 						screen.DrawImage(diceImage(d2), op)
@@ -1599,12 +1631,15 @@ func (b *board) Draw(screen *ebiten.Image) {
 		}
 
 		op := &ebiten.DrawImageOptions{}
-		op.ColorScale.ScaleAlpha(alpha)
 
 		d1, d2, d3 := b.playerRoll1, b.playerRoll2, b.playerRoll3
+		d1a, d2a, d3a := diceAlphaValues(rolls, d1, d2, d3, alpha, b.dim, true)
 
 		if b.gameState.Turn == 0 {
 			if d1 != 0 {
+				op.ColorScale.Reset()
+				op.ColorScale.ScaleAlpha(alpha)
+				op.GeoM.Reset()
 				op.GeoM.Translate(float64(innerCenter-diceSize/2), float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 				screen.DrawImage(diceImage(d1), op)
 			}
@@ -1612,28 +1647,40 @@ func (b *board) Draw(screen *ebiten.Image) {
 			if d1 != 0 && d2 != 0 {
 				if d3 != 0 {
 					{
+						op.ColorScale.Reset()
+						op.ColorScale.ScaleAlpha(d1a)
+						op.GeoM.Reset()
 						op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap-float64(diceSize/2)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 						screen.DrawImage(diceImage(d1), op)
 					}
 
 					{
+						op.ColorScale.Reset()
+						op.ColorScale.ScaleAlpha(d2a)
 						op.GeoM.Reset()
 						op.GeoM.Translate(float64(innerCenter)-float64(diceSize)/2, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 						screen.DrawImage(diceImage(d2), op)
 					}
 
 					{
+						op.ColorScale.Reset()
+						op.ColorScale.ScaleAlpha(d3a)
 						op.GeoM.Reset()
 						op.GeoM.Translate(float64(innerCenter)+diceGap+float64(diceSize/2)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 						screen.DrawImage(diceImage(d3), op)
 					}
 				} else {
 					{
+						op.ColorScale.Reset()
+						op.ColorScale.ScaleAlpha(d1a)
+						op.GeoM.Reset()
 						op.GeoM.Translate(float64(innerCenter-diceSize)-diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 						screen.DrawImage(diceImage(d1), op)
 					}
 
 					{
+						op.ColorScale.Reset()
+						op.ColorScale.ScaleAlpha(d2a)
 						op.GeoM.Reset()
 						op.GeoM.Translate(float64(innerCenter)+diceGap, float64(b.y+(b.innerH/2))-diceGap-float64(diceSize))
 						screen.DrawImage(diceImage(d2), op)
@@ -1723,7 +1770,8 @@ func (b *board) setRect(x, y, w, h int) {
 		if dialogWidth > game.screenW {
 			dialogWidth = game.screenW
 		}
-		dialogHeight := 72 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + 72 + 20 + etk.Scale(baseButtonHeight)
+		const settingsRows = 12
+		dialogHeight := 72 + (72+20)*settingsRows + etk.Scale(baseButtonHeight)
 		if dialogHeight > game.screenH {
 			dialogHeight = game.screenH
 		}
@@ -2682,6 +2730,10 @@ func (b *board) Update() {
 		b.pendingSettings = nil
 		b.stateLock.Unlock()
 
+		if ev.Dim >= bgammon.DimNone && ev.Dim <= bgammon.DimAll {
+			b.dim = ev.Dim
+			b.selectDim.SetSelectedItem(int(b.dim))
+		}
 		if ev.Speed >= bgammon.SpeedSlow && ev.Speed <= bgammon.SpeedInstant {
 			b.speed = ev.Speed
 			b.selectSpeed.SetSelectedItem(int(b.speed))
@@ -2811,6 +2863,48 @@ func formatRoll(r1, r2, r3 int8) string {
 		dice = fmt.Sprintf("%d", r2)
 	}
 	return dice
+}
+
+func dimDie(rolls []int8, dieNum int8, dieValue int8) bool {
+	var found int8
+	for _, v := range rolls {
+		if dieValue == v {
+			found++
+		}
+	}
+	return found < dieNum
+}
+
+func diceAlphaValues(rolls []int8, d1 int8, d2 int8, d3 int8, alpha float32, dim int8, player bool) (float32, float32, float32) {
+	if alpha != 1 || dim == bgammon.DimNone || (dim == bgammon.DimPlayer && !player) {
+		return alpha, alpha, alpha
+	}
+	const diceFadeTurnAlpha = 0.2
+	d1a, d2a, d3a := alpha, alpha, alpha
+	dieNum := int8(1)
+	if d1 == d2 {
+		if d1 == d3 {
+			dieNum = 3
+		} else {
+			dieNum = 2
+		}
+	}
+	if dimDie(rolls, dieNum, d1) {
+		d1a = diceFadeTurnAlpha
+	}
+	if d2 == d3 {
+		dieNum = 2
+	} else {
+		dieNum = 1
+	}
+	if dimDie(rolls, dieNum, d2) {
+		d2a = diceFadeTurnAlpha
+	}
+	dieNum = 1
+	if dimDie(rolls, dieNum, d3) {
+		d3a = diceFadeTurnAlpha
+	}
+	return d1a, d2a, d3a
 }
 
 func sortMovesFunc(moves [][2]int8, variant int8) func(int, int) bool {

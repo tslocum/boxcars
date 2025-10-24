@@ -51,6 +51,9 @@ msgstr ""
 msgid "Advanced movement"
 msgstr ""
 
+msgid "All dice"
+msgstr ""
+
 msgid "Auto-play forced moves"
 msgstr ""
 
@@ -118,6 +121,9 @@ msgid "Current"
 msgstr ""
 
 msgid "Date"
+msgstr ""
+
+msgid "Dim"
 msgstr ""
 
 msgid "Dismiss"
@@ -276,6 +282,9 @@ msgstr ""
 msgid "No"
 msgstr ""
 
+msgid "No dice"
+msgstr ""
+
 msgid "No matches found."
 msgstr ""
 
@@ -298,6 +307,9 @@ msgid "Play Offline"
 msgstr ""
 
 msgid "Play backgammon online via bgammon.org"
+msgstr ""
+
+msgid "Player dice"
 msgstr ""
 
 msgid "Playing offline."
