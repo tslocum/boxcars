@@ -495,6 +495,7 @@ func (b *board) createReplayControls() {
 func (b *board) createReplayList() {
 	scrollBarWidth := etk.Scale(32)
 	b.replayList = etk.NewList(etk.Scale(baseButtonHeight), nil, nil)
+	b.replayList.SetSelectionMode(etk.SelectNone)
 	b.replayList.SetScrollBarColors(etk.Style.ScrollAreaColor, etk.Style.ScrollHandleColor)
 	b.replayList.SetScrollBarWidth(scrollBarWidth)
 }

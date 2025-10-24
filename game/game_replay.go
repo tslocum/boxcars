@@ -448,12 +448,12 @@ func (g *Game) HandleReplay(replay []byte) {
 				g.showReplayFrame(frame, true)
 				return nil
 			})
-			rollWidth := 85
+			rollWidth := 50
 			if gs.Variant == bgammon.VariantTabula {
-				rollWidth = 110
+				rollWidth = 75
 			}
 			grid := etk.NewGrid()
-			grid.SetColumnSizes(rollWidth, -1)
+			grid.SetColumnSizes(etk.Scale(rollWidth), -1)
 			rollLabel := etk.NewText(string(roll))
 			rollLabel.SetPadding(etk.Scale(etk.Style.ButtonBorderSize + 2))
 			rollLabel.SetVertical(etk.AlignCenter)
