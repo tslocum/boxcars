@@ -10,11 +10,11 @@ Visit https://play.bgammon.org
 
 ### Desktop
 
-Download Boxcars for Windows and Linux [here](https://codeberg.org/tslocum/boxcars/releases)
+Download Boxcars for Windows and Linux [here](https://codeberg.org/tslocum/boxcars/releases).
 
 ### Android
 
-Download Boxcars via [F-Droid](https://f-droid.org/packages/com.rocket9labs.boxcars/)
+Download Boxcars for Android [here](https://bgammon.org/boxcars/boxcars-android.apk).
 
 ## Screenshot
 

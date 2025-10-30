@@ -5,11 +5,11 @@ go 1.24.0
 toolchain go1.24.9
 
 require (
-	codeberg.org/tslocum/bgammon v0.0.0-20251024032821-d7b947a754ab
+	codeberg.org/tslocum/bgammon v0.0.0-20251030165947-64900b287b3e
 	codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9
 	codeberg.org/tslocum/etk v0.0.0-20251024034519-8e5757b0ec50
 	codeberg.org/tslocum/gotext v0.0.0-20250401033345-fc2bcce10286
-	codeberg.org/tslocum/tabula v0.0.0-20250401032642-84c7ebdd87e2
+	codeberg.org/tslocum/tabula v0.0.0-20251028214643-fad460fa1451
 	github.com/coder/websocket v1.8.14
 	github.com/hajimehoshi/ebiten/v2 v2.9.3
 	golang.org/x/sys v0.37.0
@@ -24,7 +24,8 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.3 // indirect
 	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
-	github.com/clipperhouse/uax29/v2 v2.2.0 // indirect
+	github.com/clipperhouse/stringish v0.1.1 // indirect
+	github.com/clipperhouse/uax29/v2 v2.3.0 // indirect
 	github.com/ebitengine/gomobile v0.0.0-20250923094054-ea854a63cce1 // indirect
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
 	github.com/ebitengine/oto/v3 v3.4.0 // indirect
