@@ -1,3 +1,6 @@
+1.5.1:
+- Support Crawford Rule
+
 1.5.0:
 - Dim dice as rolls are played
 - Skip pending animations when leaving match

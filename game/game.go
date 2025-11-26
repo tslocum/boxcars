@@ -79,6 +79,7 @@ var (
 	imgCubes16 *ebiten.Image
 	imgCubes32 *ebiten.Image
 	imgCubes64 *ebiten.Image
+	imgCubesC  *ebiten.Image
 
 	imgProfileBirthday1 *ebiten.Image
 	imgProfileBirthday2 *ebiten.Image
@@ -288,6 +289,7 @@ func loadImageAssets(width int) {
 	imgCubes16 = resizeDice(imgCubes.SubImage(image.Rect(0, size*1, size*1, size*2)).(*ebiten.Image), 0.6)
 	imgCubes32 = resizeDice(imgCubes.SubImage(image.Rect(size*1, size*1, size*2, size*2)).(*ebiten.Image), 0.6)
 	imgCubes64 = resizeDice(imgCubes.SubImage(image.Rect(size*2, size*1, size*3, size*2)).(*ebiten.Image), 0.6)
+	imgCubesC = resizeDice(imgCubes.SubImage(image.Rect(0, size*2, size*1, size*3)).(*ebiten.Image), 0.6)
 
 	imgProfileBirthday1 = ebiten.NewImageFromImage(loadImage("asset/image/profile_birthday_1.png"))
 	imgProfileBirthday2 = ebiten.NewImageFromImage(loadImage("asset/image/profile_birthday_2.png"))
@@ -451,7 +453,10 @@ func diceImage(roll int8) *ebiten.Image {
 	}
 }
 
-func cubeImage(value int8) *ebiten.Image {
+func cubeImage(value int8, crawford bgammon.Crawford) *ebiten.Image {
+	if crawford == bgammon.CrawfordActive {
+		return imgCubesC
+	}
 	switch value {
 	case 2:
 		return imgCubes2

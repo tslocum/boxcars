@@ -62,6 +62,7 @@ type board struct {
 	lastVariant      int8
 	lastIconPlayer   int
 	lastIconOpponent int
+	lastCrawford     bgammon.Crawford
 
 	gameState *bgammon.GameState
 
@@ -1232,7 +1233,7 @@ func (b *board) updateBackgroundImage() {
 		}
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(float64(b.w)-b.spaceWidth/2-float64(cubesImageSize)/2-1, cubeY)
-		b.backgroundImage.DrawImage(cubeImage(b.gameState.DoubleValue), op)
+		b.backgroundImage.DrawImage(cubeImage(b.gameState.DoubleValue, b.gameState.Crawford), op)
 	}
 
 	// Draw space numbers.
@@ -2221,7 +2222,7 @@ func (b *board) processState() {
 	if b.lastPlayerNumber != b.gameState.PlayerNumber || b.lastVariant != b.gameState.Variant {
 		b.setSpaceRects()
 		b.updateBackgroundImage()
-	} else if b.lastPoints != b.gameState.Points || b.lastDoublePlayer != b.gameState.DoublePlayer || b.lastDoubleValue != b.gameState.DoubleValue || b.lastIconPlayer != b.gameState.Player1.Icon || b.lastIconOpponent != b.gameState.Player2.Icon {
+	} else if b.lastPoints != b.gameState.Points || b.lastDoublePlayer != b.gameState.DoublePlayer || b.lastDoubleValue != b.gameState.DoubleValue || b.lastIconPlayer != b.gameState.Player1.Icon || b.lastIconOpponent != b.gameState.Player2.Icon || b.lastCrawford != b.gameState.Crawford {
 		b.updateBackgroundImage()
 	}
 	b.lastPlayerNumber = b.gameState.PlayerNumber
@@ -2231,6 +2232,7 @@ func (b *board) processState() {
 	b.lastDoubleValue = b.gameState.DoubleValue
 	b.lastIconPlayer = b.gameState.Player1.Icon
 	b.lastIconOpponent = b.gameState.Player2.Icon
+	b.lastCrawford = b.gameState.Crawford
 
 	if b.flipBoard || b.gameState.PlayerNumber == 2 {
 		if b.opponentLabel.activeColor != colorBlack {
