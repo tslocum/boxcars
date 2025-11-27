@@ -95,6 +95,8 @@ type lobby struct {
 
 	historyButton *etk.Button
 	buttonsGrid   *etk.Grid
+
+	achievementInfo map[int][2]string
 }
 
 func NewLobby() *lobby {
@@ -127,7 +129,8 @@ func NewLobby() *lobby {
 	}
 
 	l := &lobby{
-		buttonsGrid: etk.NewGrid(),
+		buttonsGrid:     etk.NewGrid(),
+		achievementInfo: make(map[int][2]string),
 	}
 
 	loadingText := newCenteredText(gotext.Get("Loading..."))

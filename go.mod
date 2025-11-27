@@ -5,7 +5,7 @@ go 1.24.1
 toolchain go1.24.9
 
 require (
-	codeberg.org/tslocum/bgammon v0.0.0-20251126230253-0d09561fbfdd
+	codeberg.org/tslocum/bgammon v0.0.0-20251127051528-8ef6aae9a6b4
 	codeberg.org/tslocum/bgammon-bei-bot v0.0.0-20250401034558-ae6ab01531a9
 	codeberg.org/tslocum/etk v0.0.0-20251024034519-8e5757b0ec50
 	codeberg.org/tslocum/gotext v0.0.0-20250401033345-fc2bcce10286

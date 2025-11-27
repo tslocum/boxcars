@@ -40,7 +40,7 @@ import (
 )
 
 const (
-	AppVersion           = "v1.5.0"
+	AppVersion           = "v1.5.0p2"
 	baseButtonHeight     = 54
 	MaxDebug             = 2
 	DefaultServerAddress = "wss://ws.bgammon.org:1338"
@@ -2164,6 +2164,10 @@ func (g *Game) handleEvent(e interface{}) {
 		g.board.stateLock.Lock()
 		g.board.pendingSettings = ev
 		g.board.stateLock.Unlock()
+	case *bgammon.EventAchievements:
+		for _, a := range ev.Achievements {
+			g.lobby.achievementInfo[a.ID] = [2]string{a.Name, a.Description}
+		}
 	case *bgammon.EventReplay:
 		if game.downloadReplay == ev.ID {
 			err := saveReplay(ev.ID, ev.Content)
@@ -2194,8 +2198,13 @@ func (g *Game) handleEvent(e interface{}) {
 			achieved[achievement.ID] = *achievement
 		}
 		var allIDs []int
-		for id := range server.Achievements {
+		for id := range game.lobby.achievementInfo {
 			allIDs = append(allIDs, id)
+		}
+		if len(allIDs) == 0 {
+			for id := range server.Achievements {
+				allIDs = append(allIDs, id)
+			}
 		}
 		sort.Ints(allIDs)
 		for _, id := range allIDs {
@@ -2205,7 +2214,11 @@ func (g *Game) handleEvent(e interface{}) {
 		}
 		game.lobby.historyAchievementsFlex.Clear()
 		for _, id := range ids {
-			info := server.Achievements[id]
+			info := game.lobby.achievementInfo[id]
+			if info[0] == "" {
+				info[0] = gotext.Get("Loading...")
+				info[1] = info[0]
+			}
 			achievement := achieved[id]
 			w := newAchievementWidget(info[0], info[1], achievement.Replay, achievement.Timestamp, false)
 			game.lobby.historyAchievementsFlex.AddChild(w)
@@ -2213,7 +2226,11 @@ func (g *Game) handleEvent(e interface{}) {
 		game.lobby.historyAchievementsGrid.Clear()
 		for i := 0; i < 3; i++ {
 			id := ids[i]
-			info := server.Achievements[id]
+			info := game.lobby.achievementInfo[id]
+			if info[0] == "" {
+				info[0] = gotext.Get("Loading...")
+				info[1] = info[0]
+			}
 			achievement := achieved[id]
 			w := newAchievementWidget(info[0], info[1], achievement.Replay, achievement.Timestamp, true)
 			game.lobby.historyAchievementsGrid.AddChildAt(w, i, 0, 1, 1)
@@ -2462,6 +2479,9 @@ func (g *Game) viewHistory(search string) error {
 		setViewBoard(false)
 	}
 	go hideKeyboard()
+	if len(g.lobby.achievementInfo) == 0 {
+		g.client.Out <- []byte("achievements")
+	}
 	g.lobby.showHistory = true
 	g.setRoot(historyFrame)
 	g.lobby.historyUsername.SetText(search)
