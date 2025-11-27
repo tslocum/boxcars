@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-06-03 09:58+0000\n"
-"Last-Translator: yurtpage <yurtpage@noreply.codeberg.org>\n"
+"PO-Revision-Date: 2025-11-09 19:09+0000\n"
+"Last-Translator: Githabnet <githabnet@noreply.codeberg.org>\n"
 "Language-Team: Russian <https://translate.codeberg.org/projects/bgammon/"
 "client/ru/>\n"
 "Language: ru\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.11.4\n"
+"X-Generator: Weblate 5.14\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Бесплатные онлайн нарды"
@@ -52,13 +52,13 @@ msgid "Acey-deucey"
 msgstr "Эйси-Дьюси"
 
 msgid "Achievements"
-msgstr ""
+msgstr "Достижения"
 
 msgid "Advanced movement"
 msgstr "Продвинутый ход"
 
 msgid "All dice"
-msgstr ""
+msgstr "Все кубики"
 
 msgid "Auto-play forced moves"
 msgstr "Делать вынужденные ходы автоматически"
@@ -164,9 +164,12 @@ msgstr "Скачать повторение"
 msgid "Downloaded replay"
 msgstr "Скачанное повторение"
 
+#, fuzzy
 msgid ""
 "Drag a checker off the board to bear it off. Bear off all 15 checkers to win."
 msgstr ""
+"Перетащите шашку с доски, чтобы вывести ее из игры. Выведите из игры все 15 "
+"шашек, чтобы выиграть."
 
 msgid "Email"
 msgstr "Почта"
