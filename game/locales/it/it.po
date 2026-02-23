@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-12-13 01:42+0000\n"
-"Last-Translator: fitopot <fitopot@users.noreply.translate.codeberg.org>\n"
+"PO-Revision-Date: 2026-02-07 11:29+0000\n"
+"Last-Translator: KinGaume <kingaume@noreply.codeberg.org>\n"
 "Language-Team: Italian <https://translate.codeberg.org/projects/bgammon/"
 "client/it/>\n"
 "Language: it\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.8.4\n"
+"X-Generator: Weblate 5.15.2\n"
 
 msgid "%s - Free Online Backgammon"
 msgstr "%s - Backgammon online, libero e aperto"
@@ -52,14 +52,14 @@ msgid "Acey-deucey"
 msgstr "Acey-deucey"
 
 msgid "Achievements"
-msgstr ""
+msgstr "Risultati raggiunti"
 
 #, fuzzy
 msgid "Advanced movement"
 msgstr "Mossa avanzata"
 
 msgid "All dice"
-msgstr ""
+msgstr "Tutti i dadi"
 
 msgid "Auto-play forced moves"
 msgstr "Gioca automaticamente mosse obbligatorie"
@@ -145,7 +145,7 @@ msgid "Date"
 msgstr "Data"
 
 msgid "Dim"
-msgstr ""
+msgstr "Debole"
 
 msgid "Dismiss"
 msgstr "Scarta"
@@ -170,6 +170,8 @@ msgstr "Partita scaricata"
 msgid ""
 "Drag a checker off the board to bear it off. Bear off all 15 checkers to win."
 msgstr ""
+"Trascina una pedina fuori dalla tavola per eliminarla. Elimina tutte e 15 le "
+"pedine per vincere."
 
 msgid "Email"
 msgstr "Email"
