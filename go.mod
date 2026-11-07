@@ -9,7 +9,7 @@ require (
 	codeberg.org/tslocum/gotext v0.0.0-20260702153535-d0250b83dac7
 	codeberg.org/tslocum/tabula v0.0.0-20251126224954-c4a498a4d704
 	github.com/coder/websocket v1.8.15
-	github.com/hajimehoshi/ebiten/v2 v2.10.5
+	github.com/hajimehoshi/ebiten/v2 v2.10.6
 	golang.org/x/sys v0.49.0
 	golang.org/x/text v0.43.0
 )
