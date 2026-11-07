@@ -2108,16 +2108,25 @@ func (g *Game) handleEvent(e interface{}) {
 	case *bgammon.EventFailedRoll:
 		ls(fmt.Sprintf("*** %s: %s", gotext.Get("Failed to roll"), ev.Reason))
 	case *bgammon.EventMoved:
-		incomingGameLogMove = true
+		incomingGameLogMove = !g.board.gameState.Forced
 		if ev.Player == g.client.Username && !g.board.gameState.Spectating && !g.board.gameState.Forced {
 			return
 		}
 
 		g.board.Lock()
 		g.Unlock()
-		for _, move := range ev.Moves {
+		for i, move := range ev.Moves {
 			playSoundEffect(effectMove)
 			g.board.movePiece(move[0], move[1], true)
+			if g.board.gameState.Forced {
+				if i == 0 && len(g.board.gameState.Moves) == 0 {
+					gameBuffer.Write([]byte(" "))
+				} else {
+					gameBuffer.Write([]byte(", "))
+				}
+				gameBuffer.Write([]byte(bgammon.FormatMoves([][]int8{{move[0], move[1]}})))
+				g.board.gameState.Moves = append(g.board.gameState.Moves, move)
+			}
 		}
 		g.Lock()
 		if g.board.showMoves {

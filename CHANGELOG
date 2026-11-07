@@ -1,5 +1,7 @@
 1.5.1:
 - Support Crawford Rule
+- Fix dimming dice
+- Fix logging forced moves
 
 1.5.0:
 - Dim dice as rolls are played
