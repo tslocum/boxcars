@@ -1,32 +1,36 @@
 msgid ""
 msgstr ""
+"PO-Revision-Date: 2026-07-03 07:07+0000\n"
+"Last-Translator: frandj <frandj@noreply.codeberg.org>\n"
+"Language-Team: Catalan <https://translate.codeberg.org/projects/bgammon/"
+"client/ca/>\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: xgotext\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 msgid "%s - Free Online Backgammon"
-msgstr ""
+msgstr "%s - Backgammon En Línia Gratuït"
 
 msgid "%s joined the match."
-msgstr ""
+msgstr "%s s'ha unit a la partida."
 
 msgid "%s left the match."
-msgstr ""
+msgstr "%s ha abandonat la partida."
 
 msgid "%s moved %s"
-msgstr ""
+msgstr "%s ha mogut %s"
 
 msgid "%s rolled %s"
 msgstr ""
 
 msgid "%s resigned."
-msgstr ""
+msgstr "%s s'ha rendit."
 
 msgid "%s wins!"
-msgstr ""
+msgstr "%s ha guanyat!"
 
 msgid "%[1]s wins %[2]d point!"
 msgid_plural "%[1]s wins %[2]d points!"
@@ -34,34 +38,35 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "About"
-msgstr ""
+msgstr "Quant a"
 
 msgid "Accept"
 msgstr ""
 
 msgid "Account"
-msgstr ""
+msgstr "Compte"
 
 msgid "Acey-deucey"
 msgstr ""
 
 msgid "Achievements"
-msgstr ""
+msgstr "Assoliments"
 
 msgid "Advanced movement"
-msgstr ""
+msgstr "Moviment avançat"
 
 msgid "All dice"
-msgstr ""
+msgstr "Tots els daus"
 
 msgid "Auto-play forced moves"
 msgstr ""
 
 msgid "Available"
-msgstr ""
+msgstr "Disponible"
 
+#, fuzzy
 msgid "Backgammon"
-msgstr ""
+msgstr "Backgammon"
 
 msgid "Bear Off"
 msgstr ""
@@ -70,64 +75,71 @@ msgid "Bearing Off"
 msgstr ""
 
 msgid "Board"
-msgstr ""
+msgstr "Tauler"
 
 msgid ""
 "Boxcars is a client for playing backgammon via bgammon.org, a free and open "
 "source backgammon service."
 msgstr ""
+"Boxcars és un client per a jugar backgammon mitjançant bgammon.org, un "
+"servei de backgammon gratuït i de codi obert."
 
 msgid "Cancel"
-msgstr ""
+msgstr "Cancel·la"
 
 msgid "Change password"
-msgstr ""
+msgstr "Canvia la contrasenya"
 
 msgid "Chat"
-msgstr ""
+msgstr "Xat"
 
 msgid ""
 "Check your email for a link to reset your password. Be sure to check your "
 "spam folder."
 msgstr ""
+"Consulteu el correu electrònic per l'enllaç de restabliment de contrasenya. "
+"Assegureu-vos de comprovar la carpeta de correu brossa."
 
 msgid "Connect"
-msgstr ""
+msgstr "Connecta"
 
 msgid "Connecting..."
-msgstr ""
+msgstr "Connectant..."
 
+#, fuzzy
 msgid "Contact:"
-msgstr ""
+msgstr "Contacte:"
 
 msgid "Create"
-msgstr ""
+msgstr "Crea"
 
 msgid "Create Match"
-msgstr ""
+msgstr "Crea la Partida"
 
 msgid ""
 "Create a match if you would like to play against someone else. Backgammon "
 "and several of its variants are supported."
 msgstr ""
+"Creeu una partida si voleu jugar contra algú altre. Backgammon i algunes de "
+"les seves variants són disponibles."
 
 msgid "Create match"
-msgstr ""
+msgstr "Crea partida"
 
 msgid "Create new match"
-msgstr ""
+msgstr "Crea una nova partida"
 
 msgid "Created by %s"
-msgstr ""
+msgstr "Creada per %s"
 
 msgid "Creating..."
-msgstr ""
+msgstr "Creant..."
 
 msgid "Current"
-msgstr ""
+msgstr "Actual"
 
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 msgid "Dim"
 msgstr ""
@@ -136,32 +148,32 @@ msgid "Dismiss"
 msgstr ""
 
 msgid "Donate:"
-msgstr ""
+msgstr "Donar:"
 
 msgid "Double"
-msgstr ""
+msgstr "Doble"
 
 msgid "Double click a checker to bear it off. Bear off all 15 checkers to win."
 msgstr ""
 
 msgid "Download replay"
-msgstr ""
+msgstr "Descarrega la repetició"
 
 msgid "Downloaded replay"
-msgstr ""
+msgstr "Repetició descarregada"
 
 msgid ""
 "Drag a checker off the board to bear it off. Bear off all 15 checkers to win."
 msgstr ""
 
 msgid "Email"
-msgstr ""
+msgstr "Correu electrònic"
 
 msgid "Exit Boxcars?"
-msgstr ""
+msgstr "Tancar Boxcars?"
 
 msgid "FAQ:"
-msgstr ""
+msgstr "PMF:"
 
 msgid "Failed to connect to %s"
 msgstr ""
@@ -182,7 +194,7 @@ msgid "Failed to move checker%s: %s"
 msgstr ""
 
 msgid "illegal move"
-msgstr ""
+msgstr "Moviment ilegal"
 
 msgid "Failed to roll"
 msgstr ""
@@ -191,130 +203,130 @@ msgid "Failed to submit moves: %s"
 msgstr ""
 
 msgid "Fast"
-msgstr ""
+msgstr "Ràpid"
 
 msgid "Flip board"
-msgstr ""
+msgstr "Gira el tauler"
 
 msgid "Flip opp. space numbers"
 msgstr ""
 
 msgid "Forced"
-msgstr ""
+msgstr "Forçat"
 
 msgid "Go"
-msgstr ""
+msgstr "Avança"
 
 msgid "Go to page:"
-msgstr ""
+msgstr "Anar a la pàgina:"
 
 msgid "Good Luck, Have Fun"
-msgstr ""
+msgstr "Bona Sort, Gaudeix"
 
 msgid "Highlight legal moves"
-msgstr ""
+msgstr "Ressalta els moviments ilegals"
 
 msgid "History"
-msgstr ""
+msgstr "Historial"
 
 msgid "Instant"
-msgstr ""
+msgstr "Instant"
 
 msgid "Join"
-msgstr ""
+msgstr "Unir-se"
 
 msgid "Join/Leave"
-msgstr ""
+msgstr "Unir-se/Abandonar"
 
 msgid "Join match"
-msgstr ""
+msgstr "Unir-se a la partida"
 
 msgid "Join match: %s"
 msgstr ""
 
 msgid "Joining..."
-msgstr ""
+msgstr "Unint-se..."
 
 msgid "Leave"
 msgstr ""
 
 msgid "Leave match?"
-msgstr ""
+msgstr "Abandonar la partida?"
 
 msgid "Left match"
-msgstr ""
+msgstr "Ha abandonat la partida"
 
 msgid "Legal moves: %s"
-msgstr ""
+msgstr "Moviments permesos: %s"
 
 msgid "Loading..."
-msgstr ""
+msgstr "Carregant..."
 
 msgid "Logged in as guest"
-msgstr ""
+msgstr "Identificat com a convidat"
 
 msgid "Long press back to exit the application."
 msgstr ""
 
 msgid "Match Name"
-msgstr ""
+msgstr "Nom de la Partida"
 
 msgid "Matches List"
-msgstr ""
+msgstr "Llista de partides"
 
 msgid "Medium"
-msgstr ""
+msgstr "Mitja"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menú"
 
 msgid "Move"
-msgstr ""
+msgstr "Moviment"
 
 msgid "Multi"
-msgstr ""
+msgstr "Multi"
 
 msgid "Mute Sounds"
-msgstr ""
+msgstr "Silencia els sons"
 
 msgid "Name"
-msgstr ""
+msgstr "Nom"
 
 msgid "New"
-msgstr ""
+msgstr "Nou"
 
 msgid "Next"
-msgstr ""
+msgstr "Següent"
 
 msgid "No"
-msgstr ""
+msgstr "No"
 
 msgid "No dice"
 msgstr ""
 
 msgid "No matches found."
-msgstr ""
+msgstr "No s'han trobat partides."
 
 msgid "No replays found."
-msgstr ""
+msgstr "No s'han trobat repeticions."
 
 msgid "None"
-msgstr ""
+msgstr "Cap"
 
 msgid "OK"
 msgstr ""
 
 msgid "Opponent"
-msgstr ""
+msgstr "Oponent"
 
 msgid "Password"
-msgstr ""
+msgstr "Contrasenya"
 
 msgid "Play Offline"
-msgstr ""
+msgstr "Jugar desconnectat"
 
 msgid "Play backgammon online via bgammon.org"
-msgstr ""
+msgstr "Juga a backgammon en línia amb bgammon.org"
 
 msgid "Player dice"
 msgstr ""
@@ -487,27 +499,31 @@ msgstr[1] ""
 
 msgid "%d match"
 msgid_plural "%d matches"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d partida"
+msgstr[1] "%d partides"
 
 msgid "Write error"
-msgstr ""
+msgstr "Error d'escriptura"
 
 msgid "Yes"
-msgstr ""
+msgstr "Sí"
 
 msgid ""
 "You have the black checkers. You can move a checker by either clicking it or "
 "dragging it."
 msgstr ""
+"Tens les fitxes negres. Pots moure una fitxa tant clicant-la com arrossegant-"
+"la."
 
 msgid ""
 "You have the black checkers. You can move a checker by tapping or dragging "
 "the touchscreen."
 msgstr ""
+"Tens les fitxes negres. Pots moure una fitxa prement a sobre o bé "
+"arrossegant sobre la pantalla tàctil."
 
 msgid "You may need to upgrade your client."
-msgstr ""
+msgstr "S'hauria d'actualitzar la teva aplicació client."
 
 msgid "from %s to %s"
 msgstr ""
