@@ -2611,6 +2611,9 @@ func (b *board) playerTurn() bool {
 }
 
 func (b *board) startDrag(s *Sprite, space int8, click bool) {
+	if b.gameState.Roll1 == 0 || b.gameState.Roll2 == 0 {
+		return
+	}
 	b.dragging = s
 
 	if space >= 0 && space < bgammon.BoardSpaces {
