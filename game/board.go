@@ -2916,6 +2916,8 @@ func diceAlphaValues(rolls []int8, d1 int8, d2 int8, d3 int8, alpha float32, dim
 		} else {
 			dieNum = 2
 		}
+	} else if d1 == d3 {
+		dieNum = 2
 	}
 	if dimDie(rolls, dieNum, d1) {
 		d1a = diceFadeTurnAlpha
